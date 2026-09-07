@@ -1,0 +1,111 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --color-sidebar: var(--sidebar-background, var(--background));
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-accent: var(--pressed);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--focus);
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-heading: 'IBM Plex Sans', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--on-primary);
+  --color-secondary: var(--wash);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--wash);
+  --color-muted-foreground: var(--muted-ink);
+  --color-accent: var(--hover);
+  --color-accent-foreground: var(--foreground);
+  --color-card: var(--background);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--background);
+  --color-popover-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input-border);
+  --color-ring: var(--focus);
+  --color-secondary-ink: var(--secondary-ink);
+  --color-pressed: var(--pressed);
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+  --color-success: var(--success);
+  --color-destructive: #b42318;
+  --color-destructive-foreground: var(--danger);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+}
+
+:root {
+  color-scheme: light;
+  --background: #fff;
+  --foreground: #171717;
+  --primary: #202020;
+  --on-primary: #fff;
+  --secondary-ink: rgb(0 0 0 / 68%);
+  --muted-ink: rgb(0 0 0 / 60%);
+  --border: rgb(0 0 0 / 10%);
+  --input-border: rgb(0 0 0 / 24%);
+  --wash: rgb(0 0 0 / 3%);
+  --hover: rgb(0 0 0 / 5%);
+  --pressed: rgb(0 0 0 / 9%);
+  --focus: #525252;
+  --chart-ink: #333;
+  --danger: #b42318;
+  --danger-wash: #fff4f2;
+  --success: #176b3a;
+  --radius: 6px;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #121212;
+  --foreground: #ededed;
+  --primary: #ededed;
+  --on-primary: #171717;
+  --secondary-ink: rgb(255 255 255 / 68%);
+  --muted-ink: rgb(255 255 255 / 60%);
+  --border: rgb(255 255 255 / 12%);
+  --input-border: rgb(255 255 255 / 28%);
+  --wash: rgb(255 255 255 / 5%);
+  --hover: rgb(255 255 255 / 9%);
+  --pressed: rgb(255 255 255 / 14%);
+  --focus: #bdbdbd;
+  --chart-ink: #dedede;
+  --danger: #ff9e95;
+  --danger-wash: #2c1917;
+  --success: #87d9a8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    color-scheme: dark;
+    --background: #121212;
+    --foreground: #ededed;
+    --primary: #ededed;
+    --on-primary: #171717;
+    --secondary-ink: rgb(255 255 255 / 68%);
+    --muted-ink: rgb(255 255 255 / 60%);
+    --border: rgb(255 255 255 / 12%);
+    --input-border: rgb(255 255 255 / 28%);
+    --wash: rgb(255 255 255 / 5%);
+    --hover: rgb(255 255 255 / 9%);
+    --pressed: rgb(255 255 255 / 14%);
+    --focus: #bdbdbd;
+    --chart-ink: #dedede;
+    --danger: #ff9e95;
+    --danger-wash: #2c1917;
+    --success: #87d9a8;
+  }
+}
+
+.dashboard-workspace {
+  --sidebar-background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+}

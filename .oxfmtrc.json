@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "worker-configuration.d.ts",
+    "drizzle/meta/**",
+    "artifacts/**",
+    "output/**",
+    ".codex/**"
+  ]
+}

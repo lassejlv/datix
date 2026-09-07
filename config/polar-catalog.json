@@ -1,0 +1,935 @@
+{
+  "organization": {
+    "id": "4f109880-3be1-48f8-a8b2-bea2f101634f",
+    "slug": "analyticsbeer"
+  },
+  "verifiedAt": "2026-09-07T11:25:12.571Z",
+  "usageEvent": {
+    "name": "analytics.events.v1",
+    "quantityProperty": "event_count",
+    "categoryProperty": "event_type",
+    "customerIdentity": "external_customer_id: authenticated Analytics Beer account owner ID"
+  },
+  "meters": [
+    {
+      "metadata": {
+        "app": "analytics_beer",
+        "role": "usage_breakdown",
+        "event_type": "event",
+        "catalog_version": 1
+      },
+      "created_at": "2026-09-07T09:44:16.815686Z",
+      "modified_at": "2026-09-07T09:44:16.824711Z",
+      "id": "5e3df607-eb56-4879-b9da-ec743cec84a6",
+      "name": "Activity events",
+      "unit": "custom",
+      "custom_label": "events",
+      "custom_multiplier": 1,
+      "filter": {
+        "conjunction": "and",
+        "clauses": [
+          {
+            "property": "name",
+            "operator": "eq",
+            "value": "analytics.events.v1"
+          },
+          {
+            "property": "event_type",
+            "operator": "eq",
+            "value": "event"
+          }
+        ]
+      },
+      "aggregation": {
+        "func": "sum",
+        "property": "event_count"
+      },
+      "organization_id": "4f109880-3be1-48f8-a8b2-bea2f101634f",
+      "archived_at": null
+    },
+    {
+      "metadata": {
+        "app": "analytics_beer",
+        "role": "plan_usage",
+        "event_name": "analytics.events.v1",
+        "catalog_version": 1,
+        "quantity_property": "event_count"
+      },
+      "created_at": "2026-09-07T09:42:18.082715Z",
+      "modified_at": "2026-09-07T09:42:18.152626Z",
+      "id": "756728a3-3cc5-4552-85c5-34d0b577f1d9",
+      "name": "Events",
+      "unit": "custom",
+      "custom_label": "events",
+      "custom_multiplier": 1,
+      "filter": {
+        "conjunction": "and",
+        "clauses": [
+          {
+            "property": "name",
+            "operator": "eq",
+            "value": "analytics.events.v1"
+          }
+        ]
+      },
+      "aggregation": {
+        "func": "sum",
+        "property": "event_count"
+      },
+      "organization_id": "4f109880-3be1-48f8-a8b2-bea2f101634f",
+      "archived_at": null
+    },
+    {
+      "metadata": {
+        "app": "analytics_beer",
+        "role": "usage_breakdown",
+        "event_type": "pageview",
+        "catalog_version": 1
+      },
+      "created_at": "2026-09-07T09:44:10.594574Z",
+      "modified_at": "2026-09-07T09:44:10.604296Z",
+      "id": "da5aa8cb-75ae-4f28-bd10-661a027988d8",
+      "name": "Pageviews",
+      "unit": "custom",
+      "custom_label": "events",
+      "custom_multiplier": 1,
+      "filter": {
+        "conjunction": "and",
+        "clauses": [
+          {
+            "property": "name",
+            "operator": "eq",
+            "value": "analytics.events.v1"
+          },
+          {
+            "property": "event_type",
+            "operator": "eq",
+            "value": "pageview"
+          }
+        ]
+      },
+      "aggregation": {
+        "func": "sum",
+        "property": "event_count"
+      },
+      "organization_id": "4f109880-3be1-48f8-a8b2-bea2f101634f",
+      "archived_at": null
+    }
+  ],
+  "products": [
+    {
+      "id": "cb2ad4c0-aa8f-47df-815f-aff8796f95cc",
+      "name": "Enterprise \u2014 Contact sales",
+      "visibility": "draft",
+      "is_archived": true,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "enterprise",
+        "quote_required": true,
+        "catalog_version": 1,
+        "events_meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9",
+        "overage_billing": false,
+        "price_configured": false,
+        "activation_blocked": "agreed_quote_required",
+        "min_monthly_events": 5000001
+      },
+      "prices": [
+        {
+          "id": "9ac2f644-62e0-4bb9-8915-209a2745cfb4",
+          "amount_type": "fixed",
+          "price_amount": 0,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": []
+    },
+    {
+      "id": "ca7515c2-5034-41bb-b584-f90e69fb5638",
+      "name": "Pro 5M \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 5000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 149,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "ec54f460-492c-4da8-8831-08ea4ee4dfb0",
+          "amount_type": "fixed",
+          "price_amount": 149000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d86b8be1-e956-400f-b7d2-8bae15d586e5",
+          "type": "meter_credit",
+          "description": "5,000,000 monthly events",
+          "properties": {
+            "units": 5000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "a2078d6e-3e31-4d03-ac3e-bfb1ca04ca1c",
+      "name": "Pro 2M \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 2000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 79,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "7165fdd7-35b3-4a89-8ead-7b3d7b3c91ff",
+          "amount_type": "fixed",
+          "price_amount": 79000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "aadc5a0c-cb75-4547-baf7-7c883e13a7ad",
+          "type": "meter_credit",
+          "description": "2,000,000 monthly events",
+          "properties": {
+            "units": 2000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "788464d8-a962-40ff-874d-129cdd700b20",
+      "name": "Pro 1M \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 1000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 49,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "8c804cbc-b8f2-4129-adc6-5a3db5751cda",
+          "amount_type": "fixed",
+          "price_amount": 49000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "835f95b0-46a6-4974-ace5-e7e41244a88a",
+          "type": "meter_credit",
+          "description": "1,000,000 monthly events",
+          "properties": {
+            "units": 1000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "0c70c813-eeba-4670-9e55-fb487eca913f",
+      "name": "Pro 500k \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 500000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 29,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "b22374dd-fb21-4d11-a1d0-57b9fed391a9",
+          "amount_type": "fixed",
+          "price_amount": 29000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "f6f9aac7-0fcf-4799-a3fd-3b4470f5d1e7",
+          "type": "meter_credit",
+          "description": "500,000 monthly events",
+          "properties": {
+            "units": 500000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "adb36a7c-c8c3-4bdb-bcf7-43b340a07307",
+      "name": "Pro 250k \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 250000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 19,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "526ed9b2-8677-412f-b969-2149292d34a0",
+          "amount_type": "fixed",
+          "price_amount": 19000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d0dbdb5b-52da-4b8b-918b-030c8fc44a7a",
+          "type": "meter_credit",
+          "description": "250,000 monthly events",
+          "properties": {
+            "units": 250000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "e8ad12fd-087c-4696-bb3c-93b195330915",
+      "name": "Pro 100k \u2014 Yearly",
+      "visibility": "draft",
+      "is_archived": false,
+      "recurring_interval": "year",
+      "meter_interval": null,
+      "trial_interval": "day",
+      "trial_interval_count": 14,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 100000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "year",
+        "monthly_price_usd": 9,
+        "activation_blocked": "enable_monthly_meter_cycle",
+        "meter_cycle_pending": true,
+        "intended_meter_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "4057bf79-ab54-4ef9-b126-d917a935ecba",
+          "amount_type": "fixed",
+          "price_amount": 9000,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d0ebe7a7-6617-4168-aa58-26014b281699",
+          "type": "meter_credit",
+          "description": "100,000 monthly events",
+          "properties": {
+            "units": 100000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "5eba1fae-fe73-409f-97dd-e9780b07030a",
+      "name": "Pro 5M \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 5000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 149
+      },
+      "prices": [
+        {
+          "id": "053c52b7-3a69-40b3-95ce-5fefd00b1c42",
+          "amount_type": "fixed",
+          "price_amount": 14900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d86b8be1-e956-400f-b7d2-8bae15d586e5",
+          "type": "meter_credit",
+          "description": "5,000,000 monthly events",
+          "properties": {
+            "units": 5000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1a9bf34f-0b2f-4cbd-8f89-048f3048d04c",
+      "name": "Pro 2M \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 2000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 79
+      },
+      "prices": [
+        {
+          "id": "87b5f23b-0ae0-45b7-8c0b-29b2877fa839",
+          "amount_type": "fixed",
+          "price_amount": 7900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "aadc5a0c-cb75-4547-baf7-7c883e13a7ad",
+          "type": "meter_credit",
+          "description": "2,000,000 monthly events",
+          "properties": {
+            "units": 2000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "e78a708a-dbb4-4fc0-a05d-102ac539a1e7",
+      "name": "Pro 1M \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 1000000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 49
+      },
+      "prices": [
+        {
+          "id": "33eea23d-52d4-4bbb-b6a3-181aaaccd57c",
+          "amount_type": "fixed",
+          "price_amount": 4900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "835f95b0-46a6-4974-ace5-e7e41244a88a",
+          "type": "meter_credit",
+          "description": "1,000,000 monthly events",
+          "properties": {
+            "units": 1000000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1a26fd5d-40ad-4b4e-8e63-fe9ec539c4c0",
+      "name": "Pro 500k \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 500000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 29
+      },
+      "prices": [
+        {
+          "id": "a3793055-d85f-4bb9-abc1-be9d30c11089",
+          "amount_type": "fixed",
+          "price_amount": 2900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "f6f9aac7-0fcf-4799-a3fd-3b4470f5d1e7",
+          "type": "meter_credit",
+          "description": "500,000 monthly events",
+          "properties": {
+            "units": 500000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "6821b12a-ddc7-449c-8348-8d80d1b24c23",
+      "name": "Pro 250k \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 250000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 19
+      },
+      "prices": [
+        {
+          "id": "520518c8-95d9-4248-b266-6bc508f6193b",
+          "amount_type": "fixed",
+          "price_amount": 1900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d0dbdb5b-52da-4b8b-918b-030c8fc44a7a",
+          "type": "meter_credit",
+          "description": "250,000 monthly events",
+          "properties": {
+            "units": 250000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "a0de3cc9-ea92-4e95-b23e-b8d9240685aa",
+      "name": "Pro 100k \u2014 Monthly",
+      "visibility": "public",
+      "is_archived": false,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": "day",
+      "trial_interval_count": 14,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "pro",
+        "websites": 10,
+        "trial_days": 14,
+        "monthly_events": 100000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month",
+        "monthly_price_usd": 9
+      },
+      "prices": [
+        {
+          "id": "2377ab38-a6ea-4a82-9d29-67ab8265930f",
+          "amount_type": "fixed",
+          "price_amount": 900,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "d0ebe7a7-6617-4168-aa58-26014b281699",
+          "type": "meter_credit",
+          "description": "100,000 monthly events",
+          "properties": {
+            "units": 100000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "e7ce9d75-14d5-4279-97ae-435a0ae4daa4",
+          "type": "custom",
+          "description": "10 websites",
+          "properties": {
+            "note": "Up to 10 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    },
+    {
+      "id": "cc71df7e-5ecf-41e6-973d-04f89d404b87",
+      "name": "Free",
+      "visibility": "private",
+      "is_archived": true,
+      "recurring_interval": "month",
+      "meter_interval": null,
+      "trial_interval": null,
+      "trial_interval_count": null,
+      "metadata": {
+        "app": "analytics_beer",
+        "plan": "free",
+        "websites": 3,
+        "monthly_events": 10000,
+        "catalog_version": 1,
+        "overage_billing": false,
+        "billing_interval": "month"
+      },
+      "prices": [
+        {
+          "id": "3c1dca85-e538-4a39-a713-9494ba899dd2",
+          "amount_type": "fixed",
+          "price_amount": 0,
+          "price_currency": "usd"
+        }
+      ],
+      "benefits": [
+        {
+          "id": "866aaabe-09c5-4c00-92ed-4e6cdef916fc",
+          "type": "meter_credit",
+          "description": "10,000 monthly events",
+          "properties": {
+            "units": 10000,
+            "rollover": false,
+            "meter_id": "756728a3-3cc5-4552-85c5-34d0b577f1d9"
+          }
+        },
+        {
+          "id": "bdb723d9-487c-4971-9ce6-ccb6c3452acc",
+          "type": "custom",
+          "description": "3 websites",
+          "properties": {
+            "note": "Up to 3 websites, with separate environments."
+          }
+        },
+        {
+          "id": "fcd27f58-cd4d-48ea-bc22-661318b53c4d",
+          "type": "custom",
+          "description": "All reports, events and environments",
+          "properties": {
+            "note": "Includes all analytics reports, visitor journeys, custom events and environments."
+          }
+        }
+      ]
+    }
+  ],
+  "activation": {
+    "checkoutPayments": true,
+    "annualMeterCycling": false,
+    "appEventDelivery": false,
+    "webhookReceiver": true,
+    "limitEnforcement": true
+  },
+  "salesContact": "mailto:hello@analytics.beer",
+  "webhook": {
+    "id": "a4cbb9b8-0ab9-4f78-8bbe-a44e07804d2f",
+    "url": "https://analytics.beer/api/webhooks/polar",
+    "events": [
+      "customer.state_changed",
+      "customer.deleted"
+    ],
+    "apiVersion": "2026-04",
+    "enabled": true,
+    "signingSecretBinding": "POLAR_WEBHOOK_SECRET"
+  },
+  "collectionPolicy": {
+    "requiresActivePro": true,
+    "previewAllowance": false,
+    "websiteLimit": 10,
+    "quotaScope": "Account across every website and environment",
+    "counts": "Deduplicated pageviews and tracked actions; engagement heartbeats excluded",
+    "atLimit": "Pause collection until renewal or upgrade"
+  }
+}

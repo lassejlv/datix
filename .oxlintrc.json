@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "worker-configuration.d.ts",
+    "drizzle/meta/**",
+    "artifacts/**",
+    "output/**",
+    ".codex/**"
+  ]
+}

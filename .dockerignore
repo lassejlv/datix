@@ -1,0 +1,14 @@
+*
+!package.json
+!bun.lock
+!vite.config.ts
+!tsconfig.json
+!src
+!src/**
+!config
+!config/**
+!public
+!public/**
+!scripts
+!scripts/build-tracker.ts
+!Dockerfile
