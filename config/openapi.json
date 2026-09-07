@@ -2888,6 +2888,15 @@
             "maximum": 100000,
             "default": 0
           }
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "description": "Opaque nextCursor from the preceding page. Bound to the environment, date range, visitor and session filters. Do not combine with offset.",
+          "schema": {
+            "type": "string",
+            "maxLength": 2048
+          }
         }
       ],
       "get": {
@@ -2900,7 +2909,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Detailed session data is limited to 30 days. Lists 50 sessions per page with summary session/visitor/click counts and average active seconds, or 200 activities for a session key. hasMore and nextOffset provide pagination. Heartbeats contribute active time but are omitted from event counts and timelines.",
+        "description": "Detailed session data is limited to 30 days. Lists 50 sessions per page with summary session/visitor/click counts and average active seconds, or 200 activities for a session key. Use hasMore and nextCursor for stable keyset pagination; nextOffset remains available for older clients. Report responses may be cached for up to five seconds. Heartbeats contribute active time but are omitted from event counts and timelines.",
         "responses": {
           "200": {
             "description": "Success",
@@ -2943,6 +2952,12 @@
                     },
                     "nextOffset": {
                       "type": "integer"
+                    },
+                    "nextCursor": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   }
                 }

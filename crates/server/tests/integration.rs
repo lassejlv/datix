@@ -71,6 +71,11 @@ impl Fixture {
             port: 3057,
             static_dir: concat!(env!("CARGO_MANIFEST_DIR"), "/../../web/dist/client").into(),
             event_stream: format!("analytics:test:{user}"),
+            runtime: analytics_core::config::Runtime {
+                report_cache_seconds: 0,
+                ..Default::default()
+            },
+            metrics_token: Some("test-metrics-token".into()),
         };
         let state = State::connect(config, &url, &redis).await.unwrap();
         sqlx::query("INSERT INTO \"user\"(id,name,email,email_verified,created_at,updated_at) VALUES($1,'Rust fixture',$2,false,now(),now())").bind(&user).bind(&email).execute(&state.db).await.unwrap();
@@ -235,6 +240,9 @@ impl Fixture {
     }
 }
 macro_rules! fixture {($name:ident,$body:block)=>{{let $name=Fixture::new().await;let outcome=AssertUnwindSafe(async $body).catch_unwind().await;$name.cleanup().await;if let Err(error)=outcome{std::panic::resume_unwind(error)}}}}
+
+#[path = "scaling/mod.rs"]
+mod scaling;
 
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]

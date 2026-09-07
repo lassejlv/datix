@@ -173,12 +173,6 @@ pub fn detect(
     }
     (source, traffic, reason)
 }
-#[derive(sqlx::FromRow)]
-struct Environment {
-    baseline: Value,
-    learned_at: DateTime<Utc>,
-    traffic: Value,
-}
 pub async fn guard(
     state: &State,
     environment: Uuid,
@@ -187,54 +181,22 @@ pub async fn guard(
     pageview: bool,
     now: DateTime<Utc>,
 ) -> Result<Option<&'static str>> {
-    let mut cached = sqlx::query_as::<_, Environment>(
-        "SELECT baseline,learned_at,traffic FROM abuse_environment WHERE environment_id=$1",
-    )
-    .bind(environment)
-    .fetch_optional(&state.db)
-    .await?;
-    if cached
-        .as_ref()
-        .is_none_or(|s| now - s.learned_at >= Duration::hours(1))
-    {
-        let days=sqlx::query_as::<_,Day>("SELECT pageviews,custom_events,visitors,coalesce((SELECT sum(blocked) FROM abuse_daily WHERE environment_id=$1 AND day=daily_stats.day),0)::bigint AS blocked FROM daily_stats WHERE site_id=$1 AND dimension='total' AND value='' AND day >= $2 AND day < $3")
-  .bind(environment).bind((now-Duration::days(14)).date_naive()).bind(now.date_naive()).fetch_all(&state.db).await?;
-        let baseline = json!(learn(&days));
-        cached=Some(sqlx::query_as::<_,Environment>("INSERT INTO abuse_environment(environment_id,baseline,learned_at,traffic) VALUES($1,$2,$3,'{\"start\":0,\"events\":0,\"custom\":0}'::jsonb) ON CONFLICT(environment_id) DO UPDATE SET baseline=excluded.baseline,learned_at=excluded.learned_at RETURNING baseline,learned_at,traffic").bind(environment).bind(baseline).bind(now).fetch_one(&state.db).await?);
+    let mut conn = state.acquire().await?;
+    let reason: Option<String> = sqlx::query_scalar("SELECT analytics_guard($1,$2,$3,$4,$5)")
+        .bind(environment)
+        .bind(source)
+        .bind(signature)
+        .bind(pageview)
+        .bind(now)
+        .fetch_one(&mut *conn)
+        .await?;
+    match reason.as_deref() {
+        None => Ok(None),
+        Some("source_limit") => Ok(Some("source_limit")),
+        Some("repeated_activity") => Ok(Some("repeated_activity")),
+        Some("unusual_activity") => Ok(Some("unusual_activity")),
+        _ => Err(analytics_core::Error::unavailable()),
     }
-    let cached = cached.expect("loaded baseline");
-    let baseline = serde_json::from_value(cached.baseline)
-        .map_err(|_| analytics_core::Error::unavailable())?;
-    let traffic =
-        serde_json::from_value(cached.traffic).map_err(|_| analytics_core::Error::unavailable())?;
-    let mut tx = state.db.begin().await?;
-    let previous:Value=sqlx::query_scalar("INSERT INTO abuse_sources(environment_id,source,activity,updated_at) VALUES($1,$2,$3,$4) ON CONFLICT(environment_id,source) DO UPDATE SET updated_at=abuse_sources.updated_at RETURNING activity").bind(environment).bind(source).bind(json!(Source::default())).bind(now).fetch_one(&mut *tx).await?;
-    let previous =
-        serde_json::from_value(previous).map_err(|_| analytics_core::Error::unavailable())?;
-    let (activity, _, reason) = detect(
-        now.timestamp_millis(),
-        pageview,
-        signature,
-        &previous,
-        &traffic,
-        &baseline,
-    );
-    sqlx::query(
-        "UPDATE abuse_sources SET activity=$1,updated_at=$2 WHERE environment_id=$3 AND source=$4",
-    )
-    .bind(json!(activity))
-    .bind(now)
-    .bind(environment)
-    .bind(source)
-    .execute(&mut *tx)
-    .await?;
-    if let Some(reason) = reason {
-        sqlx::query("INSERT INTO abuse_daily(environment_id,day,reason,blocked,last_blocked_at) VALUES($1,$2,$3,1,$4) ON CONFLICT(environment_id,day,reason) DO UPDATE SET blocked=abuse_daily.blocked+1,last_blocked_at=excluded.last_blocked_at").bind(environment).bind(now.date_naive()).bind(reason).bind(now).execute(&mut *tx).await?;
-    }
-    sqlx::query("UPDATE abuse_environment SET traffic=jsonb_build_object('start',greatest((traffic->>'start')::bigint,$2),'events',CASE WHEN (traffic->>'start')::bigint=$2 THEN (traffic->>'events')::bigint+1 WHEN (traffic->>'start')::bigint>$2 THEN (traffic->>'events')::bigint ELSE 1 END,'custom',CASE WHEN (traffic->>'start')::bigint=$2 THEN (traffic->>'custom')::bigint+$3 WHEN (traffic->>'start')::bigint>$2 THEN (traffic->>'custom')::bigint ELSE $3 END) WHERE environment_id=$1")
- .bind(environment).bind(now.timestamp_millis()/300000).bind((!pageview) as i64).execute(&mut *tx).await?;
-    tx.commit().await?;
-    Ok(reason)
 }
 pub async fn summary(state: &State, owner: &str) -> Result<Value> {
     let since = (Utc::now() - Duration::days(29)).date_naive();

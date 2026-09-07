@@ -9,13 +9,16 @@ pub fn stream(state: &State) -> &str {
 pub async fn enqueue(state: &State, event: &Event) -> Result<()> {
     let data = serde_json::to_string(event).expect("event serialization");
     let mut conn = state.redis.clone();
-    let _: String = redis::cmd("XADD")
-        .arg(stream(state))
-        .arg("*")
-        .arg("data")
-        .arg(data)
-        .query_async(&mut conn)
-        .await?;
+    let accepted: i64 = redis::Script::new("if redis.call('XLEN',KEYS[1]) >= tonumber(ARGV[1]) then return 0 end; redis.call('XADD',KEYS[1],'*','data',ARGV[2]); return 1")
+        .key(stream(state)).arg(state.config.runtime.queue_max_pending).arg(data)
+        .invoke_async(&mut conn).await?;
+    if accepted == 0 {
+        return Err(analytics_core::Error::unavailable());
+    }
+    state
+        .metrics
+        .collect_accepted
+        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     Ok(())
 }
 pub async fn initialize(state: &State) -> Result<()> {

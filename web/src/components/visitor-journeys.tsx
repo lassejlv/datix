@@ -10,7 +10,6 @@ import {
   Download,
   ExternalLink,
   FileText,
-  Globe2,
   Monitor,
   MousePointer2,
   RefreshCw,
@@ -160,7 +159,7 @@ function VisitExplorer({
     const signal = requests.current?.signal;
     try {
       const next = await apiClient<VisitReport>(
-        `/sites/${siteId}/sessions?${query}&offset=${report.nextOffset}`,
+        `/sites/${siteId}/sessions?${query}&${report.nextCursor ? `cursor=${encodeURIComponent(report.nextCursor)}` : `offset=${report.nextOffset}`}`,
         { signal },
       );
       if (!signal?.aborted)
@@ -344,6 +343,7 @@ function JourneyTimeline({
   const [events, setEvents] = useState<Activity[]>([]),
     [hasMore, setHasMore] = useState(false),
     [offset, setOffset] = useState(0),
+    [cursor, setCursor] = useState<string | null>(null),
     [busy, setBusy] = useState(true),
     [error, setError] = useState(''),
     [retry, setRetry] = useState(0);
@@ -358,14 +358,17 @@ function JourneyTimeline({
     controller.current = request;
     setBusy(true);
     setError('');
-    apiClient<{ events: Activity[]; hasMore: boolean; nextOffset: number }>(
-      `/sites/${siteId}/sessions?${query}&session=${visit.id}`,
-      { signal: request.signal },
-    )
+    apiClient<{
+      events: Activity[];
+      hasMore: boolean;
+      nextOffset: number;
+      nextCursor?: string | null;
+    }>(`/sites/${siteId}/sessions?${query}&session=${visit.id}`, { signal: request.signal })
       .then((result) => {
         setEvents(result.events);
         setHasMore(result.hasMore);
         setOffset(result.nextOffset);
+        setCursor(result.nextCursor ?? null);
       })
       .catch((e) => {
         if (!request.signal.aborted) setError(errorText(e));
@@ -384,11 +387,16 @@ function JourneyTimeline({
         events: Activity[];
         hasMore: boolean;
         nextOffset: number;
-      }>(`/sites/${siteId}/sessions?${query}&session=${visit.id}&offset=${offset}`, { signal });
+        nextCursor?: string | null;
+      }>(
+        `/sites/${siteId}/sessions?${query}&session=${visit.id}&${cursor ? `cursor=${encodeURIComponent(cursor)}` : `offset=${offset}`}`,
+        { signal },
+      );
       if (!signal?.aborted) {
         setEvents((current) => [...current, ...result.events]);
         setHasMore(result.hasMore);
         setOffset(result.nextOffset);
+        setCursor(result.nextCursor ?? null);
       }
     } catch (e) {
       if (!signal?.aborted) setError(errorText(e));

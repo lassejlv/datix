@@ -38,22 +38,15 @@ struct Input {
     session: Option<SessionContext>,
     activity: Option<Anonymous>,
 }
-#[derive(sqlx::FromRow)]
-struct Site {
-    tracking_mode: String,
-    tracking_settings: Value,
-    domain: String,
-    enabled: bool,
-    allow_localhost: bool,
-    owner_id: String,
-}
 fn header<'a>(headers: &'a HeaderMap, key: &str) -> &'a str {
     headers.get(key).and_then(|v| v.to_str().ok()).unwrap_or("")
 }
 pub fn is_bot(ua: &str) -> bool {
-    regex::Regex::new(r"(?i)bot\b|crawler|spider|headless|lighthouse|pagespeed|pingdom")
-        .unwrap()
-        .is_match(ua)
+    static BOT: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+        regex::Regex::new(r"(?i)bot\b|crawler|spider|headless|lighthouse|pagespeed|pingdom")
+            .unwrap()
+    });
+    BOT.is_match(ua)
 }
 pub fn device(ua: &str) -> &'static str {
     let ua = ua.to_lowercase();
@@ -157,11 +150,9 @@ pub async fn collect(
     if input.event_type == "pageview" && body.get("name").is_some() {
         return Err(Error::invalid("A pageview has no event name."));
     }
-    if input.event_type == "event"
-        && !regex::Regex::new(r"^[a-zA-Z][a-zA-Z0-9_.-]{0,63}$")
-            .unwrap()
-            .is_match(input.name.as_deref().unwrap_or(""))
-    {
+    static EVENT_NAME: std::sync::LazyLock<regex::Regex> =
+        std::sync::LazyLock::new(|| regex::Regex::new(r"^[a-zA-Z][a-zA-Z0-9_.-]{0,63}$").unwrap());
+    if input.event_type == "event" && !EVENT_NAME.is_match(input.name.as_deref().unwrap_or("")) {
         return Err(Error::invalid("Invalid event name."));
     }
     if let Some(s) = &input.session {
@@ -206,19 +197,14 @@ pub async fn collect(
             120,
         )
         .await?;
-    let site=sqlx::query_as::<_,Site>("SELECT e.tracking_mode,e.tracking_settings,e.domain,e.enabled,e.allow_localhost,s.owner_id FROM environments e JOIN sites s ON s.id=e.site_id WHERE e.id=$1 AND e.site_id=$2").bind(environment).bind(input.site_id).fetch_optional(&state.db).await?.filter(|s|s.enabled).ok_or_else(||Error::new(404,"site_not_found","Website is unavailable."))?;
+    let site = billing::admission::load(state, input.site_id, environment).await?;
     let url = page_url(
         &input.url,
         &site.domain,
         header(headers, "origin"),
         site.allow_localhost,
     )?;
-    let usage = billing::account_usage(state, &site.owner_id).await?;
-    let pause = usage["websites"]
-        .as_array()
-        .and_then(|sites| sites.iter().find(|s| s["id"] == input.site_id.to_string()))
-        .and_then(|s| s["pauseReason"].as_str());
-    if let Some(reason) = pause {
+    if let Some(reason) = site.pause_reason(input.site_id, now)? {
         return Ok(json!({"accepted":false,"reason":reason}));
     }
     if (site.tracking_mode != "cookieless") != input.session.is_some()

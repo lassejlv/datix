@@ -108,6 +108,7 @@ pub async fn perimeter(
     mut request: Request,
     next: Next,
 ) -> Response {
+    let started = std::time::Instant::now();
     let path = request.uri().path().to_string();
     let api = path == "/api" || path.starts_with("/api/");
     let request_id = Uuid::new_v4().to_string();
@@ -192,5 +193,15 @@ pub async fn perimeter(
         "x-content-type-options",
         HeaderValue::from_static("nosniff"),
     );
+    if api {
+        state.metrics.http[analytics_core::metrics::Metrics::http_group(&path)]
+            .observe(started.elapsed().as_secs_f64());
+        if response.status().is_server_error() {
+            state
+                .metrics
+                .http_errors
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        }
+    }
     response
 }

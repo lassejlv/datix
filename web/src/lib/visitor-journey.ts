@@ -37,6 +37,7 @@ export type VisitReport = {
   sessions: Visit[];
   hasMore: boolean;
   nextOffset: number;
+  nextCursor?: string | null;
 };
 const animals = ['Robin', 'Rabbit', 'Cat', 'Fish', 'Squirrel', 'Turtle'] as const;
 const moods = ['Curious', 'Sunny', 'Gentle', 'Bright', 'Cosy', 'Little'] as const;

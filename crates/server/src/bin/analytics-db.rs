@@ -3,8 +3,8 @@ use analytics_core::{config::connect_database, database};
 async fn main() {
     dotenvy::dotenv().ok();
     let command = std::env::args().nth(1).unwrap_or_else(|| "check".into());
-    if !["check", "init-empty"].contains(&command.as_str()) {
-        eprintln!("Usage: analytics-db [check|init-empty]");
+    if !["check", "init-empty", "upgrade"].contains(&command.as_str()) {
+        eprintln!("Usage: analytics-db [check|init-empty|upgrade]");
         std::process::exit(2)
     }
     let result = async {
@@ -16,6 +16,9 @@ async fn main() {
             database::initialize_empty(&db)
                 .await
                 .map_err(|e| e.message)?;
+        }
+        if command == "upgrade" {
+            database::upgrade(&db).await.map_err(|e| e.message)?;
         }
         let report = database::check(&db).await.map_err(|e| e.message)?;
         println!("{report}");

@@ -35,7 +35,16 @@ async fn run() -> Result<(), String> {
     let listener = tokio::net::TcpListener::bind(("0.0.0.0", port))
         .await
         .map_err(|_| "Failed to bind HTTP listener")?;
-    tracing::info!(port, runtime = "rust", framework = "axum", "server started");
+    tracing::info!(
+        port,
+        runtime = "rust",
+        framework = "axum",
+        role = state.config.runtime.role.name(),
+        db_max_connections = state.config.runtime.db_connections,
+        event_workers = state.config.runtime.event_workers,
+        event_batch_size = state.config.runtime.event_batch_size,
+        "server started"
+    );
     let ready = jobs.ready.clone();
     let result = axum::serve(
         listener,

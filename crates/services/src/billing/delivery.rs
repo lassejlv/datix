@@ -5,7 +5,7 @@ use serde_json::json;
 use uuid::Uuid;
 pub async fn deliver(state: &State) -> Result<usize> {
     let lease = Uuid::new_v4();
-    let mut tx = state.db.begin().await?;
+    let mut tx = state.begin().await?;
     let rows=sqlx::query_as::<_,BillingOutbox>("SELECT id,owner_id,event_type,event_count::text,occurred_at,available_at,attempts,lease_id FROM billing_outbox WHERE available_at<=now() ORDER BY available_at LIMIT 100 FOR UPDATE SKIP LOCKED").fetch_all(&mut *tx).await?;
     if rows.is_empty() {
         return Ok(0);
@@ -35,6 +35,10 @@ pub async fn deliver(state: &State) -> Result<usize> {
             .bind(&ids)
             .execute(&state.db)
             .await?;
+        state
+            .metrics
+            .billing_delivered
+            .fetch_add(rows.len() as u64, std::sync::atomic::Ordering::Relaxed);
         return Ok(rows.len());
     }
     for row in rows {
@@ -50,13 +54,18 @@ pub async fn deliver(state: &State) -> Result<usize> {
     }
     Err(Error::unavailable())
 }
-pub async fn flush(state: &State) -> Result<()> {
+pub async fn flush(state: &State) -> Result<usize> {
+    let mut delivered = 0;
     if state.config.polar_token.is_some() {
-        for _ in 0..5 {
-            if deliver(state).await? < 100 {
+        let deadline = std::time::Instant::now()
+            + std::time::Duration::from_secs(state.config.runtime.billing_drain_seconds);
+        while std::time::Instant::now() < deadline {
+            let count = deliver(state).await?;
+            delivered += count;
+            if count < 100 {
                 break;
             }
         }
     }
-    Ok(())
+    Ok(delivered)
 }

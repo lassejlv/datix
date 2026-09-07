@@ -1,6 +1,6 @@
 # Deployment and operations
 
-Analytics Beer runs in the [Analytics Beer Railway project](https://railway.com/project/ff5d734f-2a11-4fec-a74d-d2793515f557), production environment. The web service runs `/usr/local/bin/analytics-server`, an Axum application with SQLx and Redis Streams. It serves the static React/TanStack Router frontend and runs event consumers and maintenance in the same process.
+Analytics Beer runs in the [Analytics Beer Railway project](https://railway.com/project/ff5d734f-2a11-4fec-a74d-d2793515f557), production environment. The web service runs `/usr/local/bin/analytics-server`, an Axum application with SQLx and Redis Streams. It serves the static React/TanStack Router frontend with SERVICE_ROLE=api. A separate private worker service runs ingestion, billing and retention. See [Scaling and operations](scaling.md) for connection budgets, schema upgrades, metrics and current rollback instructions.
 
 ## Build and runtime
 
@@ -12,7 +12,7 @@ Cloudflare proxies `analytics.beer` to Railway. The diagnostic domain is [web-pr
 
 ## Database and configuration
 
-The existing Neon production branch is retained: project `billowing-night-55335840`, branch `br-frosty-frost-b18zvthi`, database `analytics`, Frankfurt. SQLx uses the restricted `analytics_runtime` role, a maximum of ten pooled connections, certificate/hostname-verified TLS and a 15-second statement timeout. No database copy or schema change is required for the Rust migration.
+The existing Neon production branch is retained: project `billowing-night-55335840`, branch `br-frosty-frost-b18zvthi`, database `analytics`, Frankfurt. SQLx uses the restricted `analytics_runtime` role, separate budgets of six API and eight worker connections, certificate/hostname-verified TLS and a 15-second statement timeout. The subsequent scaling release explicitly upgrades the existing database to schema version 3; startup verifies its checksums without running migrations.
 
 Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, and `VISITOR_HASH_SECRET`. Production also retains `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, and `CLOUDFLARE_ORIGIN_SECRET`. Preserve signing secrets to keep existing sessions and visitor hashes valid. Railway's private Redis URL stays unchanged. Keep credentials out of build arguments and source control.
 
@@ -40,13 +40,13 @@ For a deliberate upload of the working tree, use `railway up` with the explicit 
 
 The live schema snapshot is `docs/database/schema.sql`; the corresponding SQLx baseline is `crates/core/migrations/0001_existing_schema.sql`. `analytics-db check` compares the deployed schema with the 133-column manifest and required default-environment trigger. `analytics-db init-empty` refuses populated databases and initializes only a new empty database. Never apply the baseline to an existing installation. Add future reviewed changes as versioned SQL migrations and apply them explicitly under an owner role.
 
-`cargo test --workspace` runs Rust unit tests. `cargo test -p analytics-server --test integration -- --ignored --test-threads=1` explicitly runs the ignored database/Redis tests against the isolated Neon branch, with `TEST_DATABASE_URL`, matching `TEST_DATABASE_HOST`, and `RUST_TEST_REDIS_URL` (default loopback port 6394). They test atomic credit limits, duplicate ingestion, concurrency, ownership, consent, reports, signed webhooks, provider retries and crash recovery. They remove only their own records. `bun web/scripts/rust-auth-compatibility.ts` verifies both directions against the frozen Better Auth test fixture. JavaScript backend tests were replaced by Rust tests; frontend/tracker tests remain in Bun.
+`cargo test --workspace` runs Rust unit tests. `cargo test -p analytics-server --test integration -- --ignored --test-threads=1` explicitly runs the ignored database/Redis tests against the isolated Neon branch, with `TEST_DATABASE_URL`, matching `TEST_DATABASE_HOST`, and `RUST_TEST_REDIS_URL` (default loopback port 6394). They test atomic credit limits, duplicate ingestion, concurrency, ownership, consent, reports, signed webhooks, provider retries and crash recovery. They remove their own records; the scaling retention test also removes expired rows in the isolated test branch. `bun web/scripts/rust-auth-compatibility.ts` verifies both directions against the frozen Better Auth test fixture. JavaScript backend tests were replaced by Rust tests; frontend/tracker tests remain in Bun.
 
 ## Queue cutover and recovery
 
 The Rust consumer group `analytics-rust` reads `analytics:events:v2`. An event is acknowledged and deleted only after its PostgreSQL transaction commits. Four consumers reclaim deliveries abandoned for at least 60 seconds. After ten failed deliveries, the original payload moves atomically into `analytics:events:v2:failed`; malformed envelopes also remain there for inspection. No event ID is regenerated. Duplicate redelivery does not charge twice.
 
-Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Polar external IDs, checked every minute under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
+Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Polar external IDs, drained every second under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
 
 For the initial cutover, let Railway switch traffic to the healthy Rust deployment and stop the old application, then run inside that service:
 
@@ -60,7 +60,9 @@ The migration copies unfinished BullMQ jobs from waiting, active, paused, delaye
 
 For a failed Rust event, repair its cause, preserve its ID and replay its original `data` payload to the event stream. Keep retries inside the existing 30-day deduplication window.
 
-## Rollback
+## Original Rust migration rollback
+
+For the current scaling release, follow [the compatible Rust application rollback](scaling.md#schema-rollout-and-rollback). The instructions below describe the earlier migration history.
 
 Commit `9842b39` is the pre-Rust Hono/Bun deployment and retains the complete former backend. Redeploy that commit and verify its original Bun start command, health and database access. It uses the same tables, password hashes, signed cookies, visitor secrets and Polar outbox. No database restore is required.
 

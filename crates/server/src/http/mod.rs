@@ -36,11 +36,16 @@ mod assets;
 use assets::fallback;
 
 pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
-    Router::new()
+    let operational = Router::new()
         .route(
             "/health/ready",
             get(move |AppState(state): AppState<State>| health(state, jobs_ready)),
         )
+        .route("/internal/metrics", get(metrics));
+    if state.config.runtime.role == analytics_core::config::Role::Worker {
+        return operational.with_state(state);
+    }
+    operational
         .route(
             "/api/health",
             get(|| async { Json(json!({"status":"ok","service":"analytics","version":1})) }),
@@ -116,7 +121,7 @@ async fn health(state: State, ready: Arc<AtomicBool>) -> Response {
     if check.await.is_ok() {
         (
             StatusCode::OK,
-            Json(json!({"status":"ok","runtime":"rust","service":"app"})),
+            Json(json!({"status":"ok","runtime":"rust","service":"app","role":state.config.runtime.role.name()})),
         )
             .into_response()
     } else {
@@ -126,6 +131,27 @@ async fn health(state: State, ready: Arc<AtomicBool>) -> Response {
         )
             .into_response()
     }
+}
+async fn metrics(AppState(state): AppState<State>, request: Request) -> Result<Response> {
+    let supplied = request
+        .headers()
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "));
+    if !state.config.metrics_token.as_ref().is_some_and(|token| {
+        supplied
+            .is_some_and(|value| analytics_core::crypto::equal(token.as_bytes(), value.as_bytes()))
+    }) {
+        return Err(Error::new(404, "not_found", "Not found."));
+    }
+    Ok((
+        [
+            ("content-type", "text/plain; version=0.0.4; charset=utf-8"),
+            ("cache-control", "no-store"),
+        ],
+        state.metrics.render(&state.db),
+    )
+        .into_response())
 }
 fn id(value: &str) -> Result<Uuid> {
     Uuid::parse_str(value).map_err(|_| Error::invalid("Invalid identifier."))

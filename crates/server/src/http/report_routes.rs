@@ -30,8 +30,17 @@ pub(super) async fn overview(
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
     let env = report_environment(&state, &c, &key, &params).await?;
+    let range = DateRange::parse(&params)?;
     Ok(Json(
-        reports::overview(&state, env, DateRange::parse(&params)?).await?,
+        reports::cached(
+            &state,
+            env,
+            "overview",
+            &range,
+            &params,
+            reports::overview(&state, env, range.clone()),
+        )
+        .await?,
     ))
 }
 pub(super) async fn timeseries(
@@ -41,8 +50,17 @@ pub(super) async fn timeseries(
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
     let env = report_environment(&state, &c, &key, &params).await?;
+    let range = DateRange::parse(&params)?;
     Ok(Json(
-        reports::timeseries(&state, env, DateRange::parse(&params)?).await?,
+        reports::cached(
+            &state,
+            env,
+            "timeseries",
+            &range,
+            &params,
+            reports::timeseries(&state, env, range.clone()),
+        )
+        .await?,
     ))
 }
 pub(super) async fn breakdown(
@@ -52,8 +70,17 @@ pub(super) async fn breakdown(
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
     let env = report_environment(&state, &c, &key, &params).await?;
+    let range = DateRange::parse(&params)?;
     Ok(Json(
-        reports::breakdown(&state, env, DateRange::parse(&params)?, &params).await?,
+        reports::cached(
+            &state,
+            env,
+            "breakdown",
+            &range,
+            &params,
+            reports::breakdown(&state, env, range.clone(), &params),
+        )
+        .await?,
     ))
 }
 pub(super) async fn sessions(
@@ -63,7 +90,16 @@ pub(super) async fn sessions(
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
     let env = report_environment(&state, &c, &key, &params).await?;
+    let range = DateRange::parse(&params)?;
     Ok(Json(
-        reports::sessions(&state, env, DateRange::parse(&params)?, &params).await?,
+        reports::cached(
+            &state,
+            env,
+            "sessions",
+            &range,
+            &params,
+            reports::sessions(&state, env, range.clone(), &params),
+        )
+        .await?,
     ))
 }

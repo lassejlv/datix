@@ -1,0 +1,21 @@
+FROM rust:1.96-bookworm AS backend
+WORKDIR /app
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates
+COPY config ./config
+COPY docs/database ./docs/database
+RUN --mount=type=cache,id=s/2399cc05-2728-4890-9d73-10c56a89e05a-/usr/local/cargo/registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=s/2399cc05-2728-4890-9d73-10c56a89e05a-/app/target,target=/app/target \
+    cargo build --locked --release -p analytics-server --bin analytics-server --bin analytics-db --bin analytics-queue \
+    && cp target/release/analytics-server target/release/analytics-db target/release/analytics-queue /usr/local/bin/
+
+FROM debian:bookworm-slim AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --create-home app
+WORKDIR /app
+COPY --from=backend /usr/local/bin/analytics-server /usr/local/bin/analytics-db /usr/local/bin/analytics-queue /usr/local/bin/
+ENV SERVICE_ROLE=worker RUST_LOG=analytics_server=info,analytics_services=info,analytics_core=warn
+USER app
+EXPOSE 3000
+CMD ["/usr/local/bin/analytics-server"]
