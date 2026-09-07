@@ -21,3 +21,4 @@
 !web/scripts
 !web/scripts/build-tracker.ts
 !Dockerfile
+!railway.json
