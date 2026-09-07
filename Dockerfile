@@ -14,8 +14,8 @@ COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
 COPY config ./config
 COPY docs/database ./docs/database
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/app/target \
+RUN --mount=type=cache,id=s/a5cb579e-e445-4882-a49f-6aea52c8480a-/usr/local/cargo/registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=s/a5cb579e-e445-4882-a49f-6aea52c8480a-/app/target,target=/app/target \
     cargo build --locked --release -p analytics-server --bin analytics-server --bin analytics-db --bin analytics-queue \
     && cp target/release/analytics-server target/release/analytics-db target/release/analytics-queue /usr/local/bin/
 
