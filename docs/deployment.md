@@ -4,7 +4,7 @@ Analytics Beer runs in the [Analytics Beer Railway project](https://railway.com/
 
 ## Build and runtime
 
-`Dockerfile` builds the frontend with Bun 1.4.2 and the Cargo workspace with Rust 1.96. The final Debian image contains three native binaries, CA certificates, and `web/dist/client`. Bun and Node are build/test tools and are absent from the runtime image. `railway.json` selects the Dockerfile, Rust start command, readiness endpoint and restart policy.
+`Dockerfile` builds the frontend with Bun 1.4.2 and the Cargo workspace with Rust 1.96. The final Debian image contains three native binaries, CA certificates, and `web/dist/client`. Bun and Node are build/test tools and are absent from the runtime image. Railway service settings pin `Dockerfile`, `/usr/local/bin/analytics-server`, and `/health/ready`; `railway.json` records the same deployment configuration. When changing the start command, create a fresh deployment snapshot: retrying an earlier snapshot can retain its previous command.
 
 The server listens on `PORT` (3000 in production). `/health/ready` verifies PostgreSQL, Redis, and background task liveness. Startup validates the existing schema before listening; it never applies migrations. SIGTERM stops accepting HTTP requests, drains active requests and jobs, and closes the SQLx pool. Unacknowledged events remain in Redis for recovery.
 
@@ -67,3 +67,9 @@ Commit `9842b39` is the pre-Rust Hono/Bun deployment and retains the complete fo
 Once the Rust deployment has stopped, run `bun web/scripts/rollback-rust-queue.ts --apply` from this migration checkout with the target `REDIS_URL`. It copies all remaining Rust envelopes (including the failed stream) into BullMQ with stable event-derived job IDs, retaining original stream entries and invalid records. Its default mode is read-only. Re-run after the old worker drains the queue, verify reports and check failed jobs. Do not run queue replay while both deployments are consuming traffic. Preserve source streams until rollback is verified.
 
 The older Cloudflare deployment history is retained in [Cloudflare deployment history](cloudflare-deployment-history.md). The pre-Rust rollback above is the relevant rollback for this release.
+
+## Rust cutover verification — 2026-09-07
+
+The native release passed 12 Rust unit tests, 11 isolated Neon/Redis integration tests, 21 frontend tests, TypeScript, Cargo formatting, Clippy and scoped JavaScript lint. Existing React lint errors remain in unchanged components. Browser checks covered authentication, account deletion, routes, environments, reporting, keyboard/mobile behavior, cookieless activity and both consented tracking modes. Forward and rollback queue migration tests passed, as did initialization of a disposable empty database from the pulled SQLx baseline.
+
+Railway deployment `183d57ef-cc45-4b3b-a324-8c6cba59a946` was verified running Rust/Axum with the actual restricted runtime database role. The original Better Auth cookie and password remained usable after cutover. A real public browser tracker round trip increased the disposable account from one to two pageviews and from 0.45 to 0.9 credits. Desktop/mobile reports showed no browser errors. Both event streams and all unfinished legacy event queues were empty. The fixture account and saved credentials were removed. Local reports are under `web/artifacts/rust-production/`.
