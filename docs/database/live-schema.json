@@ -1,0 +1,1492 @@
+{
+  "capturedAt": "2026-09-07T19:25:36.645Z",
+  "source": "production",
+  "columns": [
+    {
+      "table_name": "abuse_daily",
+      "column_name": "environment_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_daily",
+      "column_name": "day",
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_daily",
+      "column_name": "reason",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_daily",
+      "column_name": "blocked",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "abuse_daily",
+      "column_name": "last_blocked_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_environment",
+      "column_name": "environment_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_environment",
+      "column_name": "baseline",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_environment",
+      "column_name": "learned_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_environment",
+      "column_name": "traffic",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_sources",
+      "column_name": "environment_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_sources",
+      "column_name": "source",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_sources",
+      "column_name": "activity",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "abuse_sources",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "account_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "provider_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "user_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "access_token",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "refresh_token",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "id_token",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "access_token_expires_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "refresh_token_expires_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "scope",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "password",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "account",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "environment_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "session_key",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "visitor_key",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "received_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "kind",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "path",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "referrer",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "country",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "device",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "browser",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "os",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "activity_events",
+      "column_name": "details",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "checkout_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "customer_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "subscriptions",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "deleted",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "occurred_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "event_type",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "event_count",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "occurred_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "available_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "attempts",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "lease_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "period_start",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "period_end",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "events",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "billing_webhook_events",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_webhook_events",
+      "column_name": "type",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_webhook_events",
+      "column_name": "occurred_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "billing_webhook_events",
+      "column_name": "received_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "day",
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "dimension",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "value",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "pageviews",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "custom_events",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "daily_stats",
+      "column_name": "visitors",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "daily_visitors",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_visitors",
+      "column_name": "day",
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "daily_visitors",
+      "column_name": "visitor",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "environments",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "environments",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "environments",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "environments",
+      "column_name": "domain",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "environments",
+      "column_name": "enabled",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "table_name": "environments",
+      "column_name": "allow_localhost",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "environments",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "environments",
+      "column_name": "tracking_mode",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'cookieless'::text"
+    },
+    {
+      "table_name": "environments",
+      "column_name": "tracking_settings",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "table_name": "events",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "received_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "day",
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "type",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "path",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "referrer",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "country",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "device",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "events",
+      "column_name": "visitor",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "free_usage",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "free_usage",
+      "column_name": "site_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "free_usage",
+      "column_name": "period_start",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "free_usage",
+      "column_name": "period_end",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "free_usage",
+      "column_name": "events",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "column_default": "0"
+    },
+    {
+      "table_name": "rate_limit",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rate_limit",
+      "column_name": "key",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rate_limit",
+      "column_name": "count",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "rate_limit",
+      "column_name": "last_request",
+      "data_type": "bigint",
+      "udt_name": "int8",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "expires_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "token",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "ip_address",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "user_agent",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "session",
+      "column_name": "user_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sites",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "table_name": "sites",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sites",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sites",
+      "column_name": "domain",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "sites",
+      "column_name": "enabled",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "table_name": "sites",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "table_name": "sites",
+      "column_name": "allow_localhost",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "sites",
+      "column_name": "credit_budget",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "name",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "email",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "email_verified",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "table_name": "user",
+      "column_name": "image",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "user",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "identifier",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "value",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "expires_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "table_name": "verification",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "abuse_daily",
+      "name": "abuse_daily_environment_id_day_reason_pk",
+      "definition": "PRIMARY KEY (environment_id, day, reason)"
+    },
+    {
+      "table_name": "abuse_daily",
+      "name": "abuse_daily_environment_id_environments_id_fk",
+      "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "abuse_environment",
+      "name": "abuse_environment_environment_id_environments_id_fk",
+      "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "abuse_environment",
+      "name": "abuse_environment_pkey",
+      "definition": "PRIMARY KEY (environment_id)"
+    },
+    {
+      "table_name": "abuse_sources",
+      "name": "abuse_sources_environment_id_environments_id_fk",
+      "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "abuse_sources",
+      "name": "abuse_sources_environment_id_source_pk",
+      "definition": "PRIMARY KEY (environment_id, source)"
+    },
+    {
+      "table_name": "account",
+      "name": "account_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "account",
+      "name": "account_user_id_user_id_fk",
+      "definition": "FOREIGN KEY (user_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "activity_events",
+      "name": "activity_events_environment_id_environments_id_fk",
+      "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "activity_events",
+      "name": "activity_events_environment_id_id_pk",
+      "definition": "PRIMARY KEY (environment_id, id)"
+    },
+    {
+      "table_name": "billing_checkouts",
+      "name": "billing_checkouts_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "billing_checkouts",
+      "name": "billing_checkouts_pkey",
+      "definition": "PRIMARY KEY (owner_id)"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "billing_customers",
+      "name": "billing_customers_pkey",
+      "definition": "PRIMARY KEY (customer_id)"
+    },
+    {
+      "table_name": "billing_outbox",
+      "name": "billing_outbox_count_check",
+      "definition": "CHECK ((event_count > (0)::numeric))"
+    },
+    {
+      "table_name": "billing_outbox",
+      "name": "billing_outbox_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "billing_outbox",
+      "name": "billing_outbox_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "billing_usage",
+      "name": "billing_usage_owner_id_period_start_site_id_pk",
+      "definition": "PRIMARY KEY (owner_id, period_start, site_id)"
+    },
+    {
+      "table_name": "billing_usage",
+      "name": "billing_usage_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "billing_webhook_events",
+      "name": "billing_webhook_events_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "daily_stats",
+      "name": "daily_stats_site_id_day_dimension_value_pk",
+      "definition": "PRIMARY KEY (site_id, day, dimension, value)"
+    },
+    {
+      "table_name": "daily_stats",
+      "name": "daily_stats_site_id_environments_id_fk",
+      "definition": "FOREIGN KEY (site_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "daily_visitors",
+      "name": "daily_visitors_site_id_day_visitor_pk",
+      "definition": "PRIMARY KEY (site_id, day, visitor)"
+    },
+    {
+      "table_name": "daily_visitors",
+      "name": "daily_visitors_site_id_environments_id_fk",
+      "definition": "FOREIGN KEY (site_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "environments",
+      "name": "environments_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "environments",
+      "name": "environments_site_id_sites_id_fk",
+      "definition": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "events",
+      "name": "events_site_id_environments_id_fk",
+      "definition": "FOREIGN KEY (site_id) REFERENCES environments(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "events",
+      "name": "events_site_id_id_pk",
+      "definition": "PRIMARY KEY (site_id, id)"
+    },
+    {
+      "table_name": "events",
+      "name": "events_type_check",
+      "definition": "CHECK ((type = ANY (ARRAY['pageview'::text, 'event'::text])))"
+    },
+    {
+      "table_name": "free_usage",
+      "name": "free_usage_owner_id_period_start_site_id_pk",
+      "definition": "PRIMARY KEY (owner_id, period_start, site_id)"
+    },
+    {
+      "table_name": "free_usage",
+      "name": "free_usage_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "rate_limit",
+      "name": "rate_limit_key_unique",
+      "definition": "UNIQUE (key)"
+    },
+    {
+      "table_name": "rate_limit",
+      "name": "rate_limit_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "session",
+      "name": "session_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "session",
+      "name": "session_token_unique",
+      "definition": "UNIQUE (token)"
+    },
+    {
+      "table_name": "session",
+      "name": "session_user_id_user_id_fk",
+      "definition": "FOREIGN KEY (user_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "sites",
+      "name": "sites_owner_id_user_id_fk",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "sites",
+      "name": "sites_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "user",
+      "name": "user_email_unique",
+      "definition": "UNIQUE (email)"
+    },
+    {
+      "table_name": "user",
+      "name": "user_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "verification",
+      "name": "verification_pkey",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "abuse_daily",
+      "indexname": "abuse_daily_environment_id_day_reason_pk",
+      "indexdef": "CREATE UNIQUE INDEX abuse_daily_environment_id_day_reason_pk ON public.abuse_daily USING btree (environment_id, day, reason)"
+    },
+    {
+      "tablename": "abuse_daily",
+      "indexname": "abuse_daily_retention_idx",
+      "indexdef": "CREATE INDEX abuse_daily_retention_idx ON public.abuse_daily USING btree (day)"
+    },
+    {
+      "tablename": "abuse_environment",
+      "indexname": "abuse_environment_pkey",
+      "indexdef": "CREATE UNIQUE INDEX abuse_environment_pkey ON public.abuse_environment USING btree (environment_id)"
+    },
+    {
+      "tablename": "abuse_sources",
+      "indexname": "abuse_sources_environment_id_source_pk",
+      "indexdef": "CREATE UNIQUE INDEX abuse_sources_environment_id_source_pk ON public.abuse_sources USING btree (environment_id, source)"
+    },
+    {
+      "tablename": "abuse_sources",
+      "indexname": "abuse_sources_retention_idx",
+      "indexdef": "CREATE INDEX abuse_sources_retention_idx ON public.abuse_sources USING btree (updated_at)"
+    },
+    {
+      "tablename": "account",
+      "indexname": "account_pkey",
+      "indexdef": "CREATE UNIQUE INDEX account_pkey ON public.account USING btree (id)"
+    },
+    {
+      "tablename": "account",
+      "indexname": "account_userId_idx",
+      "indexdef": "CREATE INDEX \"account_userId_idx\" ON public.account USING btree (user_id)"
+    },
+    {
+      "tablename": "activity_events",
+      "indexname": "activity_environment_received_idx",
+      "indexdef": "CREATE INDEX activity_environment_received_idx ON public.activity_events USING btree (environment_id, received_at)"
+    },
+    {
+      "tablename": "activity_events",
+      "indexname": "activity_events_environment_id_id_pk",
+      "indexdef": "CREATE UNIQUE INDEX activity_events_environment_id_id_pk ON public.activity_events USING btree (environment_id, id)"
+    },
+    {
+      "tablename": "activity_events",
+      "indexname": "activity_retention_idx",
+      "indexdef": "CREATE INDEX activity_retention_idx ON public.activity_events USING btree (received_at)"
+    },
+    {
+      "tablename": "activity_events",
+      "indexname": "activity_session_idx",
+      "indexdef": "CREATE INDEX activity_session_idx ON public.activity_events USING btree (environment_id, session_key, received_at)"
+    },
+    {
+      "tablename": "billing_checkouts",
+      "indexname": "billing_checkouts_pkey",
+      "indexdef": "CREATE UNIQUE INDEX billing_checkouts_pkey ON public.billing_checkouts USING btree (owner_id)"
+    },
+    {
+      "tablename": "billing_customers",
+      "indexname": "billing_customers_owner_idx",
+      "indexdef": "CREATE INDEX billing_customers_owner_idx ON public.billing_customers USING btree (owner_id)"
+    },
+    {
+      "tablename": "billing_customers",
+      "indexname": "billing_customers_pkey",
+      "indexdef": "CREATE UNIQUE INDEX billing_customers_pkey ON public.billing_customers USING btree (customer_id)"
+    },
+    {
+      "tablename": "billing_outbox",
+      "indexname": "billing_outbox_available_idx",
+      "indexdef": "CREATE INDEX billing_outbox_available_idx ON public.billing_outbox USING btree (available_at)"
+    },
+    {
+      "tablename": "billing_outbox",
+      "indexname": "billing_outbox_pkey",
+      "indexdef": "CREATE UNIQUE INDEX billing_outbox_pkey ON public.billing_outbox USING btree (id)"
+    },
+    {
+      "tablename": "billing_usage",
+      "indexname": "billing_usage_owner_id_period_start_site_id_pk",
+      "indexdef": "CREATE UNIQUE INDEX billing_usage_owner_id_period_start_site_id_pk ON public.billing_usage USING btree (owner_id, period_start, site_id)"
+    },
+    {
+      "tablename": "billing_webhook_events",
+      "indexname": "billing_webhook_events_pkey",
+      "indexdef": "CREATE UNIQUE INDEX billing_webhook_events_pkey ON public.billing_webhook_events USING btree (id)"
+    },
+    {
+      "tablename": "daily_stats",
+      "indexname": "daily_stats_site_id_day_dimension_value_pk",
+      "indexdef": "CREATE UNIQUE INDEX daily_stats_site_id_day_dimension_value_pk ON public.daily_stats USING btree (site_id, day, dimension, value)"
+    },
+    {
+      "tablename": "daily_stats",
+      "indexname": "stats_retention_idx",
+      "indexdef": "CREATE INDEX stats_retention_idx ON public.daily_stats USING btree (day)"
+    },
+    {
+      "tablename": "daily_visitors",
+      "indexname": "daily_visitors_site_id_day_visitor_pk",
+      "indexdef": "CREATE UNIQUE INDEX daily_visitors_site_id_day_visitor_pk ON public.daily_visitors USING btree (site_id, day, visitor)"
+    },
+    {
+      "tablename": "daily_visitors",
+      "indexname": "visitors_retention_idx",
+      "indexdef": "CREATE INDEX visitors_retention_idx ON public.daily_visitors USING btree (day)"
+    },
+    {
+      "tablename": "environments",
+      "indexname": "environments_pkey",
+      "indexdef": "CREATE UNIQUE INDEX environments_pkey ON public.environments USING btree (id)"
+    },
+    {
+      "tablename": "environments",
+      "indexname": "environments_site_name_idx",
+      "indexdef": "CREATE UNIQUE INDEX environments_site_name_idx ON public.environments USING btree (site_id, lower(name))"
+    },
+    {
+      "tablename": "events",
+      "indexname": "events_retention_idx",
+      "indexdef": "CREATE INDEX events_retention_idx ON public.events USING btree (received_at)"
+    },
+    {
+      "tablename": "events",
+      "indexname": "events_site_id_id_pk",
+      "indexdef": "CREATE UNIQUE INDEX events_site_id_id_pk ON public.events USING btree (site_id, id)"
+    },
+    {
+      "tablename": "events",
+      "indexname": "events_site_received_idx",
+      "indexdef": "CREATE INDEX events_site_received_idx ON public.events USING btree (site_id, received_at)"
+    },
+    {
+      "tablename": "free_usage",
+      "indexname": "free_usage_owner_id_period_start_site_id_pk",
+      "indexdef": "CREATE UNIQUE INDEX free_usage_owner_id_period_start_site_id_pk ON public.free_usage USING btree (owner_id, period_start, site_id)"
+    },
+    {
+      "tablename": "rate_limit",
+      "indexname": "rate_limit_key_unique",
+      "indexdef": "CREATE UNIQUE INDEX rate_limit_key_unique ON public.rate_limit USING btree (key)"
+    },
+    {
+      "tablename": "rate_limit",
+      "indexname": "rate_limit_pkey",
+      "indexdef": "CREATE UNIQUE INDEX rate_limit_pkey ON public.rate_limit USING btree (id)"
+    },
+    {
+      "tablename": "session",
+      "indexname": "session_pkey",
+      "indexdef": "CREATE UNIQUE INDEX session_pkey ON public.session USING btree (id)"
+    },
+    {
+      "tablename": "session",
+      "indexname": "session_token_unique",
+      "indexdef": "CREATE UNIQUE INDEX session_token_unique ON public.session USING btree (token)"
+    },
+    {
+      "tablename": "session",
+      "indexname": "session_userId_idx",
+      "indexdef": "CREATE INDEX \"session_userId_idx\" ON public.session USING btree (user_id)"
+    },
+    {
+      "tablename": "sites",
+      "indexname": "sites_owner_domain_idx",
+      "indexdef": "CREATE UNIQUE INDEX sites_owner_domain_idx ON public.sites USING btree (owner_id, domain)"
+    },
+    {
+      "tablename": "sites",
+      "indexname": "sites_owner_idx",
+      "indexdef": "CREATE INDEX sites_owner_idx ON public.sites USING btree (owner_id)"
+    },
+    {
+      "tablename": "sites",
+      "indexname": "sites_pkey",
+      "indexdef": "CREATE UNIQUE INDEX sites_pkey ON public.sites USING btree (id)"
+    },
+    {
+      "tablename": "user",
+      "indexname": "user_email_unique",
+      "indexdef": "CREATE UNIQUE INDEX user_email_unique ON public.\"user\" USING btree (email)"
+    },
+    {
+      "tablename": "user",
+      "indexname": "user_pkey",
+      "indexdef": "CREATE UNIQUE INDEX user_pkey ON public.\"user\" USING btree (id)"
+    },
+    {
+      "tablename": "verification",
+      "indexname": "verification_identifier_idx",
+      "indexdef": "CREATE INDEX verification_identifier_idx ON public.verification USING btree (identifier)"
+    },
+    {
+      "tablename": "verification",
+      "indexname": "verification_pkey",
+      "indexdef": "CREATE UNIQUE INDEX verification_pkey ON public.verification USING btree (id)"
+    }
+  ],
+  "functions": [
+    {
+      "name": "sync_default_environment",
+      "definition": "CREATE OR REPLACE FUNCTION public.sync_default_environment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  INSERT INTO public.environments (id, site_id, name, domain, enabled, allow_localhost, created_at)\n  VALUES (NEW.id, NEW.id, 'Production', NEW.domain, NEW.enabled, NEW.allow_localhost, NEW.created_at)\n  ON CONFLICT (id) DO UPDATE SET\n    domain = EXCLUDED.domain, enabled = EXCLUDED.enabled, allow_localhost = EXCLUDED.allow_localhost;\n  RETURN NEW;\nEND;\n$function$\n"
+    }
+  ],
+  "triggers": [
+    {
+      "table_name": "sites",
+      "name": "sites_default_environment",
+      "definition": "CREATE TRIGGER sites_default_environment AFTER INSERT OR UPDATE OF domain, enabled, allow_localhost ON public.sites FOR EACH ROW EXECUTE FUNCTION sync_default_environment()"
+    }
+  ]
+}

@@ -1,18 +1,32 @@
-FROM oven/bun:1.4.2 AS build
-WORKDIR /app
-COPY package.json bun.lock ./
+FROM oven/bun:1.4.2 AS frontend
+WORKDIR /app/web
+COPY web/package.json web/bun.lock ./
 RUN bun install --frozen-lockfile
-COPY . .
+COPY web/vite.config.ts web/tsconfig.json web/index.html ./
+COPY web/src ./src
+COPY web/public ./public
+COPY web/scripts/build-tracker.ts ./scripts/build-tracker.ts
 RUN bun run build
 
-FROM oven/bun:1.4.2 AS runtime
+FROM rust:1.96-bookworm AS backend
 WORKDIR /app
-ENV NODE_ENV=production
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/src ./src
-COPY --from=build /app/config ./config
-USER bun
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates
+COPY config ./config
+COPY docs/database ./docs/database
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build --locked --release -p analytics-server --bin analytics-server --bin analytics-db --bin analytics-queue \
+    && cp target/release/analytics-server target/release/analytics-db target/release/analytics-queue /usr/local/bin/
+
+FROM debian:bookworm-slim AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --create-home app
+WORKDIR /app
+COPY --from=backend /usr/local/bin/analytics-server /usr/local/bin/analytics-db /usr/local/bin/analytics-queue /usr/local/bin/
+COPY --from=frontend /app/web/dist ./web/dist
+ENV RUST_LOG=analytics_server=info,analytics_services=info,analytics_core=warn
+USER app
 EXPOSE 3000
-CMD ["bun", "run", "start"]
+CMD ["/usr/local/bin/analytics-server"]

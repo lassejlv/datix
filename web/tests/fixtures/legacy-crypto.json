@@ -1,0 +1,8 @@
+{
+  "password": "A very long café ① password",
+  "normalized": "A very long café 1 password",
+  "hash": "0123456789abcdef0123456789abcdef:ea0003ba109cf2e395469a25fb9bb891ea80202b97bc1a1c155dfa5b5259a8b2486ac42cfce287742a695044cf450b1d5025e66453c7e3e807a00404743fa36a",
+  "secret": "compatibility-test-secret",
+  "token": "test-token",
+  "cookie": "test-token.idUcN0OIhDcMzn0ZrI1/oFdHeq9+DYqyWiWEFjyie5s="
+}

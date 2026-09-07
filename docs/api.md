@@ -2,7 +2,7 @@
 
 Base URL in development: `http://localhost:3000`. Application OpenAPI: `GET /api/openapi.json`.
 
-Hono serves the API and the static TanStack Router frontend from the same Bun process. `GET /api/preferences` returns `{ locale: 'en' | 'de' | 'da', theme: 'system' | 'light' | 'dark' }`; saved preference cookies override trusted country defaults. This endpoint is public and its response is not cached.
+Axum serves the API and the static TanStack Router frontend from the same Rust process. `GET /api/preferences` returns `{ locale: 'en' | 'de' | 'da', theme: 'system' | 'light' | 'dark' }`; saved preference cookies override trusted country defaults. This endpoint is public and its response is not cached.
 
 ## Authentication
 

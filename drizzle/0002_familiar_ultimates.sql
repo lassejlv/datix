@@ -1,1 +1,0 @@
-ALTER TABLE "sites" ADD COLUMN "allow_localhost" boolean DEFAULT false NOT NULL;

@@ -1,1 +1,0 @@
-CREATE INDEX "events_site_received_idx" ON "events" USING btree ("site_id","received_at");
