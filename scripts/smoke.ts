@@ -46,7 +46,7 @@ try {
   assert.equal((await request('/api/me')).status, 401);
   assert.equal((await fetch(`${base}/`)).status, 200);
   assert.equal((await fetch(`${base}/tracker.js`)).status, 200);
-  check('Bun HTTP health, SSR shell, tracker, and unauthenticated rejection');
+  check('Hono/Bun health, frontend shell, tracker, and unauthenticated rejection');
   for (const email of emails) {
     const response = await request('/api/auth/sign-up/email', 'POST', {
       name: 'API smoke',

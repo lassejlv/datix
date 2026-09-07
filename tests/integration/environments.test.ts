@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { seedPro, cleanupPro } from '../fixtures/billing';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { Client } from 'pg';
@@ -26,7 +27,7 @@ const env = {
   APP_URL: 'http://localhost:3000',
   BETTER_AUTH_SECRET: 'environment-tests-auth-secret-at-least-32-characters',
   VISITOR_HASH_SECRET: 'environment-tests-visitor-secret-at-least-32-characters',
-  HYPERDRIVE: { connectionString },
+  DATABASE_URL: connectionString,
   EVENTS: {
     send: async (message: EventMessage) => {
       pending.push(message);
@@ -35,7 +36,7 @@ const env = {
   COLLECT_LIMITER: { limit: async () => ({ success: true }) },
   AUTH_LIMITER: { limit: async () => ({ success: true }) },
   API_LIMITER: { limit: async () => ({ success: true }) },
-} as unknown as Env;
+} as unknown as AppEnv;
 async function request(
   path: string,
   method = 'GET',

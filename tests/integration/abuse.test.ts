@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { beforeAll, afterAll, test, expect } from 'bun:test';
 import { Client } from 'pg';
 import { database, withDatabase } from '../../src/db/client.server';
@@ -17,7 +18,7 @@ const db = database(client);
 const owners: string[] = [];
 const pending: EventMessage[] = [];
 const env = {
-  HYPERDRIVE: { connectionString },
+  DATABASE_URL: connectionString,
   VISITOR_HASH_SECRET: 'abuse-test-secret-with-more-than-32-chars',
   COLLECT_LIMITER: { limit: async () => ({ success: true }) },
   EVENTS: {
@@ -25,7 +26,7 @@ const env = {
       pending.push(message);
     },
   },
-} as unknown as Env;
+} as unknown as AppEnv;
 beforeAll(() => client.connect());
 afterAll(async () => {
   await cleanupPro(client, owners);

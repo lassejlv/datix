@@ -3,8 +3,17 @@ import { flushUsage } from '../billing/delivery.server';
 import { withDatabase } from '../db/client.server';
 import { eventMessageSchema, ingest, type EventMessage } from './ingest.server';
 
-export async function consume(batch: MessageBatch<unknown>, env: AppEnv) {
-  const valid: { message: Message<unknown>; event: EventMessage }[] = [];
+export interface EventBatch {
+  messages: {
+    id: string;
+    body: unknown;
+    ack(): void;
+    retry(options: { delaySeconds: number }): void;
+  }[];
+}
+
+export async function consume(batch: EventBatch, env: AppEnv) {
+  const valid: { message: EventBatch['messages'][number]; event: EventMessage }[] = [];
   for (const message of batch.messages) {
     const parsed = eventMessageSchema.safeParse(message.body);
     if (parsed.success) valid.push({ message, event: parsed.data });

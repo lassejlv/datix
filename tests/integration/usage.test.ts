@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { afterAll, beforeAll, expect, test } from 'bun:test';
 import { Client } from 'pg';
 import { api } from '../../src/api/router.server';
@@ -23,7 +24,7 @@ const env = {
   APP_URL: 'http://localhost:3000',
   BETTER_AUTH_SECRET: 'usage-tests-auth-secret-with-more-than-32-chars',
   VISITOR_HASH_SECRET: 'usage-tests-visitor-secret-with-more-than-32-chars',
-  HYPERDRIVE: { connectionString },
+  DATABASE_URL: connectionString,
   EVENTS: {
     send: async (event: EventMessage) => {
       pending.push(event);
@@ -32,7 +33,7 @@ const env = {
   COLLECT_LIMITER: { limit: async () => ({ success: true }) },
   AUTH_LIMITER: { limit: async () => ({ success: true }) },
   API_LIMITER: { limit: async () => ({ success: true }) },
-} as unknown as Env;
+} as unknown as AppEnv;
 const request = (
   path: string,
   cookie = '',

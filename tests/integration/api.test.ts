@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { seedPro, cleanupPro } from '../fixtures/billing';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { Client } from 'pg';
@@ -8,7 +9,7 @@ import { api } from '../../src/api/router.server';
 import { eventMessageSchema, ingest, type EventMessage } from '../../src/analytics/ingest.server';
 import { retain } from '../../src/analytics/retention.server';
 import { hash } from '../../src/lib/privacy';
-import { consume } from '../../src/analytics/queue.server';
+import { consume, type EventBatch } from '../../src/analytics/queue.server';
 
 const connectionString = process.env.TEST_DATABASE_URL;
 if (
@@ -29,7 +30,7 @@ const env = {
   APP_URL: 'http://localhost:3000',
   BETTER_AUTH_SECRET: 'integration-auth-secret-with-more-than-32-characters',
   VISITOR_HASH_SECRET: 'integration-visitor-secret-with-more-than-32-characters',
-  HYPERDRIVE: { connectionString },
+  DATABASE_URL: connectionString,
   EVENTS: {
     send: async (message: EventMessage) => {
       pending.push(message);
@@ -38,7 +39,7 @@ const env = {
   COLLECT_LIMITER: { limit: async () => ({ success: true }) },
   AUTH_LIMITER: { limit: async () => ({ success: true }) },
   API_LIMITER: { limit: async () => ({ success: true }) },
-} as unknown as Env;
+} as unknown as AppEnv;
 
 async function request(
   path: string,
@@ -204,7 +205,7 @@ describe('authenticated API with real Neon PostgreSQL', () => {
       send: async () => {
         throw new Error('Simulated queue outage');
       },
-    } as unknown as Queue;
+    } as unknown as AppEnv['EVENTS'];
     expect(
       (
         await request('/api/collect', {
@@ -462,7 +463,7 @@ describe('authenticated API with real Neon PostgreSQL', () => {
           retry: () => state.invalidRetried++,
         },
       ],
-    } as unknown as MessageBatch<unknown>;
+    } as unknown as EventBatch;
     await consume(batch, env);
     expect(state).toEqual({ validAcked: 1, validRetried: 0, invalidAcked: 0, invalidRetried: 1 });
   }, 20000);
@@ -485,7 +486,7 @@ describe('authenticated API with real Neon PostgreSQL', () => {
           messages: [
             { id: 'rollback-test', body: item, ack: () => acknowledged++, retry: () => retried++ },
           ],
-        } as unknown as MessageBatch<unknown>,
+        } as unknown as EventBatch,
         env,
       );
       expect(acknowledged).toBe(0);

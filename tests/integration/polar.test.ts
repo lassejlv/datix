@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { Client } from 'pg';
 import { api } from '../../src/api/router.server';
@@ -22,8 +23,8 @@ const ids: string[] = [];
 const env = {
   APP_URL: 'http://localhost:3000',
   POLAR_WEBHOOK_SECRET: polarTestSecret,
-  HYPERDRIVE: { connectionString },
-} as unknown as Env;
+  DATABASE_URL: connectionString,
+} as unknown as AppEnv;
 const send = (
   payload: unknown,
   id = `${prefix}-${crypto.randomUUID()}`,
@@ -152,8 +153,8 @@ describe('Polar webhooks', () => {
     const id = `${prefix}-storage`;
     const response = await send(payload, id, {}, {
       ...env,
-      HYPERDRIVE: { connectionString: 'postgres://invalid:invalid@127.0.0.1:1/invalid' },
-    } as unknown as Env);
+      DATABASE_URL: 'postgres://invalid:invalid@127.0.0.1:1/invalid',
+    } as unknown as AppEnv);
     expect(response.status).toBe(503);
     expect(response.headers.get('retry-after')).toBe('60');
     expect(

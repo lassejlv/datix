@@ -2,6 +2,8 @@
 
 Base URL in development: `http://localhost:3000`. Application OpenAPI: `GET /api/openapi.json`.
 
+Hono serves the API and the static TanStack Router frontend from the same Bun process. `GET /api/preferences` returns `{ locale: 'en' | 'de' | 'da', theme: 'system' | 'light' | 'dark' }`; saved preference cookies override trusted country defaults. This endpoint is public and its response is not cached.
+
 ## Authentication
 
 Better Auth owns `/api/auth/*`. Email/password is enabled for the current development/beta phase; passwords must contain 12–128 characters. Verification and password recovery emails are not configured yet. Configure a delivery provider and these flows before open registration.
@@ -14,7 +16,7 @@ Better Auth owns `/api/auth/*`. Email/password is enabled for the current develo
 | POST   | `/api/auth/sign-out`      | `{}` and session cookie                                                               |
 | GET    | `/api/me`                 | Session cookie; returns minimal user details                                          |
 
-Preserve `Set-Cookie` responses and send the cookie on account/reporting requests. HTTPS deployments use secure cookies. All POST/PATCH/DELETE account requests require `Origin` equal to the configured `APP_URL`. The dashboard shares that origin; cross-origin dashboard clients are not enabled. Sign-out invalidates the server-side session immediately. Hyperdrive caching must remain disabled.
+Preserve `Set-Cookie` responses and send the cookie on account/reporting requests. HTTPS deployments use secure cookies. All POST/PATCH/DELETE account requests require `Origin` equal to the configured `APP_URL`. The dashboard shares that origin; cross-origin dashboard clients are not enabled. Sign-out invalidates the server-side session immediately. Database authorization reads use the direct Neon connection without proxy caching.
 
 Better Auth returns its own response/error format. Application errors use `{ "error": { "code", "message", "requestId" } }`. Responses include `X-Request-Id`, `Cache-Control: no-store`, and `Retry-After` for 429/503. Health reports only Worker availability, not database readiness.
 

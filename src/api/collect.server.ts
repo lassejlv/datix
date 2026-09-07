@@ -128,11 +128,8 @@ export async function collect(
     destination.hash = '';
     activity.details.destination = destination.href;
   }
-  const country =
-    request.headers.get('x-analytics-country') ??
-    (typeof request.cf?.country === 'string' && /^[A-Z]{2}$/.test(request.cf.country)
-      ? request.cf.country
-      : '');
+  const countryHeader = request.headers.get('x-analytics-country') ?? '';
+  const country = /^[A-Z]{2}$/.test(countryHeader) ? countryHeader : '';
   const message: EventMessage = {
     ...(activity
       ? { version: 3 as const, environmentId, activity }

@@ -10,8 +10,10 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
-    "paths": { "@/*": ["./src/*"] },
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "types": ["vite/client", "bun"]
   },
-  "include": ["src", "scripts", "tests", "*.ts", "worker-configuration.d.ts"]
+  "include": ["src", "scripts", "tests", "*.ts"]
 }

@@ -1,6 +1,6 @@
 # Analytics Beer
 
-A small analytics app built with TanStack Start, Bun, Railway, Redis/BullMQ, Better Auth, Drizzle, and Neon PostgreSQL. The responsive dashboard uses Tailwind v4, coss components, [Dither Kit charts](https://www.tripwire.sh/dither-kit), and self-hosted IBM Plex Sans. It follows the system light/dark theme. Dashboard tabs, website changes, and sign-in/sign-up views use a short fade-and-rise transition; reduced-motion preferences disable these animations. The product domain is `analytics.beer`.
+A small analytics app built with Hono on Bun, a static React/TanStack Router frontend, Railway, Redis/BullMQ, Better Auth, Drizzle, and Neon PostgreSQL. The responsive dashboard uses Tailwind v4, coss components, [Dither Kit charts](https://www.tripwire.sh/dither-kit), and self-hosted IBM Plex Sans. It follows the system light/dark theme. Dashboard tabs, website changes, and sign-in/sign-up views use a short fade-and-rise transition; reduced-motion preferences disable these animations. The product domain is `analytics.beer`.
 
 Create an account, add a website, copy its script, and check for the first pageview. The dashboard shows pageviews, daily visitor estimates, custom events, date ranges, and page/referrer/country/device breakdowns. Website settings support renaming, pausing collection, and deletion with confirmation. All reports come from the API. Onboarding includes a clearly labeled interactive sample; it does not create traffic in your account.
 
@@ -14,12 +14,11 @@ Use Bun 1.4.2. PostgreSQL stays on Neon; Redis is required for queues and rate l
 bun install --frozen-lockfile
 # Copy .env.example to .env and fill in development credentials and random secrets.
 redis-server --bind 127.0.0.1 --port 6393 --appendonly yes --maxmemory-policy noeviction
-# In separate terminals:
+# Starts the frontend dev server plus Hono with its background jobs:
 bun run dev
-bun run dev:worker
 ```
 
-Open [localhost:3000](http://localhost:3000) to match `APP_URL`. The web process and worker must share the same development database and Redis URL. `DATABASE_URL` and secrets are server-only. Keep production Polar credentials out of local test workers. `.dev.vars` and Wrangler configuration are retained only for the Cloudflare rollback path.
+Open [localhost:3000](http://localhost:3000) to match `APP_URL`. `bun run dev` starts Vite on port 3000 and Hono on port 3001; Vite proxies `/api` and `/health` to Hono. Hono runs event consumption and maintenance jobs in the same process. Use `DEV_PORT` and `DEV_API_PORT` to change development ports, and keep `APP_URL` aligned with the frontend origin. `DATABASE_URL` and secrets are server-only. Keep production Polar credentials out of local runs.
 
 | Resource                   | Value                                                          |
 | -------------------------- | -------------------------------------------------------------- |
@@ -74,7 +73,7 @@ bun run build
 
 Integration tests use the isolated Neon test branch. They test real PostgreSQL and real local Redis, including queue reconnects, retries, duplicate suppression and atomic limits. Set `TEST_REDIS_URL` to the isolated local Redis. They refuse to use the development hostname and clean up only users created by that run. Run one integration suite at a time because rollback tests briefly install a trigger in the isolated branch.
 
-The smoke and browser tests require `bun run dev` in another terminal, or `bun run build` followed by `bun run preview` to check the production build. Run the Bun worker alongside the web process. The API smoke test exercises HTTP requests through Redis into the Bun worker and Neon, then deletes its own fixtures. The browser test also checks onboarding, tracker execution, reports, settings, sign-in, keyboard interactions, and mobile layout. It requires Playwright Chromium (`bunx playwright install chromium`). Successful runs write `artifacts/api-smoke.json`, `artifacts/browser-qa.json`, and screenshots. Screenshots show synthetic traffic created solely for the disposable QA account.
+The smoke and browser tests require `bun run dev` in another terminal, or `bun run build` followed by `bun run preview` to check the production build. The same Bun process serves the frontend/API and consumes the queued events. The API smoke test exercises HTTP requests through Redis into the Bun worker and Neon, then deletes its own fixtures. The browser test also checks onboarding, tracker execution, reports, settings, sign-in, keyboard interactions, and mobile layout. It requires Playwright Chromium (`bunx playwright install chromium`). Successful runs write `artifacts/api-smoke.json`, `artifacts/browser-qa.json`, and screenshots. Screenshots show synthetic traffic created solely for the disposable QA account.
 
 Validation reports and screenshots are local outputs under `artifacts/` and are excluded from Git. Run `bun run test:design` and `bun scripts/chart-qa.ts` with the app running to repeat the form interaction and contrast checks.
 
@@ -89,7 +88,7 @@ bun run db:migrate --test
 
 The first command creates versioned migrations. The latter commands apply them to the configured Neon development and test databases, respectively. Neither runs automatically in requests or startup.
 
-Production runs at [analytics.beer](https://analytics.beer) on Railway with separate Bun web/worker services, Redis, and the existing Neon production branch. See [deployment and operations](docs/deployment.md) for exact deployment commands, resources, migrations, and live verification.
+Production runs at [analytics.beer](https://analytics.beer) on Railway with one Hono/Bun application service, Redis, and the existing Neon production branch. See [deployment and operations](docs/deployment.md) for exact deployment commands, resources, migrations, and live verification.
 
 ## Website environments
 
@@ -110,7 +109,6 @@ Run `bun scripts/routes-qa.ts` to verify routing with a disposable local account
 Local-storage visitor QA: `bun --env-file=.env.production scripts/sessions-qa.ts --production --local-storage`. Cookieless remains the default and includes anonymous daily visitor journeys from retained pageviews and custom events; no existing environment is switched automatically.
 
 Default cookieless mode includes browser/OS, device, viewport/screen dimensions, language, clicks, links, downloads, form submissions, scroll depth and active time. It sends an anonymous `activity` context, never client visitor/session identifiers. The existing daily hash groups visits; identities reset each UTC day. Field values and page text are excluded. `data-analytics-ignore` and Do Not Track are respected. A sessionStorage pageview throttle contains only paths/timestamps, not visitor IDs. Browser QA: `bun --env-file=.env.production scripts/sessions-qa.ts --production --cookieless`.
-
 
 ### Usage limits
 

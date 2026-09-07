@@ -1,3 +1,4 @@
+import type { AppEnv } from '../../src/runtime/types';
 import { afterAll, beforeAll, expect, test } from 'bun:test';
 import { Client } from 'pg';
 import { eq } from 'drizzle-orm';
@@ -22,13 +23,13 @@ const db = database(client);
 const ids: string[] = [];
 const env = {
   APP_URL: 'http://localhost:3000',
-  HYPERDRIVE: { connectionString },
+  DATABASE_URL: connectionString,
   POLAR_ACCESS_TOKEN: 'test-no-network',
   BETTER_AUTH_SECRET: 'billing-qa-secret-with-more-than-32-chars',
   VISITOR_HASH_SECRET: 'billing-qa-visitor-with-more-than-32-chars',
   API_LIMITER: { limit: async () => ({ success: true }) },
   AUTH_LIMITER: { limit: async () => ({ success: true }) },
-} as unknown as Env;
+} as unknown as AppEnv;
 const missing = () => Promise.reject({ statusCode: 404 });
 const request = (path: string, body = {}) =>
   new Request(`${env.APP_URL}/api/billing/${path}`, {

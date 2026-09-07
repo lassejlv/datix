@@ -7,7 +7,7 @@ export interface AppEnv {
   VISITOR_HASH_SECRET: string;
   POLAR_ACCESS_TOKEN?: string;
   POLAR_WEBHOOK_SECRET?: string;
-  HYPERDRIVE?: { connectionString: string };
+  DATABASE_URL?: string;
   DATABASE?: Database;
   EVENTS: { send(event: EventMessage): Promise<unknown> };
   COLLECT_LIMITER: RateLimiter;

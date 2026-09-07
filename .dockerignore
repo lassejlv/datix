@@ -2,6 +2,7 @@
 !package.json
 !bun.lock
 !vite.config.ts
+!index.html
 !tsconfig.json
 !src
 !src/**

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-theme="system">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-router-head>Analytics Beer | Website analytics</title>
+    <meta
+      data-router-head
+      name="description"
+      content="Understand your visitors, spot what works, and get back to building. Simple website analytics with cookieless tracking by default."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Analytics Beer | Good insights. Less head scratching." />
+    <meta
+      property="og:description"
+      content="Understand your visitors, spot what works, and get back to building."
+    />
+    <meta
+      property="og:image"
+      content="https://analytics.beer/media/beer-stop-motion-poster-light.webp"
+    />
+    <meta property="og:image:width" content="960" />
+    <meta property="og:image:height" content="600" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      (() => {
+        const cookies = Object.fromEntries(
+          document.cookie.split(';').map((part) => {
+            const [name, ...value] = part.trim().split('=');
+            return [name, value.join('=')];
+          }),
+        );
+        const language = cookies['ab-language'];
+        const savedTheme = cookies['ab-theme'];
+        const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'system';
+        const root = document.documentElement;
+        root.lang = language === 'en' || language === 'de' || language === 'da' ? language : 'en';
+        root.dataset.theme = theme;
+        root.classList.toggle(
+          'dark',
+          theme === 'dark' ||
+            (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches),
+        );
+      })();
+    </script>
+    <script
+      src="https://analytics.beer/tracker.js"
+      data-site="01a1b8f5-e833-42e6-a58f-ce78db51b128"
+      defer
+    ></script>
+  </head>
+  <body
+    class="m-0 bg-background font-sans text-[15px] leading-normal text-foreground antialiased selection:bg-pressed **:motion-reduce:animate-none **:motion-reduce:transition-none **:motion-reduce:scroll-auto"
+  >
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

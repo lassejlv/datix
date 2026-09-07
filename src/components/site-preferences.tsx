@@ -18,7 +18,9 @@ export function SitePreferences({
 }) {
   const [locale, setLocale] = useState(initial.locale);
   const [theme, setTheme] = useState(initial.theme);
-  const [systemDark, setSystemDark] = useState(false);
+  const [systemDark, setSystemDark] = useState(
+    () => matchMedia('(prefers-color-scheme: dark)').matches,
+  );
   const dark = theme === 'dark' || (theme === 'system' && systemDark);
   useEffect(() => {
     const media = matchMedia('(prefers-color-scheme: dark)');

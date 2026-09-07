@@ -103,6 +103,23 @@ export const openapi = {
   },
   servers: [{ url: '/' }],
   paths: {
+    '/api/preferences': {
+      get: {
+        operationId: 'getPreferences',
+        description:
+          'Public language and theme preferences. Saved cookies take precedence over trusted country defaults; responses are not cached.',
+        responses: {
+          200: ok({
+            type: 'object',
+            required: ['locale', 'theme'],
+            properties: {
+              locale: { type: 'string', enum: ['en', 'de', 'da'] },
+              theme: { type: 'string', enum: ['system', 'light', 'dark'] },
+            },
+          }),
+        },
+      },
+    },
     '/api/tracker-config': {
       get: {
         operationId: 'getTrackerConfig',
