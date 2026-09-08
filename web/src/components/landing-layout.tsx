@@ -45,10 +45,35 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
 
       {children}
       <footer className="landing-footer">
-        <a href="/" aria-label={t('Analytics Beer home')}>
-          <Brand />
-        </a>
-        <p>{t('Website analytics. A little more human.')}</p>
+        <div className="landing-footer-main">
+          <div className="landing-footer-identity">
+            <a href="/" aria-label={t('Analytics Beer home')}>
+              <Brand />
+            </a>
+            <p>{t('Website analytics. A little more human.')}</p>
+            <a className="landing-footer-email" href="mailto:hello@analytics.beer">
+              hello@analytics.beer
+            </a>
+          </div>
+          <nav className="landing-footer-nav" aria-label={t('Footer navigation')}>
+            <ul>
+              <li>
+                <a href="/#how-it-works">{t('How it works')}</a>
+              </li>
+              <li>
+                <a href="/pricing" aria-current={!home ? 'page' : undefined}>
+                  {t('Pricing')}
+                </a>
+              </li>
+              <li>
+                <a href="/#questions">{t('FAQ')}</a>
+              </li>
+              <li>
+                <a href="/signin">{t('Sign in')}</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
         <div className="footer-controls">
           <button
             type="button"

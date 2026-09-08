@@ -241,6 +241,8 @@ impl Fixture {
 }
 macro_rules! fixture {($name:ident,$body:block)=>{{let $name=Fixture::new().await;let outcome=AssertUnwindSafe(async $body).catch_unwind().await;$name.cleanup().await;if let Err(error)=outcome{std::panic::resume_unwind(error)}}}}
 
+#[path = "imports/mod.rs"]
+mod imports;
 #[path = "scaling/mod.rs"]
 mod scaling;
 

@@ -3,6 +3,7 @@ export const dashboardPages = [
   'overview',
   'visitors',
   'installation',
+  'imports',
   'settings',
 ] as const;
 export type DashboardPage = (typeof dashboardPages)[number];

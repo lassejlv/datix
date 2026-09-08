@@ -91,92 +91,125 @@ export function PricingSection() {
             onClick={() => setYearly(true)}
           >
             {t('Yearly')}
+            <span className="pricing-coming-soon">{t('Coming soon')}</span>
           </button>
         </div>
       </header>
       <div className="pricing-grid">
         <article className="pricing-card pricing-card-pro" aria-labelledby="plan-pro">
-          <h3 id="plan-pro">{enterprise ? t('Enterprise') : 'Pro'}</h3>
-          <p className="pricing-amount" aria-live="polite" aria-atomic="true">
-            <span>{enterprise ? t('Custom') : `$${amount(plan)}`}</span>
-            {!enterprise && <span> / {interval}</span>}
-          </p>
-          <p className="pricing-billing-note">
-            {enterprise
-              ? t('For more than 5 million events per month.')
-              : t('Save 2 months with yearly billing.')}
-          </p>
-          <dl className="pricing-limits">
-            <div>
-              <dt>
-                <label htmlFor="pro-events">{t('Monthly events')}</label>
-              </dt>
-              <dd>
-                <output htmlFor="pro-events">
-                  {enterprise ? `${number(5_000_000)}+` : number(plan.events)}
-                </output>
-              </dd>
-            </div>
-            <div className="pricing-volume">
-              <dt className="sr-only">{t('Adjust event volume')}</dt>
-              <dd>
-                <input
-                  id="pro-events"
-                  type="range"
-                  min={0}
-                  max={proVolumes.length}
-                  step={1}
-                  value={volume}
+          <div className="pricing-configure">
+            <h2 id="plan-pro">{enterprise ? t('Enterprise') : 'Pro'}</h2>
+            <p className="pricing-amount" aria-live="polite" aria-atomic="true">
+              <span>{enterprise ? t('Custom') : `$${amount(plan)}`}</span>
+              {!enterprise && <span> / {interval}</span>}
+            </p>
+            <p className="pricing-billing-note">
+              {enterprise
+                ? t('For more than 5 million events per month.')
+                : yearly
+                  ? t('Yearly billing is coming soon. Save 2 months when it arrives.')
+                  : plan.events === 100_000
+                    ? t('14 days free on Pro 100k, then billed monthly.')
+                    : t('Billed monthly. This volume does not include a trial.')}
+            </p>
+            <dl className="pricing-limits">
+              <div>
+                <dt>
+                  <label htmlFor="pro-events">{t('Monthly events')}</label>
+                </dt>
+                <dd>
+                  <output htmlFor="pro-events">
+                    {enterprise ? `${number(5_000_000)}+` : number(plan.events)}
+                  </output>
+                </dd>
+              </div>
+              <div className="pricing-volume">
+                <dt className="sr-only">{t('Adjust event volume')}</dt>
+                <dd>
+                  <input
+                    id="pro-events"
+                    type="range"
+                    min={0}
+                    max={proVolumes.length}
+                    step={1}
+                    value={volume}
+                    disabled={!mounted}
+                    aria-valuetext={
+                      enterprise
+                        ? t('Over 5 million monthly events — Enterprise')
+                        : `${number(plan.events)} ${t('Monthly events')}`
+                    }
+                    onChange={(event) => setVolume(Number(event.target.value))}
+                  />
+                  <span className="pricing-volume-endpoints" aria-hidden="true">
+                    <span>{number(proVolumes[0].events)}</span>
+                    <span>{number(5_000_000)}+</span>
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt>{t('Websites')}</dt>
+                <dd>{enterprise ? t('Custom') : plan.websites}</dd>
+              </div>
+            </dl>
+            <div className="pricing-action">
+              {enterprise ? (
+                <a className="pricing-select" href="mailto:hello@analytics.beer">
+                  {t('Contact sales')}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </a>
+              ) : (
+                <button
+                  className="pricing-select"
+                  type="button"
                   disabled={!mounted}
-                  aria-valuetext={
-                    enterprise
-                      ? t('Over 5 million monthly events — Enterprise')
-                      : `${number(plan.events)} ${t('Monthly events')}`
-                  }
-                  onChange={(event) => setVolume(Number(event.target.value))}
-                />
-                <span className="pricing-volume-endpoints" aria-hidden="true">
-                  <span>{number(proVolumes[0].events)}</span>
-                  <span>{number(5_000_000)}+</span>
-                </span>
-              </dd>
+                  onClick={(event) => {
+                    returnFocus.current = event.currentTarget;
+                    setSelected(plan);
+                    setError('');
+                    setOpen(true);
+                  }}
+                >
+                  {t(
+                    yearly
+                      ? 'Preview yearly plan'
+                      : plan.events === 100_000
+                        ? 'Start 14-day trial'
+                        : 'Choose Pro',
+                  )}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
+              )}
             </div>
-            <div>
-              <dt>{t('Websites')}</dt>
-              <dd>{enterprise ? t('Custom') : plan.websites}</dd>
+            <p className="pricing-currency-note">{t('All prices in USD.')}</p>
+          </div>
+          <div className="pricing-included">
+            <h3>{t('Included at every volume')}</h3>
+            <ul className="pricing-feature-list">
+              <li>
+                <h4>{t('All dashboard reports')}</h4>
+                <p>{t('Traffic, visitor journeys and engagement in one place.')}</p>
+              </li>
+              <li>
+                <h4>{t('Custom events')}</h4>
+                <p>{t('Measure the actions that matter to your website.')}</p>
+              </li>
+              <li>
+                <h4>{t('Separate environments')}</h4>
+                <p>{t('Keep development and production traffic apart.')}</p>
+              </li>
+            </ul>
+            <div className="pricing-event-note">
+              <h4>{t('What counts as an event?')}</h4>
+              <p>
+                {t(
+                  'Events include pageviews and tracked activity. Your monthly allowance is shared across your websites.',
+                )}
+              </p>
             </div>
-          </dl>
-          <div className="pricing-action">
-            {enterprise ? (
-              <a className="pricing-select" href="mailto:hello@analytics.beer">
-                {t('Contact sales')}
-                <ArrowRight size={16} aria-hidden="true" />
-              </a>
-            ) : (
-              <button
-                className="pricing-select"
-                type="button"
-                disabled={!mounted}
-                onClick={(event) => {
-                  returnFocus.current = event.currentTarget;
-                  setSelected(plan);
-                  setError('');
-                  setOpen(true);
-                }}
-              >
-                {t('Explore Pro')}
-                <ArrowRight size={16} aria-hidden="true" />
-              </button>
-            )}
           </div>
         </article>
       </div>
-      <p className="pricing-shared">{t('All reports, custom events and environments.')}</p>
-      <p className="pricing-preview-note">
-        {t(
-          'Prices in USD. Monthly plans are available now. Yearly billing is coming soon. Events include pageviews and tracked activity.',
-        )}
-      </p>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogPopup
           closeProps={{ 'aria-label': t('Close') }}
@@ -187,7 +220,7 @@ export function PricingSection() {
           <DialogHeader>
             <DialogTitle>Pro{yearly ? ` · ${t('Coming soon')}` : ''}</DialogTitle>
             <DialogDescription>
-              {`${selected.events === 100000 ? `${t('14 days free, then')} ` : ''}$${amount(selected)} ${t('per')} ${interval}.`}
+              {`${!yearly && selected.events === 100000 ? `${t('14 days free, then')} ` : ''}$${amount(selected)} ${t('per')} ${interval}.`}
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
@@ -226,7 +259,12 @@ export function PricingSection() {
                 {t('Back to plans')}
               </button>
               {!yearly && (
-                <button type="button" disabled={busy} onClick={() => void checkout()}>
+                <button
+                  className="pricing-checkout"
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void checkout()}
+                >
                   {busy ? t('Opening checkout…') : t('Continue to checkout')}
                   <ArrowRight size={16} aria-hidden="true" />
                 </button>

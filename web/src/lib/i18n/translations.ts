@@ -1,4 +1,43 @@
 export const translations = {
+  'Footer navigation': { de: 'Navigation im Footer', da: 'Navigation i sidefoden' },
+  'Yearly billing is coming soon. Save 2 months when it arrives.': {
+    de: 'Jährliche Zahlung folgt bald. Dann sparst du 2 Monate.',
+    da: 'Årlig betaling kommer snart. Spar 2 måneder, når den er klar.',
+  },
+  '14 days free on Pro 100k, then billed monthly.': {
+    de: '14 Tage kostenlos mit Pro 100k, danach monatliche Zahlung.',
+    da: '14 dage gratis med Pro 100k, derefter månedlig betaling.',
+  },
+  'Billed monthly. This volume does not include a trial.': {
+    de: 'Monatliche Zahlung. Dieses Volumen enthält keine Testphase.',
+    da: 'Betales månedligt. Dette antal hændelser inkluderer ikke en prøveperiode.',
+  },
+  'Preview yearly plan': { de: 'Jahrestarif ansehen', da: 'Se årlig plan' },
+  'Start 14-day trial': { de: '14 Tage kostenlos testen', da: 'Start 14 dages prøveperiode' },
+  'Choose Pro': { de: 'Pro wählen', da: 'Vælg Pro' },
+  'All prices in USD.': { de: 'Alle Preise in USD.', da: 'Alle priser i USD.' },
+  'Included at every volume': {
+    de: 'Bei jedem Volumen inklusive',
+    da: 'Inkluderet ved alle niveauer',
+  },
+  'Traffic, visitor journeys and engagement in one place.': {
+    de: 'Traffic, Besucherpfade und Interaktionen an einem Ort.',
+    da: 'Trafik, besøgsforløb og engagement samlet ét sted.',
+  },
+  'Measure the actions that matter to your website.': {
+    de: 'Miss die Aktionen, die für deine Website zählen.',
+    da: 'Mål de handlinger, der betyder noget for dit website.',
+  },
+  'Keep development and production traffic apart.': {
+    de: 'Halte Entwicklungs- und Produktionstraffic getrennt.',
+    da: 'Hold trafik fra udvikling og produktion adskilt.',
+  },
+  'What counts as an event?': { de: 'Was zählt als Ereignis?', da: 'Hvad tæller som en hændelse?' },
+  'Events include pageviews and tracked activity. Your monthly allowance is shared across your websites.':
+    {
+      de: 'Ereignisse umfassen Seitenaufrufe und erfasste Aktivitäten. Dein monatliches Kontingent gilt für alle deine Websites zusammen.',
+      da: 'Hændelser omfatter sidevisninger og registreret aktivitet. Dit månedlige antal deles mellem dine websites.',
+    },
   '14 days free on Pro 100k. Pick your event volume.': {
     de: '14 Tage kostenlos mit Pro 100k. Wähle deine Ereignismenge.',
     da: '14 dage gratis med Pro 100k. Vælg dit antal hændelser.',

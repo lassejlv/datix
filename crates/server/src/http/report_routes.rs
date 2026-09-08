@@ -5,14 +5,15 @@ pub(super) async fn report_environment(
     c: &Context,
     key: &str,
     params: &HashMap<String, String>,
-) -> Result<Uuid> {
+) -> Result<(Uuid, i64)> {
     let site = load_site(state, c, key).await?;
     let env = params
         .get("environment")
         .map(|s| id(s))
         .transpose()?
         .unwrap_or(site.id);
-    Ok(sites::environment(state, site.id, env).await?.id)
+    let environment = sites::environment(state, site.id, env).await?;
+    Ok((environment.id, environment.import_revision))
 }
 pub(super) async fn installation(
     AppState(state): AppState<State>,
@@ -20,7 +21,7 @@ pub(super) async fn installation(
     Path(key): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
-    let env = report_environment(&state, &c, &key, &params).await?;
+    let (env, _) = report_environment(&state, &c, &key, &params).await?;
     Ok(Json(reports::installation(&state, env).await?))
 }
 pub(super) async fn overview(
@@ -29,12 +30,13 @@ pub(super) async fn overview(
     Path(key): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
-    let env = report_environment(&state, &c, &key, &params).await?;
+    let (env, revision) = report_environment(&state, &c, &key, &params).await?;
     let range = DateRange::parse(&params)?;
     Ok(Json(
         reports::cached(
             &state,
             env,
+            revision,
             "overview",
             &range,
             &params,
@@ -49,12 +51,13 @@ pub(super) async fn timeseries(
     Path(key): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
-    let env = report_environment(&state, &c, &key, &params).await?;
+    let (env, revision) = report_environment(&state, &c, &key, &params).await?;
     let range = DateRange::parse(&params)?;
     Ok(Json(
         reports::cached(
             &state,
             env,
+            revision,
             "timeseries",
             &range,
             &params,
@@ -69,12 +72,13 @@ pub(super) async fn breakdown(
     Path(key): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
-    let env = report_environment(&state, &c, &key, &params).await?;
+    let (env, revision) = report_environment(&state, &c, &key, &params).await?;
     let range = DateRange::parse(&params)?;
     Ok(Json(
         reports::cached(
             &state,
             env,
+            revision,
             "breakdown",
             &range,
             &params,
@@ -89,12 +93,13 @@ pub(super) async fn sessions(
     Path(key): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> Result<Json<Value>> {
-    let env = report_environment(&state, &c, &key, &params).await?;
+    let (env, revision) = report_environment(&state, &c, &key, &params).await?;
     let range = DateRange::parse(&params)?;
     Ok(Json(
         reports::cached(
             &state,
             env,
+            revision,
             "sessions",
             &range,
             &params,

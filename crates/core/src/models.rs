@@ -148,6 +148,7 @@ pub struct Environments {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub tracking_mode: String,
     pub tracking_settings: serde_json::Value,
+    pub import_revision: i64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, sqlx::FromRow)]

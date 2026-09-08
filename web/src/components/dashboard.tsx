@@ -17,6 +17,8 @@ import { WelcomeOnboarding, SetupOnboarding } from './onboarding';
 import { VisitorJourneys } from './visitor-journeys';
 import { AddSiteDialog, Installation, SiteSettings } from './site-panels';
 import { AddEnvironmentDialog } from './environment-panels';
+import { AnalyticsImports } from './analytics-imports';
+import { breakdownName, providerName } from '../lib/imports';
 import {
   ApiError,
   apiClient,
@@ -116,6 +118,9 @@ function Dashboard({
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const isUsage = useLocation({ select: (location) => location.pathname === '/usage' });
+  const reportRange = useLocation({
+    select: (location) => location.search as { from?: string; to?: string },
+  });
   const { setOpenMobile } = useSidebar();
   const [sites, setSites] = useState<Site[]>([]),
     [rememberedSite, setRememberedSite] = useState(''),
@@ -361,9 +366,11 @@ function Dashboard({
                     ? 'Settings'
                     : panel === 'installation'
                       ? 'Install'
-                      : panel === 'visitors'
-                        ? 'Visitors'
-                        : 'Overview'}
+                      : panel === 'imports'
+                        ? 'Imports'
+                        : panel === 'visitors'
+                          ? 'Visitors'
+                          : 'Overview'}
             </span>
           </div>
         </header>
@@ -449,6 +456,19 @@ function Dashboard({
                 onUpdated={environmentUpdated}
                 onConnected={completeSetup}
               />
+            ) : panel === 'imports' ? (
+              <AnalyticsImports
+                key={environment.id}
+                site={site}
+                environment={environment}
+                onViewReport={(from, to) => {
+                  void navigate({
+                    to: siteRoute,
+                    params: { siteId: site.id, environmentId: environment.id, page: 'overview' },
+                    search: { from, to },
+                  });
+                }}
+              />
             ) : panel === 'settings' ? (
               <SiteSettings
                 key={environment.id}
@@ -493,9 +513,10 @@ function Dashboard({
               />
             ) : (
               <Overview
-                key={environment.id}
+                key={`${environment.id}:${reportRange.from ?? ''}:${reportRange.to ?? ''}`}
                 site={site}
                 environment={environment}
+                initialRange={reportRange}
                 onInstall={() => show('installation')}
                 onExpired={onSignedOut}
               />
@@ -548,21 +569,23 @@ function Overview({
   environment,
   onInstall,
   onExpired,
+  initialRange,
 }: {
   site: Site;
   environment: SiteEnvironment;
   onInstall: () => void;
   onExpired: () => void;
+  initialRange?: { from?: string; to?: string };
 }) {
-  const [days, setDays] = useState('30'),
+  const [days, setDays] = useState(initialRange?.from && initialRange?.to ? 'custom' : '30'),
     [metric, setMetric] = useState<Metric>('pageviews'),
     [reports, setReports] = useState<Reports | null>(null),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true),
     [reload, setReload] = useState(0);
   const today = new Date().toISOString().slice(0, 10);
-  const [customFrom, setCustomFrom] = useState(today),
-    [customTo, setCustomTo] = useState(today);
+  const [customFrom, setCustomFrom] = useState(initialRange?.from ?? today),
+    [customTo, setCustomTo] = useState(initialRange?.to ?? today);
   const from =
     days === 'custom'
       ? customFrom
@@ -783,7 +806,9 @@ function Overview({
           <span>{metrics.find((item) => item.key === metric)?.name}</span>
           <span>
             {from && to ? `${dateLabel(from)} - ${dateLabel(to)}` : ''}
-            <span className="ml-2 text-muted-foreground">UTC</span>
+            <span className="ml-2 text-muted-foreground">
+              {reports?.overview.imports?.calendarDayWarning ? 'Source dates' : 'UTC'}
+            </span>
           </span>
         </div>
         {loading ? (
@@ -802,6 +827,44 @@ function Overview({
           </div>
         )}
       </section>
+
+      {!!reports?.overview.imports?.importedDays && (
+        <details className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-secondary-ink">
+          <summary className="cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+            Includes {number(reports.overview.imports.importedDays)} days of imported history
+          </summary>
+          <ul className="mt-2 space-y-1">
+            {reports.overview.imports.sources.map((source) => (
+              <li key={source.id}>
+                {providerName(source.provider)} · {source.timeZone} ·{' '}
+                {source.breakdowns.length
+                  ? source.breakdowns.map(breakdownName).join(', ')
+                  : 'Daily totals only'}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2">
+            Daily visitors follow each provider’s definition and are added across days. Events and
+            breakdowns include only what was tracked here or included in the export; GA4 imports
+            contain daily pageviews and total users. Visitor journeys contain only visits tracked by
+            Analytics Beer.
+          </p>
+          {reports.overview.imports.calendarDayWarning && (
+            <p className="mt-2">
+              Imported totals retain their provider’s calendar dates and timezone. Analytics Beer
+              tracking uses UTC.
+            </p>
+          )}
+          <Link
+            to={siteRoute}
+            params={{ siteId: site.id, environmentId: environment.id, page: 'imports' }}
+            search={{}}
+            className="mt-2 inline-block underline underline-offset-4"
+          >
+            Manage imports
+          </Link>
+        </details>
+      )}
 
       {(!reports || reports.overview.pageviews > 0) && (
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-x-8 md:gap-y-6">

@@ -5,10 +5,22 @@ use std::collections::HashMap;
 use uuid::Uuid;
 mod cursor;
 
+// Late native queue deliveries can move the live boundary back after an import.
+// Store source intervals at import time and prefer native history on every read.
+const IMPORTED: &str = "WITH live_start AS (
+    SELECT min(day)::timestamp AT TIME ZONE 'UTC' AS starts_at FROM daily_stats WHERE site_id=$1 AND dimension='total'
+), imported AS (
+    SELECT d.*,i.provider,i.source_timezone,i.summary FROM imported_daily_stats d
+    JOIN analytics_imports i ON i.id=d.import_id AND i.environment_id=d.environment_id
+    CROSS JOIN live_start l WHERE d.environment_id=$1 AND d.day BETWEEN $2 AND $3
+      AND (l.starts_at IS NULL OR d.ends_at<=l.starts_at)
+)";
+
 /// The HTTP layer verifies ownership and environment existence before consulting this cache.
 pub async fn cached(
     state: &State,
     environment: Uuid,
+    import_revision: i64,
     kind: &str,
     range: &DateRange,
     params: &HashMap<String, String>,
@@ -19,7 +31,7 @@ pub async fn cached(
     }
     let ordered: std::collections::BTreeMap<_, _> = params.iter().collect();
     let key = format!(
-        "{environment}:{}",
+        "{environment}:{import_revision}:{}",
         analytics_core::crypto::hash(
             &state.config.auth_secret,
             &json!([kind, range, ordered]).to_string()
@@ -47,14 +59,43 @@ pub async fn installation(state: &State, id: Uuid) -> Result<Value> {
     Ok(json!({"receiving":latest.is_some(),"lastReceivedAt":latest}))
 }
 pub async fn overview(state: &State, id: Uuid, range: DateRange) -> Result<Value> {
-    let (pageviews,events,visitors):(i64,i64,i64)=sqlx::query_as("SELECT coalesce(sum(pageviews),0)::bigint,coalesce(sum(custom_events),0)::bigint,coalesce(sum(visitors),0)::bigint FROM daily_stats WHERE site_id=$1 AND dimension='total' AND day BETWEEN $2 AND $3")
- .bind(id).bind(range.from).bind(range.to).fetch_one(&state.db).await?;
-    Ok(
-        json!({"range":range,"pageviews":pageviews,"customEvents":events,"dailyUniqueVisitors":visitors,"visitorMetric":"sum_of_daily_unique_visitors"}),
-    )
+    let statement = format!("{IMPORTED}, native AS (
+        SELECT coalesce(sum(pageviews),0)::bigint AS pageviews,coalesce(sum(custom_events),0)::bigint AS custom_events,coalesce(sum(visitors),0)::bigint AS visitors
+        FROM daily_stats WHERE site_id=$1 AND dimension='total' AND day BETWEEN $2 AND $3
+    ), historical AS (
+        SELECT count(*) AS days,coalesce(sum(pageviews),0)::bigint AS pageviews,coalesce(sum(custom_events),0)::bigint AS custom_events,coalesce(sum(visitors),0)::bigint AS visitors,
+        coalesce(bool_or(source_timezone NOT IN('UTC','Etc/UTC','GMT','Etc/GMT')),false) AS calendar_warning FROM imported
+    ) SELECT jsonb_build_object(
+        'pageviews',n.pageviews+h.pageviews,'customEvents',n.custom_events+h.custom_events,'dailyUniqueVisitors',n.visitors+h.visitors,
+        'visitorMetric','sum_of_daily_unique_visitors',
+        'imports',jsonb_build_object('importedDays',h.days,'pageviews',h.pageviews,'dailyVisitors',h.visitors,'customEvents',h.custom_events,
+            'calendarDayWarning',h.calendar_warning,'dateBasis','provider_calendar_day',
+            'sources',coalesce((SELECT jsonb_agg(source ORDER BY source->>'id') FROM (
+                SELECT DISTINCT jsonb_build_object('id',import_id,'provider',provider,'sourceName',summary->'sourceName','timeZone',source_timezone,
+                    'visitorMetric',summary->'visitorMetric','from',summary->'from','to',summary->'to','metrics',summary->'metrics','breakdowns',summary->'breakdowns') AS source FROM imported
+            ) s),'[]'::jsonb),
+            'breakdowns',coalesce((SELECT jsonb_agg(DISTINCT b.dimension ORDER BY b.dimension) FROM imported_breakdowns b JOIN imported d ON d.environment_id=b.environment_id AND d.day=b.day),'[]'::jsonb)
+        )) FROM native n CROSS JOIN historical h");
+    let mut report: Value = sqlx::query_scalar(&statement)
+        .bind(id)
+        .bind(range.from)
+        .bind(range.to)
+        .fetch_one(&state.db)
+        .await?;
+    report["range"] = json!(range);
+    Ok(report)
 }
 pub async fn timeseries(state: &State, id: Uuid, range: DateRange) -> Result<Value> {
-    let rows:Vec<(NaiveDate,i64,i64,i64)>=sqlx::query_as("SELECT day,pageviews,custom_events,visitors FROM daily_stats WHERE site_id=$1 AND dimension='total' AND day BETWEEN $2 AND $3 ORDER BY day").bind(id).bind(range.from).bind(range.to).fetch_all(&state.db).await?;
+    let statement = format!("{IMPORTED}, combined AS (
+        SELECT day,pageviews,custom_events,visitors FROM daily_stats WHERE site_id=$1 AND dimension='total' AND day BETWEEN $2 AND $3
+        UNION ALL SELECT day,pageviews,custom_events,visitors FROM imported
+    ) SELECT day,sum(pageviews)::bigint,sum(custom_events)::bigint,sum(visitors)::bigint FROM combined GROUP BY day ORDER BY day");
+    let rows: Vec<(NaiveDate, i64, i64, i64)> = sqlx::query_as(&statement)
+        .bind(id)
+        .bind(range.from)
+        .bind(range.to)
+        .fetch_all(&state.db)
+        .await?;
     let data:Vec<_>=(0..range.days).map(|i|{let day=range.from+Duration::days(i);let row=rows.iter().find(|r|r.0==day);json!({"day":day,"pageviews":row.map_or(0,|r|r.1),"customEvents":row.map_or(0,|r|r.2),"dailyUniqueVisitors":row.map_or(0,|r|r.3)})}).collect();
     Ok(json!({"range":range,"data":data}))
 }
@@ -90,8 +131,19 @@ pub async fn breakdown(
         return Err(Error::invalid("Invalid breakdown dimension."));
     }
     let limit = number(params, "limit", 10, 1, 100)?;
-    let rows:Vec<(String,i64)>=sqlx::query_as("SELECT value,sum(CASE WHEN dimension='event' THEN custom_events ELSE pageviews END)::bigint AS count FROM daily_stats WHERE site_id=$1 AND dimension=$2 AND day BETWEEN $3 AND $4 GROUP BY value ORDER BY count DESC,value ASC LIMIT $5")
- .bind(id).bind(dimension).bind(range.from).bind(range.to).bind(limit).fetch_all(&state.db).await?;
+    let statement = format!("{IMPORTED}, combined AS (
+        SELECT value,CASE WHEN dimension='event' THEN custom_events ELSE pageviews END AS count FROM daily_stats
+            WHERE site_id=$1 AND dimension=$4 AND day BETWEEN $2 AND $3
+        UNION ALL SELECT b.value,b.count FROM imported_breakdowns b JOIN imported d ON d.environment_id=b.environment_id AND d.day=b.day WHERE b.dimension=$4
+    ) SELECT value,sum(count)::bigint AS count FROM combined GROUP BY value ORDER BY count DESC,value ASC LIMIT $5");
+    let rows: Vec<(String, i64)> = sqlx::query_as(&statement)
+        .bind(id)
+        .bind(range.from)
+        .bind(range.to)
+        .bind(dimension)
+        .bind(limit)
+        .fetch_all(&state.db)
+        .await?;
     Ok(
         json!({"range":range,"dimension":dimension,"metric":if dimension=="event"{"customEvents"}else{"pageviews"},"data":rows.iter().map(|r|json!({"value":r.0,"count":r.1})).collect::<Vec<_>>()}),
     )

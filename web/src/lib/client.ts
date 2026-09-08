@@ -1,4 +1,5 @@
 import type { TrackingSettings } from './tracking-settings';
+import type { ImportedReportSources } from './imports';
 export type User = { id: string; name: string; email: string };
 export type SiteEnvironment = {
   trackingSettings?: Partial<TrackingSettings>;
@@ -31,7 +32,12 @@ export type Point = {
 };
 export type Breakdown = { data: { value: string; count: number }[] };
 export type Reports = {
-  overview: { pageviews: number; dailyUniqueVisitors: number; customEvents: number };
+  overview: {
+    pageviews: number;
+    dailyUniqueVisitors: number;
+    customEvents: number;
+    imports?: ImportedReportSources;
+  };
   timeseries: { data: Point[] };
   path: Breakdown;
   referrer: Breakdown;

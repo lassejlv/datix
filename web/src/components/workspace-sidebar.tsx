@@ -1,6 +1,15 @@
 import { AccountMenu } from './account-menu';
 import { Link } from '@tanstack/react-router';
-import { Sparkles, BarChart3, Footprints, Code2, Settings2, Activity, X } from './ui/icons';
+import {
+  Sparkles,
+  BarChart3,
+  Footprints,
+  Code2,
+  FileText,
+  Settings2,
+  Activity,
+  X,
+} from './ui/icons';
 import { WorkspaceSwitcher } from './workspace-switcher';
 import { Brand } from './brand';
 import { Button } from './ui/button';
@@ -99,6 +108,7 @@ export function WorkspaceSidebar({
                 { page: 'overview', label: 'Overview', icon: BarChart3 },
                 { page: 'visitors', label: 'Visitors', icon: Footprints },
                 { page: 'installation', label: 'Install', icon: Code2 },
+                { page: 'imports', label: 'Imports', icon: FileText },
                 { page: 'settings', label: 'Settings', icon: Settings2 },
               ] as const
             )

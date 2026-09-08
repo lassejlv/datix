@@ -39,6 +39,8 @@ A website belongs to one account. All reads and mutations verify the owner and r
 
 ## Collection
 
+Historical Plausible and GA4 exports use the owner-authenticated [imports API](imports.md#api). They are stored as separate aggregates and do not enter event collection or billing.
+
 `POST /api/collect` accepts `application/json` or JSON carried as `text/plain` (avoids a browser CORS preflight). Maximum body: 8192 bytes. Cookies are unnecessary. OPTIONS is supported; collection responses allow any browser origin without credentials, while payload validation enforces the site's allowed hostnames and Origin/URL agreement.
 
 ```json

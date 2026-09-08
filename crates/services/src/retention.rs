@@ -24,6 +24,18 @@ pub async fn retain(state: &State) -> Result<Value> {
         ("daily_visitors", "day < (now()-interval '30 days')::date"),
         ("daily_stats", "day < (now()-interval '729 days')::date"),
         (
+            "imported_breakdowns",
+            "day < (now()-interval '729 days')::date",
+        ),
+        (
+            "imported_daily_stats",
+            "day < (now()-interval '729 days')::date AND NOT EXISTS(SELECT 1 FROM imported_breakdowns b WHERE b.environment_id=imported_daily_stats.environment_id AND b.day=imported_daily_stats.day)",
+        ),
+        (
+            "analytics_imports",
+            "NOT EXISTS(SELECT 1 FROM imported_daily_stats d WHERE d.import_id=analytics_imports.id)",
+        ),
+        (
             "rate_limit",
             "last_request < (extract(epoch FROM now())*1000)::bigint-86400000",
         ),
@@ -63,6 +75,21 @@ pub async fn retain(state: &State) -> Result<Value> {
             deleted += rows;
             totals[table] = json!(totals[table].as_u64().unwrap_or(0) + rows);
             pending[index] = rows >= limit;
+            // Rotation can visit a parent before its children. Revisit it after child progress,
+            // without using cascades to bypass the retention row/time budget.
+            if rows > 0 {
+                let parent = match table {
+                    "imported_breakdowns" => Some("imported_daily_stats"),
+                    "imported_daily_stats" => Some("analytics_imports"),
+                    _ => None,
+                };
+                if let Some(parent) = parent {
+                    pending[predicates
+                        .iter()
+                        .position(|(table, _)| *table == parent)
+                        .unwrap()] = true;
+                }
+            }
         }
     }
     let backlog = pending.iter().any(|value| *value);

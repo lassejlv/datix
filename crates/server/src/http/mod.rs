@@ -34,6 +34,8 @@ mod report_routes;
 use report_routes::{breakdown, installation, overview, sessions, timeseries};
 mod assets;
 use assets::fallback;
+mod import_routes;
+use import_routes::{create_import, delete_import, list_imports, preview_import};
 
 pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
     let operational = Router::new()
@@ -94,6 +96,18 @@ pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
         .route("/api/sites/{site}/timeseries", get(timeseries))
         .route("/api/sites/{site}/breakdown", get(breakdown))
         .route("/api/sites/{site}/sessions", get(sessions))
+        .route(
+            "/api/sites/{site}/environments/{environment}/imports",
+            get(list_imports).post(create_import),
+        )
+        .route(
+            "/api/sites/{site}/environments/{environment}/imports/preview",
+            post(preview_import),
+        )
+        .route(
+            "/api/sites/{site}/environments/{environment}/imports/{import}",
+            axum::routing::delete(delete_import),
+        )
         .fallback(fallback)
         .method_not_allowed_fallback(|| async {
             Error::new(

@@ -493,9 +493,9 @@
   font-size: 14px;
   line-height: 20px;
 }
-/* Compact pricing comparison with a volume-based Enterprise option. */
+/* One offer: choose capacity, then see what every volume includes. */
 .landing-pricing {
-  max-width: 640px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 64px 24px 0;
   text-align: left;
@@ -509,15 +509,15 @@
 .pricing-heading h1 {
   max-width: 560px;
   margin: 0;
-  font-size: 30px;
+  font-size: 40px;
   line-height: 1.2;
   letter-spacing: -1px;
   font-weight: 500;
   text-wrap: balance;
 }
 .pricing-heading .landing-section-description {
-  margin: 8px 0 0;
-  font-size: 15px;
+  margin: 12px 0 0;
+  font-size: 16px;
   line-height: 24px;
 }
 .pricing-billing-switch {
@@ -530,7 +530,11 @@
   background: var(--landing-wash);
 }
 .pricing-billing-switch button {
-  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
   padding: 6px 12px;
   border: 0;
   border-radius: 6px;
@@ -538,6 +542,10 @@
   color: var(--landing-secondary);
   font-size: 14px;
   line-height: 20px;
+}
+.pricing-coming-soon {
+  font-size: 12px;
+  line-height: 16px;
 }
 .pricing-billing-switch button[aria-pressed='true'] {
   background: var(--landing-ink);
@@ -547,15 +555,16 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 40px;
-  margin-top: 32px;
+  margin-top: 40px;
 }
 .pricing-card {
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 64px;
+  padding: 32px 0 0;
   border-top: 1px solid var(--landing-line);
 }
-.pricing-card h3 {
+.pricing-configure h2 {
   margin: 0;
   font-size: 20px;
   line-height: 28px;
@@ -569,7 +578,7 @@
   font-variant-numeric: tabular-nums;
 }
 .pricing-amount span:first-child {
-  font-size: 36px;
+  font-size: 52px;
   line-height: 1;
   font-weight: 500;
   letter-spacing: -1.5px;
@@ -580,7 +589,8 @@
   line-height: 20px;
 }
 .pricing-card .pricing-billing-note {
-  margin-top: 8px;
+  min-height: 40px;
+  margin-top: 12px;
   color: var(--landing-secondary);
   font-size: 13px;
   line-height: 20px;
@@ -588,7 +598,7 @@
 .pricing-limits {
   display: grid;
   gap: 12px;
-  margin: 24px 0 0;
+  margin: 20px 0 0;
   font-size: 15px;
   line-height: 24px;
 }
@@ -633,11 +643,9 @@
   margin: 0;
   font-weight: 500;
 }
-.landing-pricing .pricing-shared {
-  margin: 24px 0 0;
-  font-size: 14px;
-  line-height: 22px;
-  color: var(--landing-secondary);
+.pricing-limits output {
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
 }
 .pricing-action {
   margin-top: auto;
@@ -650,7 +658,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 40px;
+  min-height: 48px;
   margin-top: 0;
   padding: 8px 16px;
   border: 1px solid var(--landing-line);
@@ -667,12 +675,43 @@
   color: var(--landing-canvas);
   border-color: transparent;
 }
-.landing-pricing .pricing-preview-note {
-  margin: 8px 0 0;
-  max-width: 720px;
+.pricing-card .pricing-currency-note {
+  margin-top: 12px;
   color: var(--landing-secondary);
   font-size: 13px;
   line-height: 20px;
+}
+.pricing-included {
+  padding-left: 40px;
+  border-left: 1px solid var(--landing-line);
+}
+.pricing-included h3 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.pricing-feature-list {
+  display: grid;
+  gap: 20px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pricing-included h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.pricing-included p {
+  color: var(--landing-secondary);
+  font-size: 14px;
+  line-height: 22px;
+}
+.pricing-event-note {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--landing-line);
 }
 .pricing-dialog {
   border-radius: 16px;
@@ -725,7 +764,7 @@
   background: transparent;
   color: var(--foreground);
 }
-.pricing-dialog-actions a {
+.pricing-dialog-actions :is(a, .pricing-checkout) {
   background: var(--foreground);
   color: var(--background);
   text-decoration: none;
@@ -783,22 +822,81 @@
   margin-top: 24px;
 }
 .landing-footer {
-  padding: 0 24px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  text-align: left;
 }
-.landing-footer > a > span {
-  font-size: 16px;
+.landing-footer-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 48px;
+  padding-bottom: 24px;
+}
+.landing-footer-identity > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+.landing-footer-identity > a > span {
+  font-size: 18px;
   line-height: 24px;
   font-weight: 500;
 }
-.landing-footer p,
-.landing-footer .landing-inline-link {
+.landing-footer-identity p {
+  max-width: 32ch;
   color: var(--landing-secondary);
-  font-size: 12px !important;
-  line-height: 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+.landing-footer-identity .landing-footer-email {
+  margin-top: 4px;
+  color: var(--landing-secondary);
+  font-size: 14px;
+  line-height: 22px;
+}
+.landing-footer-nav ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(112px, 1fr));
+  gap: 0 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.landing-footer-nav a {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  min-width: 40px;
+  width: fit-content;
+  color: var(--landing-secondary);
+  font-size: 14px;
+  line-height: 22px;
+}
+.landing-footer-nav a[aria-current='page'] {
+  color: var(--landing-ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .landing-footer-nav a:hover,
+  .landing-footer-email:hover {
+    color: var(--landing-ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+@media (max-width: 600px) {
+  .landing-footer-main {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .landing-footer-nav ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
 }
 .landing-dialog {
   border-radius: 12px;
@@ -855,9 +953,9 @@
     background: color-mix(in srgb, var(--landing-ink) 85%, var(--landing-canvas));
   }
   .pricing-dialog-actions button:hover {
-    background: var(--muted);
+    background: var(--wash);
   }
-  .pricing-dialog-actions a:hover {
+  .pricing-dialog-actions :is(a, .pricing-checkout):hover {
     background: color-mix(in srgb, var(--foreground) 88%, var(--background));
   }
 }
@@ -1030,7 +1128,22 @@
     margin-top: 24px;
   }
   .pricing-card {
+    grid-template-columns: 1fr;
+    gap: 32px;
     padding: 24px 0 0;
+  }
+  .pricing-billing-switch {
+    width: 100%;
+  }
+  .pricing-billing-switch button {
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 0 8px;
+  }
+  .pricing-included {
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--landing-line);
   }
   .pricing-dialog-actions {
     flex-direction: column-reverse;
@@ -1091,14 +1204,17 @@
 .footer-controls {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 8px 20px;
-  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--landing-line);
 }
 .footer-controls .landing-inline-link {
   text-decoration: none;
-  min-height: 32px;
+  min-height: 40px;
+  color: var(--landing-secondary);
+  line-height: 20px;
 }
 .footer-controls .landing-inline-link:hover {
   text-decoration: underline;
@@ -1113,8 +1229,7 @@
   display: flex;
   gap: 4px;
   align-items: center;
-  padding-left: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--landing-secondary);
 }
 .footer-preferences label > svg {
@@ -1124,9 +1239,9 @@
   color: var(--landing-secondary);
   background: var(--landing-canvas);
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 4px;
-  height: 32px;
+  min-height: 40px;
   font: inherit;
   cursor: pointer;
 }
@@ -1138,14 +1253,12 @@
   outline: 2px solid var(--landing-ink);
   outline-offset: 2px;
 }
-@media (pointer: coarse) {
-  .footer-preferences select,
-  .footer-controls .landing-inline-link {
-    min-height: 40px;
+@media (max-width: 600px) {
+  .footer-controls {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
-}
-.landing-footer {
-  flex-wrap: wrap;
 }
 
 .pricing-page-content {

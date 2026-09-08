@@ -7,6 +7,7 @@ pub static MIGRATIONS: sqlx::migrate::Migrator = sqlx::migrate!("./migrations");
 static UPGRADES: &[(i64, &str)] = &[
     (2, include_str!("../upgrades/0002_scaling.sql")),
     (3, include_str!("../upgrades/0003_partition_events.sql")),
+    (4, include_str!("../upgrades/0004_imports.sql")),
 ];
 
 pub async fn check(pool: &PgPool) -> Result<Value> {

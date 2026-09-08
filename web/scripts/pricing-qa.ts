@@ -35,8 +35,9 @@ try {
       expect(parseFloat(outline)).toBeGreaterThanOrEqual(2);
       await page.keyboard.press('Enter');
       await expect(page.getByRole('dialog')).toBeVisible();
-      await expect(page.getByRole('dialog')).toContainText('14');
+      await expect(page.getByRole('dialog')).not.toContainText(/\b14\b/);
       await expect(page.getByRole('dialog')).toContainText('100');
+      await expect(page.locator('.pricing-checkout')).toHaveCount(0);
       await page.keyboard.press('Escape');
       await expect(page.locator('.pricing-select').nth(i)).toBeFocused();
     }
@@ -58,9 +59,18 @@ try {
     await page.keyboard.press('Escape');
     await page.locator('.pricing-billing-switch button').first().click();
     await expect(page.locator('.pricing-card-pro .pricing-amount')).toContainText('$149');
+    await page.locator('.pricing-select').click();
+    await expect(page.getByRole('dialog')).toContainText('$149');
+    await expect(page.locator('.pricing-checkout')).toBeVisible();
+    await expect(page.getByRole('dialog')).not.toContainText(/\b14\b/);
+    await page.keyboard.press('Escape');
     await slider.focus();
     await page.keyboard.press('Home');
     await expect(page.locator('.pricing-card-pro .pricing-amount')).toContainText('$9');
+    await page.locator('.pricing-select').click();
+    await expect(page.getByRole('dialog')).toContainText('14');
+    await expect(page.locator('.pricing-checkout')).toBeVisible();
+    await page.keyboard.press('Escape');
     // Exercise pointer dragging as well as keyboard selection.
     const range = await slider.boundingBox();
     await page.mouse.move(range!.x + 8, range!.y + range!.height / 2);
