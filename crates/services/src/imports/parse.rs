@@ -13,6 +13,7 @@ const MAX_RECORDS: usize = 100_000;
 const MAX_FIELD_BYTES: usize = 4096;
 const MAX_VALUE_BYTES: usize = 2048;
 const MAX_COUNT: i64 = 1_000_000_000_000;
+const DASHBOARD_EXPORT: &str = "Upload imported_visitors.csv or the full Plausible export ZIP from site settings. Dashboard exports are not supported.";
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -172,9 +173,7 @@ pub fn parse(provider: &str, timezone: &str, filename: &str, bytes: &[u8]) -> Re
         && extension.eq_ignore_ascii_case("csv")
         && classify(&files[0].name)?.map(|(table, _)| table) != Some(Table::Visitors)
     {
-        return Err(Error::invalid(
-            "Upload imported_visitors.csv or the full Plausible export ZIP from site settings. Dashboard exports are not supported.",
-        ));
+        return Err(Error::invalid(DASHBOARD_EXPORT));
     }
     for file in &files {
         match provider {
@@ -258,11 +257,56 @@ fn safe_name(name: &str, nested: bool) -> Result<()> {
     Ok(())
 }
 
+fn dashboard_export_file(name: &str) -> bool {
+    let basename = name.rsplit('/').next().unwrap_or(name);
+    let Some((stem, extension)) = basename.rsplit_once('.') else {
+        return false;
+    };
+    if !extension.eq_ignore_ascii_case("csv") {
+        return false;
+    }
+    matches!(
+        stem.to_ascii_lowercase().as_str(),
+        "visitors"
+            | "sources"
+            | "channels"
+            | "utm_mediums"
+            | "utm_sources"
+            | "utm_campaigns"
+            | "utm_contents"
+            | "utm_terms"
+            | "pages"
+            | "entry_pages"
+            | "exit_pages"
+            | "countries"
+            | "regions"
+            | "cities"
+            | "browsers"
+            | "browser_versions"
+            | "operating_systems"
+            | "operating_system_versions"
+            | "devices"
+            | "conversions"
+            | "referrers"
+            | "custom_props"
+    )
+}
+
 fn read_zip(bytes: &[u8]) -> Result<Vec<SourceFile>> {
     let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
         .map_err(|_| Error::invalid("The ZIP archive is invalid or unsupported."))?;
     // Allow benign directory entries without permitting an unbounded directory list.
     if archive.len() > MAX_FILES * 2 {
+        for index in 0..MAX_FILES * 2 {
+            let raw = archive
+                .by_index_raw(index)
+                .map_err(|_| Error::invalid("The ZIP archive contains an invalid entry."))?;
+            if let Ok(name) = std::str::from_utf8(raw.name_raw())
+                && dashboard_export_file(name)
+            {
+                return Err(Error::invalid(DASHBOARD_EXPORT));
+            }
+        }
         return Err(too_large("The ZIP archive contains too many entries."));
     }
     let mut files = Vec::new();
@@ -296,6 +340,9 @@ fn read_zip(bytes: &[u8]) -> Result<Vec<SourceFile>> {
                 return Err(Error::invalid("ZIP directory entries must be empty."));
             }
             continue;
+        }
+        if dashboard_export_file(&name) {
+            return Err(Error::invalid(DASHBOARD_EXPORT));
         }
         if files.len() >= MAX_FILES {
             return Err(too_large("Import archives may contain at most 20 files."));
@@ -881,9 +928,79 @@ mod tests {
 
     #[test]
     fn rejects_dashboard_exports_and_multiple_daily_files() {
-        assert!(parse("plausible", "UTC", "visitors.csv", DAILY.as_bytes()).is_err());
+        assert_eq!(
+            parse("plausible", "UTC", "visitors.csv", DAILY.as_bytes())
+                .unwrap_err()
+                .message,
+            DASHBOARD_EXPORT
+        );
         let dashboard = archive(&[("visitors.csv", DAILY.as_bytes())]);
-        assert!(parse("plausible", "UTC", "export.zip", &dashboard).is_err());
+        assert_eq!(
+            parse("plausible", "UTC", "export.zip", &dashboard)
+                .unwrap_err()
+                .message,
+            DASHBOARD_EXPORT
+        );
+        let nested = archive(&[("export/countries.csv", b"name,visitors\nDenmark,1\n")]);
+        assert_eq!(
+            parse("plausible", "UTC", "export.zip", &nested)
+                .unwrap_err()
+                .message,
+            DASHBOARD_EXPORT
+        );
+        let stems = [
+            "visitors",
+            "sources",
+            "channels",
+            "utm_mediums",
+            "utm_sources",
+            "utm_campaigns",
+            "utm_contents",
+            "utm_terms",
+            "pages",
+            "entry_pages",
+            "exit_pages",
+            "countries",
+            "regions",
+            "cities",
+            "browsers",
+            "browser_versions",
+            "operating_systems",
+            "operating_system_versions",
+            "devices",
+            "conversions",
+            "referrers",
+            "custom_props",
+        ];
+        let names: Vec<_> = stems.iter().map(|stem| format!("{stem}.csv")).collect();
+        let entries: Vec<_> = names
+            .iter()
+            .map(|name| (name.as_str(), b"name,visitors\nDirect,1\n".as_slice()))
+            .collect();
+        assert_eq!(
+            parse("plausible", "UTC", "export.zip", &archive(&entries))
+                .unwrap_err()
+                .message,
+            DASHBOARD_EXPORT
+        );
+        let oversized: Vec<_> = (0..=MAX_FILES * 2)
+            .map(|i| format!("part-{i}/visitors.csv"))
+            .collect();
+        let oversized_entries: Vec<_> = oversized
+            .iter()
+            .map(|name| (name.as_str(), b"name,visitors\nDirect,1\n".as_slice()))
+            .collect();
+        assert_eq!(
+            parse(
+                "plausible",
+                "UTC",
+                "export.zip",
+                &archive(&oversized_entries)
+            )
+            .unwrap_err()
+            .message,
+            DASHBOARD_EXPORT
+        );
         let duplicate = archive(&[
             ("imported_visitors.csv", DAILY.as_bytes()),
             ("imported_visitors_20260801_20260802.csv", DAILY.as_bytes()),
