@@ -812,7 +812,7 @@ function Overview({
         </div>
         {loading ? (
           <div
-            className="mt-4 flex h-[210px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink md:h-[240px]"
+            className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink"
             role="status"
           >
             <Spinner className="size-5" />
@@ -821,7 +821,7 @@ function Overview({
         ) : reports ? (
           <TrafficChart data={reports.timeseries.data} metric={metric} />
         ) : (
-          <div className="mt-4 flex h-[210px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink md:h-[240px]">
+          <div className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink">
             No report to display.
           </div>
         )}

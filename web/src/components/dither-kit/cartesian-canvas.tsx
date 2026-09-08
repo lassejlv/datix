@@ -287,7 +287,7 @@ function startCartesianLoop({
 /**
  * Continuous dither canvas for area and line charts. Each series is reduced to a
  * `[top, floor]` band per backing column: areas fill from their value line down
- * to their floor; lines fill only a single backing-pixel band. The shared
+ * to their floor; lines fill only a thin glow band hugging the line. The shared
  * {@link paintColumn} renders the ordered-dither scatter, capped by the bright
  * series line, with winking stars + scrub crosshair on top.
  */
@@ -308,7 +308,7 @@ export function CartesianCanvas() {
     const out: Record<string, Surface> = {};
     if (!ready) return out;
     const h = height || 1;
-    const lineThickness = 1;
+    const glow = Math.max(6, Math.round(rows * 0.16));
     const defaultKind = chartType === 'line' ? 'line' : 'area';
     for (const key of configKeys) {
       const band = bands[key];
@@ -316,7 +316,7 @@ export function CartesianCanvas() {
       const line = (seriesSpecs[key]?.kind ?? defaultKind) === 'line';
       const top = band.map((b) => (y(b[1]) / h) * (rows - 1));
       const floor = band.map((b, i) =>
-        line ? Math.min(rows - 1, top[i] + lineThickness) : (y(b[0]) / h) * (rows - 1),
+        line ? Math.min(rows - 1, top[i] + glow) : (y(b[0]) / h) * (rows - 1),
       );
       out[key] = { top: resample(top, cols), floor: resample(floor, cols) };
     }
