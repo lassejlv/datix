@@ -4,7 +4,7 @@ import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { isDashboardPage, siteRoute, type DashboardPage } from '../lib/dashboard-route';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, CalendarDays, ChevronDown, Code2, ExternalLink, RefreshCw } from './ui/icons';
+import { ArrowRight, ChevronDown, Code2, ExternalLink, RefreshCw } from './ui/icons';
 import { Button } from './ui/button';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from './ui/sidebar';
@@ -656,7 +656,7 @@ function Overview({
   ] as const;
   return (
     <div>
-      <div className="mb-7 flex flex-col items-stretch gap-5 md:flex-row md:items-center md:justify-between md:gap-6">
+      <div className="mb-8 flex flex-col items-stretch gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-2.5">
             <h1 className="text-[23px] leading-[1.25] font-medium tracking-[-0.025em] wrap-anywhere md:text-[26px]">
@@ -678,7 +678,6 @@ function Overview({
         </div>
         <div className="flex shrink-0 items-center gap-2 max-md:self-stretch">
           <div className="relative flex h-8 items-center gap-2 rounded-md border border-input px-3 text-secondary-ink max-md:flex-1">
-            <CalendarDays size={16} />
             <select
               className="cursor-pointer appearance-none bg-transparent pr-2 text-[13px] text-foreground max-md:flex-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               aria-label="Date range"
@@ -780,17 +779,17 @@ function Overview({
         </div>
       )}
       <section className="w-full" aria-label="Traffic overview">
-        <div className="grid grid-cols-3 gap-1 md:gap-4">
+        <div className="grid grid-cols-3 gap-2 md:max-w-[580px] md:gap-6">
           {metrics.map((item) => (
             <button
               key={item.key}
-              className="relative cursor-pointer border-b-2 border-transparent px-2.5 py-2 text-left hover:bg-muted aria-pressed:border-foreground md:px-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              className="relative min-w-0 cursor-pointer rounded-md px-3 py-3 text-left hover:bg-muted aria-pressed:bg-pressed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               title={item.caption}
               onClick={() => setMetric(item.key)}
               aria-pressed={metric === item.key}
             >
               <span className="text-xs text-secondary-ink md:text-sm">{item.name}</span>
-              <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[24px]">
+              <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
                 {loading ? (
                   <span className="block h-[38px] w-[72px] rounded-sm bg-pressed" />
                 ) : reports ? (
@@ -813,7 +812,7 @@ function Overview({
         </div>
         {loading ? (
           <div
-            className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink"
+            className="mt-4 flex h-[210px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink md:h-[240px]"
             role="status"
           >
             <Spinner className="size-5" />
@@ -822,7 +821,7 @@ function Overview({
         ) : reports ? (
           <TrafficChart data={reports.timeseries.data} metric={metric} />
         ) : (
-          <div className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink">
+          <div className="mt-4 flex h-[210px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink md:h-[240px]">
             No report to display.
           </div>
         )}
@@ -867,7 +866,7 @@ function Overview({
       )}
 
       {(!reports || reports.overview.pageviews > 0) && (
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-x-8 md:gap-y-6">
+        <div className="mt-9 grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-9">
           <BreakdownCard title="Top pages" label="Page" report={reports?.path} loading={loading} />
           <BreakdownCard
             title="Referrers"
@@ -929,7 +928,6 @@ function BreakdownCard({
   loading: boolean;
   countries?: boolean;
 }) {
-  const max = Math.max(1, ...(report?.data.map((item) => item.count) ?? []));
   return (
     <section className="min-w-0">
       <div>
@@ -950,7 +948,7 @@ function BreakdownCard({
           No {label.toLowerCase()} data in this period.
         </div>
       ) : (
-        <ol className="m-0 flex list-none flex-col gap-1 p-0">
+        <ol className="m-0 flex list-none flex-col p-0">
           {report.data.map((item) => {
             const text = item.value
               ? countries
@@ -961,20 +959,16 @@ function BreakdownCard({
                 : 'Direct / none';
             return (
               <li
-                className="relative flex min-h-10 items-center justify-between gap-4 px-2.5 py-[7px] text-sm md:min-h-9"
+                className="flex min-h-10 items-center justify-between gap-4 py-2 text-sm md:min-h-9"
                 key={item.value}
               >
                 <span
-                  className="absolute inset-y-0 left-0 rounded-sm bg-muted"
-                  style={{ width: `${(item.count / max) * 78}%` }}
-                />
-                <span
                   title={text}
-                  className={`relative truncate ${label === 'Device' ? 'capitalize' : ''}`}
+                  className={`truncate ${label === 'Device' ? 'capitalize' : ''}`}
                 >
                   {countries ? <CountryLabel code={item.value} /> : text}
                 </span>
-                <strong className="relative text-[13px] font-normal tabular-nums">
+                <strong className="shrink-0 text-[13px] font-normal tabular-nums">
                   {number(item.count)}
                 </strong>
               </li>

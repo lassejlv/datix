@@ -2,8 +2,8 @@ import { useSitePreferences } from './site-preferences';
 import { useMemo } from 'react';
 import { Activity } from './ui/icons';
 import { MotionConfig } from 'motion/react';
-import { AreaChart } from './dither-kit/area-chart';
-import { Area } from './dither-kit/area';
+import { LineChart } from './dither-kit/area-chart';
+import { Line } from './dither-kit/area';
 import type { Rgb } from './dither-kit/palette';
 import { Grid } from './dither-kit/grid';
 import { XAxis } from './dither-kit/x-axis';
@@ -36,7 +36,7 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
   const allZero = data.every((point) => point[metric] === 0);
 
   return (
-    <div data-testid="traffic-chart" className="relative mt-4 h-[190px] md:h-[200px]">
+    <div data-testid="traffic-chart" className="relative mt-4 h-[210px] md:h-[240px]">
       {allZero ? (
         <div
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center"
@@ -50,7 +50,7 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
         </div>
       ) : (
         <MotionConfig reducedMotion="user">
-          <AreaChart
+          <LineChart
             key={metric}
             data={rows}
             config={config}
@@ -64,8 +64,8 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
             <XAxis dataKey="label" maxTicks={3} tickMargin={12} />
             <YAxis tickFormatter={(value) => (Number.isInteger(value) ? number(value) : '')} />
             <Tooltip labelKey="label" valueFormatter={number} />
-            <Area dataKey={metric} variant="gradient" />
-          </AreaChart>
+            <Line dataKey={metric} />
+          </LineChart>
         </MotionConfig>
       )}
     </div>
