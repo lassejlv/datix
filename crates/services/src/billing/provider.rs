@@ -56,22 +56,50 @@ fn date(value: &Value, key: &str) -> Option<DateTime<Utc>> {
 
 fn units(value: &Value) -> Option<i64> {
     let n = value.as_f64()?;
-    (n.is_finite() && n >= 0.0 && n < (i64::MAX / 100) as f64)
-        .then_some((n * 100.0).round() as i64)
+    (n.is_finite() && n >= 0.0 && n < (i64::MAX / 100) as f64).then_some((n * 100.0).round() as i64)
 }
-fn entitlements(customer: &Value, row: &Value, start: DateTime<Utc>, end: DateTime<Utc>) -> Option<Entitlements> {
+fn entitlements(
+    customer: &Value,
+    row: &Value,
+    start: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Option<Entitlements> {
     let events = &customer["balances"]["events"];
     let websites = &customer["balances"]["websites"];
-    if events["feature_id"] != "events" || websites["feature_id"] != "websites" { return None; }
+    if events["feature_id"] != "events" || websites["feature_id"] != "websites" {
+        return None;
+    }
     let unlimited = events["unlimited"].as_bool()?;
-    let event_limit = if unlimited { None } else { Some(units(&events["granted"])? ) };
-    let remaining = if unlimited { None } else { Some(units(&events["remaining"])? ) };
-    let website_limit = if websites["unlimited"].as_bool()? { None } else { Some(websites["granted"].as_i64()?.max(0)) };
+    let event_limit = if unlimited {
+        None
+    } else {
+        Some(units(&events["granted"])?)
+    };
+    let remaining = if unlimited {
+        None
+    } else {
+        Some({
+            let value = events["remaining"].as_f64()?;
+            if !value.is_finite() {
+                return None;
+            }
+            units(&json!(value.max(0.0)))?
+        })
+    };
+    let website_limit = if websites["unlimited"].as_bool()? {
+        None
+    } else {
+        Some(websites["granted"].as_i64()?.max(0))
+    };
     let reset = date(events, "next_reset_at");
-    if !events["next_reset_at"].is_null() && reset.is_none() { return None; }
+    if !events["next_reset_at"].is_null() && reset.is_none() {
+        return None;
+    }
     let period_end = reset.unwrap_or(end);
     let origin = date(row, "started_at").unwrap_or(start);
-    let interval = events["breakdown"].as_array().and_then(|rows| rows.iter().find_map(|r| r["reset"]["interval"].as_str()));
+    let interval = events["breakdown"]
+        .as_array()
+        .and_then(|rows| rows.iter().find_map(|r| r["reset"]["interval"].as_str()));
     let period_start = match interval {
         Some("day") => period_end - chrono::Duration::days(1),
         Some("week") => period_end - chrono::Duration::weeks(1),
@@ -79,14 +107,33 @@ fn entitlements(customer: &Value, row: &Value, start: DateTime<Utc>, end: DateTi
         Some("year") => period_end.checked_sub_months(chrono::Months::new(12))?,
         Some("month") => {
             // Preserve the provider's original month-end anchor where it matches this reset.
-            let anchor = Subscription { id: String::new(), product_id: String::new(), status: "active".into(), current_period_start: Some(origin), current_period_end: period_end, trial_end: None, cancel_at_period_end: false, ends_at: None, entitlements: None };
+            let anchor = Subscription {
+                id: String::new(),
+                product_id: String::new(),
+                status: "active".into(),
+                current_period_start: Some(origin),
+                current_period_end: period_end,
+                trial_end: None,
+                cancel_at_period_end: false,
+                ends_at: None,
+                entitlements: None,
+            };
             super::allowance::period(&anchor, period_end - chrono::Duration::milliseconds(1))?.start
         }
         None if reset.is_none() => origin,
         _ => return None,
     };
-    Some(Entitlements { name: row["plan"]["name"].as_str()?.to_owned(), event_limit, website_limit,
-        used: units(&events["usage"])?, remaining, local_baseline: 0, pending: 0, period_start, period_end })
+    Some(Entitlements {
+        name: row["plan"]["name"].as_str()?.to_owned(),
+        event_limit,
+        website_limit,
+        used: units(&events["usage"])?,
+        remaining,
+        local_baseline: 0,
+        pending: 0,
+        period_start,
+        period_end,
+    })
 }
 
 pub fn subscriptions(value: &Value) -> Result<Value> {
@@ -114,7 +161,9 @@ pub fn subscriptions(value: &Value) -> Result<Value> {
         let Some(end) = date(row, "current_period_end") else {
             continue;
         };
-        let Some(entitlements) = entitlements(value, row, start, end) else { continue; };
+        let Some(entitlements) = entitlements(value, row, start, end) else {
+            continue;
+        };
         let trial = date(row, "trial_ends_at");
         let status = if trial.is_some_and(|t| t > Utc::now()) {
             "trialing"
@@ -147,7 +196,10 @@ pub async fn save_snapshot(
 }
 pub async fn sync(state: &State, conn: &mut PgConnection, owner: &str) -> Result<Option<Value>> {
     let mut tx = conn.begin().await?;
-    sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE").bind(owner).fetch_optional(&mut *tx).await?;
+    sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
+        .bind(owner)
+        .fetch_optional(&mut *tx)
+        .await?;
     let occurred = Utc::now();
     let customer = request(
         state,
@@ -171,7 +223,8 @@ pub async fn sync(state: &State, conn: &mut PgConnection, owner: &str) -> Result
     };
     if let Some(rows) = subs.as_array_mut() {
         for row in rows {
-            let mut subscription: Subscription = serde_json::from_value(row.clone()).map_err(|_| Error::unavailable())?;
+            let mut subscription: Subscription =
+                serde_json::from_value(row.clone()).map_err(|_| Error::unavailable())?;
             if let Some(e) = &mut subscription.entitlements {
                 e.local_baseline = sqlx::query_scalar("SELECT coalesce(sum(events)*100,0)::bigint FROM billing_usage WHERE owner_id=$1 AND period_start=$2")
                     .bind(owner).bind(e.period_start).fetch_one(&mut *tx).await?;
@@ -392,12 +445,42 @@ mod tests {
         let now = Utc::now();
         let customer = json!({
             "flags":{"analytics":{"feature_id":"analytics"}},
-            "subscriptions":[{"id":"sub","plan_id":"basic","status":"active",
+            "balances":{"events":{"feature_id":"events","granted":10000000,"remaining":5000000,"usage":5000000,"unlimited":false},"websites":{"feature_id":"websites","granted":23,"unlimited":false}},
+            "subscriptions":[{"id":"sub","plan_id":"custom","plan":{"name":"My Custom Plan"},"status":"active",
                 "current_period_start":now.timestamp_millis(),
                 "current_period_end":(now+chrono::Duration::days(30)).timestamp_millis(),
                 "trial_ends_at":(now+chrono::Duration::days(14)).timestamp_millis()}]
         });
-        assert_eq!(subscriptions(&customer).unwrap()[0]["status"], "trialing");
+        let normalized = subscriptions(&customer).unwrap();
+        assert_eq!(normalized[0]["status"], "trialing");
+        assert_eq!(normalized[0]["entitlements"]["name"], "My Custom Plan");
+        assert_eq!(normalized[0]["entitlements"]["eventLimit"], 1000000000i64);
+        assert_eq!(normalized[0]["entitlements"]["used"], 500000000);
+        assert_eq!(normalized[0]["entitlements"]["websiteLimit"], 23);
+        let mut exhausted = customer.clone();
+        exhausted["balances"]["events"]["remaining"] = json!(-1);
+        assert_eq!(
+            subscriptions(&exhausted).unwrap()[0]["entitlements"]["remaining"],
+            0
+        );
+        let mut monthly = customer.clone();
+        let origin = now - chrono::Duration::minutes(2);
+        let reset = origin.checked_add_months(chrono::Months::new(1)).unwrap();
+        monthly["subscriptions"][0]["started_at"] = json!(origin.timestamp_millis());
+        monthly["subscriptions"][0]["current_period_end"] =
+            json!((now + chrono::Duration::days(365)).timestamp_millis());
+        monthly["balances"]["events"]["next_reset_at"] = json!(reset.timestamp_millis());
+        monthly["balances"]["events"]["breakdown"] =
+            json!([{"reset":{"interval":"month","resets_at":reset.timestamp_millis()}}]);
+        let normalized: Subscription =
+            serde_json::from_value(subscriptions(&monthly).unwrap()[0].clone()).unwrap();
+        let e = normalized.entitlements.as_ref().unwrap();
+        assert_eq!(e.period_start.timestamp_millis(), origin.timestamp_millis());
+        assert_eq!(e.period_end.timestamp_millis(), reset.timestamp_millis());
+        assert!(super::super::allowance::active(vec![normalized], reset).is_none());
+        let mut missing = customer.clone();
+        missing["balances"] = json!({});
+        assert_eq!(subscriptions(&missing).unwrap(), json!([]));
         for (field, value) in [
             ("status", json!("scheduled")),
             ("past_due", json!(true)),

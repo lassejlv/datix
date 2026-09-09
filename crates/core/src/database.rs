@@ -14,6 +14,7 @@ static UPGRADES: &[(i64, &str)] = &[
         include_str!("../upgrades/0006_billing_provider_defaults.sql"),
     ),
     (7, include_str!("../upgrades/0007_checkout_options.sql")),
+    (8, include_str!("../upgrades/0008_features.sql")),
 ];
 
 pub async fn check(pool: &PgPool) -> Result<Value> {

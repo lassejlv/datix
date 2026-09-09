@@ -17,3 +17,5 @@ output/
 .DS_Store
 
 /target/
+
+/web/public/web-vitals.js

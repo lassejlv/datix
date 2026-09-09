@@ -1,4 +1,18 @@
 export const en = {
+  Journey: 'Journey',
+  Timeline: 'Timeline',
+  'Activity view': 'Activity view',
+  Steps: 'Steps',
+  Actions: 'Actions',
+  'Journey steps': 'Journey steps',
+  'Page context': 'Page context',
+  'Actions on {path}': 'Actions on {path}',
+  'Follow the visit from top to bottom. Select a step for details.':
+    'Follow the visit from top to bottom. Select a step for details.',
+  'Showing loaded activity. Load more to continue the journey.':
+    'Showing loaded activity. Load more to continue the journey.',
+  '{seconds} seconds active': '{seconds} seconds active',
+  Unlimited: 'Unlimited',
   'Your website allowance has been reached.': 'Your website allowance has been reached.',
   'All prices in {currency}.': 'All prices in {currency}.',
   '{price} per {interval}': '{price} per {interval}',

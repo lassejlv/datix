@@ -148,7 +148,12 @@ async fn ingest_owner(
     let Some(active) = active else {
         return Ok(HashSet::new());
     };
-    let allowed: HashMap<_, _> = websites.iter().enumerate().filter(|(i, _)| active.permits_website(*i as i64)).map(|(_, w)| (w.id, w)).collect();
+    let allowed: HashMap<_, _> = websites
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| active.permits_website(*i as i64))
+        .map(|(_, w)| (w.id, w))
+        .collect();
     let event_ids: Vec<_> = batch.iter().map(|(_, e)| e.id).collect();
     let duplicates: HashSet<(Uuid, Uuid)> = sqlx::query_as(
         "SELECT e.environment_id,e.id FROM event_receipts e JOIN unnest($1::uuid[],$2::uuid[]) AS input(site_id,id) ON e.environment_id=input.site_id AND e.id=input.id WHERE e.kind=0"
@@ -242,6 +247,9 @@ async fn ingest_owner(
     if admitted.is_empty() {
         return Ok(HashSet::new());
     }
+    let goal_events: Vec<_> = admitted.iter().map(|(_,e,_)| json!({"env":e.environment(),"id":e.id,"at":e.received_at,"day":e.day,"visitor":e.visitor,"path":e.path,"kind":e.event_type,"name":e.name})).collect();
+    sqlx::query("INSERT INTO goal_conversions(goal_id,environment_id,event_id,received_at,day,visitor,path) SELECT g.id,r.env,r.id,r.at,r.day,r.visitor,r.path FROM jsonb_to_recordset($1) r(env uuid,id uuid,at timestamptz,day date,visitor text,path text,kind text,name text) JOIN environments e ON e.id=r.env AND e.feature_settings->>'goals'='true' JOIN conversion_goals g ON g.environment_id=r.env AND g.created_at<=r.at AND ((g.match_type='page' AND r.kind='pageview' AND g.match_value=r.path) OR (g.match_type='event' AND r.kind='event' AND g.match_value=r.name)) ON CONFLICT DO NOTHING")
+        .bind(json!(goal_events)).execute(&mut *tx).await?;
     let activity: Vec<_> = admitted
         .iter()
         .filter_map(|(_, e, _)| e.activity.as_ref().map(|a| (e, a)))

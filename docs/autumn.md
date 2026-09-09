@@ -6,11 +6,11 @@ Autumn owns subscription state and handles Stripe payment webhooks. This applica
 
 `config/autumn-catalog.json` and `web/src/lib/billing-plans.ts` describe the matching sandbox and production catalogs:
 
-| Plan | Monthly USD | Monthly EUR | Monthly DKK | Monthly events | Websites |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Basic | 9 | 9 | 59 | 100,000 | 10 |
-| Pro | 49 | 49 | 329 | 1,000,000 | 10 |
-| Ultra | 149 | 149 | 999 | 5,000,000 | 10 |
+| Plan  | Monthly USD | Monthly EUR | Monthly DKK | Monthly events | Websites |
+| ----- | ----------: | ----------: | ----------: | -------------: | -------: |
+| Basic |           9 |           9 |          59 |        100,000 |       10 |
+| Pro   |          49 |          49 |         329 |      1,000,000 |       10 |
+| Ultra |         149 |         149 |         999 |      5,000,000 |       10 |
 
 Annual prices are ten times monthly. English checkout selects USD, Danish DKK, and German EUR; the same fixed prices appear on the pricing page. Enable multi-currency in Autumn and configure every currency on monthly and annual plans before deploying. An existing customer may be locked to their billing currency by Stripe.
 
@@ -53,3 +53,9 @@ They verify hosted checkout, annual selection, customer ownership, cancellation,
 Live checkout also requires an explicit eligible Stripe tax code on each mapped product. An account-wide preset is insufficient. The Basic, Pro, and Ultra production products use `txcd_10103001` (SaaS, business use); their annual variants share those products.
 
 Production was upgraded to schema 7 and both Railway services deployed on September 9, 2026. `web/scripts/autumn-production-qa.ts --production` verified hosted Managed Payments checkout for all six plans and all three currencies without submitting payment. This check requires the production database variables and live Autumn key; it deletes only its disposable customer and app account.
+
+## Customer overrides
+
+The public catalog is used for checkout selection only. Access snapshots fetch `customers.get` with `expand: ["subscriptions.plan"]`: the expanded plan supplies its display name, while customer `balances.events` and `balances.websites` supply the actual allowances. Custom plan IDs and customer-specific overrides are supported. Unlimited allowances appear as `null` in the usage API. Missing or invalid entitlements cannot grant access.
+
+Usage combines Autumn's customer usage with pending local deliveries and events ingested since that snapshot. Snapshot reads, ingestion, and delivery serialize on the account lock so delivered usage is not added twice. An ambiguous delivery stays conservatively reserved until reconciled. Manual usage adjustments in Autumn take effect on the next refresh, normally within 60 seconds; stale snapshots expire after five minutes and at the feature reset boundary. Feature reset dates determine the allowance window, independently of annual subscription billing dates. Website creation and collection use the same customer allowance.

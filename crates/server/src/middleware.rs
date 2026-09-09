@@ -166,11 +166,11 @@ pub async fn perimeter(
             HeaderValue::from_str(&request_id).expect("uuid header"),
         );
         h.insert("cache-control", HeaderValue::from_static("no-store"));
-        if path == "/api/collect" || path == "/api/tracker-config" {
+        if path == "/api/collect" || path == "/api/telemetry" || path == "/api/tracker-config" {
             h.insert("access-control-allow-origin", HeaderValue::from_static("*"));
             h.insert(
                 "access-control-allow-methods",
-                HeaderValue::from_static(if path == "/api/collect" {
+                HeaderValue::from_static(if path == "/api/collect" || path == "/api/telemetry" {
                     "POST, OPTIONS"
                 } else {
                     "GET, OPTIONS"

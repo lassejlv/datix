@@ -54,7 +54,7 @@ impl Jobs {
             }));
         }
         if maintenance_enabled {
-            for job in 0..3 {
+            for job in 0..4 {
                 let state = state.clone();
                 let live = ready.clone();
                 let rx = rx.clone();
@@ -63,7 +63,8 @@ impl Jobs {
                     match job {
                         0 => billing_loop(state, rx).await,
                         1 => maintenance_loop(state, rx).await,
-                        _ => observation_loop(state, rx).await,
+                        2 => observation_loop(state, rx).await,
+                        _ => pulse_loop(state, rx).await,
                     }
                 }));
             }
@@ -153,6 +154,20 @@ async fn process_batch(state: &State, items: Vec<StreamId>) -> Result<()> {
     let mut events = vec![];
     for item in items {
         let data = item.get::<String>("data").unwrap_or_default();
+        if let Ok(envelope) =
+            serde_json::from_str::<analytics_services::features::diagnostics::Envelope>(&data)
+        {
+            match tokio::time::timeout(
+                Duration::from_secs(10),
+                analytics_services::features::diagnostics::ingest(state, &envelope.diagnostic),
+            )
+            .await
+            {
+                Ok(Ok(())) => acknowledge(state, std::slice::from_ref(&item.id)).await?,
+                _ => retry(state, &item, &data).await?,
+            }
+            continue;
+        }
         match serde_json::from_str::<Event>(&data)
             .ok()
             .filter(|e| e.validate().is_ok())
@@ -413,4 +428,15 @@ pub async fn observe(state: &State) -> Result<()> {
     m.last_observation
         .store(Utc::now().timestamp() as u64, Ordering::Relaxed);
     Ok(())
+}
+
+async fn pulse_loop(state: State, mut stop: watch::Receiver<bool>) {
+    let mut interval = tokio::time::interval(Duration::from_secs(15));
+    interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+    loop {
+        tokio::select! {
+            _=stop.changed()=>break,
+            _=interval.tick()=>{if analytics_services::features::pulse::tick(&state).await.is_err(){tracing::warn!("Pulse monitoring tick failed");}}
+        }
+    }
 }

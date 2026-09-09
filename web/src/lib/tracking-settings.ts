@@ -16,7 +16,10 @@ export const trackingSettingLabels = {
 } as const;
 export type TrackingSettings = Record<keyof typeof trackingSettingLabels, boolean>;
 export const defaultTrackingSettings = Object.fromEntries(
-  Object.keys(trackingSettingLabels).map((key) => [key, true]),
+  Object.keys(trackingSettingLabels).map((key) => [
+    key,
+    !['click', 'download', 'scroll'].includes(key),
+  ]),
 ) as TrackingSettings;
 export function trackingSettings(value?: Partial<TrackingSettings> | null): TrackingSettings {
   return { ...defaultTrackingSettings, ...value };

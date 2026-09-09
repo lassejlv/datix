@@ -20,6 +20,17 @@ export async function seedPro(
     trialEnd: null,
     cancelAtPeriodEnd: false,
     endsAt: null,
+    entitlements: {
+      name: 'Basic',
+      eventLimit: 10000000,
+      websiteLimit: 10,
+      used: 0,
+      remaining: 10000000,
+      localBaseline: 0,
+      pending: 0,
+      periodStart: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString(),
+      periodEnd: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString(),
+    },
     ...overrides,
   };
   await client.query(

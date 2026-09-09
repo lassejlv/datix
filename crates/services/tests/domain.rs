@@ -75,12 +75,13 @@ fn annual_billing_keeps_month_end_anchor() {
     }
 }
 #[test]
-fn expired_trials_unknown_products_and_inactive_plans_cannot_grant_usage() {
+fn customer_entitlements_grant_access_without_catalog_membership() {
     let now = date("2026-02-01T00:00:00Z");
-    let s = subscription();
+    let mut s = subscription();
+    s.entitlements = Some(serde_json::from_value(json!({"name":"Custom plan","eventLimit":10000000,"websiteLimit":23,"used":0,"remaining":10000000,"localBaseline":0,"pending":0,"periodStart":"2026-01-31T12:00:00Z","periodEnd":"2026-02-28T12:00:00Z"})).unwrap());
     assert_eq!(
         allowance::active(vec![s.clone()], now).unwrap().event_limit,
-        100000
+        Some(10000000)
     );
     for status in ["past_due", "canceled", "unpaid", "incomplete", "paused"] {
         let mut invalid = s.clone();
@@ -94,7 +95,7 @@ fn expired_trials_unknown_products_and_inactive_plans_cannot_grant_usage() {
     ] {
         let mut invalid = s.clone();
         invalid.product_id = product.into();
-        assert!(allowance::active(vec![invalid], now).is_none());
+        assert!(allowance::active(vec![invalid], now).is_some());
     }
     let mut trial = s.clone();
     trial.status = "trialing".into();
@@ -284,7 +285,7 @@ fn event() -> Event {
 #[test]
 fn tracking_policy_removes_disabled_metadata_and_actions() {
     let e = event();
-    let clean=e.apply_policy(&json!({"country":false,"device":false,"dimensions":false,"language":false,"coordinates":false})).unwrap();
+    let clean=e.apply_policy(&json!({"click":true,"country":false,"device":false,"dimensions":false,"language":false,"coordinates":false})).unwrap();
     assert_eq!(clean.country, "");
     let activity = clean.activity.unwrap();
     assert_eq!(activity.browser, "");
@@ -306,4 +307,51 @@ fn fractional_credits_are_exact_and_heartbeats_free() {
     assert_eq!(e.units(), 100);
     e.activity.as_mut().unwrap().kind = "engagement".into();
     assert_eq!(e.units(), 0);
+}
+
+#[test]
+fn provider_balance_reserves_local_usage_and_supports_overrides() {
+    let now = date("2026-02-01T00:00:00Z");
+    let mut s = subscription();
+    assert!(allowance::active(vec![s.clone()], now).is_none());
+    s.entitlements = Some(serde_json::from_value(json!({"name":"Bespoke","eventLimit":1000000000,"websiteLimit":23,"used":500000000,"remaining":500000000,"localBaseline":200,"pending":50,"periodStart":"2026-01-31T12:00:00Z","periodEnd":"2026-02-28T12:00:00Z"})).unwrap());
+    let a = allowance::active(vec![s.clone()], now).unwrap();
+    assert_eq!(a.used(300), 500000150);
+    assert_eq!(a.remaining(300), Some(499999850));
+    assert!(a.permits_website(22));
+    assert!(!a.permits_website(23));
+    let e = s.entitlements.as_mut().unwrap();
+    // A fresh provider snapshot can lower usage, independent of the historical local ledger.
+    e.used = 0;
+    e.remaining = Some(100);
+    e.local_baseline = 300;
+    e.pending = 0;
+    let a = allowance::active(vec![s.clone()], now).unwrap();
+    assert_eq!(a.used(300), 0);
+    assert_eq!(a.remaining(400), Some(0));
+    let e = s.entitlements.as_mut().unwrap();
+    e.event_limit = None;
+    e.remaining = None;
+    e.website_limit = None;
+    let a = allowance::active(vec![s], now).unwrap();
+    assert_eq!(a.remaining(1000000000), None);
+    assert!(a.permits_website(1000));
+}
+
+#[test]
+fn noisy_tracking_is_opt_in_and_explicit_choices_are_preserved() {
+    let defaults = tracking::settings(&json!({}));
+    for kind in ["click", "download", "scroll"] {
+        assert_eq!(defaults[kind], false);
+        let mut e = event();
+        e.activity.as_mut().unwrap().kind = kind.into();
+        assert!(e.apply_policy(&json!({})).is_none());
+        assert!(e.apply_policy(&json!({kind:true})).is_some());
+    }
+    assert_eq!(defaults["pageview"], true);
+    assert_eq!(defaults["custom"], true);
+    assert_eq!(
+        tracking::settings(&json!({"pageview":false}))["pageview"],
+        false
+    );
 }

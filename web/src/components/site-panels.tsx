@@ -1,3 +1,4 @@
+import { FeatureSettings } from './feature-settings';
 import { useSitePreferences } from './site-preferences';
 import { agentInstallationInstructions } from '../lib/agent-installation';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -436,9 +437,9 @@ export function SiteSettings({
   onDeleted: () => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
-  const [tab, setTab] = useState<'website' | 'environment' | 'tracking'>('website');
-  const tabs = ['website', 'environment', 'tracking'] as const;
-  const labels = { website: t('Website'), environment: t('Environment'), tracking: t('Tracking') };
+  const [tab, setTab] = useState<'website' | 'environment' | 'tracking' | 'features'>('website');
+  const tabs = ['website', 'environment', 'tracking', 'features'] as const;
+  const labels = { website: t('Website'), environment: t('Environment'), tracking: t('Tracking'), features: t('Features') };
   const [name, setName] = useState(site.name);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
@@ -485,7 +486,7 @@ export function SiteSettings({
       <div
         role="tablist"
         aria-label={t('Website settings')}
-        className="mb-8 flex gap-6 border-b border-border"
+        className="mb-8 flex gap-4 overflow-x-auto border-b border-border sm:gap-6"
       >
         {tabs.map((value, index) => (
           <button
@@ -526,7 +527,8 @@ export function SiteSettings({
         tabIndex={0}
         className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       >
-        <div hidden={tab === 'website'}>
+        {tab === 'features' && <FeatureSettings siteId={site.id} environment={environment} onUpdated={onEnvironmentUpdated} />}
+        <div hidden={tab === 'website' || tab === 'features'}>
           <EnvironmentSettings
             key={environment.id}
             section={tab === 'tracking' ? 'tracking' : 'environment'}

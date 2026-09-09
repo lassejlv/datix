@@ -1,4 +1,15 @@
 export type BillingSubscription = {
+  entitlements?: {
+    name: string;
+    eventLimit: number | null;
+    websiteLimit: number | null;
+    used: number;
+    remaining: number | null;
+    localBaseline: number;
+    pending: number;
+    periodStart: string;
+    periodEnd: string;
+  };
   id: string;
   productId: string;
   status: string;

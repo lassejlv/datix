@@ -6,6 +6,17 @@ pub async fn retain(state: &State) -> Result<Value> {
         .fetch_one(&state.db)
         .await?;
     let predicates = [
+        (
+            "diagnostic_events",
+            "received_at < now()-interval '30 days'",
+        ),
+        ("goal_conversions", "received_at < now()-interval '30 days'"),
+        ("pulse_checks", "checked_at < now()-interval '30 days'"),
+        ("pulse_alerts", "created_at < now()-interval '30 days'"),
+        (
+            "error_resolutions",
+            "resolved_at < now()-interval '30 days'",
+        ),
         ("activity_events", "received_at < now()-interval '30 days'"),
         ("events", "received_at < now()-interval '30 days'"),
         (

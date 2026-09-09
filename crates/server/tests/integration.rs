@@ -190,7 +190,7 @@ impl Fixture {
     async fn pro(&self) {
         let now = Utc::now();
         let annual = json!({"id":"basic_annual"});
-        let subscriptions = json!([{"id":Uuid::new_v4(),"productId":annual["id"],"status":"active","currentPeriodStart":now-Duration::days(5),"currentPeriodEnd":now+Duration::days(360),"trialEnd":null,"cancelAtPeriodEnd":false,"endsAt":null}]);
+        let subscriptions = json!([{"id":Uuid::new_v4(),"productId":annual["id"],"entitlements":{"name":"Basic Annual","eventLimit":10000000,"websiteLimit":10,"used":0,"remaining":10000000,"localBaseline":0,"pending":0,"periodStart":now-Duration::days(5),"periodEnd":now+Duration::days(25)},"status":"active","currentPeriodStart":now-Duration::days(5),"currentPeriodEnd":now+Duration::days(360),"trialEnd":null,"cancelAtPeriodEnd":false,"endsAt":null}]);
         sqlx::query("INSERT INTO billing_customers(customer_id,owner_id,subscriptions,occurred_at,provider) VALUES($1,$2,$3,now(),'autumn')").bind(format!("test-{}",self.user)).bind(&self.user).bind(subscriptions).execute(&self.state.db).await.unwrap();
     }
     async fn site(&self) -> Uuid {
@@ -202,7 +202,15 @@ impl Fixture {
             )
             .await;
         assert_eq!(status, 201, "{body}");
-        body["site"]["id"].as_str().unwrap().parse().unwrap()
+        let id: Uuid = body["site"]["id"].as_str().unwrap().parse().unwrap();
+        // These fixtures exercise every activity kind; production defaults are opt-in.
+        sqlx::query("UPDATE environments SET tracking_settings=$1 WHERE site_id=$2")
+            .bind(json!({"click":true,"download":true,"scroll":true}))
+            .bind(id)
+            .execute(&self.state.db)
+            .await
+            .unwrap();
+        id
     }
     fn event(&self, site: Uuid) -> Event {
         let now = Utc::now();
@@ -785,7 +793,7 @@ async fn mock_provider(
     (StatusCode::OK, axum::Json(response))
 }
 fn autumn_customer(owner: &str) -> Value {
-    json!({"id":owner,"flags":{"analytics":{"feature_id":"analytics"}},"subscriptions":[{"id":"subscription","plan_id":"basic","status":"active","past_due":false,"current_period_start":(Utc::now()-Duration::days(1)).timestamp_millis(),"current_period_end":(Utc::now()+Duration::days(29)).timestamp_millis(),"trial_ends_at":null,"canceled_at":null,"expires_at":null}]})
+    json!({"id":owner,"balances":{"events":{"feature_id":"events","granted":100000,"remaining":100000,"usage":0,"unlimited":false},"websites":{"feature_id":"websites","granted":10,"unlimited":false}},"flags":{"analytics":{"feature_id":"analytics"}},"subscriptions":[{"id":"subscription","plan_id":"basic","plan":{"name":"Basic"},"status":"active","past_due":false,"current_period_start":(Utc::now()-Duration::days(1)).timestamp_millis(),"current_period_end":(Utc::now()+Duration::days(29)).timestamp_millis(),"trial_ends_at":null,"canceled_at":null,"expires_at":null}]})
 }
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]
@@ -1113,5 +1121,119 @@ async fn redis_workers_recover_abandoned_deliveries_and_quarantine_invalid_envel
             .await
             .unwrap();
         assert_eq!(failed, 1);
+    });
+}
+
+#[tokio::test]
+#[ignore = "requires isolated Neon and Redis"]
+async fn autumn_customer_overrides_control_usage_admission_and_ingestion() {
+    fixture!(f, {
+        let site = f.site().await;
+        let mock = MockProvider::start().await;
+        let state = mock.state(&f);
+        let mut customer = autumn_customer(&f.user);
+        customer["subscriptions"][0]["plan_id"] = json!("bespoke-customer-plan");
+        customer["subscriptions"][0]["plan"]["name"] = json!("Customer Special");
+        customer["balances"]["events"]["granted"] = json!(10000000);
+        customer["balances"]["events"]["usage"] = json!(9999999);
+        customer["balances"]["events"]["remaining"] = json!(1);
+        customer["balances"]["websites"]["granted"] = json!(1);
+        mock.data.lock().await.customer = Some(customer.clone());
+        let mut conn = state.db.acquire().await.unwrap();
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        let usage = billing::usage::usage(&mut conn, &f.user, Utc::now())
+            .await
+            .unwrap();
+        assert_eq!(usage["plan"]["name"], "Customer Special");
+        assert_eq!(usage["plan"]["eventLimit"], 10000000.0);
+        assert_eq!(usage["plan"]["websiteLimit"], 1);
+        assert_eq!(usage["events"]["used"], 9999999.0);
+        assert_eq!(
+            f.request(
+                "/api/sites",
+                "POST",
+                Some(json!({"name":"Second","domain":"second.example"}))
+            )
+            .await
+            .0,
+            409
+        );
+        assert!(
+            ingest::ingest(&f.state, &f.event(site), Utc::now())
+                .await
+                .unwrap()
+        );
+        assert!(
+            !ingest::ingest(&f.state, &f.event(site), Utc::now())
+                .await
+                .unwrap()
+        );
+        assert_eq!(
+            billing::admission::load(&f.state, site, site)
+                .await
+                .unwrap()
+                .pause_reason(site, Utc::now())
+                .unwrap(),
+            Some("event_limit")
+        );
+        // Refresh before delivery: pending local usage remains reserved exactly once.
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        let usage = billing::usage::usage(&mut conn, &f.user, Utc::now())
+            .await
+            .unwrap();
+        assert_eq!(usage["events"]["used"], 10000000.0);
+        assert_eq!(usage["events"]["remaining"], 0.0);
+        assert_eq!(billing::delivery::deliver(&state).await.unwrap(), 1);
+        // The provider now includes the delivery, so no pending reservation is added again.
+        customer["balances"]["events"]["usage"] = json!(10000000);
+        customer["balances"]["events"]["remaining"] = json!(0);
+        mock.data.lock().await.customer = Some(customer.clone());
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        assert_eq!(
+            billing::usage::usage(&mut conn, &f.user, Utc::now())
+                .await
+                .unwrap()["events"]["used"],
+            10000000.0
+        );
+        // An operator's usage reset and increased website allowance replace the old snapshot.
+        customer["balances"]["events"]["usage"] = json!(0);
+        customer["balances"]["events"]["remaining"] = json!(10000000);
+        customer["balances"]["websites"]["granted"] = json!(23);
+        mock.data.lock().await.customer = Some(customer.clone());
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        let usage = billing::usage::usage(&mut conn, &f.user, Utc::now())
+            .await
+            .unwrap();
+        assert_eq!(usage["events"]["used"], 0.0);
+        assert_eq!(usage["plan"]["websiteLimit"], 23);
+        for index in 1..=10 {
+            assert_eq!(f.request("/api/sites", "POST", Some(json!({"name":format!("Extra {index}"),"domain":format!("extra-{index}.example")}))).await.0, 201);
+        }
+        assert!(
+            ingest::ingest(&f.state, &f.event(site), Utc::now())
+                .await
+                .unwrap()
+        );
+        customer["balances"]["events"]["unlimited"] = json!(true);
+        customer["balances"]["websites"]["unlimited"] = json!(true);
+        mock.data.lock().await.customer = Some(customer);
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        let usage = billing::usage::usage(&mut conn, &f.user, Utc::now())
+            .await
+            .unwrap();
+        assert!(usage["plan"]["eventLimit"].is_null());
+        assert!(usage["plan"]["websiteLimit"].is_null());
+        assert!(usage["events"]["remaining"].is_null());
+        assert_eq!(usage["paused"], false);
     });
 }

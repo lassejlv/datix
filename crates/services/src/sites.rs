@@ -10,7 +10,7 @@ use uuid::Uuid;
 const SITE_COLUMNS: &str =
     "id, owner_id, name, domain, enabled, allow_localhost, credit_budget::text, created_at";
 // Explicit projections keep prepared result types stable across additive schema changes.
-const ENVIRONMENT_COLUMNS: &str = "id, site_id, name, domain, enabled, allow_localhost, created_at, tracking_mode, tracking_settings, import_revision";
+const ENVIRONMENT_COLUMNS: &str = "id, site_id, name, domain, enabled, allow_localhost, created_at, tracking_mode, tracking_settings, feature_settings, import_revision";
 pub async fn owned(state: &State, owner: &str, id: Uuid) -> Result<Sites> {
     sqlx::query_as::<_, Sites>(&format!(
         "SELECT {SITE_COLUMNS} FROM sites WHERE id=$1 AND owner_id=$2"
@@ -95,8 +95,12 @@ pub async fn create(state: &State, owner: &str, body: Value) -> Result<Value> {
         .bind(owner)
         .fetch_one(&mut *tx)
         .await?;
-    let (allowance, _) = super::billing::usage::account_allowance(&mut tx, owner, chrono::Utc::now()).await?;
-    if allowance.as_ref().map_or(total >= 10, |a| !a.permits_website(total)) {
+    let (allowance, _) =
+        super::billing::usage::account_allowance(&mut tx, owner, chrono::Utc::now()).await?;
+    if allowance
+        .as_ref()
+        .map_or(total >= 10, |a| !a.permits_website(total))
+    {
         return Err(Error::new(
             409,
             "site_limit",
@@ -160,10 +164,14 @@ struct EnvironmentInput {
     domain: Option<String>,
     tracking_mode: Option<String>,
     tracking_settings: Option<Value>,
+    feature_settings: Option<Value>,
     allow_localhost: Option<bool>,
     enabled: Option<bool>,
 }
 fn validate_environment(input: &mut EnvironmentInput) -> Result<()> {
+    if let Some(features) = &input.feature_settings {
+        crate::features::validate(features)?;
+    }
     if let Some(name) = &input.name {
         input.name = Some(validation::name(name, 40)?)
     }
@@ -223,8 +231,8 @@ pub async fn create_environment(state: &State, site: &Sites, body: Value) -> Res
             "A website can have at most 20 environments.",
         ));
     }
-    let environment=sqlx::query_as::<_,Environments>(&format!("INSERT INTO environments(site_id,name,domain,tracking_mode,tracking_settings,allow_localhost) VALUES($1,$2,$3,$4,$5,$6) RETURNING {ENVIRONMENT_COLUMNS}"))
- .bind(site.id).bind(name).bind(input.domain.unwrap_or_else(||site.domain.clone())).bind(input.tracking_mode.unwrap_or_else(||"cookieless".into())).bind(input.tracking_settings.unwrap_or(json!({}))).bind(input.allow_localhost.unwrap_or(false)).fetch_one(&mut *tx).await.map_err(conflict)?;
+    let environment=sqlx::query_as::<_,Environments>(&format!("INSERT INTO environments(site_id,name,domain,tracking_mode,tracking_settings,allow_localhost,feature_settings) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING {ENVIRONMENT_COLUMNS}"))
+ .bind(site.id).bind(name).bind(input.domain.unwrap_or_else(||site.domain.clone())).bind(input.tracking_mode.unwrap_or_else(||"cookieless".into())).bind(input.tracking_settings.unwrap_or(json!({}))).bind(input.allow_localhost.unwrap_or(false)).bind(input.feature_settings.unwrap_or(json!({}))).fetch_one(&mut *tx).await.map_err(conflict)?;
     tx.commit().await?;
     Ok(json!({"environment":environment}))
 }
@@ -252,8 +260,8 @@ pub async fn update_environment(
         .bind(site.id)
         .fetch_one(&mut *tx)
         .await?;
-    let environment=sqlx::query_as::<_,Environments>(&format!("UPDATE environments SET name=coalesce($1,name),domain=coalesce($2,domain),tracking_mode=coalesce($3,tracking_mode),tracking_settings=coalesce($4,tracking_settings),allow_localhost=coalesce($5,allow_localhost),enabled=coalesce($6,enabled) WHERE site_id=$7 AND id=$8 RETURNING {ENVIRONMENT_COLUMNS}"))
- .bind(input.name).bind(input.domain).bind(input.tracking_mode).bind(input.tracking_settings).bind(input.allow_localhost).bind(input.enabled).bind(site.id).bind(id).fetch_optional(&mut *tx).await.map_err(conflict)?.ok_or_else(||Error::new(404,"environment_not_found","Environment not found."))?;
+    let environment=sqlx::query_as::<_,Environments>(&format!("UPDATE environments SET name=coalesce($1,name),domain=coalesce($2,domain),tracking_mode=coalesce($3,tracking_mode),tracking_settings=coalesce($4,tracking_settings),allow_localhost=coalesce($5,allow_localhost),enabled=coalesce($6,enabled),feature_settings=coalesce($9,feature_settings) WHERE site_id=$7 AND id=$8 RETURNING {ENVIRONMENT_COLUMNS}"))
+ .bind(input.name).bind(input.domain).bind(input.tracking_mode).bind(input.tracking_settings).bind(input.allow_localhost).bind(input.enabled).bind(site.id).bind(id).bind(input.feature_settings).fetch_optional(&mut *tx).await.map_err(conflict)?.ok_or_else(||Error::new(404,"environment_not_found","Environment not found."))?;
     if id == site.id {
         sqlx::query("UPDATE sites SET enabled=$1,allow_localhost=$2 WHERE id=$3")
             .bind(environment.enabled)

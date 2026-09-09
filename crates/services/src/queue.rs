@@ -7,6 +7,9 @@ pub fn stream(state: &State) -> &str {
 }
 
 pub async fn enqueue(state: &State, event: &Event) -> Result<()> {
+    enqueue_value(state, event).await
+}
+pub async fn enqueue_value(state: &State, event: &impl serde::Serialize) -> Result<()> {
     let data = serde_json::to_string(event).expect("event serialization");
     let mut conn = state.redis.clone();
     let accepted: i64 = redis::Script::new("if redis.call('XLEN',KEYS[1]) >= tonumber(ARGV[1]) then return 0 end; redis.call('XADD',KEYS[1],'*','data',ARGV[2]); return 1")

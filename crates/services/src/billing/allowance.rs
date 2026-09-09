@@ -50,10 +50,20 @@ pub struct Allowance {
 }
 pub fn period(subscription: &Subscription, now: DateTime<Utc>) -> Option<Period> {
     if let Some(e) = &subscription.entitlements {
-        let end = e.period_end.min(subscription.current_period_end)
+        let end = e
+            .period_end
+            .min(subscription.current_period_end)
             .min(subscription.ends_at.unwrap_or(e.period_end))
-            .min(subscription.trial_end.filter(|_| subscription.status == "trialing").unwrap_or(e.period_end));
-        return (now >= e.period_start && now < end).then_some(Period { start: e.period_start, end });
+            .min(
+                subscription
+                    .trial_end
+                    .filter(|_| subscription.status == "trialing")
+                    .unwrap_or(e.period_end),
+            );
+        return (now >= e.period_start && now < end).then_some(Period {
+            start: e.period_start,
+            end,
+        });
     }
     let origin = subscription.current_period_start?;
     let mut end = subscription.current_period_end;
@@ -86,9 +96,14 @@ pub fn active(subscriptions: Vec<Subscription>, now: DateTime<Utc>) -> Option<Al
                 return None;
             }
             let e = subscription.entitlements.as_ref()?;
-            if e.name.trim().is_empty() || e.event_limit.is_some_and(|v| v < 0)
-                || e.website_limit.is_some_and(|v| v < 0) || e.used < 0 || e.pending < 0 || e.local_baseline < 0
-                || e.event_limit.is_some() != e.remaining.is_some() {
+            if e.name.trim().is_empty()
+                || e.event_limit.is_some_and(|v| v < 0)
+                || e.website_limit.is_some_and(|v| v < 0)
+                || e.used < 0
+                || e.pending < 0
+                || e.local_baseline < 0
+                || e.event_limit.is_some() != e.remaining.is_some()
+            {
                 return None;
             }
             let period = period(&subscription, now)?;
@@ -101,7 +116,8 @@ pub fn active(subscriptions: Vec<Subscription>, now: DateTime<Utc>) -> Option<Al
             })
         })
         .max_by(|a, b| {
-            a.event_limit.unwrap_or(i64::MAX)
+            a.event_limit
+                .unwrap_or(i64::MAX)
                 .cmp(&b.event_limit.unwrap_or(i64::MAX))
                 .then(a.period.start.cmp(&b.period.start))
         })
@@ -109,16 +125,29 @@ pub fn active(subscriptions: Vec<Subscription>, now: DateTime<Utc>) -> Option<Al
 
 impl Allowance {
     pub fn used(&self, local: i64) -> i64 {
-        let e = self.subscription.entitlements.as_ref().expect("active entitlement");
+        let e = self
+            .subscription
+            .entitlements
+            .as_ref()
+            .expect("active entitlement");
         e.used.saturating_add(self.reserved(local))
     }
     fn reserved(&self, local: i64) -> i64 {
-        let e = self.subscription.entitlements.as_ref().expect("active entitlement");
-        e.pending.saturating_add(local.saturating_sub(e.local_baseline).max(0))
+        let e = self
+            .subscription
+            .entitlements
+            .as_ref()
+            .expect("active entitlement");
+        e.pending
+            .saturating_add(local.saturating_sub(e.local_baseline).max(0))
     }
     pub fn remaining(&self, local: i64) -> Option<i64> {
-        self.subscription.entitlements.as_ref().expect("active entitlement")
-            .remaining.map(|v| v.saturating_sub(self.reserved(local)).max(0))
+        self.subscription
+            .entitlements
+            .as_ref()
+            .expect("active entitlement")
+            .remaining
+            .map(|v| v.saturating_sub(self.reserved(local)).max(0))
     }
     pub fn permits_website(&self, position: i64) -> bool {
         self.website_limit.is_none_or(|limit| position < limit)

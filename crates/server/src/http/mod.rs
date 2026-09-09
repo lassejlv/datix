@@ -22,6 +22,7 @@ use tower::ServiceExt;
 use uuid::Uuid;
 
 mod auth_routes;
+mod feature_routes;
 use auth_routes::authentication;
 mod account_routes;
 use account_routes::{billing_operation, billing_root, me, usage};
@@ -69,6 +70,18 @@ pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
         .route(
             "/api/collect",
             post(collect_event).options(|| async { StatusCode::NO_CONTENT }),
+        )
+        .route(
+            "/api/telemetry",
+            post(feature_routes::telemetry).options(|| async { StatusCode::NO_CONTENT }),
+        )
+        .route(
+            "/api/sites/{site}/environments/{environment}/features/{feature}",
+            get(feature_routes::report).post(feature_routes::configure),
+        )
+        .route(
+            "/api/sites/{site}/environments/{environment}/features/goals/{goal}",
+            axum::routing::delete(feature_routes::delete_goal),
         )
         .route("/api/auth/{*path}", any(authentication))
         .route("/api/me", get(me))
@@ -249,7 +262,7 @@ async fn tracker_config(
         .unwrap_or(site);
     let e = sites::environment(&state, site, environment).await?;
     Ok(Json(
-        json!({"enabled":e.enabled,"settings":tracking::settings(&e.tracking_settings)}),
+        json!({"enabled":e.enabled,"settings":tracking::settings(&e.tracking_settings),"features":analytics_services::features::settings(&e.feature_settings)}),
     ))
 }
 async fn collect_event(

@@ -22,26 +22,15 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "locale",
-                    "theme"
-                  ],
+                  "required": ["locale", "theme"],
                   "properties": {
                     "locale": {
                       "type": "string",
-                      "enum": [
-                        "en",
-                        "de",
-                        "da"
-                      ]
+                      "enum": ["en", "de", "da"]
                     },
                     "theme": {
                       "type": "string",
-                      "enum": [
-                        "system",
-                        "light",
-                        "dark"
-                      ]
+                      "enum": ["system", "light", "dark"]
                     }
                   }
                 }
@@ -253,10 +242,7 @@
                   "type": "object",
                   "properties": {
                     "plan": {
-                      "type": [
-                        "object",
-                        "null"
-                      ],
+                      "type": ["object", "null"],
                       "properties": {
                         "name": {
                           "type": "string"
@@ -265,18 +251,17 @@
                           "type": "boolean"
                         },
                         "eventLimit": {
-                          "type": "integer"
+                          "type": ["number", "null"],
+                          "description": "Customer-specific Autumn allowance; null means unlimited."
                         },
                         "websiteLimit": {
-                          "type": "integer"
+                          "type": ["integer", "null"],
+                          "description": "Customer-specific Autumn allowance; null means unlimited."
                         }
                       }
                     },
                     "period": {
-                      "type": [
-                        "object",
-                        "null"
-                      ],
+                      "type": ["object", "null"],
                       "properties": {
                         "start": {
                           "type": "string",
@@ -296,8 +281,9 @@
                           "multipleOf": 0.01
                         },
                         "remaining": {
-                          "type": "number",
-                          "multipleOf": 0.01
+                          "type": ["number", "null"],
+                          "multipleOf": 0.01,
+                          "description": "Autumn remaining credits less locally pending usage; null means unlimited."
                         }
                       }
                     },
@@ -312,10 +298,7 @@
                           "type": "integer"
                         },
                         "lastBlockedAt": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
+                          "type": ["string", "null"],
                           "format": "date-time"
                         },
                         "learning": {
@@ -330,11 +313,7 @@
                             "type": "object",
                             "properties": {
                               "reason": {
-                                "enum": [
-                                  "source_limit",
-                                  "repeated_activity",
-                                  "unusual_activity"
-                                ]
+                                "enum": ["source_limit", "repeated_activity", "unusual_activity"]
                               },
                               "blocked": {
                                 "type": "integer"
@@ -377,10 +356,7 @@
                             "multipleOf": 0.01
                           },
                           "creditBudget": {
-                            "type": [
-                              "number",
-                              "null"
-                            ],
+                            "type": ["number", "null"],
                             "minimum": 0.15,
                             "maximum": 1000000000,
                             "multipleOf": 0.01
@@ -800,10 +776,7 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": [
-                  "name",
-                  "domain"
-                ],
+                "required": ["name", "domain"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1085,10 +1058,7 @@
                     "maxLength": 80
                   },
                   "creditBudget": {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
+                    "type": ["number", "null"],
                     "minimum": 0.15,
                     "maximum": 1000000000,
                     "multipleOf": 0.01,
@@ -1475,9 +1445,7 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1493,11 +1461,7 @@
                   },
                   "trackingMode": {
                     "type": "string",
-                    "enum": [
-                      "cookieless",
-                      "sessions",
-                      "local"
-                    ],
+                    "enum": ["cookieless", "sessions", "local"],
                     "default": "cookieless",
                     "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
                   },
@@ -1874,11 +1838,7 @@
                   },
                   "trackingMode": {
                     "type": "string",
-                    "enum": [
-                      "cookieless",
-                      "sessions",
-                      "local"
-                    ],
+                    "enum": ["cookieless", "sessions", "local"],
                     "default": "cookieless",
                     "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
                   },
@@ -2162,10 +2122,7 @@
                       "description": "At least one persisted pageview remains in raw retention."
                     },
                     "lastReceivedAt": {
-                      "type": [
-                        "string",
-                        "null"
-                      ],
+                      "type": ["string", "null"],
                       "format": "date-time"
                     }
                   }
@@ -2659,13 +2616,7 @@
           "in": "query",
           "schema": {
             "type": "string",
-            "enum": [
-              "path",
-              "referrer",
-              "country",
-              "device",
-              "event"
-            ],
+            "enum": ["path", "referrer", "country", "device", "event"],
             "default": "path"
           }
         },
@@ -2706,10 +2657,7 @@
                     },
                     "metric": {
                       "type": "string",
-                      "enum": [
-                        "pageviews",
-                        "customEvents"
-                      ]
+                      "enum": ["pageviews", "customEvents"]
                     },
                     "data": {
                       "type": "array",
@@ -2954,10 +2902,7 @@
                       "type": "integer"
                     },
                     "nextCursor": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": ["string", "null"]
                     }
                   }
                 }
@@ -3272,33 +3217,19 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": [
-                  "events",
-                  "interval"
-                ],
+                "required": ["events", "interval"],
                 "properties": {
                   "events": {
                     "type": "integer",
-                    "enum": [
-                      100000,
-                      1000000,
-                      5000000
-                    ]
+                    "enum": [100000, 1000000, 5000000]
                   },
                   "interval": {
                     "type": "string",
-                    "enum": [
-                      "month",
-                      "year"
-                    ]
+                    "enum": ["month", "year"]
                   },
                   "locale": {
                     "type": "string",
-                    "enum": [
-                      "en",
-                      "da",
-                      "de"
-                    ]
+                    "enum": ["en", "da", "de"]
                   }
                 }
               }
@@ -3389,10 +3320,7 @@
       "AnonymousActivity": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "kind",
-          "details"
-        ],
+        "required": ["kind", "details"],
         "description": "Cookieless activity only. No client visitor/session identifiers. Cannot be combined with session.",
         "properties": {
           "kind": {
@@ -3406,23 +3334,14 @@
       "SessionContext": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "consent",
-          "visitorId",
-          "sessionId",
-          "kind",
-          "details"
-        ],
+        "required": ["consent", "visitorId", "sessionId", "kind", "details"],
         "properties": {
           "consent": {
             "const": true
           },
           "storage": {
             "type": "string",
-            "enum": [
-              "cookie",
-              "local"
-            ],
+            "enum": ["cookie", "local"],
             "default": "cookie",
             "description": "Must match the environment. local mode requires storage=local."
           },
@@ -3533,11 +3452,7 @@
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "message",
-              "requestId"
-            ],
+            "required": ["code", "message", "requestId"],
             "properties": {
               "code": {
                 "type": "string"
@@ -3625,11 +3540,7 @@
           },
           "trackingMode": {
             "type": "string",
-            "enum": [
-              "cookieless",
-              "sessions",
-              "local"
-            ],
+            "enum": ["cookieless", "sessions", "local"],
             "default": "cookieless",
             "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
           },
@@ -3681,10 +3592,7 @@
             "type": "string"
           },
           "creditBudget": {
-            "type": [
-              "number",
-              "null"
-            ],
+            "type": ["number", "null"],
             "minimum": 0.15,
             "maximum": 1000000000,
             "multipleOf": 0.01
@@ -3733,12 +3641,7 @@
           {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "siteId",
-              "id",
-              "type",
-              "url"
-            ],
+            "required": ["siteId", "id", "type", "url"],
             "properties": {
               "session": {
                 "$ref": "#/components/schemas/SessionContext"
@@ -3777,13 +3680,7 @@
           {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "siteId",
-              "id",
-              "type",
-              "url",
-              "name"
-            ],
+            "required": ["siteId", "id", "type", "url", "name"],
             "properties": {
               "session": {
                 "$ref": "#/components/schemas/SessionContext"

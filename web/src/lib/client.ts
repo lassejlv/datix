@@ -1,7 +1,9 @@
+import type { FeatureSettings } from './features';
 import type { TrackingSettings } from './tracking-settings';
 import type { ImportedReportSources } from './imports';
 export type User = { id: string; name: string; email: string };
 export type SiteEnvironment = {
+  featureSettings?: Partial<FeatureSettings>;
   trackingSettings?: Partial<TrackingSettings>;
   trackingMode: 'cookieless' | 'sessions' | 'local';
   id: string;

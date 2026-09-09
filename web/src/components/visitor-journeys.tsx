@@ -1,3 +1,4 @@
+import { JourneyFlow } from './journey-flow';
 import { deviceName } from '../lib/i18n/display';
 import { Translated } from './translated';
 import { useSitePreferences } from './site-preferences';
@@ -423,6 +424,7 @@ function JourneyTimeline({
       if (!signal?.aborted) setBusy(false);
     }
   }
+  const [view, setView] = useState<'journey' | 'timeline'>('journey');
   const first = events[0];
   return (
     <section aria-label={t('Session timeline')} className="min-w-0 max-w-[800px]">
@@ -478,41 +480,61 @@ function JourneyTimeline({
           )}
         </p>
       )}
-      <ol aria-label={t('Activity events')} className="mt-6 border-t border-border pt-3">
-        {events.map((event) => {
-          const Icon = eventIcons[event.kind as keyof typeof eventIcons] ?? Sparkles;
-          return (
-            <li key={event.id} className="relative flex gap-3 py-2.5">
-              <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center text-secondary-ink">
-                <Icon size={14} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-baseline justify-between gap-1">
-                  <h3 className="min-w-0 break-all text-sm">
-                    {event.kind === 'pageview' ? event.path : activityTitle(event, locale)}
-                  </h3>
-                  <time className="text-[11px] text-secondary-ink tabular-nums">
-                    {new Date(event.occurredAt).toISOString().slice(11, 19)}
-                  </time>
+      <div
+        className="mt-6 inline-flex gap-1 rounded-md border border-border p-1"
+        role="group"
+        aria-label={t('Activity view')}
+      >
+        {(['journey', 'timeline'] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            aria-pressed={view === mode}
+            onClick={() => setView(mode)}
+            className={`rounded px-3 py-1.5 text-xs focus-visible:outline-2 focus-visible:outline-ring ${view === mode ? 'bg-muted font-medium text-foreground' : 'text-secondary-ink hover:text-foreground'}`}
+          >
+            {t(mode === 'journey' ? 'Journey' : 'Timeline')}
+          </button>
+        ))}
+      </div>
+      {view === 'journey' && events.length > 0 && <JourneyFlow events={events} hasMore={hasMore} />}
+      {view === 'timeline' && (
+        <ol aria-label={t('Activity events')} className="mt-6 border-t border-border pt-3">
+          {events.map((event) => {
+            const Icon = eventIcons[event.kind as keyof typeof eventIcons] ?? Sparkles;
+            return (
+              <li key={event.id} className="relative flex gap-3 py-2.5">
+                <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center text-secondary-ink">
+                  <Icon size={14} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline justify-between gap-1">
+                    <h3 className="min-w-0 break-all text-sm">
+                      {event.kind === 'pageview' ? event.path : activityTitle(event, locale)}
+                    </h3>
+                    <time className="text-[11px] text-secondary-ink tabular-nums">
+                      {new Date(event.occurredAt).toISOString().slice(11, 19)}
+                    </time>
+                  </div>
+                  {event.kind !== 'pageview' && (
+                    <p className="mt-0.5 break-all text-xs text-secondary-ink">{event.path}</p>
+                  )}
+                  {event.details.target && (
+                    <p className="mt-1 break-all text-xs text-secondary-ink">
+                      {t('Element:')} {event.details.target}
+                    </p>
+                  )}
+                  {event.details.destination && (
+                    <p className="mt-1 break-all text-xs text-secondary-ink">
+                      {t('Destination:')} {event.details.destination}
+                    </p>
+                  )}
                 </div>
-                {event.kind !== 'pageview' && (
-                  <p className="mt-0.5 break-all text-xs text-secondary-ink">{event.path}</p>
-                )}
-                {event.details.target && (
-                  <p className="mt-1 break-all text-xs text-secondary-ink">
-                    {t('Element:')} {event.details.target}
-                  </p>
-                )}
-                {event.details.destination && (
-                  <p className="mt-1 break-all text-xs text-secondary-ink">
-                    {t('Destination:')} {event.details.destination}
-                  </p>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+              </li>
+            );
+          })}
+        </ol>
+      )}
       {busy && (
         <p role="status" className="mt-5 text-sm text-secondary-ink">
           {t('Loading activity…')}

@@ -1,3 +1,4 @@
+import './build-vitals';
 // Keep operational paths stable when invoked from either the repository or web/.
 process.chdir(new URL('../..', import.meta.url).pathname);
 const frontendPort = process.env.DEV_PORT ?? '3000';

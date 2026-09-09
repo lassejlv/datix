@@ -29,9 +29,20 @@ pub async fn deliver(state: &State) -> Result<usize> {
     for row in rows {
         // Serialize provider delivery and snapshot reads with ingestion for this owner.
         let mut tx = state.db.begin().await?;
-        sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE").bind(&row.owner_id).fetch_optional(&mut *tx).await?;
-        let leased: bool = sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM billing_outbox WHERE id=$1 AND lease_id=$2)").bind(row.id).bind(lease).fetch_one(&mut *tx).await?;
-        if !leased { continue; }
+        sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
+            .bind(&row.owner_id)
+            .fetch_optional(&mut *tx)
+            .await?;
+        let leased: bool = sqlx::query_scalar(
+            "SELECT EXISTS(SELECT 1 FROM billing_outbox WHERE id=$1 AND lease_id=$2)",
+        )
+        .bind(row.id)
+        .bind(lease)
+        .fetch_one(&mut *tx)
+        .await?;
+        if !leased {
+            continue;
+        }
 
         let value = row
             .event_count

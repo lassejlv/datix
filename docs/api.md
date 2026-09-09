@@ -171,7 +171,7 @@ Local visitor payloads require `session.storage: "local"` and `session.consent: 
 
 ### Tracking controls and event credits
 
-Environment settings offer individual switches for pageviews, custom events, clicks, outbound links, downloads, form submissions, scroll depth and engagement time. Optional details include referrers, country, device/browser/OS, screen size, language and click positions. Existing environments default to all enabled. PATCH the environment with a complete `trackingSettings` object to save these booleans. Existing reports remain unchanged.
+Environment settings offer individual switches for pageviews, custom events, clicks, outbound links, downloads, form submissions, scroll depth and engagement time. Optional details include referrers, country, device/browser/OS, screen size, language and click positions. Downloads, clicks, and scroll depth default to disabled when no explicit setting has been saved. Other switches default to enabled; explicitly saved settings take precedence. PATCH the environment with a complete `trackingSettings` object to save these booleans. Existing reports remain unchanged.
 
 The tracker reads public `/api/tracker-config?siteId=UUID&environmentId=UUID` settings, caches them for 60 seconds and pauses if settings cannot be loaded. Collection and queue admission also enforce the current policy. Disabled details are stripped before storage; disabled events do not use credits.
 

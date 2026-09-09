@@ -1,5 +1,19 @@
 import type { Copy } from './en';
 export const da = {
+  Journey: 'Rejse',
+  Timeline: 'Tidslinje',
+  'Activity view': 'Aktivitetsvisning',
+  Steps: 'Trin',
+  Actions: 'Handlinger',
+  'Journey steps': 'Trin i besøget',
+  'Page context': 'Sidekontekst',
+  'Actions on {path}': 'Handlinger på {path}',
+  'Follow the visit from top to bottom. Select a step for details.':
+    'Følg besøget oppefra og ned. Vælg et trin for at se detaljer.',
+  'Showing loaded activity. Load more to continue the journey.':
+    'Viser indlæst aktivitet. Indlæs mere for at fortsætte besøget.',
+  '{seconds} seconds active': '{seconds} sekunder aktiv',
+  Unlimited: 'Ubegrænset',
   'Your website allowance has been reached.': 'Din grænse for websites er nået.',
   'All prices in {currency}.': 'Alle priser i {currency}.',
   '{price} per {interval}': '{price} pr. {interval}',

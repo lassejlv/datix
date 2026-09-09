@@ -1,5 +1,19 @@
 import type { Copy } from './en';
 export const de = {
+  Journey: 'Besuchsverlauf',
+  Timeline: 'Zeitleiste',
+  'Activity view': 'Aktivitätsansicht',
+  Steps: 'Schritte',
+  Actions: 'Aktionen',
+  'Journey steps': 'Besuchsschritte',
+  'Page context': 'Seitenkontext',
+  'Actions on {path}': 'Aktionen auf {path}',
+  'Follow the visit from top to bottom. Select a step for details.':
+    'Folge dem Besuch von oben nach unten. Wähle einen Schritt für Details.',
+  'Showing loaded activity. Load more to continue the journey.':
+    'Die geladenen Aktivitäten werden angezeigt. Lade weitere, um den Besuch fortzusetzen.',
+  '{seconds} seconds active': '{seconds} Sekunden aktiv',
+  Unlimited: 'Unbegrenzt',
   'Your website allowance has been reached.': 'Dein Website-Limit wurde erreicht.',
   'All prices in {currency}.': 'Alle Preise in {currency}.',
   '{price} per {interval}': '{price} pro {interval}',

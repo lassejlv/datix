@@ -101,7 +101,11 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="font-medium">
-                {data.plan ? (data.plan.trial ? t('{plan} · Trial', { plan: data.plan.name }) : data.plan.name) : t('No active plan')}
+                {data.plan
+                  ? data.plan.trial
+                    ? t('{plan} · Trial', { plan: data.plan.name })
+                    : data.plan.name
+                  : t('No active plan')}
               </h2>
               <p className="mt-1 text-sm text-secondary-ink">
                 {data.period
@@ -138,7 +142,9 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
               <p className="tabular-nums">
                 <span className="text-2xl font-medium">{number(data.events.used)}</span>
                 <span className="text-sm text-secondary-ink">
-                  {data.plan ? ` / ${data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit)}` : t(' · No active allowance')}
+                  {data.plan
+                    ? ` / ${data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit)}`
+                    : t(' · No active allowance')}
                 </span>
               </p>
             </div>
@@ -151,7 +157,8 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
                 aria-valuenow={Math.min(data.events.used, data.plan.eventLimit)}
                 aria-valuetext={t('{used} of {limit} credits', {
                   used: number(data.events.used),
-                  limit: data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit),
+                  limit:
+                    data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit),
                 })}
                 className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
               >
@@ -230,7 +237,9 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
               <h2 className="font-medium">{t('Websites')}</h2>
               <p className="text-sm tabular-nums text-secondary-ink">
                 {data.websites.length}
-                {data.plan ? ` / ${data.plan.websiteLimit === null ? t('Unlimited') : number(data.plan.websiteLimit)}` : ''}
+                {data.plan
+                  ? ` / ${data.plan.websiteLimit === null ? t('Unlimited') : number(data.plan.websiteLimit)}`
+                  : ''}
               </p>
             </div>
             {!data.websites.length ? (

@@ -9,3 +9,5 @@ pub mod reports;
 pub mod retention;
 pub mod sites;
 pub mod tracking;
+
+pub mod features;

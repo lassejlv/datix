@@ -1,0 +1,202 @@
+.journey-flow {
+  border-block: 1px solid var(--border);
+  padding-block: 24px;
+  margin-top: 16px;
+}
+.journey-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin-bottom: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+.journey-summary > div {
+  display: flex;
+  gap: 8px;
+}
+.journey-summary dd {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.journey-summary dt {
+  color: var(--secondary-ink);
+}
+.journey-stops,
+.journey-actions {
+  list-style: none;
+  padding: 0;
+}
+.journey-stop {
+  position: relative;
+  padding-bottom: 20px;
+}
+.journey-stop:last-child {
+  padding-bottom: 0;
+}
+.journey-stop:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 17px;
+  bottom: -17px;
+  width: 1px;
+  background: var(--border);
+}
+.journey-page-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 26px;
+  position: relative;
+}
+.journey-page-row::before {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 26px;
+  width: 27px;
+  height: 1px;
+  background: var(--border);
+}
+.journey-order {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 27px;
+  height: 27px;
+  margin-top: 4px;
+  border: 1px solid var(--input-border);
+  border-radius: 50%;
+  background: var(--background);
+  color: var(--muted-ink);
+  font:
+    10px ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+.journey-node {
+  --node-ink: var(--secondary-ink);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  max-width: min(100%, 320px);
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--node-ink) 38%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--node-ink) 5%, var(--background));
+  color: var(--node-ink);
+  font:
+    12px / 1.5 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-align: left;
+}
+.journey-node[data-tone='entry'] {
+  --node-ink: light-dark(#176b3a, #72c899);
+}
+.journey-node[data-tone='page'] {
+  --node-ink: light-dark(#8a5b11, #d4a44c);
+}
+.journey-node[data-tone='action'] {
+  --node-ink: light-dark(#7250a3, #b19bdc);
+}
+.journey-node[data-tone='passive'] {
+  --node-ink: var(--muted-ink);
+}
+.journey-node svg {
+  flex-shrink: 0;
+}
+.journey-node > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+button.journey-node {
+  cursor: pointer;
+  transition:
+    background 120ms,
+    border-color 120ms;
+}
+button.journey-node:hover,
+.journey-node[aria-expanded='true'] {
+  background: color-mix(in srgb, var(--node-ink) 13%, var(--background));
+  border-color: var(--node-ink);
+}
+button.journey-node:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+.journey-context {
+  border-style: dashed;
+}
+.journey-actions {
+  margin-left: 76px;
+}
+.journey-action-row {
+  position: relative;
+  padding: 10px 0 0 25px;
+}
+.journey-action-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.journey-action-row:last-child::before {
+  height: 27px;
+  bottom: auto;
+}
+.journey-action-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 27px;
+  width: 25px;
+  height: 1px;
+  background: var(--border);
+}
+.journey-detail {
+  margin-top: 10px;
+  max-width: 460px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--input-border);
+  color: var(--secondary-ink);
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 480px) {
+  .journey-page-row {
+    gap: 16px;
+  }
+  .journey-page-row::before {
+    width: 17px;
+  }
+  .journey-actions {
+    margin-left: 57px;
+  }
+  .journey-action-row {
+    padding-left: 20px;
+  }
+  .journey-action-row::after {
+    width: 20px;
+  }
+  .journey-node {
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button.journey-node {
+    transition: none;
+  }
+}

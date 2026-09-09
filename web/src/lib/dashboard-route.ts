@@ -5,6 +5,11 @@ export const dashboardPages = [
   'installation',
   'imports',
   'settings',
+  'goals',
+  'errors',
+  'web-vitals',
+  'globe',
+  'pulse',
 ] as const;
 export type DashboardPage = (typeof dashboardPages)[number];
 export function isDashboardPage(value: unknown): value is DashboardPage {

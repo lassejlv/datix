@@ -19,7 +19,11 @@ pub const SETTING_KEYS: [&str; 14] = [
 pub fn settings(raw: &Value) -> Value {
     let mut result = json!({});
     for key in SETTING_KEYS {
-        result[key] = json!(raw.get(key).and_then(Value::as_bool).unwrap_or(true));
+        result[key] = json!(
+            raw.get(key)
+                .and_then(Value::as_bool)
+                .unwrap_or(!["click", "download", "scroll"].contains(&key))
+        );
     }
     result
 }

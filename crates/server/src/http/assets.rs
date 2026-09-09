@@ -20,6 +20,9 @@ pub(super) async fn fallback(AppState(state): AppState<State>, request: Request)
     match static_service.oneshot(request).await {
         Ok(response) if response.status() != StatusCode::NOT_FOUND => {
             let mut response = response.map(Body::new);
+            if path == "/web-vitals.js" {
+                response.headers_mut().insert("access-control-allow-origin",HeaderValue::from_static("*"));
+            }
             let cache = if path == "/" || path.ends_with("/index.html") {
                 "no-cache"
             } else if path.starts_with("/assets/") {
