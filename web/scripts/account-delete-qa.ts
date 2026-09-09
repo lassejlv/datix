@@ -7,7 +7,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { ingest, type EventMessage } from '../tests/fixtures/queued-events';
 const production = process.argv.includes('--production');
 const base = production
-  ? 'https://analytics.beer'
+  ? 'https://usedatix.com'
   : (process.env.QA_BASE_URL ?? 'http://localhost:3000');
 const connectionString = process.env[production ? 'PRODUCTION_DATABASE_URL' : 'DATABASE_URL'];
 if (

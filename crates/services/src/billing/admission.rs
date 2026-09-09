@@ -53,9 +53,9 @@ impl Admission {
                 site_used += row.units;
             }
         }
-        Ok(if active.event_limit * 100 - total < 15 {
+        Ok(if active.remaining(total).is_some_and(|r| r < 15) {
             Some("event_limit")
-        } else if self.site_position >= 10 {
+        } else if !active.permits_website(self.site_position) {
             Some("website_limit")
         } else if super::usage::budget_units(&self.credit_budget)
             .is_some_and(|budget| budget - site_used < 15)

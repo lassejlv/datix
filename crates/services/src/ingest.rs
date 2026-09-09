@@ -148,7 +148,7 @@ async fn ingest_owner(
     let Some(active) = active else {
         return Ok(HashSet::new());
     };
-    let allowed: HashMap<_, _> = websites.iter().take(10).map(|w| (w.id, w)).collect();
+    let allowed: HashMap<_, _> = websites.iter().enumerate().filter(|(i, _)| active.permits_website(*i as i64)).map(|(_, w)| (w.id, w)).collect();
     let event_ids: Vec<_> = batch.iter().map(|(_, e)| e.id).collect();
     let duplicates: HashSet<(Uuid, Uuid)> = sqlx::query_as(
         "SELECT e.environment_id,e.id FROM event_receipts e JOIN unnest($1::uuid[],$2::uuid[]) AS input(site_id,id) ON e.environment_id=input.site_id AND e.id=input.id WHERE e.kind=0"
@@ -200,7 +200,7 @@ async fn ingest_owner(
         }
         let used = account_used.entry(period.start).or_default();
         let site = site_used.entry((period.start, event.site_id)).or_default();
-        let remaining = (active.event_limit * 100 - *used).max(0);
+        let remaining = active.remaining(*used).unwrap_or(i64::MAX);
         let site_remaining = budget.map_or(i64::MAX, |limit| (limit - *site).max(0));
         let units = event.units();
         if remaining == 0 || site_remaining < 15 || units > remaining || units > site_remaining {
@@ -320,7 +320,7 @@ async fn ingest_owner(
             .iter()
             .map(|((kind, _, _), (units, at))| json!({"kind":kind,"units":units,"at":at}))
             .collect();
-        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at) SELECT $1,r.kind,r.units::numeric/100,r.at FROM jsonb_to_recordset($2) r(kind text,units bigint,at timestamptz)")
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider) SELECT $1,r.kind,r.units::numeric/100,r.at,'autumn' FROM jsonb_to_recordset($2) r(kind text,units bigint,at timestamptz)")
             .bind(owner).bind(json!(rows)).execute(&mut *tx).await?;
     }
     let visitors: Vec<_> = admitted

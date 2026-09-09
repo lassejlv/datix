@@ -27,11 +27,11 @@ export type AccountUsage = {
   plan: {
     name: string;
     trial: boolean;
-    eventLimit: number;
-    websiteLimit: number;
+    eventLimit: number | null;
+    websiteLimit: number | null;
   } | null;
   period: { start: string; end: string } | null;
-  events: { used: number; remaining: number };
+  events: { used: number; remaining: number | null };
   paused: boolean;
   pauseReason: UsagePauseReason | null;
   websites: {

@@ -1,4 +1,4 @@
-# Analytics Beer landing page
+# Datix landing page
 
 The page serves independent website owners. Its primary action is **Start tracking**, opening the existing account creation flow. The user's explicit centered, basic layout takes precedence over generic asymmetric or long landing page templates.
 

@@ -12,7 +12,7 @@ fn date(s: &str) -> DateTime<Utc> {
     s.parse().unwrap()
 }
 fn subscription() -> Subscription {
-    serde_json::from_value(json!({"id":"test","productId":"a0de3cc9-ea92-4e95-b23e-b8d9240685aa","status":"active","currentPeriodStart":"2026-01-31T12:00:00Z","currentPeriodEnd":"2027-01-31T12:00:00Z","trialEnd":null,"cancelAtPeriodEnd":false,"endsAt":null})).unwrap()
+    serde_json::from_value(json!({"id":"test","productId":"basic","status":"active","currentPeriodStart":"2026-01-31T12:00:00Z","currentPeriodEnd":"2027-01-31T12:00:00Z","trialEnd":null,"cancelAtPeriodEnd":false,"endsAt":null})).unwrap()
 }
 #[tokio::test]
 async fn legacy_passwords_and_cookie_signatures_are_compatible() {

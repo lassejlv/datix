@@ -1,4 +1,10 @@
 export const en = {
+  'Your website allowance has been reached.': 'Your website allowance has been reached.',
+  'All prices in {currency}.': 'All prices in {currency}.',
+  '{price} per {interval}': '{price} per {interval}',
+  '{events} events · {price}/year': '{events} events · {price}/year',
+  '{events} events · {price}/month': '{events} events · {price}/month',
+
   Tracking: 'Tracking',
   Environment: 'Environment',
   Website: 'Website',
@@ -31,8 +37,6 @@ export const en = {
     '14 days free on Pro 100k. Pick your event volume.',
   '14 days free, then': '14 days free, then',
   '14 days free. Pick your event volume.': '14 days free. Pick your event volume.',
-  '14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.':
-    '14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.',
   '7 days free': '7 days free',
   '7 days free, then': '7 days free, then',
   '7 days on Starter': '7 days on Starter',
@@ -81,7 +85,7 @@ export const en = {
   'Account menu': 'Account menu',
   'Account settings': 'Account settings',
   'Across all your websites and environments.': 'Across all your websites and environments.',
-  'Activate Pro to start collecting.': 'Activate Pro to start collecting.',
+  'Activate a plan to start collecting.': 'Activate a plan to start collecting.',
   active: 'active',
   Active: 'Active',
   'Activity events': 'Activity events',
@@ -120,8 +124,8 @@ export const en = {
   'An active Pro plan is required': 'An active Pro plan is required',
   'An active Pro subscription or Pro trial is required to collect events. Your existing reports remain available.':
     'An active Pro subscription or Pro trial is required to collect events. Your existing reports remain available.',
-  'An actual Analytics Beer dashboard, shown with example traffic.':
-    'An actual Analytics Beer dashboard, shown with example traffic.',
+  'An actual Datix dashboard, shown with example traffic.':
+    'An actual Datix dashboard, shown with example traffic.',
   'An environment supports up to 50 imports. Remove an earlier import before adding another.':
     'An environment supports up to 50 imports. Remove an earlier import before adding another.',
   'An import can contain only one daily total per date.':
@@ -136,12 +140,12 @@ export const en = {
   'An imported referrer is not a valid hostname or URL.':
     'An imported referrer is not a valid hostname or URL.',
   'An imported report label exceeds 2048 bytes.': 'An imported report label exceeds 2048 bytes.',
-  'Analytics Beer dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
-    'Analytics Beer dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
-  'Analytics Beer home': 'Analytics Beer home',
   'Analytics export file': 'Analytics export file',
   'Analytics mode': 'Analytics mode',
   'Analytics provider': 'Analytics provider',
+  'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
+    'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
+  'Datix home': 'Datix home',
   'and get back to building.': 'and get back to building.',
   'Animation unavailable. The illustration is still here.':
     'Animation unavailable. The illustration is still here.',
@@ -238,10 +242,6 @@ export const en = {
   'Confirm that the Google Analytics export contains only web traffic. Views can also include app screens.':
     'Confirm that the Google Analytics export contains only web traffic. Views can also include app screens.',
   'Confirm your password': 'Confirm your password',
-  'Confirm your plan and payment details in Polar. This plan starts with paid billing and has no free trial.':
-    'Confirm your plan and payment details in Polar. This plan starts with paid billing and has no free trial.',
-  'Confirm your plan and payment details in Polar. Your trial starts only after checkout is completed.':
-    'Confirm your plan and payment details in Polar. Your trial starts only after checkout is completed.',
   'Connect {domain} to {environment}.': 'Connect {domain} to {environment}.',
   'Connect your banner before using this mode. Tracking starts only after analytics consent and must stop when consent is withdrawn. Explain the data collected in your cookie and privacy notices.':
     'Connect your banner before using this mode. Tracking starts only after analytics consent and must stop when consent is withdrawn. Explain the data collected in your cookie and privacy notices.',
@@ -304,8 +304,8 @@ export const en = {
   'Daily visitor counts are added across days; they are not unique people across the full period.':
     'Daily visitor counts are added across days; they are not unique people across the full period.',
   'Daily visitors': 'Daily visitors',
-  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.':
-    'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.',
+  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Datix.':
+    'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Datix.',
   'Daily visits': 'Daily visits',
   Dark: 'Dark',
   'Date range': 'Date range',
@@ -456,8 +456,8 @@ export const en = {
     'Imported referrers were reduced to hostnames; URL paths, query strings and fragments were removed.',
   'Imported totals exceed the supported count limit.':
     'Imported totals exceed the supported count limit.',
-  'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.':
-    'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.',
+  'Imported totals retain their provider’s calendar dates and timezone. Datix tracking uses UTC.':
+    'Imported totals retain their provider’s calendar dates and timezone. Datix tracking uses UTC.',
   Imports: 'Imports',
   'In your GA4 property, open {section} and choose your dates.':
     'In your GA4 property, open {section} and choose your dates.',
@@ -558,7 +558,7 @@ export const en = {
   'New pageviews and events are being accepted for {environment}.':
     'New pageviews and events are being accepted for {environment}.',
   'New password': 'New password',
-  'New to Analytics Beer?': 'New to Analytics Beer?',
+  'New to Datix?': 'New to Datix?',
   'No active plan': 'No active plan',
   'No activity in this period': 'No activity in this period',
   'No card needed': 'No card needed',
@@ -576,8 +576,6 @@ export const en = {
     'No pageview yet. Visit your website, wait a few seconds, then check again.',
   'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
     'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.',
-  'No payment details are needed to create an account. Starting Pro requires completing checkout in Polar, where you confirm payment details and the price after your trial.':
-    'No payment details are needed to create an account. Starting Pro requires completing checkout in Polar, where you confirm payment details and the price after your trial.',
   'No report to display.': 'No report to display.',
   'No time limit': 'No time limit',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -650,14 +648,14 @@ export const en = {
   'Prices in USD. Paid plans and trials are coming soon. Events include pageviews and tracked activity.':
     'Prices in USD. Paid plans and trials are coming soon. Events include pageviews and tracked activity.',
   Pricing: 'Pricing',
-  'Pro · Trial': 'Pro · Trial',
+  '{plan} · Trial': '{plan} · Trial',
   'Pro 100k includes a 14-day free trial. Larger plans have no free trial. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro 100k includes a 14-day free trial. Larger plans have no free trial. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.',
   'Pro includes a 14-day free trial for eligible new subscribers, then the price for your selected event volume. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro includes a 14-day free trial for eligible new subscribers, then the price for your selected event volume. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.',
   'Pro includes a 14-day free trial, then the price for your selected event volume. There is no permanent free plan. These are planned offers; paid subscriptions and trial activation are not available yet.':
     'Pro includes a 14-day free trial, then the price for your selected event volume. There is no permanent free plan. These are planned offers; paid subscriptions and trial activation are not available yet.',
-  'Pro required': 'Pro required',
+  'Subscription required': 'Subscription required',
   'Pro supports up to 10 websites.': 'Pro supports up to 10 websites.',
   'Production pageviews use 1 credit; clicks and other events use 0.5. On localhost, these rates are 0.3 and 0.15 credits. Engagement time and duplicate deliveries are free.':
     'Production pageviews use 1 credit; clicks and other events use 0.5. On localhost, these rates are 0.3 and 0.15 credits. Engagement time and duplicate deliveries are free.',
@@ -824,8 +822,8 @@ export const en = {
   'This page could not be found. Head back to the homepage.':
     'This page could not be found. Head back to the homepage.',
   'This plan is not available yet.': 'This plan is not available yet.',
-  'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.':
-    'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.',
+  'This removes the imported totals and breakdowns from your reports. Your Datix tracking data stays unchanged. You can upload the export again later.':
+    'This removes the imported totals and breakdowns from your reports. Your Datix tracking data stays unchanged. You can upload the export again later.',
   'This request could not be completed. Please try again.':
     'This request could not be completed. Please try again.',
   'This script sends traffic only to {environment} for {domain}.':
@@ -933,8 +931,6 @@ export const en = {
   Visitors: 'Visitors',
   Visits: 'Visits',
   'Visits by {visitor}': 'Visits by {visitor}',
-  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
-    'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
   'Want to track a specific action?': 'Want to track a specific action?',
   'We’ll check it’s working.': 'We’ll check it’s working.',
   'Website analytics': 'Website analytics',
@@ -968,8 +964,8 @@ export const en = {
     'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.',
   'You already added this domain.': 'You already added this domain.',
   'You’re connected': 'You’re connected',
-  'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.':
-    'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.',
+  'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
+    'You’re running Datix locally. Use a hosted address in this script when connecting a public website.',
   'Your account is separate': 'Your account is separate',
   'Your best pages. Your busiest days. Where people find you.':
     'Your best pages. Your busiest days. Where people find you.',
@@ -989,5 +985,26 @@ export const en = {
   'ZIP links and special files are not supported.':
     'ZIP links and special files are not supported.',
   'ZIP or CSV · up to 10 MB': 'ZIP or CSV · up to 10 MB',
+  'Three plans. All your analytics. Start with 14 days free on Basic.':
+    'Three plans. All your analytics. Start with 14 days free on Basic.',
+  'Choose {plan}': 'Choose {plan}',
+  'Choose plan': 'Choose plan',
+  '${price} per {interval}': '${price} per {interval}',
+  '{events} events · ${price}/year': '{events} events · ${price}/year',
+  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
+    'Basic includes a 14-day trial. Confirm the price and payment details at checkout.',
+  'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
+    'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.',
+  'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
+    'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.',
+  'An active plan is required': 'An active plan is required',
+  'An active subscription or trial is required to collect events. Your existing reports remain available.':
+    'An active subscription or trial is required to collect events. Your existing reports remain available.',
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
+    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.',
+  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
+    'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
+  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
+    'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.',
 } as const;
 export type Copy = keyof typeof en;

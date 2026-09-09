@@ -48,7 +48,7 @@ export function useAccountUsage(refreshKey: string) {
 
 const reasonLabel = (reason: UsagePauseReason | null) =>
   reason === 'subscription_required'
-    ? 'Pro required'
+    ? 'Subscription required'
     : reason === 'event_limit'
       ? 'Event limit reached'
       : reason === 'website_budget'
@@ -101,12 +101,12 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="font-medium">
-                {data.plan ? (data.plan.trial ? t('Pro · Trial') : 'Pro') : t('No active plan')}
+                {data.plan ? (data.plan.trial ? t('{plan} · Trial', { plan: data.plan.name }) : data.plan.name) : t('No active plan')}
               </h2>
               <p className="mt-1 text-sm text-secondary-ink">
                 {data.period
                   ? `${date(data.period.start)} – ${date(data.period.end)} · UTC`
-                  : t('Activate Pro to start collecting.')}
+                  : t('Activate a plan to start collecting.')}
               </p>
             </div>
             <Link to="/pricing" className="text-sm underline underline-offset-4">
@@ -127,7 +127,7 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
                       { date: date(data.period!.end) },
                     )
                   : t(
-                      'An active Pro subscription or Pro trial is required to collect events. Your existing reports remain available.',
+                      'An active subscription or trial is required to collect events. Your existing reports remain available.',
                     )}
               </p>
             </div>
@@ -138,11 +138,11 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
               <p className="tabular-nums">
                 <span className="text-2xl font-medium">{number(data.events.used)}</span>
                 <span className="text-sm text-secondary-ink">
-                  {data.plan ? ` / ${number(data.plan.eventLimit)}` : t(' · No active allowance')}
+                  {data.plan ? ` / ${data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit)}` : t(' · No active allowance')}
                 </span>
               </p>
             </div>
-            {data.plan && (
+            {data.plan && data.plan.eventLimit !== null && (
               <div
                 role="progressbar"
                 aria-label={t('Event allowance used')}
@@ -151,14 +151,14 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
                 aria-valuenow={Math.min(data.events.used, data.plan.eventLimit)}
                 aria-valuetext={t('{used} of {limit} credits', {
                   used: number(data.events.used),
-                  limit: number(data.plan.eventLimit),
+                  limit: data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit),
                 })}
                 className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
               >
                 <div
                   className="h-full rounded-full bg-foreground"
                   style={{
-                    width: `${Math.min(100, (data.events.used / data.plan.eventLimit) * 100)}%`,
+                    width: `${Math.min(100, data.plan.eventLimit > 0 ? (data.events.used / data.plan.eventLimit) * 100 : 0)}%`,
                   }}
                 />
               </div>
@@ -230,7 +230,7 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
               <h2 className="font-medium">{t('Websites')}</h2>
               <p className="text-sm tabular-nums text-secondary-ink">
                 {data.websites.length}
-                {data.plan ? ` / ${data.plan.websiteLimit}` : ''}
+                {data.plan ? ` / ${data.plan.websiteLimit === null ? t('Unlimited') : number(data.plan.websiteLimit)}` : ''}
               </p>
             </div>
             {!data.websites.length ? (

@@ -16,7 +16,7 @@ Better Auth owns `/api/auth/*`. Email/password is enabled for the current develo
 | POST   | `/api/auth/sign-out`      | `{}` and session cookie                                                               |
 | GET    | `/api/me`                 | Session cookie; returns minimal user details                                          |
 
-Preserve `Set-Cookie` responses and send the cookie on account/reporting requests. HTTPS deployments use secure cookies. All POST/PATCH/DELETE account requests require `Origin` equal to the configured `APP_URL`. The dashboard shares that origin; cross-origin dashboard clients are not enabled. Sign-out invalidates the server-side session immediately. Database authorization reads use the direct Neon connection without proxy caching.
+Preserve `Set-Cookie` responses and send the cookie on account/reporting requests. HTTPS deployments use secure cookies. All POST/PATCH/DELETE account requests require `Origin` equal to `APP_URL` or, when set, `APP_LEGACY_URL`. The dashboard shares those origins; other cross-origin dashboard clients are not enabled. Sign-out invalidates the server-side session immediately. Database authorization reads use the direct Neon connection without proxy caching.
 
 Better Auth returns its own response/error format. Application errors use `{ "error": { "code", "message", "requestId" } }`. Responses include `X-Request-Id`, `Cache-Control: no-store`, and `Retry-After` for 429/503. Health reports only Worker availability, not database readiness.
 
@@ -79,11 +79,11 @@ The consumer writes raw events, visitor deduplication records, and summary incre
 
 The scheduled job runs at 03:17 UTC. It removes raw events/visitor records beyond approximately 30 days and summaries outside 730 calendar days, and cleans expired auth sessions/rate limits/verifications. Raw retention is a cleanup target, not immediate deletion at exactly 30 days: daily scheduling and backlog can delay removal. Each invocation deletes at most 100,000 rows per table in bounded chunks; `backlogPossible=true` requires follow-up. Keep queue and retention alerts enabled when the service is deployed.
 
-Rate limiting currently allows up to 120 collector requests per IP per minute, 20 auth requests per IP per minute, and 120 API requests per IP and account per minute, with additional database-backed Better Auth limits. Cloudflare's limiters operate per location and are best-effort abuse controls, not globally exact billing quotas. Shared public IPs share limits. There are no paid plans or billing limits in this phase.
+Rate limiting currently allows up to 120 collector requests per IP per minute, 20 auth requests per IP per minute, and 120 API requests per IP and account per minute, with additional database-backed Better Auth limits. Cloudflare's limiters operate per location and are best-effort abuse controls, not globally exact billing quotas. Shared public IPs share limits. Paid collection requires a current Autumn subscription and available local event credits.
 
 ### Repeated pageviews
 
-The browser tracker throttles the same normalized origin/path for 60 seconds per site and tab, including reloads and return navigation. It uses sessionStorage for recent timestamps and falls back to memory when storage is unavailable. Query strings and fragments are not part of the key. Throttled visits log `[Analytics Beer] Pageview ignored - throttled (same URL within 1 minute)` and do not extend the window. Custom events are not throttled. Rejected collection clears the timestamp; transport retries keep the original event ID. This is a browser-side throttle, separate from server event-ID deduplication and rate limits.
+The browser tracker throttles the same normalized origin/path for 60 seconds per site and tab, including reloads and return navigation. It uses sessionStorage for recent timestamps and falls back to memory when storage is unavailable. Query strings and fragments are not part of the key. Throttled visits log `[Datix] Pageview ignored - throttled (same URL within 1 minute)` and do not extend the window. Custom events are not throttled. Rejected collection clears the timestamp; transport retries keep the original event ID. This is a browser-side throttle, separate from server event-ID deduplication and rate limits.
 
 ## Environments
 
@@ -101,7 +101,7 @@ Use `?environment=UUID` on installation, overview, timeseries, and breakdown end
 ```html
 <script
   defer
-  src="https://analytics.beer/tracker.js"
+  src="https://usedatix.com/tracker.js"
   data-site="SITE_ID"
   data-environment="ENVIRONMENT_ID"
 ></script>
@@ -118,7 +118,7 @@ Environments expose `trackingMode: "cookieless" | "sessions" | "local"`. Existin
 ```html
 <script
   defer
-  src="https://analytics.beer/tracker.js"
+  src="https://usedatix.com/tracker.js"
   data-site="SITE_ID"
   data-environment="ENVIRONMENT_ID"
   data-mode="sessions"
@@ -186,3 +186,14 @@ The detector learns hourly from up to 14 completed days of accepted daily summar
 Network source identities are HMACs of environment, UTC day and the trusted client IP. Browser names and client-supplied visitor/session IDs cannot reset the limits. Raw IPs and rejected payloads are not stored. Short-lived source counters and pattern hashes are scheduled for deletion after two days; aggregate blocked-request counts are retained for 90 days. Usage shows the last 30 days, excluding edge-rate-limit rejections and the basic bot/opt-out filter.
 
 `PATCH /api/sites/{siteId}` accepts `creditBudget` (a positive number of credits, minimum 0.15, two decimals, or null to remove it). This optional ceiling applies to all environments in that website within the current account allowance period. Already consumed credits count immediately. Admission enforces the website and account ceilings in the same transaction, and capacity renews with the account period. A site reports `website_budget` when less than 0.15 credits remain; it can reject a more expensive event before that point. Other websites remain eligible for collection. Usage offers the same control under each website.
+
+## Billing
+
+Autumn manages subscriptions; the app has no billing webhook endpoint. All billing routes require the owner session, and POST requests require the trusted app Origin.
+
+- `GET /api/billing` returns `{hasCustomer}`.
+- `POST /api/billing/checkout` accepts `{events: 100000 | 1000000 | 5000000, interval: "month" | "year", locale?: "en" | "da" | "de"}` and returns `{url}` for hosted confirmation.
+- `POST /api/billing/portal` returns `{url}` for the customer portal.
+- `POST /api/billing/sync` refreshes Autumn state and returns the usage response.
+
+See [Autumn billing](autumn.md) for catalog, access refresh, and usage delivery semantics.

@@ -1,12 +1,7 @@
 //! Explicitly enabled tests against an isolated Neon branch; all fixture records are cleaned up.
 use analytics_core::{Config, State, crypto};
 use analytics_server::http;
-use analytics_services::{
-    abuse, auth,
-    billing::{self, allowance},
-    ingest, queue,
-    tracking::Event,
-};
+use analytics_services::{abuse, auth, billing, ingest, queue, tracking::Event};
 use axum::{
     body::{Body, to_bytes},
     extract::ConnectInfo,
@@ -61,12 +56,12 @@ impl Fixture {
         let email = format!("{user}@example.com");
         let config = Config {
             app_url: url::Url::parse("http://localhost:3057").unwrap(),
+            app_origins: vec!["http://localhost:3057".into()],
             auth_secret: "integration-auth-secret-with-more-than-32-characters".into(),
             visitor_secret: format!("integration-visitor-{user}"),
             origin_secret: Some("test-origin-verification-secret".into()),
-            polar_token: None,
-            polar_webhook_secret: Some("integration-polar-secret".into()),
-            polar_url: "http://127.0.0.1:1".into(),
+            autumn_key: None,
+            autumn_url: "http://127.0.0.1:1".into(),
             railway: false,
             port: 3057,
             static_dir: concat!(env!("CARGO_MANIFEST_DIR"), "/../../web/dist/client").into(),
@@ -194,19 +189,9 @@ impl Fixture {
     }
     async fn pro(&self) {
         let now = Utc::now();
-        let annual = allowance::CATALOG["products"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|p| {
-                p["metadata"]["plan"] == "pro"
-                    && p["metadata"]["monthly_events"] == 100000
-                    && p["recurring_interval"] == "year"
-                    && !p["is_archived"].as_bool().unwrap_or(true)
-            })
-            .unwrap();
+        let annual = json!({"id":"basic_annual"});
         let subscriptions = json!([{"id":Uuid::new_v4(),"productId":annual["id"],"status":"active","currentPeriodStart":now-Duration::days(5),"currentPeriodEnd":now+Duration::days(360),"trialEnd":null,"cancelAtPeriodEnd":false,"endsAt":null}]);
-        sqlx::query("INSERT INTO billing_customers(customer_id,owner_id,subscriptions,occurred_at) VALUES($1,$2,$3,now())").bind(format!("test-{}",self.user)).bind(&self.user).bind(subscriptions).execute(&self.state.db).await.unwrap();
+        sqlx::query("INSERT INTO billing_customers(customer_id,owner_id,subscriptions,occurred_at,provider) VALUES($1,$2,$3,now(),'autumn')").bind(format!("test-{}",self.user)).bind(&self.user).bind(subscriptions).execute(&self.state.db).await.unwrap();
     }
     async fn site(&self) -> Uuid {
         let (status, body, _) = self
@@ -701,8 +686,8 @@ struct ProviderData {
     checkouts: HashMap<String, Value>,
     ingested: Vec<Value>,
     partial_delivery: bool,
+    duplicate_delivery: bool,
     created: usize,
-    updated: usize,
     portals: usize,
 }
 struct MockProvider {
@@ -729,8 +714,8 @@ impl MockProvider {
     fn state(&self, f: &Fixture) -> State {
         let mut state = f.state.clone();
         let mut config = (*state.config).clone();
-        config.polar_token = Some("test-token".into());
-        config.polar_url = self.url.clone();
+        config.autumn_key = Some("test-token".into());
+        config.autumn_url = self.url.clone();
         state.config = Arc::new(config);
         state
     }
@@ -740,196 +725,71 @@ async fn mock_provider(
     request: axum::extract::Request,
 ) -> (StatusCode, axum::Json<Value>) {
     let path = request.uri().path().to_owned();
-    let method = request.method().clone();
+    assert_eq!(request.headers()["x-api-version"], "2.2");
+    let retry_key = request
+        .headers()
+        .get("idempotency-key")
+        .and_then(|v| v.to_str().ok())
+        .map(str::to_owned);
     let bytes = to_bytes(request.into_body(), 1024 * 1024).await.unwrap();
     let body: Value = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
     let mut data = data.lock().await;
-    let response = if path.starts_with("/v1/customers/external/") && path.ends_with("/state") {
-        match data.customer.clone() {
+    let response = match path.as_str() {
+        "/v1/customers.get" => match data.customer.clone() {
             Some(c) => c,
             None => {
                 return (
                     StatusCode::NOT_FOUND,
-                    axum::Json(json!({"detail":"not found"})),
+                    axum::Json(json!({"code":"customer_not_found"})),
                 );
             }
+        },
+        "/v1/customers.get_or_create" => {
+            let c = json!({"id":body["customer_id"],"subscriptions":[],"flags":{},"balances":{}});
+            data.customer = Some(c.clone());
+            c
         }
-    } else if path == "/v1/customer-sessions/" {
-        data.portals += 1;
-        json!({"customer_portal_url":"https://billing.example/portal"})
-    } else if path == "/v1/customers/" && method == "POST" {
-        let customer = json!({"id":"mock-customer","external_id":body["external_id"],"organization_id":billing::ORGANIZATION_ID,"deleted_at":null,"active_subscriptions":[]});
-        data.customer = Some(customer.clone());
-        customer
-    } else if path.starts_with("/v1/products/") {
-        json!({"id":path.rsplit('/').next().unwrap(),"organization_id":billing::ORGANIZATION_ID,"is_archived":false,"visibility":"public"})
-    } else if path == "/v1/checkouts/" && method == "GET" {
-        json!({"items":data.checkouts.values().cloned().collect::<Vec<_>>()})
-    } else if path == "/v1/checkouts/" && method == "POST" {
-        data.created += 1;
-        let id = Uuid::new_v4().to_string();
-        let result = json!({"id":id,"organization_id":billing::ORGANIZATION_ID,"external_customer_id":body["external_customer_id"],"product_id":body["products"][0],"products":[{"id":body["products"][0]}],"status":"open","expires_at":Utc::now()+Duration::hours(1),"created_at":Utc::now(),"allow_trial":body["allow_trial"],"url":format!("https://billing.example/checkout/{id}")});
-        data.checkouts.insert(id, result.clone());
-        result
-    } else if path.starts_with("/v1/checkouts/") {
-        let id = path.rsplit('/').next().unwrap();
-        if method == "PATCH" {
-            data.updated += 1;
+        "/v1/billing.open_customer_portal" => {
+            data.portals += 1;
+            json!({"url":"https://billing.example/portal"})
         }
-        match data.checkouts.get_mut(id) {
-            Some(checkout) => {
-                if method == "PATCH" {
-                    checkout["allow_trial"] = body["allow_trial"].clone();
-                }
-                checkout.clone()
-            }
-            None => {
+        "/v1/billing.attach" => {
+            assert_eq!(body["redirect_mode"], "always");
+            assert_eq!(
+                body["checkout_session_params"]["managed_payments"]["enabled"],
+                true
+            );
+            data.created += 1;
+            data.checkouts
+                .insert(body["plan_id"].as_str().unwrap().into(), body.clone());
+            json!({"payment_url":format!("https://billing.example/checkout/{}",body["plan_id"].as_str().unwrap())})
+        }
+        "/v1/balances.track" => {
+            data.ingested.push(json!({"key":retry_key,"body":body}));
+            if data.duplicate_delivery {
                 return (
-                    StatusCode::NOT_FOUND,
-                    axum::Json(json!({"detail":"not found"})),
+                    StatusCode::CONFLICT,
+                    axum::Json(json!({"code":"duplicate_idempotency_key"})),
                 );
             }
+            if data.partial_delivery {
+                return (
+                    StatusCode::SERVICE_UNAVAILABLE,
+                    axum::Json(json!({"code":"unavailable"})),
+                );
+            }
+            json!({"customer_id":body["customer_id"],"value":body["value"]})
         }
-    } else if path == "/v1/events/ingest" {
-        data.ingested.push(body.clone());
-        json!({"inserted":if data.partial_delivery{0}else{body["events"].as_array().unwrap().len()},"duplicates":0})
-    } else {
-        return (
-            StatusCode::NOT_FOUND,
-            axum::Json(json!({"detail":"unhandled mock request"})),
-        );
+        _ => panic!("Unexpected Autumn request {path}"),
     };
     (StatusCode::OK, axum::Json(response))
 }
-fn webhook_headers(id: &str, body: &[u8], timestamp: i64, secret: &str) -> axum::http::HeaderMap {
-    use base64::Engine;
-    let mut signed = format!("{id}.{timestamp}.").into_bytes();
-    signed.extend_from_slice(body);
-    let signature = base64::engine::general_purpose::STANDARD
-        .encode(crypto::signature(secret.as_bytes(), &signed));
-    let mut headers = axum::http::HeaderMap::new();
-    for (k, v) in [
-        ("webhook-id", id.to_owned()),
-        ("webhook-timestamp", timestamp.to_string()),
-        ("webhook-signature", format!("v1,{signature}")),
-    ] {
-        headers.insert(k, v.parse().unwrap());
-    }
-    headers
+fn autumn_customer(owner: &str) -> Value {
+    json!({"id":owner,"flags":{"analytics":{"feature_id":"analytics"}},"subscriptions":[{"id":"subscription","plan_id":"basic","status":"active","past_due":false,"current_period_start":(Utc::now()-Duration::days(1)).timestamp_millis(),"current_period_end":(Utc::now()+Duration::days(29)).timestamp_millis(),"trial_ends_at":null,"canceled_at":null,"expires_at":null}]})
 }
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]
-async fn webhook_verification_ordering_idempotency_and_immutable_account_binding() {
-    fixture!(f, {
-        let customer = format!("test-{}", f.user);
-        let now = Utc::now();
-        let event = json!({"type":"customer.state_changed","timestamp":now,"data":{"id":customer,"external_id":f.user,"organization_id":billing::ORGANIZATION_ID,"deleted_at":null,"active_subscriptions":[]}});
-        let body = event.to_string();
-        let id = format!("{}-delivery", f.user);
-        let headers = webhook_headers(
-            &id,
-            body.as_bytes(),
-            now.timestamp(),
-            "integration-polar-secret",
-        );
-        assert!(
-            billing::webhook::handle(&f.state, &headers, b"tampered")
-                .await
-                .is_err()
-        );
-        let stale = webhook_headers(
-            &id,
-            body.as_bytes(),
-            now.timestamp() - 301,
-            "integration-polar-secret",
-        );
-        assert_eq!(
-            billing::webhook::handle(&f.state, &stale, body.as_bytes())
-                .await
-                .unwrap_err()
-                .code,
-            "invalid_signature"
-        );
-        assert_eq!(
-            billing::webhook::handle(&f.state, &headers, body.as_bytes())
-                .await
-                .unwrap()["applied"],
-            true
-        );
-        assert_eq!(
-            billing::webhook::handle(&f.state, &headers, body.as_bytes())
-                .await
-                .unwrap()["duplicate"],
-            true
-        );
-        let owner: Option<String> =
-            sqlx::query_scalar("SELECT owner_id FROM billing_customers WHERE customer_id=$1")
-                .bind(&customer)
-                .fetch_one(&f.state.db)
-                .await
-                .unwrap();
-        assert_eq!(owner, Some(f.user.clone()));
-        let mut old = event.clone();
-        old["timestamp"] = json!(now - Duration::milliseconds(1));
-        old["type"] = json!("customer.deleted");
-        let old = old.to_string();
-        let headers = webhook_headers(
-            &format!("{}-old", f.user),
-            old.as_bytes(),
-            now.timestamp(),
-            "integration-polar-secret",
-        );
-        assert_eq!(
-            billing::webhook::handle(&f.state, &headers, old.as_bytes())
-                .await
-                .unwrap()["applied"],
-            false
-        );
-        let mut foreign = event.clone();
-        foreign["data"]["organization_id"] = json!(Uuid::new_v4());
-        let foreign = foreign.to_string();
-        let headers = webhook_headers(
-            &format!("{}-foreign", f.user),
-            foreign.as_bytes(),
-            now.timestamp(),
-            "integration-polar-secret",
-        );
-        assert_eq!(
-            billing::webhook::handle(&f.state, &headers, foreign.as_bytes())
-                .await
-                .unwrap_err()
-                .code,
-            "invalid_organization"
-        );
-        let mut unbound = event;
-        unbound["timestamp"] = json!(now + Duration::milliseconds(1));
-        unbound["data"]["external_id"] = Value::Null;
-        unbound["data"]["email"] = json!(f.email);
-        let unbound = unbound.to_string();
-        let headers = webhook_headers(
-            &format!("{}-unbound", f.user),
-            unbound.as_bytes(),
-            now.timestamp(),
-            "integration-polar-secret",
-        );
-        billing::webhook::handle(&f.state, &headers, unbound.as_bytes())
-            .await
-            .unwrap();
-        let owner: Option<String> =
-            sqlx::query_scalar("SELECT owner_id FROM billing_customers WHERE customer_id=$1")
-                .bind(&customer)
-                .fetch_one(&f.state.db)
-                .await
-                .unwrap();
-        assert!(
-            owner.is_none(),
-            "email must never bind a customer to an account"
-        );
-    });
-}
-#[tokio::test]
-#[ignore = "requires isolated Neon and Redis"]
-async fn checkout_reuses_open_sessions_and_routes_existing_subscribers_to_portal() {
+async fn autumn_checkout_always_requires_hosted_confirmation_and_supports_annual_plans() {
     fixture!(f, {
         let mock = MockProvider::start().await;
         let state = mock.state(&f);
@@ -943,57 +803,58 @@ async fn checkout_reuses_open_sessions_and_routes_existing_subscribers_to_portal
         .await
         .unwrap()
         .user;
-        let body = json!({"events":100000,"interval":"month","locale":"da"});
-        let first = billing::provider::handle(&state, &owner, "checkout", "POST", body.clone())
+        for (events, interval, id) in [
+            (100000, "month", "basic"),
+            (1000000, "year", "pro_annual"),
+            (5000000, "month", "ultra"),
+        ] {
+            let response = billing::provider::handle(
+                &state,
+                &owner,
+                "checkout",
+                "POST",
+                json!({"events":events,"interval":interval,"locale":"da"}),
+            )
             .await
             .unwrap();
-        let second = billing::provider::handle(&state, &owner, "checkout", "POST", body)
-            .await
-            .unwrap();
-        assert_eq!(first, second);
-        assert_eq!(mock.data.lock().await.created, 1);
-        // Simulate an ambiguous local write after provider success: recover the provider's existing checkout.
-        sqlx::query("DELETE FROM billing_checkouts WHERE owner_id=$1")
-            .bind(&f.user)
-            .execute(&state.db)
-            .await
-            .unwrap();
-        let recovered = billing::provider::handle(
-            &state,
-            &owner,
-            "checkout",
-            "POST",
-            json!({"events":100000,"interval":"month"}),
-        )
-        .await
-        .unwrap();
-        assert_eq!(recovered, first);
-        assert_eq!(mock.data.lock().await.created, 1);
-        let product = allowance::CATALOG["products"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|p| {
-                p["metadata"]["plan"] == "pro"
-                    && p["metadata"]["monthly_events"] == 100000
-                    && !p["is_archived"].as_bool().unwrap_or(true)
-            })
-            .unwrap();
-        {
-            let mut data = mock.data.lock().await;
-            data.customer.as_mut().unwrap()["active_subscriptions"] = json!([{"id":"subscription","product_id":product["id"],"status":"active","current_period_start":Utc::now()-Duration::days(1),"current_period_end":Utc::now()+Duration::days(29),"trial_end":null,"cancel_at_period_end":false,"ends_at":null}]);
+            assert!(response["url"].as_str().unwrap().ends_with(id));
+            let data = mock.data.lock().await;
+            assert_eq!(data.checkouts[id]["customer_id"], f.user);
+            assert_eq!(
+                data.checkouts[id]["checkout_session_params"]["locale"],
+                "da"
+            );
         }
-        let portal = billing::provider::handle(
-            &state,
-            &owner,
-            "checkout",
-            "POST",
-            json!({"events":100000,"interval":"month"}),
-        )
-        .await
-        .unwrap();
-        assert_eq!(portal["url"], "https://billing.example/portal");
-        assert_eq!(mock.data.lock().await.created, 1);
+        for (locale, currency) in [("en", "usd"), ("da", "dkk"), ("de", "eur")] {
+            let before = mock.data.lock().await.created;
+            for _ in 0..2 {
+                billing::provider::handle(
+                    &state,
+                    &owner,
+                    "checkout",
+                    "POST",
+                    json!({"events":100000,"interval":"month","locale":locale}),
+                )
+                .await
+                .unwrap();
+            }
+            let data = mock.data.lock().await;
+            assert_eq!(
+                data.created,
+                before + 1,
+                "same options reuse a session, changed locale creates one"
+            );
+            assert_eq!(data.checkouts["basic"]["currency"], currency);
+            assert_eq!(
+                data.checkouts["basic"]["checkout_session_params"]["currency"],
+                currency
+            );
+            assert_eq!(
+                data.checkouts["basic"]["checkout_session_params"]["managed_payments"]["enabled"],
+                true
+            );
+        }
+        mock.data.lock().await.customer = Some(autumn_customer(&f.user));
         assert_eq!(
             billing::provider::ensure_deletable(&state, &f.user)
                 .await
@@ -1001,11 +862,77 @@ async fn checkout_reuses_open_sessions_and_routes_existing_subscribers_to_portal
                 .code,
             "cancel_subscription_first"
         );
+        mock.data.lock().await.customer.as_mut().unwrap()["subscriptions"][0]["canceled_at"] =
+            json!(Utc::now().timestamp_millis());
+        billing::provider::ensure_deletable(&state, &f.user)
+            .await
+            .unwrap();
+        let portal = billing::provider::handle(&state, &owner, "portal", "POST", Value::Null)
+            .await
+            .unwrap();
+        assert_eq!(portal["url"], "https://billing.example/portal");
     });
 }
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]
-async fn outbox_partial_delivery_preserves_quantities_and_stable_retry_ids() {
+async fn autumn_refresh_revokes_access_and_stale_or_foreign_snapshots_fail_closed() {
+    fixture!(f, {
+        let mock = MockProvider::start().await;
+        let state = mock.state(&f);
+        mock.data.lock().await.customer = Some(autumn_customer(&f.user));
+        let mut conn = state.db.acquire().await.unwrap();
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        assert!(
+            billing::usage::usage(&mut conn, &f.user, Utc::now())
+                .await
+                .unwrap()["plan"]
+                .is_object()
+        );
+        sqlx::query(
+            "UPDATE billing_customers SET updated_at=now()-interval '6 minutes' WHERE owner_id=$1",
+        )
+        .bind(&f.user)
+        .execute(&mut *conn)
+        .await
+        .unwrap();
+        assert!(
+            billing::usage::usage(&mut conn, &f.user, Utc::now())
+                .await
+                .unwrap()["plan"]
+                .is_null()
+        );
+        mock.data.lock().await.customer = Some(autumn_customer("different-owner"));
+        assert_eq!(
+            billing::provider::sync(&state, &mut conn, &f.user)
+                .await
+                .unwrap_err()
+                .code,
+            "invalid_billing_customer"
+        );
+        mock.data.lock().await.customer = Some(autumn_customer(&f.user));
+        mock.data.lock().await.customer.as_mut().unwrap()["subscriptions"] = json!([]);
+        billing::provider::sync(&state, &mut conn, &f.user)
+            .await
+            .unwrap();
+        assert!(
+            billing::usage::usage(&mut conn, &f.user, Utc::now())
+                .await
+                .unwrap()["plan"]
+                .is_null()
+        );
+        assert_eq!(
+            f.request("/api/webhooks/polar", "POST", Some(json!({})))
+                .await
+                .0,
+            404
+        );
+    });
+}
+#[tokio::test]
+#[ignore = "requires isolated Neon and Redis"]
+async fn autumn_outbox_preserves_quantities_and_stable_retry_ids() {
     fixture!(f, {
         f.pro().await;
         let site = f.site().await;
@@ -1015,27 +942,20 @@ async fn outbox_partial_delivery_preserves_quantities_and_stable_retry_ids() {
         let mock = MockProvider::start().await;
         let state = mock.state(&f);
         mock.data.lock().await.partial_delivery = true;
-        assert!(billing::delivery::deliver(&state).await.is_err());
-        let remaining: i64 =
-            sqlx::query_scalar("SELECT count(*) FROM billing_outbox WHERE owner_id=$1")
-                .bind(&f.user)
-                .fetch_one(&state.db)
-                .await
-                .unwrap();
-        assert_eq!(remaining, 1);
+        assert_eq!(billing::delivery::deliver(&state).await.unwrap(), 0);
         let first = mock.data.lock().await.ingested[0].clone();
-        assert_eq!(first["events"][0]["metadata"]["event_count"], 1.0);
-        assert!(first.to_string().find("pricing").is_none());
-        assert!(first.to_string().find("visitor").is_none());
+        assert_eq!(first["body"]["value"], 1.0);
+        assert_eq!(first["body"]["feature_id"], "events");
+        assert!(!first.to_string().contains("visitor"));
         sqlx::query("UPDATE billing_outbox SET available_at=now() WHERE owner_id=$1")
             .bind(&f.user)
             .execute(&state.db)
             .await
             .unwrap();
         mock.data.lock().await.partial_delivery = false;
+        mock.data.lock().await.duplicate_delivery = true;
         assert_eq!(billing::delivery::deliver(&state).await.unwrap(), 1);
-        let second = mock.data.lock().await.ingested[1].clone();
-        assert_eq!(first, second);
+        assert_eq!(first, mock.data.lock().await.ingested[1]);
         let remaining: i64 =
             sqlx::query_scalar("SELECT count(*) FROM billing_outbox WHERE owner_id=$1")
                 .bind(&f.user)
@@ -1043,6 +963,20 @@ async fn outbox_partial_delivery_preserves_quantities_and_stable_retry_ids() {
                 .await
                 .unwrap();
         assert_eq!(remaining, 0);
+        // Legacy writes and keys past the safe retry window must never reach Autumn.
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at) VALUES($1,'pageview',1,now())")
+            .bind(&f.user).execute(&state.db).await.unwrap();
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider,delivery_started_at) VALUES($1,'pageview',1,now(),'autumn',now()-interval '24 hours')")
+            .bind(&f.user).execute(&state.db).await.unwrap();
+        assert_eq!(billing::delivery::deliver(&state).await.unwrap(), 0);
+        assert_eq!(mock.data.lock().await.ingested.len(), 2);
+        let retained: i64 =
+            sqlx::query_scalar("SELECT count(*) FROM billing_outbox WHERE owner_id=$1")
+                .bind(&f.user)
+                .fetch_one(&state.db)
+                .await
+                .unwrap();
+        assert_eq!(retained, 2);
     });
 }
 #[tokio::test]

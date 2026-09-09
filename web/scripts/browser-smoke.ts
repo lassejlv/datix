@@ -45,7 +45,7 @@ try {
   await mkdir('web/artifacts', { recursive: true });
   await page.goto(`${base}/signin`);
   await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
-  await expect(page).toHaveTitle('Analytics Beer | Website analytics');
+  await expect(page).toHaveTitle('Datix | Website analytics');
   await page.screenshot({ path: 'web/artifacts/sign-in-desktop.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: 'web/artifacts/sign-in-mobile.png', fullPage: true });

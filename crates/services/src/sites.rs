@@ -85,6 +85,7 @@ pub async fn create(state: &State, owner: &str, body: Value) -> Result<Value> {
     let input: CreateSite = decode(body)?;
     let name = validation::name(&input.name, 80)?;
     let domain = validation::domain(&input.domain)?;
+    super::billing::provider::refresh_if_due(state, owner).await?;
     let mut tx = state.db.begin().await?;
     sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
         .bind(owner)
@@ -94,11 +95,12 @@ pub async fn create(state: &State, owner: &str, body: Value) -> Result<Value> {
         .bind(owner)
         .fetch_one(&mut *tx)
         .await?;
-    if total >= 10 {
+    let (allowance, _) = super::billing::usage::account_allowance(&mut tx, owner, chrono::Utc::now()).await?;
+    if allowance.as_ref().map_or(total >= 10, |a| !a.permits_website(total)) {
         return Err(Error::new(
             409,
             "site_limit",
-            "Pro supports up to 10 websites.",
+            "Your website allowance has been reached.",
         ));
     }
     let site=sqlx::query_as::<_,Sites>(&format!("INSERT INTO sites(owner_id,name,domain) VALUES($1,$2,$3) ON CONFLICT DO NOTHING RETURNING {SITE_COLUMNS}"))

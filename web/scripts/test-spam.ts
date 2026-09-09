@@ -9,7 +9,7 @@ const { values } = parseArgs({
     environment: { type: 'string' },
     url: { type: 'string' },
     mode: { type: 'string', default: 'cookieless' },
-    endpoint: { type: 'string', default: 'https://analytics.beer/api/collect' },
+    endpoint: { type: 'string', default: 'https://usedatix.com/api/collect' },
     'dry-run': { type: 'boolean', default: false },
     help: { type: 'boolean', short: 'h' },
   },

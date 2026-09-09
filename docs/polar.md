@@ -1,3 +1,5 @@
+> Historical Polar integration. The application now uses [Autumn](autumn.md). These setup instructions apply only to the previous release.
+
 # Polar catalog
 
 Created and read back through the Polar MCP server on 2026-09-07 in the **Analytics** organization (`analyticsbeer`, `4f109880-3be1-48f8-a8b2-bea2f101634f`). The catalog contains 12 Pro products, plus archived Free and Enterprise products. The complete product, price, benefit and meter IDs are in [`config/polar-catalog.json`](../config/polar-catalog.json).
@@ -18,9 +20,9 @@ The Free product is archived and unavailable for new subscriptions. Monthly Pro 
 
 - **Yearly billing with monthly allowances:** the API rejected `meter_interval: "month"` with `Separate meter cycling is not enabled for this organization.` The six yearly products therefore remain drafts, with `activation_blocked: enable_monthly_meter_cycle`. Their monthly credit benefit is attached but would currently renew on the annual billing cycle. Before making these products purchasable, enable separate meter cycling, set `meter_interval: "month"` and `meter_interval_count: 1`, verify the resulting monthly grant schedule, and remove the pending metadata. Do not substitute one annual pool for the promised monthly allowance.
 - **Payments:** the organization is active. Polar now confirms checkout payments, subscription renewals, and payouts are enabled.
-- **Enterprise:** contact sales is a plain `mailto:hello@analytics.beer` link for more than 5 million events. The unused Enterprise draft is archived; no Enterprise checkout product is needed.
+- **Enterprise:** contact sales is a plain `mailto:hello@usedatix.com` link for more than 5 million events. The unused Enterprise draft is archived; no Enterprise checkout product is needed.
 - **App integration:** the webhook receiver is deployed and registered, and stores customer/subscription state. Local usage counting and allowance enforcement are implemented. Checkout, customer mapping, the billing portal and durable Polar usage delivery are now implemented. The access token is installed as an encrypted Worker secret. No paid purchase was completed during verification.
-- **Pricing page:** Contact sales links to `mailto:hello@analytics.beer`. Monthly checkout is available. Yearly pricing remains a preview with checkout disabled.
+- **Pricing page:** Contact sales links to `mailto:hello@usedatix.com`. Monthly checkout is available. Yearly pricing remains a preview with checkout disabled.
 
 ## Event meters
 

@@ -341,13 +341,17 @@ async fn billing_loop(state: State, mut stop: watch::Receiver<bool>) {
         if *stop.borrow() {
             break;
         }
-        if state.config.polar_token.is_none() {
+        if state.config.autumn_key.is_none() {
             continue;
         }
         let work = async {
             let key = format!("{}:billing-lock", queue::stream(&state));
             if let Some(token) = lease(&state, &key, 120).await? {
-                let result = billing::delivery::flush(&state).await;
+                let result = async {
+                    billing::provider::refresh_due(&state).await?;
+                    billing::delivery::flush(&state).await
+                }
+                .await;
                 release(&state, &key, &token).await?;
                 result?;
             }
@@ -392,7 +396,7 @@ pub async fn observe(state: &State) -> Result<()> {
         .first()
         .and_then(|v| v.id.split('-').next())
         .and_then(|s| s.parse::<i64>().ok());
-    let (billing, billing_age): (i64, i64) = sqlx::query_as("SELECT count(*)::bigint,coalesce(greatest(extract(epoch FROM now()-min(occurred_at)),0)::bigint,0) FROM billing_outbox")
+    let (billing, billing_age): (i64, i64) = sqlx::query_as("SELECT count(*)::bigint,coalesce(greatest(extract(epoch FROM now()-min(occurred_at)),0)::bigint,0) FROM billing_outbox WHERE provider='autumn'")
         .fetch_one(&state.db).await?;
     let m = &state.metrics;
     m.queue_depth.store(depth, Ordering::Relaxed);

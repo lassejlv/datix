@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Analytics API",
+    "title": "Datix API",
     "version": "0.1.0",
     "description": "Cookie-authenticated website management and reports; public, origin-validated event collection. Reports are eventually consistent with queue processing. Visitor counts are estimates scoped to an environment and UTC day."
   },
@@ -243,7 +243,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Account-wide event allowance, monthly renewal window and per-website collection status. Requires an active Pro subscription or trial to collect. Production pageviews use 1 credit, actions use 0.5; localhost multiplies these by 0.3. Engagement heartbeats and duplicate deliveries are free.",
+        "description": "Account-wide event allowance, monthly renewal window and per-website collection status. Requires an active subscription or trial to collect. Production pageviews use 1 credit, actions use 0.5; localhost multiplies these by 0.3. Engagement heartbeats and duplicate deliveries are free.",
         "responses": {
           "200": {
             "description": "Success",
@@ -3194,6 +3194,179 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/billing": {
+      "get": {
+        "operationId": "getBilling",
+        "description": "Refresh Autumn customer availability.",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hasCustomer": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Billing unavailable or unconfigured"
+          }
+        }
+      }
+    },
+    "/api/billing/checkout": {
+      "post": {
+        "operationId": "createBillingCheckout",
+        "description": "Create or reuse a hosted Autumn checkout; an already-active selected plan opens the billing portal.",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Billing unavailable or unconfigured"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "events",
+                  "interval"
+                ],
+                "properties": {
+                  "events": {
+                    "type": "integer",
+                    "enum": [
+                      100000,
+                      1000000,
+                      5000000
+                    ]
+                  },
+                  "interval": {
+                    "type": "string",
+                    "enum": [
+                      "month",
+                      "year"
+                    ]
+                  },
+                  "locale": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "da",
+                      "de"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/portal": {
+      "post": {
+        "operationId": "openBillingPortal",
+        "description": "Open the authenticated owner billing portal.",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Billing unavailable or unconfigured"
+          }
+        }
+      }
+    },
+    "/api/billing/sync": {
+      "post": {
+        "operationId": "syncBilling",
+        "description": "Refresh subscription state from Autumn and return the current usage response.",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Billing unavailable or unconfigured"
           }
         }
       }

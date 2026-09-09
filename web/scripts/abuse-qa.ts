@@ -5,7 +5,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { seedPro, cleanupPro } from '../tests/fixtures/billing';
 import { defaultTrackingSettings } from '../src/lib/tracking-settings';
 const production = process.argv.includes('--production');
-const base = production ? 'https://analytics.beer' : 'http://localhost:3000';
+const base = production ? 'https://usedatix.com' : 'http://localhost:3000';
 const connectionString = production
   ? process.env.PRODUCTION_DATABASE_URL!
   : process.env.DATABASE_URL!;

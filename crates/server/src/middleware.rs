@@ -77,8 +77,7 @@ async fn authorize(
     if account_path(path) || path.starts_with("/api/auth/") {
         if method != Method::GET
             && method != Method::HEAD
-            && value(headers, "origin")
-                != Some(state.config.app_url.origin().ascii_serialization().as_str())
+            && !state.config.allows_origin(value(headers, "origin"))
         {
             return Err(Error::new(
                 403,

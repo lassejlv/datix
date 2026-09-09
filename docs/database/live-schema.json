@@ -1065,6 +1065,69 @@
       "udt_name": "timestamp",
       "is_nullable": "NO",
       "column_default": null
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "provider",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "sync_attempted_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "provider",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "delivery_started_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "provider",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "plan_id",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "checkout_url",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "created_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 5
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "checkout_options",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "since_version": 7
     }
   ],
   "constraints": [

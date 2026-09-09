@@ -8,7 +8,7 @@ export const Route = createRootRoute({
   staleTime: Infinity,
   head: () => ({
     meta: [
-      { title: 'Analytics Beer | Website analytics' },
+      { title: 'Datix | Website analytics' },
       {
         name: 'description',
         content:
@@ -41,7 +41,7 @@ function NotFound() {
   const { t } = useSitePreferences();
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="text-lg font-medium">Analytics Beer</p>
+      <p className="text-lg font-medium">Datix</p>
       <h1 className="text-4xl font-medium tracking-tight">{t('Nothing brewing here.')}</h1>
       <p className="text-secondary-ink">
         {t('This page could not be found. Head back to the homepage.')}
@@ -75,9 +75,7 @@ function DocumentMetadata() {
       settings: 'Settings',
     } as const;
     const key = titles[page as keyof typeof titles];
-    document.title = key
-      ? `${t(key)} | Analytics Beer`
-      : `Analytics Beer | ${t('Website analytics')}`;
+    document.title = key ? `${t(key)} | Datix` : `Datix | ${t('Website analytics')}`;
     const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     if (description)
       description.content = t(

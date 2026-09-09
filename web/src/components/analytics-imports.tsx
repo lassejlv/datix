@@ -597,7 +597,7 @@ export function AnalyticsImports({
             <DialogTitle>{t('Remove this import?')}</DialogTitle>
             <DialogDescription>
               {t(
-                'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.',
+                'This removes the imported totals and breakdowns from your reports. Your Datix tracking data stays unchanged. You can upload the export again later.',
               )}
             </DialogDescription>
           </DialogHeader>

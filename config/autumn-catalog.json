@@ -1,0 +1,88 @@
+{
+  "plans": [
+    {
+      "id": "basic",
+      "name": "Basic",
+      "events": 100000,
+      "websites": 10,
+      "interval": "month",
+      "price": 9,
+      "trialDays": 14,
+      "prices": {
+        "usd": 9,
+        "eur": 9,
+        "dkk": 59
+      }
+    },
+    {
+      "id": "basic_annual",
+      "name": "Basic",
+      "events": 100000,
+      "websites": 10,
+      "interval": "year",
+      "price": 90,
+      "trialDays": 14,
+      "prices": {
+        "usd": 90,
+        "eur": 90,
+        "dkk": 590
+      }
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "events": 1000000,
+      "websites": 10,
+      "interval": "month",
+      "price": 49,
+      "trialDays": 0,
+      "prices": {
+        "usd": 49,
+        "eur": 49,
+        "dkk": 329
+      }
+    },
+    {
+      "id": "pro_annual",
+      "name": "Pro",
+      "events": 1000000,
+      "websites": 10,
+      "interval": "year",
+      "price": 490,
+      "trialDays": 0,
+      "prices": {
+        "usd": 490,
+        "eur": 490,
+        "dkk": 3290
+      }
+    },
+    {
+      "id": "ultra",
+      "name": "Ultra",
+      "events": 5000000,
+      "websites": 10,
+      "interval": "month",
+      "price": 149,
+      "trialDays": 0,
+      "prices": {
+        "usd": 149,
+        "eur": 149,
+        "dkk": 999
+      }
+    },
+    {
+      "id": "ultra_annual",
+      "name": "Ultra",
+      "events": 5000000,
+      "websites": 10,
+      "interval": "year",
+      "price": 1490,
+      "trialDays": 0,
+      "prices": {
+        "usd": 1490,
+        "eur": 1490,
+        "dkk": 9990
+      }
+    }
+  ]
+}

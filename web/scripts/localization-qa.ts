@@ -148,7 +148,7 @@ try {
     await expect(page.getByTestId('account-menu')).toBeFocused();
     current = locale;
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
-    await expect(page).toHaveTitle(`${t('Overview')} | Analytics Beer`);
+    await expect(page).toHaveTitle(`${t('Overview')} | Datix`);
     await expect(
       page.getByRole('button', { name: new RegExp(t('Pageviews')) }).first(),
     ).toContainText(new Intl.NumberFormat(formatLocale[locale]).format(1234));
@@ -283,7 +283,7 @@ try {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto(`${base}/pricing`);
-    await expect(page).toHaveTitle(`${t('Pricing')} | Analytics Beer`);
+    await expect(page).toHaveTitle(`${t('Pricing')} | Datix`);
     await audit(page, locale);
     await page.goto(`${base}/missing-localized-page`);
     await expect(

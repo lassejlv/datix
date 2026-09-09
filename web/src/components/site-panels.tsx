@@ -292,7 +292,7 @@ export function Installation({
         {origin && new URL(origin).hostname === 'localhost' && (
           <p className="mt-4 rounded-md bg-muted px-4 py-3 text-[13px] leading-[1.6] text-secondary-ink">
             {t(
-              'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.',
+              'You’re running Datix locally. Use a hosted address in this script when connecting a public website.',
             )}
           </p>
         )}

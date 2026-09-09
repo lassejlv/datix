@@ -404,7 +404,7 @@ function Dashboard({
                   ? t('Website budget reached')
                   : usage.data?.pauseReason === 'event_limit'
                     ? t('Event limit reached')
-                    : t('An active Pro plan is required')}
+                    : t('An active plan is required')}
               </span>
               <Link to="/usage" className="underline underline-offset-4">
                 {t('View usage')}
@@ -853,13 +853,13 @@ function Overview({
           </ul>
           <p className="mt-2">
             {t(
-              'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.',
+              'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Datix.',
             )}
           </p>
           {reports.overview.imports.calendarDayWarning && (
             <p className="mt-2">
               {t(
-                'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.',
+                'Imported totals retain their provider’s calendar dates and timezone. Datix tracking uses UTC.',
               )}
             </p>
           )}

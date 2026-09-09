@@ -5,7 +5,7 @@ import { chromium, expect } from '@playwright/test';
 import { Client } from 'pg';
 import { mkdir, writeFile } from 'node:fs/promises';
 const prod = process.argv.includes('--production');
-const base = prod ? 'https://analytics.beer' : (process.env.QA_BASE_URL ?? 'http://localhost:3000');
+const base = prod ? 'https://usedatix.com' : (process.env.QA_BASE_URL ?? 'http://localhost:3000');
 const connectionString = process.env[prod ? 'PRODUCTION_DATABASE_URL' : 'DATABASE_URL'];
 if (
   !connectionString ||

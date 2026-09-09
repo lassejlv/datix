@@ -8,10 +8,16 @@ static UPGRADES: &[(i64, &str)] = &[
     (2, include_str!("../upgrades/0002_scaling.sql")),
     (3, include_str!("../upgrades/0003_partition_events.sql")),
     (4, include_str!("../upgrades/0004_imports.sql")),
+    (5, include_str!("../upgrades/0005_autumn.sql")),
+    (
+        6,
+        include_str!("../upgrades/0006_billing_provider_defaults.sql"),
+    ),
+    (7, include_str!("../upgrades/0007_checkout_options.sql")),
 ];
 
 pub async fn check(pool: &PgPool) -> Result<Value> {
-    let mut report = check_base(pool).await?;
+    let mut report = check_base(pool, true).await?;
     let exists: bool =
         sqlx::query_scalar("SELECT to_regclass('public.analytics_schema_migrations') IS NOT NULL")
             .fetch_one(pool)
@@ -53,7 +59,7 @@ pub async fn check(pool: &PgPool) -> Result<Value> {
     Ok(report)
 }
 
-async fn check_base(pool: &PgPool) -> Result<Value> {
+async fn check_base(pool: &PgPool, include_upgrades: bool) -> Result<Value> {
     let expected: Value =
         serde_json::from_str(include_str!("../../../docs/database/live-schema.json"))
             .map_err(|_| Error::unavailable())?;
@@ -63,6 +69,9 @@ async fn check_base(pool: &PgPool) -> Result<Value> {
         .as_array()
         .ok_or_else(Error::unavailable)?
     {
+        if !include_upgrades && column["since_version"].as_i64().is_some() {
+            continue;
+        }
         let table = column["table_name"]
             .as_str()
             .ok_or_else(Error::unavailable)?;
@@ -117,7 +126,7 @@ pub async fn initialize_empty(pool: &PgPool) -> Result<()> {
 
 /// Explicit owner-only, atomic expansion. Existing schema is checked before recording any upgrades.
 pub async fn upgrade(pool: &PgPool) -> Result<()> {
-    check_base(pool).await?;
+    check_base(pool, false).await?;
     let mut tx = pool.begin().await?;
     sqlx::query("SELECT pg_advisory_xact_lock(732806230)")
         .execute(&mut *tx)

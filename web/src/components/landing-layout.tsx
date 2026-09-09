@@ -25,7 +25,7 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
           <a
             className="landing-brand"
             href="/"
-            aria-label={t('Analytics Beer home')}
+            aria-label={t('Datix home')}
             aria-current={home ? 'page' : undefined}
           >
             <Brand />
@@ -47,12 +47,12 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
       <footer className="landing-footer">
         <div className="landing-footer-main">
           <div className="landing-footer-identity">
-            <a href="/" aria-label={t('Analytics Beer home')}>
+            <a href="/" aria-label={t('Datix home')}>
               <Brand />
             </a>
             <p>{t('Website analytics. A little more human.')}</p>
-            <a className="landing-footer-email" href="mailto:hello@analytics.beer">
-              hello@analytics.beer
+            <a className="landing-footer-email" href="mailto:hello@usedatix.com">
+              hello@usedatix.com
             </a>
           </div>
           <nav className="landing-footer-nav" aria-label={t('Footer navigation')}>

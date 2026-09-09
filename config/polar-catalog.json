@@ -8,7 +8,7 @@
     "name": "analytics.events.v1",
     "quantityProperty": "event_count",
     "categoryProperty": "event_type",
-    "customerIdentity": "external_customer_id: authenticated Analytics Beer account owner ID"
+    "customerIdentity": "external_customer_id: authenticated Datix account owner ID"
   },
   "meters": [
     {
@@ -912,7 +912,7 @@
     "webhookReceiver": true,
     "limitEnforcement": true
   },
-  "salesContact": "mailto:hello@analytics.beer",
+  "salesContact": "mailto:hello@usedatix.com",
   "webhook": {
     "id": "a4cbb9b8-0ab9-4f78-8bbe-a44e07804d2f",
     "url": "https://analytics.beer/api/webhooks/polar",

@@ -70,7 +70,6 @@ pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
             "/api/collect",
             post(collect_event).options(|| async { StatusCode::NO_CONTENT }),
         )
-        .route("/api/webhooks/polar", post(webhook))
         .route("/api/auth/{*path}", any(authentication))
         .route("/api/me", get(me))
         .route("/api/usage", get(usage))
@@ -263,12 +262,5 @@ async fn collect_event(
     Ok((
         StatusCode::ACCEPTED,
         Json(collect::collect(&state, &headers, body, &context.ip, &context.country).await?),
-    ))
-}
-async fn webhook(AppState(state): AppState<State>, request: Request) -> Result<Json<Value>> {
-    let headers = request.headers().clone();
-    let body = read_body(request, 256 * 1024).await?;
-    Ok(Json(
-        billing::webhook::handle(&state, &headers, &body).await?,
     ))
 }

@@ -34,11 +34,11 @@ const questions = [
   ],
   [
     'Is there a free trial?',
-    'Pro 100k includes a 14-day free trial. Larger plans have no free trial. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.',
+    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.',
   ],
   [
     'Do I need a credit card?',
-    'No payment details are needed to create an account. Starting Pro requires completing checkout in Polar, where you confirm payment details and the price after your trial.',
+    'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
   ],
 ] as const;
 
@@ -284,7 +284,7 @@ export function LandingPage() {
           <DialogHeader>
             <DialogTitle>{t('The useful stuff, at a glance.')}</DialogTitle>
             <DialogDescription>
-              {t('An actual Analytics Beer dashboard, shown with example traffic.')}
+              {t('An actual Datix dashboard, shown with example traffic.')}
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
@@ -294,10 +294,10 @@ export function LandingPage() {
                 className="landing-demo"
                 src="/media/dashboard-light.webp"
                 alt={t(
-                  'Analytics Beer dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
+                  'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
                 )}
                 width="1440"
-                height="1453"
+                height="1128"
                 loading="lazy"
               />
             </picture>

@@ -1,0 +1,9 @@
+{
+  "mcp": {
+    "useautumn": {
+      "type": "remote",
+      "url": "https://mcp.useautumn.com/mcp",
+      "enabled": true
+    }
+  }
+}

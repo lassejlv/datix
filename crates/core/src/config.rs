@@ -129,12 +129,12 @@ impl Runtime {
 #[derive(Clone)]
 pub struct Config {
     pub app_url: url::Url,
+    pub app_origins: Vec<String>,
     pub auth_secret: String,
     pub visitor_secret: String,
     pub origin_secret: Option<String>,
-    pub polar_token: Option<String>,
-    pub polar_webhook_secret: Option<String>,
-    pub polar_url: String,
+    pub autumn_key: Option<String>,
+    pub autumn_url: String,
     pub railway: bool,
     pub port: u16,
     pub static_dir: String,
@@ -162,19 +162,25 @@ impl Config {
         } else {
             std::env::var("CLOUDFLARE_ORIGIN_SECRET").ok()
         };
+        let app_url = url::Url::parse(&required("APP_URL")?).map_err(|_| "Invalid APP_URL")?;
+        let app_origins = app_origins_from(
+            &app_url,
+            std::env::var("APP_LEGACY_URL")
+                .ok()
+                .filter(|v| !v.trim().is_empty())
+                .as_deref(),
+        )?;
         Ok(Self {
-            app_url: url::Url::parse(&required("APP_URL")?).map_err(|_| "Invalid APP_URL")?,
+            app_url,
+            app_origins,
             auth_secret: required("BETTER_AUTH_SECRET")?,
             visitor_secret: required("VISITOR_HASH_SECRET")?,
             origin_secret,
-            polar_token: std::env::var("POLAR_ACCESS_TOKEN")
+            autumn_key: std::env::var("AUTUMN_SECRET_KEY")
                 .ok()
                 .filter(|v| !v.trim().is_empty()),
-            polar_webhook_secret: std::env::var("POLAR_WEBHOOK_SECRET")
-                .ok()
-                .filter(|v| !v.trim().is_empty()),
-            polar_url: std::env::var("POLAR_API_URL")
-                .unwrap_or_else(|_| "https://api.polar.sh".into()),
+            autumn_url: std::env::var("AUTUMN_API_URL")
+                .unwrap_or_else(|_| "https://api.useautumn.com".into()),
             railway,
             port: std::env::var("PORT")
                 .unwrap_or_else(|_| "3000".into())
@@ -189,6 +195,23 @@ impl Config {
                 .filter(|v| !v.is_empty()),
         })
     }
+    pub fn allows_origin(&self, origin: Option<&str>) -> bool {
+        origin.is_some_and(|received| self.app_origins.iter().any(|allowed| allowed == received))
+    }
+}
+fn app_origins_from(
+    app_url: &url::Url,
+    legacy: Option<&str>,
+) -> std::result::Result<Vec<String>, String> {
+    let mut origins = vec![app_url.origin().ascii_serialization()];
+    if let Some(value) = legacy {
+        let url = url::Url::parse(value).map_err(|_| "Invalid APP_LEGACY_URL")?;
+        let origin = url.origin().ascii_serialization();
+        if !origins.contains(&origin) {
+            origins.push(origin);
+        }
+    }
+    Ok(origins)
 }
 impl State {
     pub async fn connect(config: Config, database_url: &str, redis_url: &str) -> Result<Self> {
@@ -277,4 +300,20 @@ pub async fn connect_database_with(database_url: &str, runtime: &Runtime) -> Res
         .connect_with(options)
         .await
         .map_err(Error::from)
+}
+
+#[cfg(test)]
+mod origin_tests {
+    use super::app_origins_from;
+    #[test]
+    fn primary_and_legacy_origins_are_both_trusted() {
+        let app = url::Url::parse("https://usedatix.com").unwrap();
+        let origins = app_origins_from(&app, Some("https://analytics.beer")).unwrap();
+        assert_eq!(origins, ["https://usedatix.com", "https://analytics.beer"]);
+        assert_eq!(
+            app_origins_from(&app, Some("https://usedatix.com/")).unwrap(),
+            ["https://usedatix.com"]
+        );
+        assert!(app_origins_from(&app, Some("not a url")).is_err());
+    }
 }

@@ -1,4 +1,4 @@
-# Scaling and operating Analytics Beer
+# Scaling and operating Datix
 
 The API and background work deploy independently in the existing Railway production project. Both use the existing Neon database and persistent Redis service. The `web` service serves React and Axum with `SERVICE_ROLE=api`; `worker` (`2399cc05-2728-4890-9d73-10c56a89e05a`) runs ingestion, billing and retention with `SERVICE_ROLE=worker`. Worker HTTP exposes only readiness, liveness and authenticated metrics; it has no public domain or frontend build. Local development defaults to `combined`.
 
@@ -71,7 +71,7 @@ For application rollback, deploy the preceding Rust commit `a21cfc0` on web in i
 
 ## Reproducible evidence
 
-All integration/load tests require the explicitly matched isolated `api-tests` Neon branch and loopback Redis (port 6394). Load fixtures have no live Polar token. They clean their accounts; the retention test additionally removes expired records in this disposable test branch. Never point these tests at production or a shared development database.
+All integration/load tests require the explicitly matched isolated `api-tests` Neon branch and loopback Redis (port 6394). Load fixtures have no live Autumn key. They clean their accounts; the retention test additionally removes expired records in this disposable test branch. Never point these tests at production or a shared development database.
 
 ```sh
 cargo test --locked --workspace

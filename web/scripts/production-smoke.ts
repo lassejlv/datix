@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 
 // This writes only a disposable account, then removes that exact account.
 // All tracking requests go directly from Chromium to the public Worker.
-const base = 'https://analytics.beer';
+const base = 'https://usedatix.com';
 const connectionString = process.env.PRODUCTION_DATABASE_URL;
 if (
   !connectionString ||
@@ -51,7 +51,7 @@ try {
         () => (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl,
       ),
     ).toBe(true);
-  await expect(page).toHaveTitle('Analytics Beer | Website analytics');
+  await expect(page).toHaveTitle('Datix | Website analytics');
   await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
   await page.screenshot({ path: 'web/artifacts/production/sign-in.png', fullPage: true });
   await page.getByRole('button', { name: 'Create an account' }).click();
@@ -121,8 +121,7 @@ try {
     tracker.waitForEvent(
       'console',
       (message) =>
-        message.text() ===
-        '[Analytics Beer] Pageview ignored - throttled (same URL within 1 minute)',
+        message.text() === '[Datix] Pageview ignored - throttled (same URL within 1 minute)',
     );
   let skipped = throttleLog();
   await tracker.reload();

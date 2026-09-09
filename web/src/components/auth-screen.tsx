@@ -52,12 +52,12 @@ export function AuthScreen({
       <div className="flex flex-col gap-1">
         <a
           href="/"
-          aria-label={t('Analytics Beer home')}
+          aria-label={t('Datix home')}
           className="w-fit rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         >
           <Brand />
         </a>
-        {!signup && <span className="text-[13px] text-muted-foreground">analytics.beer</span>}
+        {!signup && <span className="text-[13px] text-muted-foreground">usedatix.com</span>}
       </div>
       <div
         className={signup ? 'mt-8 grid items-center gap-8 lg:mt-16 lg:grid-cols-2 lg:gap-16' : ''}
@@ -163,7 +163,7 @@ export function AuthScreen({
             </p>
           )}
           <p className="mt-7 text-[13px] text-secondary-ink">
-            {signup ? t('Already have an account?') : t('New to Analytics Beer?')}{' '}
+            {signup ? t('Already have an account?') : t('New to Datix?')}{' '}
             <button
               className="ml-[3px] cursor-pointer text-foreground underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               type="button"

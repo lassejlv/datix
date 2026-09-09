@@ -20,6 +20,9 @@ try {
     await context.route('https://analytics.beer/tracker.js', (route) =>
       route.fulfill({ contentType: 'application/javascript', body: '' }),
     );
+    await context.route('https://usedatix.com/tracker.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
     await context.addCookies([{ name: 'ab-language', value: 'en', url: base }]);
     let page = await context.newPage();
     page.on('pageerror', (error) => errors.push(error.message));
@@ -91,7 +94,7 @@ try {
         (color.match(/[\d.]+/g) ?? [])
           .slice(0, 3)
           .map(Number)
-          .map((v) => v / 255)
+          .map((v) => (color.startsWith('color(srgb') ? v : v / 255))
           .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
           .reduce((n, v, i) => n + v * [0.2126, 0.7152, 0.0722][i], 0);
       const a = lum(style.color),
@@ -104,7 +107,7 @@ try {
     await page.keyboard.press('Enter');
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(
-      page.getByText('An actual Analytics Beer dashboard, shown with example traffic.'),
+      page.getByText('An actual Datix dashboard, shown with example traffic.'),
     ).toBeVisible();
     await expect
       .poll(() =>
@@ -124,7 +127,7 @@ try {
     }
     await page.getByRole('button', { name: 'Tracking & privacy' }).click();
     await expect(page.getByRole('dialog')).toContainText(
-      'Visitor tracking uses first party cookies or local storage',
+      'Persistent visitor tracking uses first party cookies or local storage',
     );
     await page.keyboard.press('Escape');
     checks.push(
@@ -222,6 +225,9 @@ try {
   await page.route('https://analytics.beer/tracker.js', (route) =>
     route.fulfill({ contentType: 'application/javascript', body: '' }),
   );
+  await page.route('https://usedatix.com/tracker.js', (route) =>
+    route.fulfill({ contentType: 'application/javascript', body: '' }),
+  );
   await page.goto(base);
   await page.locator('.landing-actions .landing-button').click();
   await expect(
@@ -237,8 +243,8 @@ try {
       .getByLabel('Email address')
       .evaluate((input: HTMLInputElement) => input.validity.typeMismatch),
   ).toBe(true);
-  await page.getByRole('link', { name: 'Analytics Beer home' }).click();
-  await page.getByRole('link', { name: 'Sign in', exact: false }).click();
+  await page.getByRole('link', { name: 'Datix home' }).click();
+  await page.getByRole('link', { name: 'Sign in', exact: false }).first().click();
   await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
   await page.goto(`${base}/?site=${crypto.randomUUID()}&view=installation`);
   await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();

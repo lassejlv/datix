@@ -147,7 +147,7 @@ test('tracker diagnostics are local or explicit, and never log page payloads', a
   await settle();
   await new Promise((resolve) => setImmediate(resolve));
   expect(result.requests).toHaveLength(1);
-  expect(result.logs).toEqual(['[Analytics Beer] Collector returned HTTP 202.']);
+  expect(result.logs).toEqual(['[Datix] Collector returned HTTP 202.']);
   expect(result.requests[0]).not.toContain('secret');
 });
 
@@ -158,9 +158,7 @@ test('same page is throttled across reloads until exactly one minute, without ex
   const reload = run({ storage: first.storage, now: 1_059_999 });
   await settle();
   expect(reload.requests).toHaveLength(0);
-  expect(reload.logs).toEqual([
-    '[Analytics Beer] Pageview ignored - throttled (same URL within 1 minute)',
-  ]);
+  expect(reload.logs).toEqual(['[Datix] Pageview ignored - throttled (same URL within 1 minute)']);
   expect((await readyRun({ storage: first.storage, now: 1_060_000 })).requests).toHaveLength(1);
 });
 test('navigation to a different page counts, returning within a minute does not, and custom events are unaffected', async () => {

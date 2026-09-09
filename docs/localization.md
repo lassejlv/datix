@@ -1,6 +1,6 @@
 # Website languages
 
-Analytics Beer supports English (`en`), Danish (`da`) and German (`de`) across the public site, authentication, onboarding, dashboard, account settings, installation, imports, visitor activity and usage/billing screens.
+Datix supports English (`en`), Danish (`da`) and German (`de`) across the public site, authentication, onboarding, dashboard, account settings, installation, imports, visitor activity and usage/billing screens.
 
 Each language owns its copy in a separate TypeScript file:
 

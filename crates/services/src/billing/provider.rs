@@ -1,15 +1,13 @@
 use super::{
-    ORGANIZATION_ID,
-    allowance::{CATALOG, Subscription},
+    allowance::{CATALOG, Entitlements, Subscription},
     usage,
 };
 use analytics_core::{Error, Result, State, models::User, validation};
 use chrono::{DateTime, Utc};
-use percent_encoding::{NON_ALPHANUMERIC, utf8_percent_encode};
 use reqwest::Method;
 use serde::Deserialize;
 use serde_json::{Value, json};
-use sqlx::PgConnection;
+use sqlx::{Connection, PgConnection};
 
 pub async fn request(
     state: &State,
@@ -17,7 +15,7 @@ pub async fn request(
     path: &str,
     body: Option<Value>,
 ) -> Result<Option<Value>> {
-    let token = state.config.polar_token.as_deref().ok_or_else(|| {
+    let token = state.config.autumn_key.as_deref().ok_or_else(|| {
         Error::new(
             503,
             "billing_unconfigured",
@@ -28,21 +26,20 @@ pub async fn request(
         .http
         .request(
             method,
-            format!("{}{path}", state.config.polar_url.trim_end_matches('/')),
+            format!("{}{path}", state.config.autumn_url.trim_end_matches('/')),
         )
-        .bearer_auth(token);
+        .bearer_auth(token)
+        .header("x-api-version", "2.2")
+        .timeout(std::time::Duration::from_secs(10));
     if let Some(body) = body {
-        req = req.json(&body)
+        req = req.json(&body);
     }
     let response = req.send().await?;
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Ok(None);
     }
     if !response.status().is_success() {
-        tracing::error!(
-            status = response.status().as_u16(),
-            "billing provider request failed"
-        );
+        tracing::error!(status = response.status().as_u16(), "Autumn request failed");
         return Err(Error::unavailable());
     }
     Ok(Some(response.json().await?))
@@ -54,21 +51,88 @@ fn field<'a>(value: &'a Value, key: &str) -> Result<&'a str> {
     value[key].as_str().ok_or_else(Error::unavailable)
 }
 fn date(value: &Value, key: &str) -> Option<DateTime<Utc>> {
-    value[key].as_str()?.parse().ok()
+    DateTime::from_timestamp_millis(value[key].as_i64()?)
 }
+
+fn units(value: &Value) -> Option<i64> {
+    let n = value.as_f64()?;
+    (n.is_finite() && n >= 0.0 && n < (i64::MAX / 100) as f64)
+        .then_some((n * 100.0).round() as i64)
+}
+fn entitlements(customer: &Value, row: &Value, start: DateTime<Utc>, end: DateTime<Utc>) -> Option<Entitlements> {
+    let events = &customer["balances"]["events"];
+    let websites = &customer["balances"]["websites"];
+    if events["feature_id"] != "events" || websites["feature_id"] != "websites" { return None; }
+    let unlimited = events["unlimited"].as_bool()?;
+    let event_limit = if unlimited { None } else { Some(units(&events["granted"])? ) };
+    let remaining = if unlimited { None } else { Some(units(&events["remaining"])? ) };
+    let website_limit = if websites["unlimited"].as_bool()? { None } else { Some(websites["granted"].as_i64()?.max(0)) };
+    let reset = date(events, "next_reset_at");
+    if !events["next_reset_at"].is_null() && reset.is_none() { return None; }
+    let period_end = reset.unwrap_or(end);
+    let origin = date(row, "started_at").unwrap_or(start);
+    let interval = events["breakdown"].as_array().and_then(|rows| rows.iter().find_map(|r| r["reset"]["interval"].as_str()));
+    let period_start = match interval {
+        Some("day") => period_end - chrono::Duration::days(1),
+        Some("week") => period_end - chrono::Duration::weeks(1),
+        Some("quarter") => period_end.checked_sub_months(chrono::Months::new(3))?,
+        Some("year") => period_end.checked_sub_months(chrono::Months::new(12))?,
+        Some("month") => {
+            // Preserve the provider's original month-end anchor where it matches this reset.
+            let anchor = Subscription { id: String::new(), product_id: String::new(), status: "active".into(), current_period_start: Some(origin), current_period_end: period_end, trial_end: None, cancel_at_period_end: false, ends_at: None, entitlements: None };
+            super::allowance::period(&anchor, period_end - chrono::Duration::milliseconds(1))?.start
+        }
+        None if reset.is_none() => origin,
+        _ => return None,
+    };
+    Some(Entitlements { name: row["plan"]["name"].as_str()?.to_owned(), event_limit, website_limit,
+        used: units(&events["usage"])?, remaining, local_baseline: 0, pending: 0, period_start, period_end })
+}
+
 pub fn subscriptions(value: &Value) -> Result<Value> {
-    let rows = value["active_subscriptions"]
+    let rows = value["subscriptions"]
         .as_array()
-        .ok_or_else(|| Error::new(400, "invalid_webhook", "Invalid subscription state."))?;
+        .ok_or_else(Error::unavailable)?;
     let mut subscriptions = vec![];
+    // A subscription alone is insufficient when its analytics entitlement has been revoked.
+    let flag = &value["flags"]["analytics"];
+    let flag_expiry = date(flag, "expires_at");
+    if !flag.is_object()
+        || flag["feature_id"] != "analytics"
+        || (!flag["expires_at"].is_null() && flag_expiry.is_none())
+        || flag_expiry.is_some_and(|expiry| expiry <= Utc::now())
+    {
+        return Ok(json!([]));
+    }
     for row in rows {
-        let normalized = json!({"id":row["id"],"productId":row["product_id"],"status":row["status"],"currentPeriodStart":row["current_period_start"],"currentPeriodEnd":row["current_period_end"],"trialEnd":row["trial_end"],"cancelAtPeriodEnd":row["cancel_at_period_end"],"endsAt":row["ends_at"]});
+        if row["status"] != "active" || row["past_due"] == true || row["scope"] == "entity" {
+            continue;
+        }
+        let Some(start) = date(row, "current_period_start") else {
+            continue;
+        };
+        let Some(end) = date(row, "current_period_end") else {
+            continue;
+        };
+        let Some(entitlements) = entitlements(value, row, start, end) else { continue; };
+        let trial = date(row, "trial_ends_at");
+        let status = if trial.is_some_and(|t| t > Utc::now()) {
+            "trialing"
+        } else {
+            "active"
+        };
+        let ends_at = match (date(row, "expires_at"), flag_expiry) {
+            (Some(subscription), Some(flag)) => Some(subscription.min(flag)),
+            (subscription, flag) => subscription.or(flag),
+        };
+        let normalized = json!({"id":row["id"],"productId":row["plan_id"],"status":status,"currentPeriodStart":start,"currentPeriodEnd":end,"trialEnd":trial,"cancelAtPeriodEnd":!row["canceled_at"].is_null(),"endsAt":ends_at,"entitlements":entitlements});
         serde_json::from_value::<Subscription>(normalized.clone())
-            .map_err(|_| Error::new(400, "invalid_webhook", "Invalid subscription state."))?;
+            .map_err(|_| Error::unavailable())?;
         subscriptions.push(normalized);
     }
     Ok(json!(subscriptions))
 }
+
 pub async fn save_snapshot(
     conn: &mut PgConnection,
     customer: &str,
@@ -77,47 +141,92 @@ pub async fn save_snapshot(
     deleted: bool,
     occurred: DateTime<Utc>,
 ) -> Result<bool> {
-    let n=sqlx::query("INSERT INTO billing_customers(customer_id,owner_id,subscriptions,deleted,occurred_at,updated_at) VALUES($1,$2,$3,$4,$5,now()) ON CONFLICT(customer_id) DO UPDATE SET owner_id=excluded.owner_id,subscriptions=excluded.subscriptions,deleted=excluded.deleted,occurred_at=excluded.occurred_at,updated_at=excluded.updated_at WHERE billing_customers.occurred_at < excluded.occurred_at")
- .bind(customer).bind(owner).bind(subscriptions).bind(deleted).bind(occurred).execute(conn).await?.rows_affected();
+    let n=sqlx::query("INSERT INTO billing_customers(customer_id,owner_id,subscriptions,deleted,occurred_at,updated_at,provider,sync_attempted_at) VALUES($1,$2,$3,$4,$5,$5,'autumn',$5) ON CONFLICT(customer_id) DO UPDATE SET owner_id=excluded.owner_id,subscriptions=excluded.subscriptions,deleted=excluded.deleted,occurred_at=excluded.occurred_at,updated_at=excluded.updated_at,sync_attempted_at=excluded.sync_attempted_at WHERE billing_customers.provider='autumn' AND billing_customers.occurred_at < excluded.occurred_at")
+        .bind(customer).bind(owner).bind(subscriptions).bind(deleted).bind(occurred).execute(conn).await?.rows_affected();
     Ok(n > 0)
 }
 pub async fn sync(state: &State, conn: &mut PgConnection, owner: &str) -> Result<Option<Value>> {
+    let mut tx = conn.begin().await?;
+    sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE").bind(owner).fetch_optional(&mut *tx).await?;
     let occurred = Utc::now();
-    let path = format!(
-        "/v1/customers/external/{}/state",
-        utf8_percent_encode(owner, NON_ALPHANUMERIC)
-    );
-    let Some(customer) = request(state, Method::GET, &path, None).await? else {
-        sqlx::query("UPDATE billing_customers SET deleted=true,subscriptions='[]'::jsonb,occurred_at=$1,updated_at=now() WHERE owner_id=$2 AND occurred_at < $1").bind(occurred).bind(owner).execute(conn).await?;
-        return Ok(None);
-    };
-    if customer["organization_id"] != ORGANIZATION_ID || customer["external_id"] != owner {
+    let customer = request(
+        state,
+        Method::POST,
+        "/v1/customers.get",
+        Some(json!({"customer_id":owner,"expand":["subscriptions.plan"]})),
+    )
+    .await?;
+    if let Some(c) = &customer
+        && c["id"] != owner
+    {
         return Err(Error::new(
             502,
             "invalid_billing_customer",
             "Billing customer could not be verified.",
         ));
     }
-    let deleted = !customer["deleted_at"].is_null();
-    let subs = if deleted {
-        json!([])
-    } else {
-        subscriptions(&customer)?
+    let mut subs = match &customer {
+        Some(c) => subscriptions(c)?,
+        None => json!([]),
     };
+    if let Some(rows) = subs.as_array_mut() {
+        for row in rows {
+            let mut subscription: Subscription = serde_json::from_value(row.clone()).map_err(|_| Error::unavailable())?;
+            if let Some(e) = &mut subscription.entitlements {
+                e.local_baseline = sqlx::query_scalar("SELECT coalesce(sum(events)*100,0)::bigint FROM billing_usage WHERE owner_id=$1 AND period_start=$2")
+                    .bind(owner).bind(e.period_start).fetch_one(&mut *tx).await?;
+                e.pending = sqlx::query_scalar("SELECT coalesce(sum(event_count)*100,0)::bigint FROM billing_outbox WHERE owner_id=$1 AND provider='autumn' AND occurred_at >= $2 AND occurred_at < $3")
+                    .bind(owner).bind(e.period_start).bind(e.period_end).fetch_one(&mut *tx).await?;
+            }
+            *row = json!(subscription);
+        }
+    }
     save_snapshot(
-        conn,
-        field(&customer, "id")?,
+        &mut tx,
+        &format!("autumn:{owner}"),
         Some(owner),
         subs,
-        deleted,
+        customer.is_none(),
         occurred,
     )
     .await?;
-    Ok(Some(customer))
+    tx.commit().await?;
+    Ok(customer)
+}
+pub async fn refresh_if_due(state: &State, owner: &str) -> Result<()> {
+    if state.config.autumn_key.is_none() {
+        return Ok(());
+    }
+    let mut conn = state.db.acquire().await?;
+    let fresh:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM billing_customers WHERE owner_id=$1 AND provider='autumn' AND updated_at>now()-interval '60 seconds')").bind(owner).fetch_one(&mut *conn).await?;
+    if !fresh {
+        sync(state, &mut conn, owner).await?;
+    }
+    Ok(())
+}
+/// The worker keeps cached access current even when the dashboard is closed.
+pub async fn refresh_due(state: &State) -> Result<()> {
+    let owners:Vec<String>=sqlx::query_scalar("UPDATE billing_customers SET sync_attempted_at=now() WHERE customer_id IN (SELECT customer_id FROM billing_customers WHERE provider='autumn' AND owner_id IS NOT NULL AND sync_attempted_at<now()-interval '60 seconds' ORDER BY sync_attempted_at LIMIT 10 FOR UPDATE SKIP LOCKED) RETURNING owner_id").fetch_all(&state.db).await?;
+    let mut tasks = tokio::task::JoinSet::new();
+    for owner in owners {
+        let state = state.clone();
+        tasks.spawn(async move {
+            let mut conn = state.db.acquire().await?;
+            sync(&state, &mut conn, &owner).await.map(|_| ())
+        });
+    }
+    while let Some(result) = tasks.join_next().await {
+        if !matches!(result, Ok(Ok(()))) {
+            tracing::warn!(
+                "Autumn subscription refresh failed; stale access expires automatically"
+            );
+        }
+    }
+    Ok(())
 }
 async fn portal(state: &State, owner: &str) -> Result<Value> {
-    let response=required(request(state,Method::POST,"/v1/customer-sessions/",Some(json!({"external_customer_id":owner,"return_url":format!("{}/usage",state.config.app_url.as_str().trim_end_matches('/'))}))).await?)?;
-    Ok(json!({"url":field(&response,"customer_portal_url")?}))
+    let response=required(request(state,Method::POST,"/v1/billing.open_customer_portal",Some(json!({"customer_id":owner,"return_url":format!("{}/usage",state.config.app_url.as_str().trim_end_matches('/'))}))).await?)?;
+    Ok(json!({"url":field(&response,"url")?}))
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -129,57 +238,35 @@ struct Selection {
 pub struct Plan {
     pub product_id: String,
     pub locale: String,
+    pub currency: &'static str,
     pub allow_trial: bool,
 }
 pub fn select(body: Value) -> Result<Plan> {
     let selected: Selection = validation::decode(body)?;
     let locale = selected.locale.unwrap_or_else(|| "en".into());
-    if selected.interval != "month" || !["en", "da", "de"].contains(&locale.as_str()) {
+    if !["month", "year"].contains(&selected.interval.as_str())
+        || !["en", "da", "de"].contains(&locale.as_str())
+    {
         return Err(Error::invalid(
-            "Select a monthly plan and supported locale.",
+            "Select an available plan and supported locale.",
         ));
     }
-    let product = CATALOG["products"]
+    let plan = CATALOG["plans"]
         .as_array()
         .unwrap()
         .iter()
-        .find(|p| {
-            p["metadata"]["plan"] == "pro"
-                && p["metadata"]["monthly_events"] == selected.events
-                && p["recurring_interval"] == "month"
-                && p["is_archived"] == false
-        })
-        .ok_or_else(|| Error::new(400, "invalid_plan", "Select an available monthly plan."))?;
+        .find(|p| p["events"] == selected.events && p["interval"] == selected.interval)
+        .ok_or_else(|| Error::new(400, "invalid_plan", "Select an available plan."))?;
     Ok(Plan {
-        product_id: field(product, "id")?.into(),
+        product_id: field(plan, "id")?.into(),
+        currency: match locale.as_str() {
+            "da" => "dkk",
+            "de" => "eur",
+            _ => "usd",
+        },
         locale,
         allow_trial: selected.events == 100000,
     })
-}
-fn valid_open(current: &Value, owner: &str, plan: &Plan) -> bool {
-    current["organization_id"] == ORGANIZATION_ID
-        && current["external_customer_id"] == owner
-        && current["status"] == "open"
-        && date(current, "expires_at").is_some_and(|d| d > Utc::now())
-        && current["products"].as_array().is_some_and(|p| p.len() == 1)
-        && current["product_id"] == plan.product_id
-}
-async fn verified_checkout(state: &State, mut checkout: Value, plan: &Plan) -> Result<Value> {
-    if !plan.allow_trial && checkout["allow_trial"] != false {
-        checkout = required(
-            request(
-                state,
-                Method::PATCH,
-                &format!(
-                    "/v1/checkouts/{}",
-                    utf8_percent_encode(field(&checkout, "id")?, NON_ALPHANUMERIC)
-                ),
-                Some(json!({"allow_trial":false})),
-            )
-            .await?,
-        )?;
-    }
-    Ok(json!({"url":field(&checkout,"url")?}))
 }
 pub async fn handle(
     state: &State,
@@ -188,7 +275,7 @@ pub async fn handle(
     method: &str,
     body: Value,
 ) -> Result<Value> {
-    if state.config.polar_token.is_none() {
+    if state.config.autumn_key.is_none() {
         return Err(Error::new(
             503,
             "billing_unconfigured",
@@ -196,12 +283,8 @@ pub async fn handle(
         ));
     }
     if path.is_empty() && method == "GET" {
-        let exists: bool = sqlx::query_scalar(
-            "SELECT EXISTS(SELECT 1 FROM billing_customers WHERE owner_id=$1 AND deleted=false)",
-        )
-        .bind(&owner.id)
-        .fetch_one(&state.db)
-        .await?;
+        refresh_if_due(state, &owner.id).await?;
+        let exists:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM billing_customers WHERE owner_id=$1 AND provider='autumn' AND deleted=false)").bind(&owner.id).fetch_one(&state.db).await?;
         return Ok(json!({"hasCustomer":exists}));
     }
     if method != "POST" {
@@ -213,7 +296,7 @@ pub async fn handle(
         if path == "sync" {
             return usage::usage(&mut conn, &owner.id, Utc::now()).await;
         }
-        if customer.is_none_or(|c| !c["deleted_at"].is_null()) {
+        if customer.is_none() {
             return Err(Error::new(
                 404,
                 "no_billing_customer",
@@ -226,105 +309,58 @@ pub async fn handle(
         return Err(Error::new(404, "not_found", "Endpoint not found."));
     }
     let plan = select(body)?;
+    let checkout_options =
+        json!({"locale":plan.locale,"currency":plan.currency,"managed_payments":{"enabled":true}});
     let mut tx = state.db.begin().await?;
     sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
         .bind(&owner.id)
         .fetch_one(&mut *tx)
         .await?;
     let customer = sync(state, &mut tx, &owner.id).await?;
-    if customer.as_ref().is_some_and(|c| {
-        c["active_subscriptions"]
+    let has_active = customer.as_ref().is_some_and(|c| {
+        c["subscriptions"]
             .as_array()
-            .is_some_and(|s| !s.is_empty())
+            .is_some_and(|rows| rows.iter().any(|r| r["status"] == "active"))
+    });
+    if customer.as_ref().is_some_and(|c| {
+        c["subscriptions"].as_array().is_some_and(|rows| {
+            rows.iter()
+                .any(|r| r["status"] == "active" && r["plan_id"] == plan.product_id)
+        })
     }) {
-        let result = portal(state, &owner.id).await?;
         tx.commit().await?;
-        return Ok(result);
+        return portal(state, &owner.id).await;
     }
-    let saved: Option<String> =
-        sqlx::query_scalar("SELECT checkout_id FROM billing_checkouts WHERE owner_id=$1")
-            .bind(&owner.id)
-            .fetch_optional(&mut *tx)
-            .await?;
-    if let Some(id) = saved
-        && let Some(current) = request(
-            state,
-            Method::GET,
-            &format!(
-                "/v1/checkouts/{}",
-                utf8_percent_encode(&id, NON_ALPHANUMERIC)
-            ),
-            None,
-        )
-        .await?
-        && current["organization_id"] == ORGANIZATION_ID
-        && current["external_customer_id"] == owner.id
-    {
-        if ["confirmed", "succeeded"].contains(&current["status"].as_str().unwrap_or(""))
-            && date(&current, "created_at").is_some_and(|d| (Utc::now() - d).num_seconds() < 300)
-        {
-            return Err(Error::new(
-                409,
-                "billing_pending",
-                "Your checkout is being activated. Return to Usage and refresh shortly.",
-            ));
-        }
-        if valid_open(&current, &owner.id, &plan) {
-            let result = verified_checkout(state, current, &plan).await?;
+    if !has_active {
+        let cached: Option<String> = sqlx::query_scalar("SELECT checkout_url FROM billing_checkouts WHERE owner_id=$1 AND provider='autumn' AND plan_id=$2 AND checkout_url IS NOT NULL AND created_at>now()-interval '10 minutes' AND checkout_options=$3")
+            .bind(&owner.id).bind(&plan.product_id).bind(&checkout_options).fetch_optional(&mut *tx).await?;
+        if let Some(url) = cached {
             tx.commit().await?;
-            return Ok(result);
+            return Ok(json!({"url":url}));
         }
     }
-    let recovered=required(request(state,Method::GET,&format!("/v1/checkouts/?external_customer_id={}&organization_id={ORGANIZATION_ID}&status=open&limit=100",utf8_percent_encode(&owner.id,NON_ALPHANUMERIC)),None).await?)?;
-    if let Some(open) = recovered["items"]
-        .as_array()
-        .and_then(|items| items.iter().find(|c| valid_open(c, &owner.id, &plan)))
-    {
-        sqlx::query("INSERT INTO billing_checkouts(owner_id,checkout_id) VALUES($1,$2) ON CONFLICT(owner_id) DO UPDATE SET checkout_id=excluded.checkout_id").bind(&owner.id).bind(field(open,"id")?).execute(&mut *tx).await?;
-        let result = verified_checkout(state, open.clone(), &plan).await?;
-        tx.commit().await?;
-        return Ok(result);
-    }
-    let product = required(
-        request(
-            state,
-            Method::GET,
-            &format!("/v1/products/{}", plan.product_id),
-            None,
-        )
-        .await?,
-    )?;
-    if product["organization_id"] != ORGANIZATION_ID
-        || product["is_archived"] != false
-        || product["visibility"] == "draft"
-    {
-        return Err(Error::new(
-            409,
-            "plan_unavailable",
-            "This plan is not available yet.",
-        ));
-    }
-    let customer = match customer {
-        Some(c) => c,
-        None => required(
+    if customer.is_none() {
+        required(
             request(
                 state,
                 Method::POST,
-                "/v1/customers/",
-                Some(json!({"external_id":owner.id,"email":owner.email,"name":owner.name})),
+                "/v1/customers.get_or_create",
+                Some(json!({"customer_id":owner.id,"email":owner.email,"name":owner.name})),
             )
             .await?,
-        )?,
-    };
+        )?;
+    }
+    // Always require a hosted confirmation, including upgrades with a saved card.
     let app = state.config.app_url.as_str().trim_end_matches('/');
-    let checkout=required(request(state,Method::POST,"/v1/checkouts/",Some(json!({"products":[plan.product_id],"allow_trial":plan.allow_trial,"customer_id":field(&customer,"id")?,"external_customer_id":owner.id,"customer_email":owner.email,"customer_name":owner.name,"success_url":format!("{app}/usage?checkout_id={{CHECKOUT_ID}}"),"return_url":format!("{app}/usage"),"locale":plan.locale}))).await?)?;
-    sqlx::query("INSERT INTO billing_checkouts(owner_id,checkout_id) VALUES($1,$2) ON CONFLICT(owner_id) DO UPDATE SET checkout_id=excluded.checkout_id").bind(&owner.id).bind(field(&checkout,"id")?).execute(&mut *tx).await?;
-    let result = json!({"url":field(&checkout,"url")?});
+    let response=required(request(state,Method::POST,"/v1/billing.attach",Some(json!({"customer_id":owner.id,"plan_id":plan.product_id,"currency":plan.currency,"redirect_mode":"always","success_url":format!("{app}/usage?checkout_id=autumn"),"checkout_session_params":checkout_options}))).await?)?;
+    let url = field(&response, "payment_url")?;
+    sqlx::query("INSERT INTO billing_checkouts(owner_id,checkout_id,provider,plan_id,checkout_url,created_at,checkout_options) VALUES($1,$2,'autumn',$3,$4,now(),$5) ON CONFLICT(owner_id) DO UPDATE SET checkout_id=excluded.checkout_id,provider=excluded.provider,plan_id=excluded.plan_id,checkout_url=excluded.checkout_url,created_at=excluded.created_at,checkout_options=excluded.checkout_options")
+        .bind(&owner.id).bind(uuid::Uuid::new_v4().to_string()).bind(&plan.product_id).bind(url).bind(&checkout_options).execute(&mut *tx).await?;
     tx.commit().await?;
-    Ok(result)
+    Ok(json!({"url":url}))
 }
 pub async fn ensure_deletable(state: &State, owner: &str) -> Result<()> {
-    if state.config.polar_token.is_none() {
+    if state.config.autumn_key.is_none() {
         return Ok(());
     }
     let mut conn = state.db.acquire().await?;
@@ -332,9 +368,10 @@ pub async fn ensure_deletable(state: &State, owner: &str) -> Result<()> {
         .await?
         .as_ref()
         .is_some_and(|s| {
-            s["active_subscriptions"]
-                .as_array()
-                .is_some_and(|a| a.iter().any(|s| s["cancel_at_period_end"] != true))
+            s["subscriptions"].as_array().is_some_and(|a| {
+                a.iter()
+                    .any(|s| s["status"] == "active" && s["canceled_at"].is_null())
+            })
         })
     {
         return Err(Error::new(
@@ -344,4 +381,47 @@ pub async fn ensure_deletable(state: &State, owner: &str) -> Result<()> {
         ));
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn only_current_account_entitlements_grant_access() {
+        let now = Utc::now();
+        let customer = json!({
+            "flags":{"analytics":{"feature_id":"analytics"}},
+            "subscriptions":[{"id":"sub","plan_id":"basic","status":"active",
+                "current_period_start":now.timestamp_millis(),
+                "current_period_end":(now+chrono::Duration::days(30)).timestamp_millis(),
+                "trial_ends_at":(now+chrono::Duration::days(14)).timestamp_millis()}]
+        });
+        assert_eq!(subscriptions(&customer).unwrap()[0]["status"], "trialing");
+        for (field, value) in [
+            ("status", json!("scheduled")),
+            ("past_due", json!(true)),
+            ("scope", json!("entity")),
+            ("current_period_end", Value::Null),
+        ] {
+            let mut revoked = customer.clone();
+            revoked["subscriptions"][0][field] = value;
+            assert_eq!(subscriptions(&revoked).unwrap(), json!([]));
+        }
+        let mut expires = customer.clone();
+        expires["flags"]["analytics"]["expires_at"] =
+            json!((now - chrono::Duration::seconds(1)).timestamp_millis());
+        assert_eq!(subscriptions(&expires).unwrap(), json!([]));
+        let future = now + chrono::Duration::hours(1);
+        expires["flags"]["analytics"]["expires_at"] = json!(future.timestamp_millis());
+        let normalized: Subscription =
+            serde_json::from_value(subscriptions(&expires).unwrap()[0].clone()).unwrap();
+        assert_eq!(
+            normalized.ends_at.unwrap().timestamp_millis(),
+            future.timestamp_millis()
+        );
+        let mut revoked = customer;
+        revoked["flags"] = json!({});
+        assert_eq!(subscriptions(&revoked).unwrap(), json!([]));
+    }
 }

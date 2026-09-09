@@ -6,7 +6,7 @@
     script?.hasAttribute('data-debug') ||
     ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const log = (message) => {
-    if (debug) console.info(`[Analytics Beer] ${message}`);
+    if (debug) console.info(`[Datix] ${message}`);
   };
   if (!siteId) {
     log('Missing data-site on the tracking script. No events will be sent.');
@@ -231,7 +231,7 @@
       if (cookieless && kind === 'pageview') {
         const previous = pageviews.get(path);
         if (previous !== undefined && now >= previous && now - previous < throttleMs) {
-          console.info('[Analytics Beer] Pageview ignored - throttled (same URL within 1 minute)');
+          console.info('[Datix] Pageview ignored - throttled (same URL within 1 minute)');
           return;
         }
         pageviews.set(path, now);

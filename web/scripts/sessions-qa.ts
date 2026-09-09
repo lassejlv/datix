@@ -8,7 +8,7 @@ const anonymous = process.argv.includes('--cookieless');
 const localMode = process.argv.includes('--local-storage');
 const mode = anonymous ? 'cookieless' : localMode ? 'local' : 'sessions';
 const prod = process.argv.includes('--production'),
-  base = prod ? 'https://analytics.beer' : (process.env.QA_BASE_URL ?? 'http://localhost:3000');
+  base = prod ? 'https://usedatix.com' : (process.env.QA_BASE_URL ?? 'http://localhost:3000');
 const connectionString = process.env[prod ? 'PRODUCTION_DATABASE_URL' : 'DATABASE_URL']!;
 if (prod && new URL(connectionString).hostname !== process.env.PRODUCTION_DATABASE_HOST)
   throw Error('Wrong production database');

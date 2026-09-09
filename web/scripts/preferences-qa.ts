@@ -12,6 +12,7 @@ try {
     reducedMotion: 'reduce',
   });
   await context.route('https://analytics.beer/tracker.js', (route) => route.fulfill({ body: '' }));
+  await context.route('https://usedatix.com/tracker.js', (route) => route.fulfill({ body: '' }));
   const page = await context.newPage();
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {

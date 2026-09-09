@@ -1,6 +1,6 @@
-# Analytics Beer
+# Datix
 
-Website analytics at [analytics.beer](https://analytics.beer). Cookieless by default.
+Website analytics at [usedatix.com](https://usedatix.com). Cookieless by default. Existing tracker snippets on [analytics.beer](https://analytics.beer) keep working.
 
 Create an account, add a site, paste the script, and wait for the first pageview. The dashboard covers pageviews, daily visitors, custom events, and breakdowns by page, referrer, country, and device.
 
@@ -11,7 +11,7 @@ Rust/Axum API, React + TanStack Router frontend, Neon Postgres, Redis Streams. P
 ```
 web/      frontend, tracker, tests
 crates/   core, services, Axum server
-config/   OpenAPI contract and Polar catalog
+config/   OpenAPI contract and Autumn catalog
 docs/     API, deployment, schema
 ```
 
@@ -41,7 +41,7 @@ Database integration tests and browser QA are documented in [AGENTS.md](AGENTS.m
 ## Tracker
 
 ```html
-<script defer src="https://analytics.beer/tracker.js" data-site="YOUR-SITE-UUID"></script>
+<script defer src="https://usedatix.com/tracker.js" data-site="YOUR-SITE-UUID"></script>
 ```
 
 ```js
@@ -54,5 +54,5 @@ The tracker respects Do Not Track, sets no cookies in the default mode, and igno
 
 - [API](docs/api.md)
 - [Deployment](docs/deployment.md)
-- [Billing](docs/polar.md)
+- [Billing](docs/autumn.md)
 - [Agent notes](AGENTS.md)

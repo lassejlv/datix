@@ -1,6 +1,11 @@
 import type { Copy } from './en';
-
 export const da = {
+  'Your website allowance has been reached.': 'Din grænse for websites er nået.',
+  'All prices in {currency}.': 'Alle priser i {currency}.',
+  '{price} per {interval}': '{price} pr. {interval}',
+  '{events} events · {price}/year': '{events} hændelser · {price}/år',
+  '{events} events · {price}/month': '{events} hændelser · {price}/måned',
+
   Tracking: 'Sporing',
   Environment: 'Miljø',
   Website: 'Website',
@@ -33,8 +38,6 @@ export const da = {
     '14 dage gratis med Pro 100k. Vælg dit antal hændelser.',
   '14 days free, then': '14 dage gratis, derefter',
   '14 days free. Pick your event volume.': '14 dage gratis. Vælg dit antal hændelser.',
-  '14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.':
-    '14 dages prøveperiode på Pro 100k, derefter $9/måned. Bekræft betalingsoplysninger i Polar.',
   '7 days free': '7 dage gratis',
   '7 days free, then': '7 dage gratis, derefter',
   '7 days on Starter': '7 dage på Starter',
@@ -83,7 +86,7 @@ export const da = {
   'Account menu': 'Kontomenu',
   'Account settings': 'Kontoindstillinger',
   'Across all your websites and environments.': 'På tværs af alle dine websites og miljøer.',
-  'Activate Pro to start collecting.': 'Aktivér Pro for at starte indsamlingen.',
+  'Activate a plan to start collecting.': 'Aktivér et abonnement for at starte indsamlingen.',
   active: 'aktiv',
   Active: 'Aktiv',
   'Activity events': 'Aktivitetshændelser',
@@ -123,8 +126,8 @@ export const da = {
   'An active Pro plan is required': 'En aktiv Pro-plan er påkrævet',
   'An active Pro subscription or Pro trial is required to collect events. Your existing reports remain available.':
     'Et aktivt Pro-abonnement eller en Pro-prøveperiode er påkrævet for at indsamle hændelser. Dine eksisterende rapporter er stadig tilgængelige.',
-  'An actual Analytics Beer dashboard, shown with example traffic.':
-    'Et rigtigt Analytics Beer-dashboard med eksempeltrafik.',
+  'An actual Datix dashboard, shown with example traffic.':
+    'Et rigtigt Datix-dashboard med eksempeltrafik.',
   'An environment supports up to 50 imports. Remove an earlier import before adding another.':
     'Et miljø understøtter op til 50 importer. Fjern en tidligere import, før du tilføjer en ny.',
   'An import can contain only one daily total per date.':
@@ -141,12 +144,12 @@ export const da = {
     'En importeret henvisning er ikke et gyldigt værtsnavn eller en gyldig URL.',
   'An imported report label exceeds 2048 bytes.':
     'Et importeret rapportnavn overstiger 2048 bytes.',
-  'Analytics Beer dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
-    'Analytics Beer-dashboard med eksempler på sidevisninger, daglige besøgende, et trafikdiagram og rapporter om sider og henvisninger.',
-  'Analytics Beer home': 'Analytics Beer forside',
   'Analytics export file': 'Eksportfil med analysedata',
   'Analytics mode': 'Analysetilstand',
   'Analytics provider': 'Analyseleverandør',
+  'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
+    'Datix-dashboard med eksempler på sidevisninger, daglige besøgende, et trafikdiagram og rapporter om sider og henvisninger.',
+  'Datix home': 'Datix forside',
   'and get back to building.': 'og kom tilbage til at bygge.',
   'Animation unavailable. The illustration is still here.':
     'Animationen er ikke tilgængelig. Illustrationen er her stadig.',
@@ -243,10 +246,6 @@ export const da = {
   'Confirm that the Google Analytics export contains only web traffic. Views can also include app screens.':
     'Bekræft, at eksporten fra Google Analytics kun indeholder webtrafik. Views kan også omfatte appskærme.',
   'Confirm your password': 'Bekræft din adgangskode',
-  'Confirm your plan and payment details in Polar. This plan starts with paid billing and has no free trial.':
-    'Bekræft din plan og dine betalingsoplysninger i Polar. Denne plan er betalt fra starten og har ingen gratis prøveperiode.',
-  'Confirm your plan and payment details in Polar. Your trial starts only after checkout is completed.':
-    'Bekræft din plan og dine betalingsoplysninger i Polar. Din prøveperiode starter først, når checkout er gennemført.',
   'Connect {domain} to {environment}.': 'Forbind {domain} med {environment}.',
   'Connect your banner before using this mode. Tracking starts only after analytics consent and must stop when consent is withdrawn. Explain the data collected in your cookie and privacy notices.':
     'Tilslut dit banner, før du bruger denne tilstand. Sporing starter først efter samtykke til analyse og skal stoppe, når samtykket trækkes tilbage. Forklar de indsamlede data i dine cookie- og privatlivstekster.',
@@ -310,8 +309,8 @@ export const da = {
   'Daily visitor counts are added across days; they are not unique people across the full period.':
     'Daglige besøgstal lægges sammen på tværs af dage; de er ikke unikke personer for hele perioden.',
   'Daily visitors': 'Daglige besøgende',
-  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.':
-    'Daglige besøgende følger den enkelte leverandørs definition og lægges sammen på tværs af dage. Hændelser og opdelinger omfatter kun det, der er målt her eller findes i eksporten; GA4-importer indeholder daglige sidevisninger og samlede brugertal. Besøgsforløb indeholder kun besøg målt af Analytics Beer.',
+  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Datix.':
+    'Daglige besøgende følger den enkelte leverandørs definition og lægges sammen på tværs af dage. Hændelser og opdelinger omfatter kun det, der er målt her eller findes i eksporten; GA4-importer indeholder daglige sidevisninger og samlede brugertal. Besøgsforløb indeholder kun besøg målt af Datix.',
   'Daily visits': 'Daglige besøg',
   Dark: 'Mørkt',
   'Date range': 'Datoperiode',
@@ -462,8 +461,8 @@ export const da = {
     'Importerede henvisninger blev reduceret til værtsnavne; URL-stier, forespørgselsparametre og fragmenter blev fjernet.',
   'Imported totals exceed the supported count limit.':
     'De importerede totaler overstiger den understøttede grænse.',
-  'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.':
-    'Importerede totaler beholder leverandørens kalenderdatoer og tidszone. Analytics Beer bruger UTC til sporing.',
+  'Imported totals retain their provider’s calendar dates and timezone. Datix tracking uses UTC.':
+    'Importerede totaler beholder leverandørens kalenderdatoer og tidszone. Datix bruger UTC til sporing.',
   Imports: 'Importer',
   'In your GA4 property, open {section} and choose your dates.':
     'Åbn {section} i din GA4-ejendom, og vælg dine datoer.',
@@ -523,7 +522,7 @@ export const da = {
   'Little Squirrel': 'Lille Egern',
   'Little Turtle': 'Lille Skildpadde',
   'Live analytics starts on {day} UTC. Export source days that end before that boundary; the source timezone may require excluding the preceding calendar day.':
-    'Måling i Analytics Beer starter {day} UTC. Eksportér kildedage, der slutter før denne grænse; kildens tidszone kan kræve, at den foregående kalenderdag også udelades.',
+    'Måling i Datix starter {day} UTC. Eksportér kildedage, der slutter før denne grænse; kildens tidszone kan kræve, at den foregående kalenderdag også udelades.',
   'Load more activity': 'Indlæs mere aktivitet',
   'Load more visits': 'Indlæs flere besøg',
   Loading: 'Indlæser',
@@ -564,7 +563,7 @@ export const da = {
   'New pageviews and events are being accepted for {environment}.':
     'Nye sidevisninger og hændelser modtages for {environment}.',
   'New password': 'Ny adgangskode',
-  'New to Analytics Beer?': 'Ny hos Analytics Beer?',
+  'New to Datix?': 'Ny hos Datix?',
   'No active plan': 'Ingen aktiv plan',
   'No activity in this period': 'Ingen aktivitet i denne periode',
   'No card needed': 'Intet kort nødvendigt',
@@ -583,8 +582,6 @@ export const da = {
     'Ingen sidevisning endnu. Besøg dit website, vent et par sekunder, og kontrollér igen.',
   'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
     'Du behøver ingen betalingsoplysninger for at oprette en konto. En forhåndsvisning starter hverken et abonnement eller en prøveperiode, og du bliver ikke opkrævet noget.',
-  'No payment details are needed to create an account. Starting Pro requires completing checkout in Polar, where you confirm payment details and the price after your trial.':
-    'Du behøver ingen betalingsoplysninger for at oprette en konto. For at starte Pro skal du gennemføre checkout i Polar og bekræfte betalingsoplysninger og prisen efter prøveperioden.',
   'No report to display.': 'Ingen rapport at vise.',
   'No time limit': 'Ingen tidsgrænse',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -658,14 +655,14 @@ export const da = {
   'Prices in USD. Paid plans and trials are coming soon. Events include pageviews and tracked activity.':
     'Priser i USD. Betalte planer og prøveperioder kommer snart. Hændelser omfatter sidevisninger og registreret aktivitet.',
   Pricing: 'Priser',
-  'Pro · Trial': 'Pro · Prøveperiode',
+  '{plan} · Trial': '{plan} · Prøveperiode',
   'Pro 100k includes a 14-day free trial. Larger plans have no free trial. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro 100k inkluderer 14 dage gratis. Større planer har ingen gratis prøveperiode. Der er ingen permanent gratis plan. Månedlig betaling er tilgængelig; årlig betaling kommer snart.',
   'Pro includes a 14-day free trial for eligible new subscribers, then the price for your selected event volume. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro giver nye berettigede abonnenter 14 dage gratis. Derefter gælder prisen for dit antal hændelser. Der er ingen permanent gratis plan. Månedlig betaling er tilgængelig; årlig betaling kommer snart.',
   'Pro includes a 14-day free trial, then the price for your selected event volume. There is no permanent free plan. These are planned offers; paid subscriptions and trial activation are not available yet.':
     'Pro inkluderer en gratis prøveperiode på 14 dage. Derefter gælder prisen for dit valgte antal hændelser. Der er ingen permanent gratis plan. Dette er planlagte tilbud; betalte abonnementer og aktivering af prøveperioder er endnu ikke tilgængelige.',
-  'Pro required': 'Pro påkrævet',
+  'Subscription required': 'Abonnement påkrævet',
   'Pro supports up to 10 websites.': 'Pro understøtter op til 10 websites.',
   'Production pageviews use 1 credit; clicks and other events use 0.5. On localhost, these rates are 0.3 and 0.15 credits. Engagement time and duplicate deliveries are free.':
     'Sidevisninger i produktion bruger 1 kredit; klik og andre hændelser bruger 0,5. På localhost er satserne 0,3 og 0,15 kreditter. Engagementstid og dubletter er gratis.',
@@ -834,8 +831,8 @@ export const da = {
   'This page could not be found. Head back to the homepage.':
     'Siden blev ikke fundet. Gå tilbage til forsiden.',
   'This plan is not available yet.': 'Denne plan er ikke tilgængelig endnu.',
-  'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.':
-    'Dette fjerner de importerede totaler og opdelinger fra dine rapporter. Dine sporingsdata i Analytics Beer ændres ikke. Du kan uploade eksporten igen senere.',
+  'This removes the imported totals and breakdowns from your reports. Your Datix tracking data stays unchanged. You can upload the export again later.':
+    'Dette fjerner de importerede totaler og opdelinger fra dine rapporter. Dine sporingsdata i Datix ændres ikke. Du kan uploade eksporten igen senere.',
   'This request could not be completed. Please try again.':
     'Anmodningen kunne ikke gennemføres. Prøv igen.',
   'This script sends traffic only to {environment} for {domain}.':
@@ -944,8 +941,6 @@ export const da = {
   Visitors: 'Besøgende',
   Visits: 'Besøg',
   'Visits by {visitor}': 'Besøg fra {visitor}',
-  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
-    'Venter på, at Polar bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
   'Want to track a specific action?': 'Vil du måle en bestemt handling?',
   'We’ll check it’s working.': 'Vi tjekker, at det virker.',
   'Website analytics': 'Websiteanalyse',
@@ -979,8 +974,8 @@ export const da = {
     'Ja. Registrer brugerdefinerede hændelser som tilmeldinger og downloads. Adskil produktions-, staging- og testtrafik med miljøer.',
   'You already added this domain.': 'Du har allerede tilføjet dette domæne.',
   'You’re connected': 'Du er forbundet',
-  'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.':
-    'Du kører Analytics Beer lokalt. Brug en offentlig adresse i scriptet, når du forbinder et offentligt website.',
+  'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
+    'Du kører Datix lokalt. Brug en offentlig adresse i scriptet, når du forbinder et offentligt website.',
   'Your account is separate': 'Din konto er adskilt',
   'Your best pages. Your busiest days. Where people find you.':
     'Dine bedste sider. Dine travleste dage. Hvor folk finder dig.',
@@ -1000,4 +995,25 @@ export const da = {
   'ZIP links and special files are not supported.':
     'Links og specialfiler i ZIP understøttes ikke.',
   'ZIP or CSV · up to 10 MB': 'ZIP eller CSV · op til 10 MB',
+  'Three plans. All your analytics. Start with 14 days free on Basic.':
+    'Tre planer. Al din analyse. Start med 14 dage gratis på Basic.',
+  'Choose {plan}': 'Vælg {plan}',
+  'Choose plan': 'Vælg plan',
+  '${price} per {interval}': '${price} pr. {interval}',
+  '{events} events · ${price}/year': '{events} hændelser · ${price}/år',
+  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
+    'Basic inkluderer 14 dages prøveperiode. Bekræft pris og betalingsoplysninger ved checkout.',
+  'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
+    'Bekræft din plan og betalingsoplysninger ved checkout. Din prøveperiode starter først, når checkout er gennemført.',
+  'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
+    'Bekræft din plan og betalingsoplysninger ved checkout. Denne plan er betalt fra starten og har ingen gratis prøveperiode.',
+  'An active plan is required': 'En aktiv plan er påkrævet',
+  'An active subscription or trial is required to collect events. Your existing reports remain available.':
+    'Et aktivt abonnement eller en prøveperiode er påkrævet for at indsamle hændelser. Dine eksisterende rapporter er stadig tilgængelige.',
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
+    'Basic inkluderer 14 dage gratis. Pro og Ultra har ingen gratis prøveperiode. Vælg månedlig eller årlig betaling.',
+  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
+    'Du behøver ingen betalingsoplysninger for at oprette en konto. For at starte en plan skal du gennemføre checkout og bekræfte betalingsoplysninger og pris.',
+  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
+    'Venter på, at Autumn bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
 } satisfies Record<Copy, string>;

@@ -3,19 +3,14 @@ import { useEffect, useState } from 'react';
 import { apiClient, errorText } from '../lib/client';
 import { Button } from './ui/button';
 
-export const billingVolumes = [
-  { events: 100_000, price: 9 },
-  { events: 250_000, price: 19 },
-  { events: 500_000, price: 29 },
-  { events: 1_000_000, price: 49 },
-  { events: 2_000_000, price: 79 },
-  { events: 5_000_000, price: 149 },
-] as const;
+import { billingPlans, billingPrice } from '../lib/billing-plans';
+export const billingVolumes = billingPlans;
 
 export function BillingActions({ active, refresh }: { active: boolean; refresh: () => void }) {
   const { locale, number, message: messageText, t } = useSitePreferences();
   const [hasCustomer, setHasCustomer] = useState(false);
   const [events, setEvents] = useState<number>(100000);
+  const [interval, setInterval] = useState('month');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [returned, setReturned] = useState(false);
@@ -28,7 +23,9 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       // Browser storage is unavailable during SSR; apply the saved selection after hydration.
       // oxlint-disable-next-line react/set-state-in-effect
       if (billingVolumes.some((p) => p.events === pending)) setEvents(pending);
+      if (sessionStorage.getItem('ab-checkout-interval') === 'year') setInterval('year');
       sessionStorage.removeItem('ab-checkout-events');
+      sessionStorage.removeItem('ab-checkout-interval');
     } catch {
       /* Checkout selection is optional when storage is blocked. */
     }
@@ -46,9 +43,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     try {
       const result = await apiClient<{ url?: string }>(path, {
         method: 'POST',
-        body: JSON.stringify(
-          path.endsWith('checkout') ? { events, interval: 'month', locale } : {},
-        ),
+        body: JSON.stringify(path.endsWith('checkout') ? { events, interval, locale } : {}),
       });
       if (result.url) window.location.assign(result.url);
       else {
@@ -65,7 +60,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       {returned && !active && (
         <p role="status" className="text-sm text-secondary-ink">
           {t(
-            'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
+            'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.',
           )}
         </p>
       )}
@@ -84,15 +79,31 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
             >
               {billingVolumes.map((p) => (
                 <option key={p.events} value={p.events}>
-                  {t('{events} events · ${price}/month', {
-                    events: number(p.events),
-                    price: number(p.price),
-                  })}
+                  {p.name} ·{' '}
+                  {t(
+                    interval === 'year'
+                      ? '{events} events · {price}/year'
+                      : '{events} events · {price}/month',
+                    {
+                      events: number(p.events),
+                      price: billingPrice(p, locale, interval === 'year'),
+                    },
+                  )}
                 </option>
               ))}
             </select>
+            <select
+              aria-label={t('Billing period')}
+              value={interval}
+              disabled={busy}
+              onChange={(e) => setInterval(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+            >
+              <option value="month">{t('Monthly')}</option>
+              <option value="year">{t('Yearly')}</option>
+            </select>
             <Button disabled={busy} onClick={() => void act('/billing/checkout')}>
-              {busy ? t('Opening…') : t('Start Pro')}
+              {busy ? t('Opening…') : t('Choose plan')}
             </Button>
           </>
         )}
@@ -112,7 +123,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       {!active && (
         <p className="text-xs text-secondary-ink">
           {events === 100000
-            ? t('14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.')
+            ? t('Basic includes a 14-day trial. Confirm the price and payment details at checkout.')
             : t('Paid subscription from the start. This plan has no free trial.')}
         </p>
       )}

@@ -9,7 +9,7 @@ import * as schema from './legacy-auth-schema';
 
 export function createAuth(db: Database, env: { APP_URL: string; BETTER_AUTH_SECRET: string }) {
   return betterAuth({
-    appName: 'Analytics Beer',
+    appName: 'Datix',
     baseURL: env.APP_URL,
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [env.APP_URL],

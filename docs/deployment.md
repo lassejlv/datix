@@ -1,6 +1,6 @@
 # Deployment and operations
 
-Analytics Beer runs in the [Analytics Beer Railway project](https://railway.com/project/ff5d734f-2a11-4fec-a74d-d2793515f557), production environment. The web service runs `/usr/local/bin/analytics-server`, an Axum application with SQLx and Redis Streams. It serves the static React/TanStack Router frontend with SERVICE_ROLE=api. A separate private worker service runs ingestion, billing and retention. See [Scaling and operations](scaling.md) for connection budgets, schema upgrades, metrics and current rollback instructions.
+Datix runs in the [production Railway project](https://railway.com/project/ff5d734f-2a11-4fec-a74d-d2793515f557), production environment. The web service runs `/usr/local/bin/analytics-server`, an Axum application with SQLx and Redis Streams. It serves the static React/TanStack Router frontend with SERVICE_ROLE=api. A separate private worker service runs ingestion, billing and retention. See [Scaling and operations](scaling.md) for connection budgets, schema upgrades, metrics and current rollback instructions.
 
 ## Build and runtime
 
@@ -8,15 +8,15 @@ Analytics Beer runs in the [Analytics Beer Railway project](https://railway.com/
 
 The server listens on `PORT` (3000 in production). `/health/ready` verifies PostgreSQL, Redis, and background task liveness. Startup validates the existing schema before listening; it never applies migrations. SIGTERM stops accepting HTTP requests, drains active requests and jobs, and closes the SQLx pool. Unacknowledged events remain in Redis for recovery.
 
-Cloudflare proxies `analytics.beer` to Railway. The diagnostic domain is [web-production-2465a.up.railway.app](https://web-production-2465a.up.railway.app). Authentication uses `APP_URL=https://analytics.beer`; use that domain for account flows. Existing Cloudflare DNS, Full TLS configuration and origin authentication remain in place.
+Cloudflare proxies `usedatix.com` and `analytics.beer` to Railway. Both Railway custom domains are active. Authentication uses `APP_URL=https://usedatix.com` and `APP_LEGACY_URL=https://analytics.beer` so account mutations work from either host. Keep `analytics.beer` serving `/tracker.js`, `/api/collect`, `/api/tracker-config` so existing snippets stay valid. Optionally 301 other `analytics.beer` paths to `usedatix.com`, preserving the query string. Copy the `x-analytics-origin-key` transform onto the `usedatix.com` zone; country is trusted only when that header matches `CLOUDFLARE_ORIGIN_SECRET`. The diagnostic domain is [web-production-2465a.up.railway.app](https://web-production-2465a.up.railway.app). Existing Cloudflare Full TLS configuration remains in place.
 
 ## Database and configuration
 
 The existing Neon production branch is retained: project `billowing-night-55335840`, branch `br-frosty-frost-b18zvthi`, database `analytics`, Frankfurt. SQLx uses the restricted `analytics_runtime` role, separate budgets of six API and eight worker connections, certificate/hostname-verified TLS and a 15-second statement timeout. The subsequent scaling release explicitly upgrades the existing database to schema version 3; startup verifies its checksums without running migrations.
 
-Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, and `VISITOR_HASH_SECRET`. Production also retains `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, and `CLOUDFLARE_ORIGIN_SECRET`. Preserve signing secrets to keep existing sessions and visitor hashes valid. Railway's private Redis URL stays unchanged. Keep credentials out of build arguments and source control.
+Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, and `VISITOR_HASH_SECRET`. Production also retains `APP_LEGACY_URL`, `AUTUMN_SECRET_KEY`, and `CLOUDFLARE_ORIGIN_SECRET`. Preserve signing secrets to keep existing sessions and visitor hashes valid. Railway's private Redis URL stays unchanged. Keep credentials out of build arguments and source control.
 
-`CLOUDFLARE_ORIGIN_SECRET` verifies the `x-analytics-origin-key` transform before trusting Cloudflare country metadata. Railway's resolved client IP is used only in the Railway runtime; direct requests cannot supply trusted country information. Optional variables are `STATIC_DIR` (default `web/dist/client`), `EVENT_STREAM` (default `analytics:events:v2`), `POLAR_API_URL` (for isolated provider tests), and `RUST_LOG`.
+`CLOUDFLARE_ORIGIN_SECRET` verifies the `x-analytics-origin-key` transform before trusting Cloudflare country metadata. Railway's resolved client IP is used only in the Railway runtime; direct requests cannot supply trusted country information. Optional variables are `STATIC_DIR` (default `web/dist/client`), `EVENT_STREAM` (default `analytics:events:v2`), `AUTUMN_API_URL` (for isolated provider tests), and `RUST_LOG`.
 
 ## Deploying
 
@@ -38,7 +38,7 @@ For a deliberate upload of the working tree, use `railway up` with the explicit 
 
 ## Schema and tests
 
-The live schema snapshot is `docs/database/schema.sql`; the corresponding SQLx baseline is `crates/core/migrations/0001_existing_schema.sql`. `analytics-db check` compares the deployed schema with the 133-column manifest and required default-environment trigger. `analytics-db init-empty` refuses populated databases and initializes only a new empty database. Never apply the baseline to an existing installation. Add future reviewed changes as versioned SQL migrations and apply them explicitly under an owner role.
+The live schema snapshot is `docs/database/schema.sql`; the corresponding SQLx baseline is `crates/core/migrations/0001_existing_schema.sql`. `analytics-db check` compares the deployed schema with the 142-column manifest and required default-environment trigger. `analytics-db init-empty` refuses populated databases and initializes only a new empty database. Never apply the baseline to an existing installation. Add future reviewed changes as versioned SQL migrations and apply them explicitly under an owner role.
 
 `cargo test --workspace` runs Rust unit tests. `cargo test -p analytics-server --test integration -- --ignored --test-threads=1` explicitly runs the ignored database/Redis tests against the isolated Neon branch, with `TEST_DATABASE_URL`, matching `TEST_DATABASE_HOST`, and `RUST_TEST_REDIS_URL` (default loopback port 6394). They test atomic credit limits, duplicate ingestion, concurrency, ownership, consent, reports, signed webhooks, provider retries and crash recovery. They remove their own records; the scaling retention test also removes expired rows in the isolated test branch. `bun web/scripts/rust-auth-compatibility.ts` verifies both directions against the frozen Better Auth test fixture. JavaScript backend tests were replaced by Rust tests; frontend/tracker tests remain in Bun.
 
@@ -46,7 +46,7 @@ The live schema snapshot is `docs/database/schema.sql`; the corresponding SQLx b
 
 The Rust consumer group `analytics-rust` reads `analytics:events:v2`. An event is acknowledged and deleted only after its PostgreSQL transaction commits. Four consumers reclaim deliveries abandoned for at least 60 seconds. After ten failed deliveries, the original payload moves atomically into `analytics:events:v2:failed`; malformed envelopes also remain there for inspection. No event ID is regenerated. Duplicate redelivery does not charge twice.
 
-Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Polar external IDs, drained every second under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
+Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Autumn idempotency keys, drained every second under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
 
 For the initial cutover, let Railway switch traffic to the healthy Rust deployment and stop the old application, then run inside that service:
 
@@ -75,3 +75,7 @@ The older Cloudflare deployment history is retained in [Cloudflare deployment hi
 The native release passed 12 Rust unit tests, 11 isolated Neon/Redis integration tests, 21 frontend tests, TypeScript, Cargo formatting, Clippy and scoped JavaScript lint. Existing React lint errors remain in unchanged components. Browser checks covered authentication, account deletion, routes, environments, reporting, keyboard/mobile behavior, cookieless activity and both consented tracking modes. Forward and rollback queue migration tests passed, as did initialization of a disposable empty database from the pulled SQLx baseline.
 
 Railway deployment `183d57ef-cc45-4b3b-a324-8c6cba59a946` was verified running Rust/Axum with the actual restricted runtime database role. The original Better Auth cookie and password remained usable after cutover. A real public browser tracker round trip increased the disposable account from one to two pageviews and from 0.45 to 0.9 credits. Desktop/mobile reports showed no browser errors. Both event streams and all unfinished legacy event queues were empty. The fixture account and saved credentials were removed. Local reports are under `web/artifacts/rust-production/`.
+
+## Autumn cutover
+
+Before deploying this release, apply schema upgrades 0005 through 0007 and configure the live Autumn catalog/key on API and worker. Local development uses the sandbox. Review existing Polar subscriptions and pending usage before cutover; they are retained but are not migrated or charged automatically. See [Autumn billing](autumn.md). Remove the former Polar webhook registration when its consumers have been transitioned.

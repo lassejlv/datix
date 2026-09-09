@@ -1238,3 +1238,33 @@
 .landing-nav-links a[aria-current='page']::after {
   transform: scaleX(1);
 }
+
+.pricing-three-plans {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+}
+.pricing-three-plans .pricing-card {
+  display: block;
+  padding-top: 24px;
+}
+.pricing-three-plans .pricing-configure {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.pricing-three-plans .pricing-feature-list {
+  gap: 12px;
+  color: var(--landing-secondary);
+  font-size: 14px;
+}
+.pricing-three-plans .pricing-card-pro .pricing-select {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+@media (max-width: 767px) {
+  .pricing-three-plans {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}

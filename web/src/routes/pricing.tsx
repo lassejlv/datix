@@ -5,11 +5,11 @@ import { PricingSection } from '../components/pricing-section';
 export const Route = createFileRoute('/pricing')({
   head: () => ({
     meta: [
-      { title: 'Pricing | Analytics Beer' },
+      { title: 'Pricing | Datix' },
       {
         name: 'description',
         content:
-          'Explore Analytics Beer Pro with a 14-day free trial. Above 5 million monthly events, contact sales for Enterprise.',
+          'Explore Datix Basic, Pro, and Ultra. Start Basic with a 14-day free trial, or contact sales above 5 million monthly events.',
       },
     ],
   }),

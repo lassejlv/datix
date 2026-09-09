@@ -1,6 +1,11 @@
 import type { Copy } from './en';
-
 export const de = {
+  'Your website allowance has been reached.': 'Dein Website-Limit wurde erreicht.',
+  'All prices in {currency}.': 'Alle Preise in {currency}.',
+  '{price} per {interval}': '{price} pro {interval}',
+  '{events} events · {price}/year': '{events} Ereignisse · {price}/Jahr',
+  '{events} events · {price}/month': '{events} Ereignisse · {price}/Monat',
+
   Tracking: 'Tracking',
   Environment: 'Umgebung',
   Website: 'Website',
@@ -33,8 +38,6 @@ export const de = {
     '14 Tage kostenlos mit Pro 100k. Wähle deine Ereignismenge.',
   '14 days free, then': '14 Tage kostenlos, danach',
   '14 days free. Pick your event volume.': '14 Tage kostenlos. Wähle deine Ereignismenge.',
-  '14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.':
-    '14 Tage Pro 100k testen, danach 9 $/Monat. Bestätige deine Zahlungsdaten bei Polar.',
   '7 days free': '7 Tage kostenlos',
   '7 days free, then': '7 Tage kostenlos, danach',
   '7 days on Starter': '7 Tage bei Starter',
@@ -83,7 +86,7 @@ export const de = {
   'Account menu': 'Kontomenü',
   'Account settings': 'Kontoeinstellungen',
   'Across all your websites and environments.': 'Über alle deine Websites und Umgebungen hinweg.',
-  'Activate Pro to start collecting.': 'Aktiviere Pro, um die Erfassung zu starten.',
+  'Activate a plan to start collecting.': 'Aktiviere ein Abonnement, um die Erfassung zu starten.',
   active: 'aktiv',
   Active: 'Aktiv',
   'Activity events': 'Aktivitätsereignisse',
@@ -122,8 +125,8 @@ export const de = {
   'An active Pro plan is required': 'Ein aktiver Pro-Tarif ist erforderlich',
   'An active Pro subscription or Pro trial is required to collect events. Your existing reports remain available.':
     'Für die Erfassung von Ereignissen ist ein aktives Pro-Abonnement oder eine Pro-Testphase erforderlich. Deine bisherigen Berichte bleiben verfügbar.',
-  'An actual Analytics Beer dashboard, shown with example traffic.':
-    'Ein echtes Analytics Beer Dashboard mit Beispieldaten.',
+  'An actual Datix dashboard, shown with example traffic.':
+    'Ein echtes Datix Dashboard mit Beispieldaten.',
   'An environment supports up to 50 imports. Remove an earlier import before adding another.':
     'Eine Umgebung unterstützt bis zu 50 Importe. Entferne einen früheren Import, bevor du einen weiteren hinzufügst.',
   'An import can contain only one daily total per date.':
@@ -141,12 +144,12 @@ export const de = {
     'Ein importierter Verweis ist kein gültiger Hostname und keine gültige URL.',
   'An imported report label exceeds 2048 bytes.':
     'Eine importierte Berichtsbezeichnung überschreitet 2048 Bytes.',
-  'Analytics Beer dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
-    'Analytics Beer Dashboard mit beispielhaften Seitenaufrufen, täglichen Besuchern, einem Zugriffsdiagramm sowie Seiten- und Verweisberichten.',
-  'Analytics Beer home': 'Analytics Beer Startseite',
   'Analytics export file': 'Analytics-Exportdatei',
   'Analytics mode': 'Analysemodus',
   'Analytics provider': 'Analytics-Anbieter',
+  'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.':
+    'Datix Dashboard mit beispielhaften Seitenaufrufen, täglichen Besuchern, einem Zugriffsdiagramm sowie Seiten- und Verweisberichten.',
+  'Datix home': 'Datix Startseite',
   'and get back to building.': 'und widme dich wieder deinen Ideen.',
   'Animation unavailable. The illustration is still here.':
     'Animation nicht verfügbar. Die Illustration bleibt sichtbar.',
@@ -243,10 +246,6 @@ export const de = {
   'Confirm that the Google Analytics export contains only web traffic. Views can also include app screens.':
     'Bestätige, dass der Google-Analytics-Export nur Webtraffic enthält. Views können auch App-Bildschirme umfassen.',
   'Confirm your password': 'Bestätige dein Passwort',
-  'Confirm your plan and payment details in Polar. This plan starts with paid billing and has no free trial.':
-    'Bestätige deinen Tarif und deine Zahlungsdaten bei Polar. Dieser Tarif ist von Anfang an kostenpflichtig und hat keine kostenlose Testphase.',
-  'Confirm your plan and payment details in Polar. Your trial starts only after checkout is completed.':
-    'Bestätige deinen Tarif und deine Zahlungsdaten bei Polar. Deine Testphase beginnt erst nach Abschluss des Checkouts.',
   'Connect {domain} to {environment}.': 'Verbinde {domain} mit {environment}.',
   'Connect your banner before using this mode. Tracking starts only after analytics consent and must stop when consent is withdrawn. Explain the data collected in your cookie and privacy notices.':
     'Verbinde dein Banner, bevor du diesen Modus verwendest. Tracking beginnt erst nach der Analyse-Einwilligung und muss bei deren Widerruf enden. Beschreibe die erfassten Daten in deinen Cookie- und Datenschutzhinweisen.',
@@ -310,8 +309,8 @@ export const de = {
   'Daily visitor counts are added across days; they are not unique people across the full period.':
     'Tägliche Besucherzahlen werden über die Tage addiert; sie sind keine eindeutigen Personen über den gesamten Zeitraum.',
   'Daily visitors': 'Tägliche Besucher',
-  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.':
-    'Tägliche Besucher folgen der Definition des jeweiligen Anbieters und werden über die Tage addiert. Ereignisse und Aufschlüsselungen enthalten nur hier erfasste oder im Export enthaltene Daten; GA4-Importe enthalten tägliche Seitenaufrufe und Gesamtnutzerzahlen. Besucherpfade enthalten nur von Analytics Beer erfasste Besuche.',
+  'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Datix.':
+    'Tägliche Besucher folgen der Definition des jeweiligen Anbieters und werden über die Tage addiert. Ereignisse und Aufschlüsselungen enthalten nur hier erfasste oder im Export enthaltene Daten; GA4-Importe enthalten tägliche Seitenaufrufe und Gesamtnutzerzahlen. Besucherpfade enthalten nur von Datix erfasste Besuche.',
   'Daily visits': 'Tägliche Besuche',
   Dark: 'Dunkel',
   'Date range': 'Zeitraum',
@@ -465,8 +464,8 @@ export const de = {
     'Importierte Verweise wurden auf Hostnamen reduziert; URL-Pfade, Abfrageparameter und Fragmente wurden entfernt.',
   'Imported totals exceed the supported count limit.':
     'Die importierten Summen überschreiten die unterstützte Obergrenze.',
-  'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.':
-    'Importierte Summen behalten die Kalenderdaten und Zeitzone ihres Anbieters. Analytics Beer verwendet UTC für die Erfassung.',
+  'Imported totals retain their provider’s calendar dates and timezone. Datix tracking uses UTC.':
+    'Importierte Summen behalten die Kalenderdaten und Zeitzone ihres Anbieters. Datix verwendet UTC für die Erfassung.',
   Imports: 'Importe',
   'In your GA4 property, open {section} and choose your dates.':
     'Öffne {section} in deiner GA4-Property und wähle deinen Zeitraum.',
@@ -526,7 +525,7 @@ export const de = {
   'Little Squirrel': 'Kleines Eichhörnchen',
   'Little Turtle': 'Kleine Schildkröte',
   'Live analytics starts on {day} UTC. Export source days that end before that boundary; the source timezone may require excluding the preceding calendar day.':
-    'Die Erfassung in Analytics Beer beginnt am {day} UTC. Exportiere Quelltage, die vor dieser Grenze enden; die Zeitzone der Quelle kann erfordern, auch den vorherigen Kalendertag auszuschließen.',
+    'Die Erfassung in Datix beginnt am {day} UTC. Exportiere Quelltage, die vor dieser Grenze enden; die Zeitzone der Quelle kann erfordern, auch den vorherigen Kalendertag auszuschließen.',
   'Load more activity': 'Weitere Aktivitäten laden',
   'Load more visits': 'Weitere Besuche laden',
   Loading: 'Wird geladen',
@@ -567,7 +566,7 @@ export const de = {
   'New pageviews and events are being accepted for {environment}.':
     'Neue Seitenaufrufe und Ereignisse werden für {environment} erfasst.',
   'New password': 'Neues Passwort',
-  'New to Analytics Beer?': 'Neu bei Analytics Beer?',
+  'New to Datix?': 'Neu bei Datix?',
   'No active plan': 'Kein aktiver Tarif',
   'No activity in this period': 'Keine Aktivitäten in diesem Zeitraum',
   'No card needed': 'Keine Kreditkarte nötig',
@@ -585,8 +584,6 @@ export const de = {
     'Noch kein Seitenaufruf. Besuche deine Website, warte einige Sekunden und prüfe erneut.',
   'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
     'Für ein Konto brauchst du keine Zahlungsdaten. Eine Tarifvorschau startet weder ein Abonnement noch eine Testphase. Es entstehen keine Kosten.',
-  'No payment details are needed to create an account. Starting Pro requires completing checkout in Polar, where you confirm payment details and the price after your trial.':
-    'Für ein Konto sind keine Zahlungsdaten nötig. Um Pro zu starten, bestätigst du im Polar-Checkout deine Zahlungsdaten und den Preis nach der Testphase.',
   'No report to display.': 'Kein Bericht zum Anzeigen.',
   'No time limit': 'Ohne Zeitlimit',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -660,14 +657,14 @@ export const de = {
   'Prices in USD. Paid plans and trials are coming soon. Events include pageviews and tracked activity.':
     'Preise in USD. Kostenpflichtige Tarife und Testphasen folgen bald. Ereignisse umfassen Seitenaufrufe und erfasste Aktivitäten.',
   Pricing: 'Preise',
-  'Pro · Trial': 'Pro · Testphase',
+  '{plan} · Trial': '{plan} · Testphase',
   'Pro 100k includes a 14-day free trial. Larger plans have no free trial. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro 100k bietet 14 Tage kostenlos. Größere Tarife haben keine kostenlose Testphase. Es gibt keinen dauerhaft kostenlosen Tarif. Monatliche Zahlung ist verfügbar; jährliche Zahlung folgt.',
   'Pro includes a 14-day free trial for eligible new subscribers, then the price for your selected event volume. There is no permanent free plan. Monthly billing is available now; yearly billing is coming soon.':
     'Pro bietet berechtigten Neukunden 14 Tage kostenlos. Danach gilt der Preis für dein Ereignisvolumen. Es gibt keinen dauerhaft kostenlosen Tarif. Monatliche Zahlung ist verfügbar; jährliche Zahlung folgt.',
   'Pro includes a 14-day free trial, then the price for your selected event volume. There is no permanent free plan. These are planned offers; paid subscriptions and trial activation are not available yet.':
     'Pro enthält eine 14-tägige kostenlose Testphase. Danach gilt der Preis für deine gewählte Ereignismenge. Es gibt keinen dauerhaft kostenlosen Tarif. Dies sind geplante Angebote; kostenpflichtige Abonnements und Testphasen sind noch nicht verfügbar.',
-  'Pro required': 'Pro erforderlich',
+  'Subscription required': 'Abonnement erforderlich',
   'Pro supports up to 10 websites.': 'Pro unterstützt bis zu 10 Websites.',
   'Production pageviews use 1 credit; clicks and other events use 0.5. On localhost, these rates are 0.3 and 0.15 credits. Engagement time and duplicate deliveries are free.':
     'Seitenaufrufe in Produktion verbrauchen 1 Credit, Klicks und andere Ereignisse 0,5. Auf localhost sind es 0,3 und 0,15 Credits. Interaktionszeit und doppelte Übermittlungen sind kostenlos.',
@@ -703,7 +700,7 @@ export const de = {
   'Review installation': 'Installation ansehen',
   'Review this export before importing it.': 'Prüfe diesen Export, bevor du ihn importierst.',
   'Review your import': 'Prüfe deinen Import',
-  'Save 2 months': '2 Monate sparen',
+  'Save 2 months': 'Spare 2 Monate',
   'Save 2 months with yearly billing.': 'Bei jährlicher Zahlung 2 Monate sparen.',
   'Save budget': 'Budget speichern',
   'Save changes': 'Änderungen speichern',
@@ -839,8 +836,8 @@ export const de = {
   'This page could not be found. Head back to the homepage.':
     'Diese Seite wurde nicht gefunden. Gehe zurück zur Startseite.',
   'This plan is not available yet.': 'Dieser Tarif ist noch nicht verfügbar.',
-  'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.':
-    'Dadurch werden die importierten Summen und Aufschlüsselungen aus deinen Berichten entfernt. Deine Tracking-Daten in Analytics Beer bleiben unverändert. Du kannst den Export später erneut hochladen.',
+  'This removes the imported totals and breakdowns from your reports. Your Datix tracking data stays unchanged. You can upload the export again later.':
+    'Dadurch werden die importierten Summen und Aufschlüsselungen aus deinen Berichten entfernt. Deine Tracking-Daten in Datix bleiben unverändert. Du kannst den Export später erneut hochladen.',
   'This request could not be completed. Please try again.':
     'Diese Anfrage konnte nicht abgeschlossen werden. Versuche es erneut.',
   'This script sends traffic only to {environment} for {domain}.':
@@ -955,8 +952,6 @@ export const de = {
   Visitors: 'Besucher',
   Visits: 'Besuche',
   'Visits by {visitor}': 'Besuche von {visitor}',
-  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
-    'Polar muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
   'Want to track a specific action?': 'Möchtest du eine bestimmte Aktion erfassen?',
   'We’ll check it’s working.': 'Wir prüfen, ob es funktioniert.',
   'Website analytics': 'Website-Analyse',
@@ -990,8 +985,8 @@ export const de = {
     'Ja. Erfasse eigene Ereignisse wie Registrierungen und Downloads. Trenne Produktions-, Staging- und Testzugriffe mit Umgebungen.',
   'You already added this domain.': 'Du hast diese Domain bereits hinzugefügt.',
   'You’re connected': 'Verbindung hergestellt',
-  'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.':
-    'Du führst Analytics Beer lokal aus. Verwende im Script eine öffentlich erreichbare Adresse, wenn du eine öffentliche Website verbindest.',
+  'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
+    'Du führst Datix lokal aus. Verwende im Script eine öffentlich erreichbare Adresse, wenn du eine öffentliche Website verbindest.',
   'Your account is separate': 'Dein Konto ist unabhängig davon',
   'Your best pages. Your busiest days. Where people find you.':
     'Deine besten Seiten. Deine stärksten Tage. Wo man dich findet.',
@@ -1011,4 +1006,25 @@ export const de = {
   'ZIP links and special files are not supported.':
     'ZIP-Verknüpfungen und Spezialdateien werden nicht unterstützt.',
   'ZIP or CSV · up to 10 MB': 'ZIP oder CSV · bis zu 10 MB',
+  'Three plans. All your analytics. Start with 14 days free on Basic.':
+    'Drei Tarife. Alle Analysen. Starte mit 14 kostenlosen Tagen mit Basic.',
+  'Choose {plan}': '{plan} wählen',
+  'Choose plan': 'Tarif wählen',
+  '${price} per {interval}': '${price} pro {interval}',
+  '{events} events · ${price}/year': '{events} Ereignisse · ${price}/Jahr',
+  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
+    'Basic umfasst 14 kostenlose Testtage. Bestätige Preis und Zahlungsdaten beim Checkout.',
+  'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
+    'Bestätige deinen Tarif und deine Zahlungsdaten beim Checkout. Deine Testphase beginnt erst nach Abschluss des Checkouts.',
+  'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
+    'Bestätige deinen Tarif und deine Zahlungsdaten beim Checkout. Dieser Tarif ist von Anfang an kostenpflichtig und hat keine kostenlose Testphase.',
+  'An active plan is required': 'Ein aktiver Tarif ist erforderlich',
+  'An active subscription or trial is required to collect events. Your existing reports remain available.':
+    'Ein aktives Abonnement oder eine Testphase ist erforderlich, um Ereignisse zu erfassen. Deine bisherigen Berichte bleiben verfügbar.',
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
+    'Basic umfasst 14 kostenlose Testtage. Pro und Ultra haben keine kostenlose Testphase. Wähle monatliche oder jährliche Zahlung.',
+  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
+    'Für ein Konto sind keine Zahlungsdaten nötig. Um einen Tarif zu starten, bestätigst du beim Checkout deine Zahlungsdaten und den Preis.',
+  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
+    'Autumn muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
 } satisfies Record<Copy, string>;

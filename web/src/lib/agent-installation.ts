@@ -1,7 +1,7 @@
 import type { SiteEnvironment } from './client';
 
 export function agentInstallationInstructions(code: string, environment: SiteEnvironment) {
-  return `Install Analytics Beer in this website's existing codebase.
+  return `Install Datix in this website's existing codebase.
 
 Target domain: ${environment.domain}
 Environment: ${environment.name}
@@ -25,7 +25,7 @@ Call this on initial consent restoration and whenever the choice changes. Reject
       : `Keep this integration cookieless. Do not add data-mode="sessions", tracking cookies, or session consent code. Preserve existing privacy preferences and do not disable Do Not Track.`
   }
 
-3. Keep changes scoped to installation. Do not change the Analytics Beer environment settings or replace other analytics without the user's instruction. Localhost collection is currently ${environment.allowLocalhost ? 'enabled' : 'disabled'}; ${environment.allowLocalhost ? 'use localhost for verification when appropriate' : 'use the configured domain, or ask the user to enable localhost testing in Install if needed'}. Collection is ${environment.enabled ? 'enabled' : 'paused; ask the user to resume it before testing'}.
+3. Keep changes scoped to installation. Do not change the Datix environment settings or replace other analytics without the user's instruction. Localhost collection is currently ${environment.allowLocalhost ? 'enabled' : 'disabled'}; ${environment.allowLocalhost ? 'use localhost for verification when appropriate' : 'use the configured domain, or ask the user to enable localhost testing in Install if needed'}. Collection is ${environment.enabled ? 'enabled' : 'paused; ask the user to resume it before testing'}.
 
-4. Run the project's relevant checks. In a normal browser, verify the script loads once, inspect /api/collect requests and their response (including accepted), and test navigation. Respect privacy controls and bot filtering; do not bypass them to force a pass. After publishing within the user's authorization, visit the configured domain and use Check installation in Analytics Beer to confirm a persisted pageview. A loaded script or HTTP 200 alone does not prove a pageview was stored. Report changed files, checks, and anything still awaiting live verification.`;
+4. Run the project's relevant checks. In a normal browser, verify the script loads once, inspect /api/collect requests and their response (including accepted), and test navigation. Respect privacy controls and bot filtering; do not bypass them to force a pass. After publishing within the user's authorization, visit the configured domain and use Check installation in Datix to confirm a persisted pageview. A loaded script or HTTP 200 alone does not prove a pageview was stored. Report changed files, checks, and anything still awaiting live verification.`;
 }

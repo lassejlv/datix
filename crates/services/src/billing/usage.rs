@@ -23,7 +23,7 @@ pub async fn account_allowance(
     now: DateTime<Utc>,
 ) -> Result<(Option<Allowance>, Vec<Website>)> {
     let rows: Vec<Value> = sqlx::query_scalar(
-        "SELECT subscriptions FROM billing_customers WHERE owner_id=$1 AND deleted=false",
+        "SELECT subscriptions FROM billing_customers WHERE owner_id=$1 AND deleted=false AND provider='autumn' AND updated_at>now()-interval '5 minutes'",
     )
     .bind(owner)
     .fetch_all(&mut *conn)
@@ -49,6 +49,7 @@ pub fn budget_units(value: &Option<String>) -> Option<i64> {
         .map(|n| (n * 100.0).round() as i64)
 }
 pub async fn account_usage(state: &State, owner: &str) -> Result<Value> {
+    super::provider::refresh_if_due(state, owner).await?;
     let mut conn = state.db.acquire().await?;
     usage(&mut conn, owner, Utc::now()).await
 }
@@ -59,21 +60,22 @@ pub async fn usage(conn: &mut PgConnection, owner: &str, now: DateTime<Utc>) -> 
     } else {
         vec![]
     };
-    let used: i64 = rows.iter().map(|r| r.units).sum();
-    let limit = allowance.as_ref().map_or(0, |a| a.event_limit * 100);
+    let local: i64 = rows.iter().map(|r| r.units).sum();
+    let used = allowance.as_ref().map_or(0, |a| a.used(local));
+    let remaining = allowance.as_ref().map_or(Some(0), |a| a.remaining(local));
     let pause = if allowance.is_none() {
         Some("subscription_required")
-    } else if limit - used < 15 {
+    } else if remaining.is_some_and(|r| r < 15) {
         Some("event_limit")
     } else {
         None
     };
     let websites:Vec<Value>=websites.iter().enumerate().map(|(index,s)|{
   let units=rows.iter().find(|r|r.site_id==s.id).map_or(0,|r|r.units);
-  let reason=if !s.enabled{Some("disabled")}else{pause.or_else(||if index>=10 {Some("website_limit")}else if budget_units(&s.credit_budget).is_some_and(|b|b-units<15){Some("website_budget")}else{None})};
+  let reason=if !s.enabled{Some("disabled")}else{pause.or_else(||if allowance.as_ref().is_some_and(|a| !a.permits_website(index as i64)) {Some("website_limit")}else if budget_units(&s.credit_budget).is_some_and(|b|b-units<15){Some("website_budget")}else{None})};
   json!({"id":s.id,"name":s.name,"domain":s.domain,"events":units as f64/100.0,"creditBudget":s.credit_budget.as_ref().and_then(|v|v.parse::<f64>().ok()),"paused":reason.is_some(),"pauseReason":reason})
  }).collect();
     Ok(
-        json!({"plan":allowance.as_ref().map(|a|json!({"name":"Pro","trial":a.trial,"eventLimit":a.event_limit,"websiteLimit":10})),"period":allowance.as_ref().map(|a|&a.period),"events":{"used":used as f64/100.0,"remaining":(limit-used).max(0) as f64/100.0},"paused":pause.is_some(),"pauseReason":pause,"websites":websites}),
+        json!({"plan":allowance.as_ref().map(|a|json!({"name":a.subscription.entitlements.as_ref().map(|e| &e.name),"trial":a.trial,"eventLimit":a.event_limit.map(|v|v as f64/100.0),"websiteLimit":a.website_limit})),"period":allowance.as_ref().map(|a|&a.period),"events":{"used":used as f64/100.0,"remaining":remaining.map(|v| v as f64/100.0)},"paused":pause.is_some(),"pauseReason":pause,"websites":websites}),
     )
 }

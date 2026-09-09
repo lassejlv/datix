@@ -4,7 +4,7 @@ import { Client } from 'pg';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { seedPro, cleanupPro } from '../tests/fixtures/billing';
 import { defaultTrackingSettings } from '../src/lib/tracking-settings';
-const base = 'https://analytics.beer';
+const base = 'https://usedatix.com';
 const connectionString = process.env.PRODUCTION_DATABASE_URL!;
 if (new URL(connectionString).hostname !== process.env.PRODUCTION_DATABASE_HOST)
   throw Error('Wrong database');

@@ -6,7 +6,7 @@ import { Client } from 'pg';
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const production = process.env.QA_TARGET === 'production';
-const base = production ? 'https://analytics.beer' : 'http://localhost:3000';
+const base = production ? 'https://usedatix.com' : 'http://localhost:3000';
 const connectionString = production
   ? process.env.PRODUCTION_DATABASE_URL
   : process.env.DATABASE_URL;

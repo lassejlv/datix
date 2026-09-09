@@ -5,9 +5,12 @@ import { seedPro, cleanupPro } from '../tests/fixtures/billing';
 
 process.chdir(new URL('../..', import.meta.url).pathname);
 const target = new URL(process.env.PRODUCTION_DATABASE_URL ?? '');
-if (target.hostname !== process.env.PRODUCTION_DATABASE_HOST || target.username !== 'analytics_owner')
+if (
+  target.hostname !== process.env.PRODUCTION_DATABASE_HOST ||
+  target.username !== 'analytics_owner'
+)
   throw new Error('Explicitly matched production owner connection required.');
-const base = 'https://analytics.beer';
+const base = 'https://usedatix.com';
 const client = new Client({ connectionString: target.toString() });
 const browser = await chromium.launch();
 const context = await browser.newContext({

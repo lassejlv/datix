@@ -5,11 +5,17 @@ use analytics_core::config::Role;
 #[ignore = "requires isolated Neon and Redis"]
 async fn billing_drains_more_than_five_batches_with_exact_quantities() {
     fixture!(f, {
-        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at) SELECT $1,'pageview',0.15,now() FROM generate_series(1,601)")
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider) SELECT $1,'pageview',0.15,now(),'autumn' FROM generate_series(1,601)")
             .bind(&f.user).execute(&f.state.db).await.unwrap();
         let provider = MockProvider::start().await;
         let state = provider.state(&f);
-        assert_eq!(billing::delivery::flush(&state).await.unwrap(), 601);
+        let deadline = Instant::now() + StdDuration::from_secs(120);
+        let mut delivered = 0;
+        while delivered < 601 {
+            delivered += billing::delivery::flush(&state).await.unwrap();
+            assert!(Instant::now() < deadline, "billing backlog did not drain");
+        }
+        assert_eq!(delivered, 601);
         let remaining: i64 =
             sqlx::query_scalar("SELECT count(*) FROM billing_outbox WHERE owner_id=$1")
                 .bind(&f.user)
@@ -18,22 +24,18 @@ async fn billing_drains_more_than_five_batches_with_exact_quantities() {
                 .unwrap();
         assert_eq!(remaining, 0);
         let data = provider.data.lock().await;
-        let events: Vec<_> = data
-            .ingested
-            .iter()
-            .flat_map(|batch| batch["events"].as_array().unwrap())
-            .collect();
+        let events: Vec<_> = data.ingested.iter().map(|event| &event["body"]).collect();
         assert_eq!(events.len(), 601);
         assert_eq!(
             events
                 .iter()
-                .map(|e| (e["metadata"]["event_count"].as_f64().unwrap() * 100.).round() as i64)
+                .map(|e| (e["value"].as_f64().unwrap() * 100.).round() as i64)
                 .sum::<i64>(),
             9015
         );
         let ids: std::collections::HashSet<_> = events
             .iter()
-            .map(|e| e["external_id"].as_str().unwrap())
+            .map(|e| e["properties"]["delivery_id"].as_str().unwrap())
             .collect();
         assert_eq!(ids.len(), 601);
     });
