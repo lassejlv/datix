@@ -1,3 +1,5 @@
+import { deviceName } from '../lib/i18n/display';
+import { useSitePreferences } from './site-preferences';
 import { AccountSettings } from './account-settings';
 import { Usage, useAccountUsage } from './usage';
 import { CountryLabel, countryName } from './country-label';
@@ -22,9 +24,7 @@ import { breakdownName, providerName } from '../lib/imports';
 import {
   ApiError,
   apiClient,
-  dateLabel,
   errorText,
-  number,
   write,
   type Breakdown,
   type Metric,
@@ -36,6 +36,7 @@ import {
 
 type Panel = DashboardPage | 'usage';
 export function AnalyticsApp() {
+  const { message: messageText, t } = useSitePreferences();
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = useNavigate();
   const returnPath = useRef(
@@ -66,9 +67,9 @@ export function AnalyticsApp() {
       <main className="flex min-h-dvh flex-col items-center justify-center gap-5 text-secondary-ink">
         <Brand />
         <p className="max-w-[420px] text-center" role="alert">
-          {error}
+          {messageText(error)}
         </p>
-        <Button onClick={() => setReload((value) => value + 1)}>Try again</Button>
+        <Button onClick={() => setReload((value) => value + 1)}>{t('Try again')}</Button>
       </main>
     );
   if (user === undefined)
@@ -76,7 +77,7 @@ export function AnalyticsApp() {
       <main className="flex min-h-dvh flex-col items-center justify-center gap-5 text-secondary-ink">
         <Brand />
         <Spinner className="size-5" />
-        <span>Getting things ready…</span>
+        <span>{t('Getting things ready…')}</span>
       </main>
     );
   return user ? (
@@ -115,6 +116,7 @@ function Dashboard({
   onSignedOut: () => void;
   onUserUpdated: (user: User) => void;
 }) {
+  const { message: messageText, t } = useSitePreferences();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
   const isUsage = useLocation({ select: (location) => location.pathname === '/usage' });
@@ -318,7 +320,7 @@ function Dashboard({
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-4 focus:z-60 focus:rounded-md focus:border focus:border-border focus:bg-background focus:p-3 focus:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         href="#main-content"
       >
-        Skip to content
+        {t('Skip to content')}
       </a>
       <AccountSettings
         open={accountOpen}
@@ -348,29 +350,30 @@ function Dashboard({
         <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-4 md:px-6">
           <SidebarTrigger
             className="size-8 rounded-md sm:size-8 [&_svg]:size-4"
-            aria-label="Toggle navigation"
+            aria-label={t('Toggle navigation')}
+            data-testid="navigation-toggle"
           />
           <div className="flex min-w-0 items-center gap-2 text-sm">
             <span className="truncate text-secondary-ink">
-              {isUsage ? 'Account' : (site?.name ?? 'Your workspace')}
+              {isUsage ? t('Account') : (site?.name ?? t('Your workspace'))}
             </span>
             <span aria-hidden="true" className="text-muted-foreground">
               /
             </span>
             <span className="shrink-0 font-medium">
               {isUsage
-                ? 'Usage'
+                ? t('Usage')
                 : !site || panel === 'setup'
-                  ? 'Setup'
+                  ? t('Setup')
                   : panel === 'settings'
-                    ? 'Settings'
+                    ? t('Settings')
                     : panel === 'installation'
-                      ? 'Install'
+                      ? t('Install')
                       : panel === 'imports'
-                        ? 'Imports'
+                        ? t('Imports')
                         : panel === 'visitors'
-                          ? 'Visitors'
-                          : 'Overview'}
+                          ? t('Visitors')
+                          : t('Overview')}
             </span>
           </div>
         </header>
@@ -384,9 +387,9 @@ function Dashboard({
               className="mb-6 flex items-center justify-between gap-3 rounded-md bg-danger-wash px-4 py-3.5 text-sm text-danger max-md:flex-wrap"
               role="alert"
             >
-              {error}
+              {messageText(error)}
               <Button variant="outline" size="sm" onClick={loadSites}>
-                Try again
+                {t('Try again')}
               </Button>
             </div>
           )}
@@ -396,15 +399,15 @@ function Dashboard({
               role="status"
             >
               <span>
-                Tracking paused ·{' '}
+                {t('Tracking paused ·')}{' '}
                 {websiteUsage?.pauseReason === 'website_budget'
-                  ? 'Website budget reached'
+                  ? t('Website budget reached')
                   : usage.data?.pauseReason === 'event_limit'
-                    ? 'Event limit reached'
-                    : 'An active Pro plan is required'}
+                    ? t('Event limit reached')
+                    : t('An active Pro plan is required')}
               </span>
               <Link to="/usage" className="underline underline-offset-4">
-                View usage
+                {t('View usage')}
               </Link>
             </div>
           )}
@@ -414,18 +417,18 @@ function Dashboard({
             {loading ? (
               <div className="flex items-center gap-3 py-20 text-secondary-ink">
                 <Spinner className="size-5" />
-                <span>Loading your workspace…</span>
+                <span>{t('Loading your workspace…')}</span>
               </div>
             ) : isUsage ? (
               <Usage {...usage} />
             ) : params.siteId && (!site || !environment) ? (
               <div className="max-w-[440px] py-10">
-                <h1 className="text-2xl font-medium">Website or environment unavailable</h1>
+                <h1 className="text-2xl font-medium">{t('Website or environment unavailable')}</h1>
                 <p className="mt-3 text-secondary-ink">
-                  It may have been removed, or you may not have access to it.
+                  {t('It may have been removed, or you may not have access to it.')}
                 </p>
                 <Link to="/dashboard" replace className="mt-5 inline-block underline">
-                  Back to your websites
+                  {t('Back to your websites')}
                 </Link>
               </div>
             ) : !site || !environment ? (
@@ -577,6 +580,7 @@ function Overview({
   onExpired: () => void;
   initialRange?: { from?: string; to?: string };
 }) {
+  const { message: messageText, number, dateLabel, t } = useSitePreferences();
   const [days, setDays] = useState(initialRange?.from && initialRange?.to ? 'custom' : '30'),
     [metric, setMetric] = useState<Metric>('pageviews'),
     [reports, setReports] = useState<Reports | null>(null),
@@ -667,7 +671,7 @@ function Overview({
               href={`https://${environment.domain}`}
               target="_blank"
               rel="noreferrer"
-              aria-label={`Visit ${environment.domain}`}
+              aria-label={t('Visit {domain}', { domain: environment.domain })}
             >
               <ExternalLink size={15} />
             </a>
@@ -680,24 +684,24 @@ function Overview({
           <div className="relative flex h-8 items-center gap-2 rounded-md border border-input px-3 text-secondary-ink max-md:flex-1">
             <select
               className="cursor-pointer appearance-none bg-transparent pr-2 text-[13px] text-foreground max-md:flex-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              aria-label="Date range"
+              aria-label={t('Date range')}
               value={days}
               onChange={(event) => setDays(event.target.value)}
             >
               <option className="bg-background" value="7">
-                Last 7 days
+                {t('Last 7 days')}
               </option>
               <option className="bg-background" value="30">
-                Last 30 days
+                {t('Last 30 days')}
               </option>
               <option className="bg-background" value="90">
-                Last 90 days
+                {t('Last 90 days')}
               </option>
               <option className="bg-background" value="365">
-                Last 365 days
+                {t('Last 365 days')}
               </option>
               <option className="bg-background" value="custom">
-                Custom dates
+                {t('Custom dates')}
               </option>
             </select>
             <ChevronDown size={13} />
@@ -706,7 +710,7 @@ function Overview({
             className="size-8 rounded-md sm:size-8"
             variant="outline"
             size="icon"
-            aria-label="Refresh analytics"
+            aria-label={t('Refresh analytics')}
             loading={loading}
             onClick={() => setReload((value) => value + 1)}
           >
@@ -717,22 +721,22 @@ function Overview({
       {days === 'custom' && (
         <div className="mb-6 flex items-end justify-start gap-2 md:justify-end md:gap-3">
           <label className="flex flex-col gap-1.5 text-[13px] text-secondary-ink max-md:min-w-0 max-md:flex-1">
-            From
+            {t('From')}
             <input
               className="min-w-0 rounded-md border border-input bg-background px-2.5 py-1 max-md:w-full max-md:text-[13px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              aria-label="From date"
+              aria-label={t('From date')}
               type="date"
               value={customFrom}
               onChange={(event) => setCustomFrom(event.target.value)}
               max={customTo || today}
             />
           </label>
-          <span className="pb-2 text-[13px] text-muted-foreground">to</span>
+          <span className="pb-2 text-[13px] text-muted-foreground">{t('to')}</span>
           <label className="flex flex-col gap-1.5 text-[13px] text-secondary-ink max-md:min-w-0 max-md:flex-1">
-            To
+            {t('To')}
             <input
               className="min-w-0 rounded-md border border-input bg-background px-2.5 py-1 max-md:w-full max-md:text-[13px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              aria-label="To date"
+              aria-label={t('To date')}
               type="date"
               value={customTo}
               onChange={(event) => setCustomTo(event.target.value)}
@@ -746,7 +750,7 @@ function Overview({
         <div className="mb-6 flex items-center gap-3 rounded-md bg-muted px-4 py-3.5 text-sm max-md:flex-wrap">
           <span className="size-1.5 shrink-0 rounded-full bg-secondary-ink" />
           <span className="flex-1 max-md:basis-[calc(100%-36px)]">
-            Collection is paused. Your existing analytics are still here.
+            {t('Collection is paused. Your existing analytics are still here.')}
           </span>
         </div>
       )}
@@ -757,10 +761,10 @@ function Overview({
           <div className="mb-6 flex items-center gap-3 rounded-md bg-muted px-4 py-3.5 text-sm max-md:flex-wrap">
             <Code2 size={18} />
             <span className="flex-1 max-md:basis-[calc(100%-36px)]">
-              Install your script to start collecting pageviews.
+              {t('Install your script to start collecting pageviews.')}
             </span>
             <Button variant="ghost" size="sm" onClick={onInstall}>
-              Get your script
+              {t('Get your script')}
               <ArrowRight size={14} />
             </Button>
           </div>
@@ -770,25 +774,25 @@ function Overview({
           className="mb-6 flex items-center justify-between gap-3 rounded-md bg-danger-wash px-4 py-3.5 text-sm text-danger max-md:flex-wrap"
           role="alert"
         >
-          {error}
+          {messageText(error)}
           {rangeValid && (
             <Button variant="outline" size="sm" onClick={() => setReload((value) => value + 1)}>
-              Try again
+              {t('Try again')}
             </Button>
           )}
         </div>
       )}
-      <section className="w-full" aria-label="Traffic overview">
+      <section className="w-full" aria-label={t('Traffic overview')}>
         <div className="grid grid-cols-3 gap-2 md:max-w-[580px] md:gap-6">
           {metrics.map((item) => (
             <button
               key={item.key}
               className="relative min-w-0 cursor-pointer rounded-md px-3 py-3 text-left hover:bg-muted aria-pressed:bg-pressed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              title={item.caption}
+              title={t(item.caption)}
               onClick={() => setMetric(item.key)}
               aria-pressed={metric === item.key}
             >
-              <span className="text-xs text-secondary-ink md:text-sm">{item.name}</span>
+              <span className="text-xs text-secondary-ink md:text-sm">{t(item.name)}</span>
               <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
                 {loading ? (
                   <span className="block h-[38px] w-[72px] rounded-sm bg-pressed" />
@@ -802,11 +806,11 @@ function Overview({
           ))}
         </div>
         <div className="flex justify-between gap-4 pt-4 text-xs text-secondary-ink md:pt-4">
-          <span>{metrics.find((item) => item.key === metric)?.name}</span>
+          <span>{t(metrics.find((item) => item.key === metric)!.name)}</span>
           <span>
             {from && to ? `${dateLabel(from)} - ${dateLabel(to)}` : ''}
             <span className="ml-2 text-muted-foreground">
-              {reports?.overview.imports?.calendarDayWarning ? 'Source dates' : 'UTC'}
+              {reports?.overview.imports?.calendarDayWarning ? t('Source dates') : 'UTC'}
             </span>
           </span>
         </div>
@@ -816,13 +820,13 @@ function Overview({
             role="status"
           >
             <Spinner className="size-5" />
-            <span>Loading analytics…</span>
+            <span>{t('Loading analytics…')}</span>
           </div>
         ) : reports ? (
           <TrafficChart data={reports.timeseries.data} metric={metric} />
         ) : (
           <div className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink">
-            No report to display.
+            {t('No report to display.')}
           </div>
         )}
       </section>
@@ -830,28 +834,33 @@ function Overview({
       {!!reports?.overview.imports?.importedDays && (
         <details className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-secondary-ink">
           <summary className="cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
-            Includes {number(reports.overview.imports.importedDays)} days of imported history
+            {t(
+              reports.overview.imports.importedDays === 1
+                ? 'Includes {count} day of imported history'
+                : 'Includes {count} days of imported history',
+              { count: number(reports.overview.imports.importedDays) },
+            )}
           </summary>
           <ul className="mt-2 space-y-1">
             {reports.overview.imports.sources.map((source) => (
               <li key={source.id}>
                 {providerName(source.provider)} · {source.timeZone} ·{' '}
                 {source.breakdowns.length
-                  ? source.breakdowns.map(breakdownName).join(', ')
-                  : 'Daily totals only'}
+                  ? source.breakdowns.map((value) => breakdownName(value, t)).join(', ')
+                  : t('Daily totals only')}
               </li>
             ))}
           </ul>
           <p className="mt-2">
-            Daily visitors follow each provider’s definition and are added across days. Events and
-            breakdowns include only what was tracked here or included in the export; GA4 imports
-            contain daily pageviews and total users. Visitor journeys contain only visits tracked by
-            Analytics Beer.
+            {t(
+              'Daily visitors follow each provider’s definition and are added across days. Events and breakdowns include only what was tracked here or included in the export; GA4 imports contain daily pageviews and total users. Visitor journeys contain only visits tracked by Analytics Beer.',
+            )}
           </p>
           {reports.overview.imports.calendarDayWarning && (
             <p className="mt-2">
-              Imported totals retain their provider’s calendar dates and timezone. Analytics Beer
-              tracking uses UTC.
+              {t(
+                'Imported totals retain their provider’s calendar dates and timezone. Analytics Beer tracking uses UTC.',
+              )}
             </p>
           )}
           <Link
@@ -860,30 +869,36 @@ function Overview({
             search={{}}
             className="mt-2 inline-block underline underline-offset-4"
           >
-            Manage imports
+            {t('Manage imports')}
           </Link>
         </details>
       )}
 
       {(!reports || reports.overview.pageviews > 0) && (
         <div className="mt-9 grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-9">
-          <BreakdownCard title="Top pages" label="Page" report={reports?.path} loading={loading} />
           <BreakdownCard
-            title="Referrers"
-            label="Source"
+            title={t('Top pages')}
+            label={t('Page')}
+            report={reports?.path}
+            loading={loading}
+          />
+          <BreakdownCard
+            title={t('Referrers')}
+            label={t('Source')}
             report={reports?.referrer}
             loading={loading}
           />
           <BreakdownCard
-            title="Countries"
-            label="Country"
+            title={t('Countries')}
+            label={t('Country')}
             report={reports?.country}
             loading={loading}
             countries
           />
           <BreakdownCard
-            title="Devices"
-            label="Device"
+            title={t('Devices')}
+            label={t('Device')}
+            devices
             report={reports?.device}
             loading={loading}
           />
@@ -892,7 +907,7 @@ function Overview({
       <section className="mt-9 flex flex-col items-start gap-3">
         <div>
           <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-            Tracked actions
+            {t('Tracked actions')}
           </h2>
         </div>
         {reports?.event.data.length ? (
@@ -906,7 +921,7 @@ function Overview({
           </div>
         ) : (
           <Button variant="outline" onClick={onInstall}>
-            Set up an event
+            {t('Set up an event')}
             <ArrowRight size={15} />
           </Button>
         )}
@@ -921,13 +936,16 @@ function BreakdownCard({
   report,
   loading,
   countries = false,
+  devices = false,
 }: {
   title: string;
   label: string;
   report?: Breakdown;
   loading: boolean;
   countries?: boolean;
+  devices?: boolean;
 }) {
+  const { locale, number, t } = useSitePreferences();
   return (
     <section className="min-w-0">
       <div>
@@ -935,37 +953,40 @@ function BreakdownCard({
       </div>
       <div className="mt-3.5 mb-2 flex justify-between text-xs text-muted-foreground">
         <span>{label}</span>
-        <span>Pageviews</span>
+        <span>{t('Pageviews')}</span>
       </div>
       {loading ? (
-        <div className="flex flex-col gap-2 pt-1" role="status" aria-label={`Loading ${title}`}>
+        <div
+          className="flex flex-col gap-2 pt-1"
+          role="status"
+          aria-label={t('Loading {title}', { title })}
+        >
           {[1, 2, 3].map((value) => (
             <i className="h-8 rounded-sm bg-muted" key={value} />
           ))}
         </div>
       ) : !report?.data.length ? (
         <div className="min-h-[100px] py-6 text-[13px] text-muted-foreground">
-          No {label.toLowerCase()} data in this period.
+          {t('No data in this period.')}
         </div>
       ) : (
         <ol className="m-0 flex list-none flex-col p-0">
           {report.data.map((item) => {
             const text = item.value
               ? countries
-                ? (countryName(item.value) ?? 'Unknown location')
-                : item.value
+                ? (countryName(item.value, locale) ?? t('Unknown location'))
+                : devices
+                  ? deviceName(item.value, t)
+                  : item.value
               : countries
-                ? 'Unknown'
-                : 'Direct / none';
+                ? t('Unknown')
+                : t('Direct / none');
             return (
               <li
                 className="flex min-h-10 items-center justify-between gap-4 py-2 text-sm md:min-h-9"
                 key={item.value}
               >
-                <span
-                  title={text}
-                  className={`truncate ${label === 'Device' ? 'capitalize' : ''}`}
-                >
+                <span title={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
                   {countries ? <CountryLabel code={item.value} /> : text}
                 </span>
                 <strong className="shrink-0 text-[13px] font-normal tabular-nums">

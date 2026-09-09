@@ -1,12 +1,8 @@
+import { translate } from '../lib/i18n/translations';
+import { Translated } from './translated';
+import { useSitePreferences } from './site-preferences';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import {
-  apiClient,
-  dateLabel,
-  errorText,
-  number,
-  type Site,
-  type SiteEnvironment,
-} from '../lib/client';
+import { apiClient, errorText, type Site, type SiteEnvironment } from '../lib/client';
 import {
   breakdownName,
   providerName,
@@ -28,8 +24,6 @@ import {
 } from './ui/dialog';
 
 const MAX_UPLOAD = 10 * 1024 * 1024;
-const fullDate = (day: string) =>
-  dateLabel(day, { day: 'numeric', month: 'short', year: 'numeric' });
 
 export function AnalyticsImports({
   site,
@@ -40,6 +34,9 @@ export function AnalyticsImports({
   environment: SiteEnvironment;
   onViewReport: (from: string, to: string) => void;
 }) {
+  const { number, message: messageText, t, locale, dateLabel } = useSitePreferences();
+  const fullDate = (day: string) =>
+    dateLabel(day, { day: 'numeric', month: 'short', year: 'numeric' });
   const endpoint = `/sites/${site.id}/environments/${environment.id}/imports`;
   const [provider, setProvider] = useState<ImportProvider>('plausible');
   const [timeZone, setTimeZone] = useState('UTC');
@@ -161,7 +158,13 @@ export function AnalyticsImports({
       setMessage(
         result.duplicate
           ? 'This export is already imported. Your totals have not changed.'
-          : `${number(result.import.days)} ${result.import.days === 1 ? 'day' : 'days'} imported from ${providerName(result.import.provider)}. Your history is ready in Overview.`,
+          : translate(
+              'en',
+              result.import.days === 1
+                ? '{count} day imported from {provider}. Your history is ready in Overview.'
+                : '{count} days imported from {provider}. Your history is ready in Overview.',
+              { count: result.import.days, provider: providerName(result.import.provider) },
+            ),
       );
       setPreview(null);
       setFile(null);
@@ -191,22 +194,28 @@ export function AnalyticsImports({
   return (
     <div className="max-w-[760px]">
       <header className="mb-7">
-        <h1 className="text-[24px] font-medium tracking-tight">Import analytics</h1>
+        <h1 className="text-[24px] font-medium tracking-tight">{t('Import analytics')}</h1>
         <p className="mt-2 text-sm leading-relaxed text-secondary-ink">
-          Bring your existing history to {environment.name} for {environment.domain}.
+          {t('Bring your existing history to {environment} for {domain}.', {
+            environment: environment.name,
+            domain: environment.domain,
+          })}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-secondary-ink">
-          Import completed days from the last two years, before tracking began here. Imported
-          history does not use your monthly event allowance.
+          {t(
+            'Import completed days from the last two years, before tracking began here. Imported history does not use your monthly event allowance.',
+          )}
         </p>
       </header>
       <form onSubmit={readExport}>
         <fieldset disabled={busy !== null}>
-          <legend className="mb-3 text-sm font-medium">Where is your data coming from?</legend>
+          <legend className="mb-3 text-sm font-medium">
+            {t('Where is your data coming from?')}
+          </legend>
           <div
             className="grid grid-cols-1 gap-3 sm:grid-cols-2"
             role="group"
-            aria-label="Analytics provider"
+            aria-label={t('Analytics provider')}
           >
             {(['plausible', 'ga4'] as const).map((value) => (
               <button
@@ -224,8 +233,8 @@ export function AnalyticsImports({
                 <span className="block text-sm font-medium">{providerName(value)}</span>
                 <span className="mt-1 block text-xs leading-relaxed text-secondary-ink">
                   {value === 'plausible'
-                    ? 'Full-export ZIP or daily visitors CSV'
-                    : 'Daily traffic report as CSV'}
+                    ? t('Full-export ZIP or daily visitors CSV')
+                    : t('Daily traffic report as CSV')}
                 </span>
               </button>
             ))}
@@ -236,27 +245,44 @@ export function AnalyticsImports({
             open={!preview}
           >
             <summary className="cursor-pointer font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
-              Prepare your {providerName(provider)} export
+              {t('Prepare your {provider} export', { provider: providerName(provider) })}
             </summary>
             {provider === 'plausible' ? (
               <div className="mt-3 text-secondary-ink">
                 <ol className="list-decimal space-y-1.5 pl-5 leading-relaxed">
                   <li>
-                    Open your site settings, then{' '}
-                    <strong className="font-medium text-foreground">Imports &amp; Exports</strong>.
+                    <Translated
+                      text="Open your site settings, then {section}."
+                      values={{
+                        section: (
+                          <strong className="font-medium text-foreground">
+                            Imports &amp; Exports
+                          </strong>
+                        ),
+                      }}
+                    />
                   </li>
                   <li>
-                    Choose <strong className="font-medium text-foreground">Export Data</strong> and
-                    download the full CSV export.
+                    <Translated
+                      text="Choose {action} and download the full CSV export."
+                      values={{
+                        action: (
+                          <strong className="font-medium text-foreground">Export Data</strong>
+                        ),
+                      }}
+                    />
                   </li>
                   <li>
-                    Upload the ZIP, or its <code className="text-xs">imported_visitors</code> CSV
-                    for daily totals only.
+                    <Translated
+                      text="Upload the ZIP, or its {file} CSV for daily totals only."
+                      values={{ file: <code className="text-xs">imported_visitors</code> }}
+                    />
                   </li>
                 </ol>
                 <p className="mt-3 leading-relaxed">
-                  The dashboard’s “Export stats” files do not contain the full history needed here.
-                  Plausible full exports also exclude data previously imported into Plausible.
+                  {t(
+                    'The dashboard’s “Export stats” files do not contain the full history needed here. Plausible full exports also exclude data previously imported into Plausible.',
+                  )}
                 </p>
                 <a
                   href="https://plausible.io/docs/export-stats"
@@ -264,46 +290,58 @@ export function AnalyticsImports({
                   rel="noreferrer"
                   className="mt-3 inline-block underline underline-offset-4"
                 >
-                  Plausible export guide
+                  {t('Plausible export guide')}
                 </a>
               </div>
             ) : (
               <div className="mt-3 text-secondary-ink">
                 <ol className="list-decimal space-y-1.5 pl-5 leading-relaxed">
                   <li>
-                    In your GA4 property, open{' '}
-                    <strong className="font-medium text-foreground">Explore → Free form</strong> and
-                    choose your dates.
+                    <Translated
+                      text="In your GA4 property, open {section} and choose your dates."
+                      values={{
+                        section: (
+                          <strong className="font-medium text-foreground">
+                            Explore → Free form
+                          </strong>
+                        ),
+                      }}
+                    />
                   </li>
                   <li>
-                    Use a table with <strong className="font-medium text-foreground">Date</strong>{' '}
-                    as the only row dimension, and{' '}
-                    <strong className="font-medium text-foreground">Views</strong> and{' '}
-                    <strong className="font-medium text-foreground">Total users</strong> as the
-                    metrics.
+                    <Translated
+                      text="Use {date} as the only row dimension, and {views} and {users} as the metrics."
+                      values={{
+                        date: <strong className="font-medium text-foreground">Date</strong>,
+                        views: <strong className="font-medium text-foreground">Views</strong>,
+                        users: <strong className="font-medium text-foreground">Total users</strong>,
+                      }}
+                    />
                   </li>
                   <li>
-                    Remove segments, comparisons, and other dimensions. Filter to your website’s web
-                    stream if the property includes apps.
+                    {t(
+                      'Remove segments, comparisons, and other dimensions. Filter to your website’s web stream if the property includes apps.',
+                    )}
                   </li>
                   <li>
-                    Export as CSV with English column names. Available history depends on your GA4
-                    retention settings.
+                    {t(
+                      'Export as CSV with English column names. Available history depends on your GA4 retention settings.',
+                    )}
                   </li>
                 </ol>
                 <a
-                  href="https://support.google.com/analytics/answer/9327972?hl=en"
+                  href={`https://support.google.com/analytics/answer/9327972?hl=${locale}`}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-3 inline-block underline underline-offset-4"
                 >
-                  Google Analytics exploration guide
+                  {t('Google Analytics exploration guide')}
                 </a>
               </div>
             )}
           </details>
           <label className="mt-5 block max-w-sm text-sm font-medium" htmlFor="import-timezone">
-            Reporting timezone
+            {t('Reporting timezone')}
             <Input
               id="import-timezone"
               className="mt-2"
@@ -327,8 +365,9 @@ export function AnalyticsImports({
             <option value="America/Los_Angeles" />
           </datalist>
           <p id="import-timezone-help" className="mt-2 text-xs leading-relaxed text-secondary-ink">
-            Use the timezone set in your provider, such as UTC or Europe/Copenhagen. Imported dates
-            keep that timezone.
+            {t(
+              'Use the timezone set in your provider, such as UTC or Europe/Copenhagen. Imported dates keep that timezone.',
+            )}
           </p>
           {provider === 'ga4' && (
             <label className="mt-5 flex items-start gap-3 text-sm leading-relaxed">
@@ -342,7 +381,7 @@ export function AnalyticsImports({
                 }}
                 className="mt-1 size-4 shrink-0 accent-foreground"
               />
-              This export contains only my website’s web traffic, with no app screens.
+              {t('This export contains only my website’s web traffic, with no app screens.')}
             </label>
           )}
           <div
@@ -368,12 +407,16 @@ export function AnalyticsImports({
               />
               <div className="min-w-0">
                 <p className="break-all text-sm font-medium">
-                  {file ? file.name : 'Drop your export here'}
+                  {file ? file.name : t('Drop your export here')}
                 </p>
                 <p className="mt-1 text-xs text-secondary-ink">
                   {file
-                    ? `${number(Math.ceil(file.size / 1024))} KB · ready to review`
-                    : `${provider === 'plausible' ? 'ZIP or CSV' : 'CSV'} · up to 10 MB`}
+                    ? t('{size} KB · ready to review', {
+                        size: number(Math.ceil(file.size / 1024)),
+                      })
+                    : provider === 'plausible'
+                      ? t('ZIP or CSV · up to 10 MB')
+                      : t('CSV · up to 10 MB')}
                 </p>
               </div>
             </div>
@@ -383,23 +426,23 @@ export function AnalyticsImports({
               accept={provider === 'plausible' ? '.zip,.csv' : '.csv'}
               className="sr-only"
               tabIndex={-1}
-              aria-label="Analytics export file"
+              aria-label={t('Analytics export file')}
               onChange={(event) => selectFile(event.target.files?.[0])}
             />
             <Button variant="outline" onClick={() => picker.current?.click()}>
-              {file ? 'Change export' : 'Select export'}
+              {file ? t('Change export') : t('Select export')}
             </Button>
           </div>
           {!preview && (
             <Button className="mt-4" type="submit" disabled={!file} loading={busy === 'preview'}>
-              Review import <ArrowRight size={15} aria-hidden="true" />
+              {t('Review import')} <ArrowRight size={15} aria-hidden="true" />
             </Button>
           )}
         </fieldset>
       </form>
       {error && !removing && (
         <p className="mt-4 text-sm leading-relaxed text-danger" role="alert">
-          {error}
+          {messageText(error)}
         </p>
       )}
       {message && (
@@ -407,7 +450,7 @@ export function AnalyticsImports({
           className="mt-5 rounded-lg border border-border p-4 text-sm leading-relaxed"
           role="status"
         >
-          {message}
+          {messageText(message)}
         </p>
       )}
       {preview && (
@@ -418,16 +461,16 @@ export function AnalyticsImports({
             tabIndex={-1}
             className="text-lg font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
-            Review your import
+            {t('Review your import')}
           </h2>
           <p className="mt-2 text-sm text-secondary-ink">
             {fullDate(preview.from)} – {fullDate(preview.to)} · {preview.timeZone}
           </p>
           <dl className="mt-5 grid grid-cols-3 gap-4">
             {[
-              ['Days', preview.days],
-              ['Pageviews', preview.pageviews],
-              ['Daily visitors', preview.dailyVisitors],
+              [t('Days'), preview.days],
+              [t('Pageviews'), preview.pageviews],
+              [t('Daily visitors'), preview.dailyVisitors],
             ].map(([label, value]) => (
               <div key={label}>
                 <dt className="text-xs text-secondary-ink">{label}</dt>
@@ -437,20 +480,24 @@ export function AnalyticsImports({
           </dl>
           <p className="mt-4 text-sm leading-relaxed text-secondary-ink">
             {preview.breakdowns.length
-              ? `Also includes: ${preview.breakdowns.map(breakdownName).join(', ')}.`
-              : 'Daily totals only. This export does not include page, source, country, device, or custom-event breakdowns.'}{' '}
-            Visitor journeys cannot be reconstructed from aggregate exports.
+              ? t('Also includes: {breakdowns}.', {
+                  breakdowns: preview.breakdowns.map((value) => breakdownName(value, t)).join(', '),
+                })
+              : t(
+                  'Daily totals only. This export does not include page, source, country, device, or custom-event breakdowns.',
+                )}{' '}
+            {t('Visitor journeys cannot be reconstructed from aggregate exports.')}
           </p>
           {preview.warnings.length > 0 && (
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-secondary-ink">
               {preview.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
+                <li key={messageText(warning)}>{messageText(warning)}</li>
               ))}
             </ul>
           )}
           {preview.duplicate ? (
             <p className="mt-4 text-sm" role="status">
-              This history is already imported. Your reports will not be counted twice.
+              {t('This history is already imported. Your reports will not be counted twice.')}
             </p>
           ) : (
             <Button
@@ -459,7 +506,9 @@ export function AnalyticsImports({
               loading={busy === 'import'}
               disabled={busy !== null}
             >
-              Import {number(preview.days)} {preview.days === 1 ? 'day' : 'days'}{' '}
+              {t(preview.days === 1 ? 'Import {count} day' : 'Import {count} days', {
+                count: number(preview.days),
+              })}{' '}
               <ArrowRight size={15} aria-hidden="true" />
             </Button>
           )}
@@ -467,24 +516,24 @@ export function AnalyticsImports({
       )}
       <section className="mt-9 border-t border-border pt-6" aria-labelledby="import-history-title">
         <h2 id="import-history-title" className="text-lg font-medium">
-          Import history
+          {t('Import history')}
         </h2>
         {loading ? (
           <div className="mt-4 flex items-center gap-2 text-sm text-secondary-ink" role="status">
-            <Spinner className="size-4" /> Loading imports…
+            <Spinner className="size-4" /> {t('Loading imports…')}
           </div>
         ) : historyError ? (
           <div className="mt-4">
             <p role="alert" className="mb-3 text-sm text-danger">
-              {historyError}
+              {messageText(historyError)}
             </p>
             <Button variant="outline" onClick={reloadHistory}>
-              Try again
+              {t('Try again')}
             </Button>
           </div>
         ) : !history.length ? (
           <p className="mt-3 text-sm text-secondary-ink">
-            No history imported into this environment yet.
+            {t('No history imported into this environment yet.')}
           </p>
         ) : (
           <ul className="mt-3 divide-y divide-border">
@@ -494,8 +543,8 @@ export function AnalyticsImports({
                   <h3 className="text-sm font-medium">{providerName(item.provider)}</h3>
                   <p className="mt-1 break-all text-xs text-secondary-ink">{item.sourceName}</p>
                   <p className="mt-1 text-xs leading-relaxed text-secondary-ink">
-                    {fullDate(item.from)} – {fullDate(item.to)} · {number(item.pageviews)} pageviews
-                    · {item.timeZone}
+                    {fullDate(item.from)} – {fullDate(item.to)} ·{' '}
+                    {t('{count} pageviews', { count: number(item.pageviews) })} · {item.timeZone}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -510,13 +559,16 @@ export function AnalyticsImports({
                     }}
                   >
                     {Date.parse(item.to) - Date.parse(item.from) >= 366 * 86400000
-                      ? 'View latest year'
-                      : 'View report'}
+                      ? t('View latest year')
+                      : t('View report')}
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Remove ${providerName(item.provider)} import from ${item.from}`}
+                    aria-label={t('Remove {provider} import from {date}', {
+                      provider: providerName(item.provider),
+                      date: fullDate(item.from),
+                    })}
                     disabled={busy !== null}
                     onClick={() => {
                       setRemoving(item);
@@ -542,23 +594,24 @@ export function AnalyticsImports({
       >
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle>Remove this import?</DialogTitle>
+            <DialogTitle>{t('Remove this import?')}</DialogTitle>
             <DialogDescription>
-              This removes the imported totals and breakdowns from your reports. Your Analytics Beer
-              tracking data stays unchanged. You can upload the export again later.
+              {t(
+                'This removes the imported totals and breakdowns from your reports. Your Analytics Beer tracking data stays unchanged. You can upload the export again later.',
+              )}
             </DialogDescription>
           </DialogHeader>
           {error && (
             <p className="px-6 pb-4 text-sm text-danger" role="alert">
-              {error}
+              {messageText(error)}
             </p>
           )}
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy === 'remove'} />}>
-              Keep import
+              {t('Keep import')}
             </DialogClose>
             <Button variant="destructive" loading={busy === 'remove'} onClick={() => void remove()}>
-              Remove import
+              {t('Remove import')}
             </Button>
           </DialogFooter>
         </DialogPopup>

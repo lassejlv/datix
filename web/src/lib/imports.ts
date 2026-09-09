@@ -1,3 +1,4 @@
+import { translate, type Translate } from './i18n/translations';
 export type ImportProvider = 'plausible' | 'ga4';
 export type ImportSummary = {
   id?: string;
@@ -41,11 +42,14 @@ export type ImportedReportSources = {
 };
 export const providerName = (provider: ImportProvider) =>
   provider === 'plausible' ? 'Plausible' : 'Google Analytics 4';
-export const breakdownName = (dimension: string) =>
-  ({
+export function breakdownName(dimension: string, t: Translate = (text) => translate('en', text)) {
+  const labels = {
     path: 'Pages',
     referrer: 'Referrers',
     country: 'Countries',
     device: 'Devices',
     event: 'Custom events',
-  })[dimension] ?? dimension;
+  } as const;
+  const key = labels[dimension as keyof typeof labels];
+  return key ? t(key) : dimension;
+}

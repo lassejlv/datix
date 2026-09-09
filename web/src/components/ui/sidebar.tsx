@@ -1,5 +1,7 @@
-// Source: https://coss.com/ui/r/sidebar.json (Coss UI). Adapted to project tokens and breakpoints.
 'use client';
+
+import { useSitePreferences } from '../site-preferences';
+// Source: https://coss.com/ui/r/sidebar.json (Coss UI). Adapted to project tokens and breakpoints.
 
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
@@ -173,6 +175,7 @@ export function Sidebar({
   variant?: 'sidebar' | 'floating' | 'inset';
   collapsible?: 'offcanvas' | 'icon' | 'none';
 }): React.ReactElement {
+  const { t } = useSitePreferences();
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === 'none') {
@@ -206,8 +209,8 @@ export function Sidebar({
           }
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Navigation</SheetTitle>
-            <SheetDescription>Choose your website, environment, and page.</SheetDescription>
+            <SheetTitle>{t('Navigation')}</SheetTitle>
+            <SheetDescription>{t('Choose your website, environment, and page.')}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetPopup>
@@ -268,13 +271,14 @@ export function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>): React.ReactElement {
+  const { t } = useSitePreferences();
   const { toggleSidebar, isMobile, openMobile, open } = useSidebar();
 
   return (
     <Button
       className={cn('size-7', className)}
       aria-expanded={isMobile ? openMobile : open}
-      title="Toggle navigation"
+      title={t('Toggle navigation')}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -286,7 +290,7 @@ export function SidebarTrigger({
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{t('Toggle Sidebar')}</span>
     </Button>
   );
 }
@@ -295,11 +299,12 @@ export function SidebarRail({
   className,
   ...props
 }: React.ComponentProps<'button'>): React.ReactElement {
+  const { t } = useSitePreferences();
   const { toggleSidebar } = useSidebar();
 
   return (
     <button
-      aria-label="Toggle Sidebar"
+      aria-label={t('Toggle Sidebar')}
       className={cn(
         'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
@@ -313,7 +318,7 @@ export function SidebarRail({
       data-slot="sidebar-rail"
       onClick={toggleSidebar}
       tabIndex={-1}
-      title="Toggle Sidebar"
+      title={t('Toggle Sidebar')}
       type="button"
       {...props}
     />

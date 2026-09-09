@@ -1,5 +1,7 @@
-// Source: https://coss.com/ui/r/combobox.json. Uses project tokens, icons and reduced-motion support.
 'use client';
+
+import { useSitePreferences } from '../site-preferences';
+// Source: https://coss.com/ui/r/combobox.json. Uses project tokens, icons and reduced-motion support.
 
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox';
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from './icons';
@@ -376,9 +378,10 @@ export function ComboboxChip({
 }
 
 export function ComboboxChipRemove(props: ComboboxPrimitive.ChipRemove.Props): React.ReactElement {
+  const { t } = useSitePreferences();
   return (
     <ComboboxPrimitive.ChipRemove
-      aria-label="Remove"
+      aria-label={t('Remove')}
       className="h-full shrink-0 cursor-pointer px-1.5 opacity-80 hover:opacity-100 [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5"
       data-slot="combobox-chip-remove"
       {...props}

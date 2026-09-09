@@ -1,3 +1,4 @@
+import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Eye, EyeOff } from './ui/icons';
 import { Button } from './ui/button';
@@ -16,6 +17,7 @@ export function AuthScreen({
   initialSignup?: boolean;
   onModeChange?: (signup: boolean) => void;
 }) {
+  const { message: messageText, t } = useSitePreferences();
   const [signup, setSignup] = useState(initialSignup);
   useEffect(() => setSignup(initialSignup), [initialSignup]);
   const [visible, setVisible] = useState(false);
@@ -50,7 +52,7 @@ export function AuthScreen({
       <div className="flex flex-col gap-1">
         <a
           href="/"
-          aria-label="Analytics Beer home"
+          aria-label={t('Analytics Beer home')}
           className="w-fit rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         >
           <Brand />
@@ -63,12 +65,12 @@ export function AuthScreen({
         {signup && (
           <aside className="hidden lg:block">
             <h2 className="text-[34px] font-medium leading-[1.15] tracking-tight">
-              Small script.
+              {t('Small script.')}
               <br />
-              Lovely insights.
+              {t('Lovely insights.')}
             </h2>
             <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-secondary-ink">
-              See your visitors, popular pages, and traffic sources.
+              {t('See your visitors, popular pages, and traffic sources.')}
             </p>
             <BeerBuddy className="mt-6 h-40 w-40" />
           </aside>
@@ -79,10 +81,10 @@ export function AuthScreen({
         >
           {signup && <BeerBuddy className="mb-4 h-16 w-16 lg:hidden" />}
           <h1 className="text-[24px] leading-[1.25] font-medium tracking-[-0.025em]">
-            {signup ? 'Make yourself at home.' : 'Sign in'}
+            {signup ? t('Make yourself at home.') : t('Sign in')}
           </h1>
           <p className="mt-2 text-sm text-secondary-ink">
-            {signup ? 'Create an account to get started.' : 'View your website analytics.'}
+            {signup ? t('Create an account to get started.') : t('View your website analytics.')}
           </p>
           <form
             onSubmit={submit}
@@ -90,7 +92,7 @@ export function AuthScreen({
           >
             {signup && (
               <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-name">
-                Your name
+                {t('Your name')}
                 <Input
                   id="auth-name"
                   name="name"
@@ -103,7 +105,7 @@ export function AuthScreen({
               </label>
             )}
             <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-email">
-              Email address
+              {t('Email address')}
               <Input
                 id="auth-email"
                 name="email"
@@ -116,7 +118,7 @@ export function AuthScreen({
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-password">
-              Password
+              {t('Password')}
               <div data-testid="password-control" className="relative">
                 <Input
                   className="[&_input]:pr-[46px]"
@@ -124,7 +126,7 @@ export function AuthScreen({
                   name="password"
                   type={visible ? 'text' : 'password'}
                   autoComplete={signup ? 'new-password' : 'current-password'}
-                  placeholder={signup ? 'At least 12 characters' : 'Enter your password'}
+                  placeholder={signup ? t('At least 12 characters') : t('Enter your password')}
                   required
                   minLength={signup ? 12 : undefined}
                   maxLength={128}
@@ -133,7 +135,7 @@ export function AuthScreen({
                 <button
                   className={`absolute top-0 right-0 grid ${signup ? 'h-full w-9' : 'size-11'} cursor-pointer place-items-center text-secondary-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring`}
                   type="button"
-                  aria-label={visible ? 'Hide password' : 'Show password'}
+                  aria-label={visible ? t('Hide password') : t('Show password')}
                   onClick={() => setVisible(!visible)}
                 >
                   {visible ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -142,7 +144,7 @@ export function AuthScreen({
             </label>
             {error && (
               <p className="text-sm leading-normal text-danger" role="alert">
-                {error}
+                {messageText(error)}
               </p>
             )}
             <Button
@@ -152,16 +154,16 @@ export function AuthScreen({
               className="mt-0.5 w-full text-sm sm:text-sm"
               loading={busy}
             >
-              {signup ? 'Create account' : 'Sign in'}
+              {signup ? t('Create account') : t('Sign in')}
             </Button>
           </form>
           {signup && (
             <p className="mt-4 text-xs leading-relaxed text-secondary-ink">
-              No card needed. No trial or subscription starts at signup.
+              {t('No card needed. No trial or subscription starts at signup.')}
             </p>
           )}
           <p className="mt-7 text-[13px] text-secondary-ink">
-            {signup ? 'Already have an account?' : 'New to Analytics Beer?'}{' '}
+            {signup ? t('Already have an account?') : t('New to Analytics Beer?')}{' '}
             <button
               className="ml-[3px] cursor-pointer text-foreground underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               type="button"
@@ -171,10 +173,13 @@ export function AuthScreen({
                 setError('');
               }}
             >
-              {signup ? 'Sign in' : 'Create an account'}
+              {signup ? t('Sign in') : t('Create an account')}
             </button>
           </p>
         </PageTransition>
+      </div>
+      <div className="mt-10 flex justify-center">
+        <FooterPreferences />
       </div>
     </main>
   );

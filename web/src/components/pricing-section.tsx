@@ -24,7 +24,7 @@ type Plan = { price: number; events: number; websites: number };
 const initialPlan: Plan = { ...proVolumes[0], websites: 10 };
 
 export function PricingSection() {
-  const { t, locale } = useSitePreferences();
+  const { number, message: messageText, t, locale } = useSitePreferences();
   const [selected, setSelected] = useState<Plan>(initialPlan);
   const [volume, setVolume] = useState(0);
   const enterprise = volume === proVolumes.length;
@@ -41,7 +41,6 @@ export function PricingSection() {
   }, []);
   const amount = (plan: Plan) => (yearly ? plan.price * 10 : plan.price);
   const interval = yearly ? t('year') : t('month');
-  const number = (value: number) => new Intl.NumberFormat(locale).format(value);
 
   const checkout = async () => {
     setBusy(true);
@@ -251,7 +250,7 @@ export function PricingSection() {
             </p>
             {error && (
               <p role="alert" className="text-sm text-danger">
-                {error}
+                {messageText(error)}
               </p>
             )}
             <div className="pricing-dialog-actions">

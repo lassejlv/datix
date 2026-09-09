@@ -1,3 +1,4 @@
+import type { Copy } from '../lib/i18n/translations';
 import { useSitePreferences } from './site-preferences';
 import { useMemo } from 'react';
 import { Activity } from './ui/icons';
@@ -9,30 +10,30 @@ import { Grid } from './dither-kit/grid';
 import { XAxis } from './dither-kit/x-axis';
 import { YAxis } from './dither-kit/y-axis';
 import { Tooltip } from './dither-kit/tooltip';
-import { dateLabel, number, type Metric, type Point } from '../lib/client';
+import { type Metric, type Point } from '../lib/client';
 
-const metricLabels: Record<Metric, string> = {
+const metricLabels: Record<Metric, Copy> = {
   pageviews: 'Pageviews',
   dailyUniqueVisitors: 'Daily visitors',
   customEvents: 'Events',
 };
 
 export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }) {
-  const { dark } = useSitePreferences();
+  const { dateLabel, number, t, dark } = useSitePreferences();
   const rows = useMemo(
     () => data.map((point) => ({ ...point, label: dateLabel(point.day) })),
-    [data],
+    [data, dateLabel],
   );
   const config = useMemo(() => {
     const ink: Rgb = dark ? [222, 222, 222] : [51, 51, 51];
     return {
       [metric]: {
-        label: metricLabels[metric],
+        label: t(metricLabels[metric]),
         color: 'grey' as const,
         seed: { fill: ink, line: ink, star: ink },
       },
     };
-  }, [metric, dark]);
+  }, [metric, dark, t]);
   const allZero = data.every((point) => point[metric] === 0);
 
   return (
@@ -43,9 +44,9 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
           role="status"
         >
           <Activity className="size-[22px] text-muted-foreground" />
-          <strong className="text-[15px] font-medium">No activity in this period</strong>
+          <strong className="text-[15px] font-medium">{t('No activity in this period')}</strong>
           <span className="text-[13px] text-secondary-ink max-md:max-w-[230px]">
-            Choose another date range or check your installation.
+            {t('Choose another date range or check your installation.')}
           </span>
         </div>
       ) : (
@@ -56,7 +57,7 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
             config={config}
             bloom="off"
             animationDuration={450}
-            ariaLabel="Daily traffic chart. Use left and right arrow keys to inspect each day."
+            ariaLabel={t('Daily traffic chart. Use left and right arrow keys to inspect each day.')}
             margins={{ top: 16, right: 8, bottom: 28, left: 36 }}
             className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >

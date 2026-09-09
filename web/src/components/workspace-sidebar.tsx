@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { AccountMenu } from './account-menu';
 import { Link } from '@tanstack/react-router';
 import {
@@ -55,19 +56,20 @@ export function WorkspaceSidebar({
   onSignOut: () => void;
   onAccountSettings: () => void;
 }) {
+  const { t } = useSitePreferences();
   const { setOpenMobile } = useSidebar();
   const action = (callback: () => void) => {
     setOpenMobile(false);
     callback();
   };
   return (
-    <Sidebar variant="inset" aria-label="Main navigation" className="border-sidebar-border">
+    <Sidebar variant="inset" aria-label={t('Main navigation')} className="border-sidebar-border">
       <SidebarHeader className="gap-0 px-5 pt-4 pb-3">
         <div className="flex min-h-8 items-center justify-between gap-2">
           <Brand />
           <Button
             className="md:hidden"
-            aria-label="Close navigation"
+            aria-label={t('Close navigation')}
             variant="ghost"
             size="icon"
             onClick={() => setOpenMobile(false)}
@@ -100,7 +102,7 @@ export function WorkspaceSidebar({
             />
           )}
         </div>
-        <nav aria-label="Workspace pages">
+        <nav aria-label={t('Workspace pages')}>
           <SidebarMenu>
             {(
               [
@@ -136,7 +138,7 @@ export function WorkspaceSidebar({
                     }
                   >
                     <item.icon />
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -148,7 +150,7 @@ export function WorkspaceSidebar({
                 render={<Link to="/usage" onClick={() => setOpenMobile(false)} />}
               >
                 <Activity />
-                <span>Usage</span>
+                <span>{t('Usage')}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

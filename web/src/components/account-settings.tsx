@@ -1,3 +1,4 @@
+import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type User } from '../lib/client';
 import { Button } from './ui/button';
@@ -17,20 +18,21 @@ export function AccountSettings({
   onUpdated: (user: User) => void;
   onDeleted: () => void;
 }) {
+  const { t } = useSitePreferences();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup
         className="max-w-[440px]"
         finalFocus={() => {
-          const account = document.querySelector<HTMLElement>('[aria-label="Account menu"]');
+          const account = document.querySelector<HTMLElement>('[data-testid="account-menu"]');
           return account?.getClientRects().length
             ? account
-            : document.querySelector<HTMLElement>('[aria-label="Toggle navigation"]');
+            : document.querySelector<HTMLElement>('[data-testid="navigation-toggle"]');
         }}
       >
         <DialogHeader>
-          <DialogTitle>Account settings</DialogTitle>
-          <DialogDescription>Manage your profile and password.</DialogDescription>
+          <DialogTitle>{t('Account settings')}</DialogTitle>
+          <DialogDescription>{t('Manage your profile and password.')}</DialogDescription>
         </DialogHeader>
         {open && <AccountForm user={user} onUpdated={onUpdated} onDeleted={onDeleted} />}
       </DialogPopup>
@@ -47,6 +49,7 @@ function AccountForm({
   onUpdated: (user: User) => void;
   onDeleted: () => void;
 }) {
+  const { message: messageText, t } = useSitePreferences();
   const [name, setName] = useState(user.name);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -120,9 +123,15 @@ function AccountForm({
   const fieldClass = 'flex flex-col gap-1.5 text-sm';
   return (
     <div className="min-h-0 overflow-y-auto px-6 pb-6">
+      <section
+        className="mb-5 border-b border-border pb-5"
+        aria-label={t('Language and appearance')}
+      >
+        <FooterPreferences />
+      </section>
       <form onSubmit={saveProfile} className="flex flex-col gap-4">
         <label className={fieldClass}>
-          Name
+          {t('Name')}
           <Input
             autoComplete="name"
             value={name}
@@ -136,7 +145,7 @@ function AccountForm({
           />
         </label>
         <label className={fieldClass}>
-          Email
+          {t('Email')}
           <Input
             type="email"
             autoComplete="email"
@@ -151,26 +160,26 @@ function AccountForm({
           disabled={!!busy || !name.trim() || name.trim() === user.name}
           loading={busy === 'profile'}
         >
-          Save name
+          {t('Save name')}
         </Button>
         {profileMessage && (
           <p role="status" className="text-xs text-success">
-            {profileMessage}
+            {messageText(profileMessage)}
           </p>
         )}
         {profileError && (
           <p role="alert" className="text-sm text-danger">
-            {profileError}
+            {messageText(profileError)}
           </p>
         )}
       </form>
       <details className="mt-5 border-t border-border pt-4">
         <summary className="cursor-pointer text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
-          Change password
+          {t('Change password')}
         </summary>
         <form onSubmit={savePassword} className="mt-4 flex flex-col gap-4">
           <label className={fieldClass}>
-            Current password
+            {t('Current password')}
             <Input
               type="password"
               autoComplete="current-password"
@@ -182,7 +191,7 @@ function AccountForm({
             />
           </label>
           <label className={fieldClass}>
-            New password
+            {t('New password')}
             <Input
               type="password"
               autoComplete="new-password"
@@ -195,7 +204,7 @@ function AccountForm({
             />
           </label>
           <label className={fieldClass}>
-            Confirm new password
+            {t('Confirm new password')}
             <Input
               type="password"
               autoComplete="new-password"
@@ -208,7 +217,7 @@ function AccountForm({
             />
           </label>
           <p className="text-xs text-secondary-ink">
-            Use 12–128 characters. Your other sessions will be signed out.
+            {t('Use 12–128 characters. Your other sessions will be signed out.')}
           </p>
           <Button
             type="submit"
@@ -216,31 +225,32 @@ function AccountForm({
             loading={busy === 'password'}
             disabled={!!busy}
           >
-            Update password
+            {t('Update password')}
           </Button>
           {passwordMessage && (
             <p role="status" className="text-xs text-success">
-              {passwordMessage}
+              {messageText(passwordMessage)}
             </p>
           )}
           {passwordError && (
             <p role="alert" className="text-sm text-danger">
-              {passwordError}
+              {messageText(passwordError)}
             </p>
           )}
         </form>
       </details>
       <details className="mt-5 border-t border-border pt-4">
         <summary className="cursor-pointer text-sm font-medium text-danger focus-visible:outline-2 focus-visible:outline-ring">
-          Delete account
+          {t('Delete account')}
         </summary>
         <p className="mt-3 text-sm leading-relaxed text-secondary-ink">
-          Permanently removes your account, websites, environments, and collected analytics. This
-          cannot be undone.
+          {t(
+            'Permanently removes your account, websites, environments, and collected analytics. This cannot be undone.',
+          )}
         </p>
         <form onSubmit={deleteAccount} className="mt-4 flex flex-col gap-4">
           <label className={fieldClass}>
-            Confirm your password
+            {t('Confirm your password')}
             <Input
               type="password"
               autoComplete="current-password"
@@ -258,11 +268,11 @@ function AccountForm({
             loading={busy === 'delete'}
             disabled={!!busy || !deletePassword}
           >
-            Permanently delete account
+            {t('Permanently delete account')}
           </Button>
           {deleteError && (
             <p role="alert" className="text-sm text-danger">
-              {deleteError}
+              {messageText(deleteError)}
             </p>
           )}
         </form>

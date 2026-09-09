@@ -210,7 +210,7 @@ export function CartesianRoot<TData extends Row>({
               height={size.height}
               className="absolute inset-0 overflow-visible"
               role="img"
-              aria-label="Chart"
+              aria-label={ariaLabel}
             >
               <g transform={`translate(${margins.left},${margins.top})`}>{svgChildren}</g>
             </svg>

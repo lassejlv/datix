@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { useState } from 'react';
 import { ChevronDown, Search, Plus } from './ui/icons';
 import {
@@ -25,6 +26,7 @@ export function WorkspaceSwitcher({
   onChange: (id: string) => void;
   onAdd: () => void;
 }) {
+  const { t } = useSitePreferences();
   const [open, setOpen] = useState(false);
   const selected = items.find((item) => item.id === selectedId) ?? null;
   const website = kind === 'website';
@@ -42,13 +44,13 @@ export function WorkspaceSwitcher({
       }}
     >
       <ComboboxTrigger
-        aria-label={`Selected ${kind}`}
+        aria-label={website ? t('Selected website') : t('Selected environment')}
         data-value={selectedId ?? ''}
         title={website ? selected?.description : undefined}
         className={`group flex h-10 w-full min-w-0 cursor-pointer items-center gap-2 rounded-md px-3 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default sm:h-8 ${website ? 'text-sm font-medium' : 'text-xs text-secondary-ink'}`}
       >
         <span className="min-w-0 flex-1 truncate">
-          {selected?.name ?? (website ? 'Choose a website' : 'Choose an environment')}
+          {selected?.name ?? (website ? t('Choose a website') : t('Choose an environment'))}
         </span>
         <ChevronDown
           size={12}
@@ -61,17 +63,17 @@ export function WorkspaceSwitcher({
       >
         <div className="p-2">
           <ComboboxInput
-            aria-label={`Search ${website ? 'websites' : 'environments'}`}
-            placeholder={`Find ${website ? 'a website' : 'an environment'}…`}
+            aria-label={website ? t('Search websites') : t('Search environments')}
+            placeholder={website ? t('Find a website…') : t('Find an environment…')}
             showTrigger={false}
             startAddon={<Search size={16} />}
             className="w-full rounded-md has-focus-visible:ring-0 has-focus-visible:border-ring"
           />
         </div>
         <ComboboxEmpty className="empty:hidden px-4 py-5 text-left text-sm text-secondary-ink">
-          No {website ? 'websites' : 'environments'} found.
+          {website ? t('No websites found.') : t('No environments found.')}
         </ComboboxEmpty>
-        <ComboboxList aria-label={website ? 'Websites' : 'Environments'}>
+        <ComboboxList aria-label={website ? t('Websites') : t('Environments')}>
           {(item: Option) => (
             <ComboboxItem
               key={item.id}
@@ -103,7 +105,7 @@ export function WorkspaceSwitcher({
             }}
           >
             <Plus size={14} />
-            {website ? 'Add a website' : 'Add environment'}
+            {website ? t('Add a website') : t('Add environment')}
           </button>
         </div>
       </ComboboxPopup>

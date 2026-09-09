@@ -1,7 +1,13 @@
 import { Globe2, Monitor } from './ui/icons';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Locale, Preferences, Theme } from '../lib/i18n/preferences';
-import { translations, type Copy } from '../lib/i18n/translations';
+import {
+  translate,
+  translateMessage,
+  formatLocale,
+  type Copy,
+  type Parameters,
+} from '../lib/i18n/translations';
 const Context = createContext({
   locale: 'en' as Locale,
   theme: 'system' as Theme,
@@ -63,15 +69,38 @@ export function SitePreferences({
 }
 export function useSitePreferences() {
   const context = useContext(Context);
+  const formatting = useMemo(() => {
+    const language = formatLocale[context.locale];
+    const formatter = new Intl.NumberFormat(language);
+    return {
+      t: (text: Copy, values?: Parameters) => translate(context.locale, text, values),
+      message: (text: string) => translateMessage(context.locale, text),
+      number: (value: number) => formatter.format(value),
+      dateLabel: (
+        day: string,
+        options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' },
+      ) =>
+        new Date(`${day}T12:00:00Z`).toLocaleDateString(language, { ...options, timeZone: 'UTC' }),
+      dateTime: (
+        value: string,
+        options: Intl.DateTimeFormatOptions = {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        },
+      ) => new Date(value).toLocaleString(language, { ...options, timeZone: 'UTC' }),
+    };
+  }, [context.locale]);
   return {
     ...context,
+    ...formatting,
     darkMedia:
       context.theme === 'system'
         ? '(prefers-color-scheme: dark)'
         : context.theme === 'dark'
           ? 'all'
           : 'not all',
-    t: (text: Copy) => (context.locale === 'en' ? text : translations[text][context.locale]),
   };
 }
 export function FooterPreferences() {

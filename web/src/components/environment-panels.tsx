@@ -1,8 +1,10 @@
+import { useSitePreferences } from './site-preferences';
 import { trackingSettingLabels, trackingSettings } from '../lib/tracking-settings';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { ArrowRight, Pause, Play, Trash2 } from './ui/icons';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { cn } from '../lib/utils';
 import {
   Dialog,
   DialogPopup,
@@ -26,6 +28,28 @@ function hostname(value: string) {
   return domain.replace(/\/$/, '');
 }
 
+const subsectionTitle = 'text-[15px] leading-[1.4] font-medium tracking-[-0.025em]';
+
+export function SettingsGroup({
+  title,
+  detail,
+  children,
+  className,
+}: {
+  title: string;
+  detail?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn(className)}>
+      <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">{title}</h2>
+      {detail ? <p className="mt-1 wrap-anywhere text-sm text-secondary-ink">{detail}</p> : null}
+      <div className="mt-5 flex flex-col gap-8">{children}</div>
+    </section>
+  );
+}
+
 export function AddEnvironmentDialog({
   site,
   open,
@@ -37,6 +61,7 @@ export function AddEnvironmentDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: (environment: SiteEnvironment) => void;
 }) {
+  const { t, message: messageText } = useSitePreferences();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   useEffect(() => {
@@ -73,7 +98,7 @@ export function AddEnvironmentDialog({
     >
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Add an environment</DialogTitle>
+          <DialogTitle>{t('Add an environment')}</DialogTitle>
           <DialogDescription>
             Keep traffic for testing, staging, or any other environment separate from {site.domain}
             ’s production reports.
@@ -85,7 +110,7 @@ export function AddEnvironmentDialog({
               className="flex flex-col gap-2 text-sm font-medium"
               htmlFor="new-environment-name"
             >
-              Environment name
+              {t('Environment name')}
               <Input
                 id="new-environment-name"
                 name="name"
@@ -99,7 +124,7 @@ export function AddEnvironmentDialog({
               className="flex flex-col gap-2 text-sm font-medium"
               htmlFor="new-environment-domain"
             >
-              Environment domain
+              {t('Environment domain')}
               <Input
                 id="new-environment-domain"
                 name="domain"
@@ -110,8 +135,9 @@ export function AddEnvironmentDialog({
                 size="lg"
               />
               <span className="text-[13px] leading-normal font-normal text-muted-foreground">
-                Use the same domain or a separate staging domain. Each environment gets its own
-                script.
+                {t(
+                  'Use the same domain or a separate staging domain. Each environment gets its own script.',
+                )}
               </span>
             </label>
             <label
@@ -124,18 +150,20 @@ export function AddEnvironmentDialog({
                 type="checkbox"
                 className="mt-1 size-4 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               />
-              Allow localhost for testing
+              {t('Allow localhost for testing')}
             </label>
             {error && (
               <p className="text-sm text-danger" role="alert">
-                {error}
+                {messageText(error)}
               </p>
             )}
           </div>
           <DialogFooter>
-            <DialogClose render={<Button variant="outline" disabled={busy} />}>Cancel</DialogClose>
+            <DialogClose render={<Button variant="outline" disabled={busy} />}>
+              {t('Cancel')}
+            </DialogClose>
             <Button type="submit" loading={busy}>
-              Add environment
+              {t('Add environment')}
               <ArrowRight size={15} />
             </Button>
           </DialogFooter>
@@ -149,13 +177,16 @@ export function LocalhostSetting({
   environment,
   busy,
   onChange,
+  className,
 }: {
   environment: SiteEnvironment;
   busy: boolean;
   onChange: (enabled: boolean) => void;
+  className?: string;
 }) {
+  const { t } = useSitePreferences();
   return (
-    <section className="mb-8">
+    <section className={cn(className)}>
       <label
         className="flex cursor-pointer items-start gap-3 has-disabled:cursor-default"
         htmlFor="allow-localhost"
@@ -169,30 +200,32 @@ export function LocalhostSetting({
           aria-describedby="localhost-help"
           className="mt-1 size-4 shrink-0 cursor-pointer accent-primary disabled:cursor-default disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         />
-        <span className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-          Allow localhost for testing
-        </span>
+        <span className={subsectionTitle}>{t('Allow localhost for testing')}</span>
       </label>
       <p id="localhost-help" className="mt-1.5 pl-7 text-sm leading-[1.6] text-secondary-ink">
-        Accept activity from localhost, 127.0.0.1, and ::1 on any port. Test activity is included
-        only in {environment.name}’s reports. Localhost pageviews use 0.3 credits; other events use
-        0.15 credits. Do Not Track still prevents collection.
+        {t(
+          'Accept activity from localhost, 127.0.0.1, and ::1 on any port. Test activity is included only in {environment}’s reports. Localhost pageviews use 0.3 credits; other events use 0.15 credits. Do Not Track still prevents collection.',
+          { environment: environment.name },
+        )}
       </p>
     </section>
   );
 }
 
 export function EnvironmentSettings({
+  section = 'environment',
   site,
   environment,
   onUpdated,
   onDeleted,
 }: {
+  section?: 'environment' | 'tracking';
   site: Site;
   environment: SiteEnvironment;
   onUpdated: (environment: SiteEnvironment) => void;
   onDeleted: () => void;
 }) {
+  const { t, message: messageText } = useSitePreferences();
   const [name, setName] = useState(environment.name),
     [domain, setDomain] = useState(environment.domain);
   const [busy, setBusy] = useState(false),
@@ -237,142 +270,159 @@ export function EnvironmentSettings({
   }
   return (
     <div className="mb-10">
-      <TrackingModeSetting
-        environment={environment}
-        busy={busy}
-        onChange={(trackingMode) => {
-          void update({ trackingMode });
-        }}
-      />
-      <section className="mb-8" aria-labelledby="tracking-controls-heading">
-        <h2 id="tracking-controls-heading" className="text-[17px] font-medium tracking-[-0.025em]">
-          What to track
-        </h2>
-        <p className="mt-1.5 text-sm leading-relaxed text-secondary-ink">
-          Choose which events and details {environment.name} collects. Changes apply to new
-          activity; existing reports are kept.
-        </p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {Object.entries(trackingSettingLabels).map(([key, label]) => {
-            const setting = key as keyof typeof trackingSettingLabels;
-            return (
-              <label key={key} className="flex items-center gap-3 text-sm">
-                <input
-                  type="checkbox"
-                  className="size-4 accent-primary"
-                  checked={trackingSettings(environment.trackingSettings)[setting]}
-                  disabled={busy}
-                  onChange={(event) => {
-                    void update({
-                      trackingSettings: {
-                        ...trackingSettings(environment.trackingSettings),
-                        [setting]: event.target.checked,
-                      },
-                    });
-                  }}
-                />
-                {label}
-              </label>
-            );
-          })}
-        </div>
-        <p className="mt-4 text-sm text-secondary-ink">
-          Production pageviews use 1 credit; other events use 0.5 credits. Engagement time is free.
-        </p>
-      </section>
-      <section className="mb-8">
-        <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-          Environment details
-        </h2>
-        <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink">
-          Settings for {environment.name}.
-        </p>
-        <form
-          className="mt-5 grid gap-4 sm:grid-cols-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void update({
-              name,
-              ...(!isDefault ? { domain: hostname(domain) } : {}),
-            });
+      <div hidden={section !== 'tracking'}>
+        <TrackingModeSetting
+          environment={environment}
+          busy={busy}
+          onChange={(trackingMode) => {
+            void update({ trackingMode });
           }}
-        >
-          <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="environment-name">
-            Environment name
-            <Input
-              id="environment-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              maxLength={40}
-              size="lg"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="environment-domain">
-            Environment domain
-            <Input
-              id="environment-domain"
-              value={domain}
-              onChange={(event) => setDomain(event.target.value)}
-              required
-              readOnly={isDefault}
-              maxLength={2048}
-              size="lg"
-            />
-            {isDefault && (
-              <span className="text-[13px] leading-normal font-normal text-muted-foreground">
-                Add an environment to track a different domain.
-              </span>
+        />
+        <section className="mb-8" aria-labelledby="tracking-controls-heading">
+          <h2
+            id="tracking-controls-heading"
+            className="text-[17px] font-medium tracking-[-0.025em]"
+          >
+            {t('What to track')}
+          </h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-secondary-ink">
+            {t(
+              'Choose which events and details {environment} collects. Changes apply to new activity; existing reports are kept.',
+              { environment: environment.name },
             )}
-          </label>
-          <Button className="justify-self-start sm:col-span-2" type="submit" loading={busy}>
-            Save environment
-          </Button>
-        </form>
-      </section>
-      <section className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
-        <div className="min-w-0 flex-1">
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {Object.entries(trackingSettingLabels).map(([key, label]) => {
+              const setting = key as keyof typeof trackingSettingLabels;
+              return (
+                <label key={key} className="flex items-center gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-primary"
+                    checked={trackingSettings(environment.trackingSettings)[setting]}
+                    disabled={busy}
+                    onChange={(event) => {
+                      void update({
+                        trackingSettings: {
+                          ...trackingSettings(environment.trackingSettings),
+                          [setting]: event.target.checked,
+                        },
+                      });
+                    }}
+                  />
+                  {t(label)}
+                </label>
+              );
+            })}
+          </div>
+          <p className="mt-4 text-sm text-secondary-ink">
+            {t(
+              'Production pageviews use 1 credit; other events use 0.5 credits. Engagement time is free.',
+            )}
+          </p>
+        </section>
+      </div>
+      <div hidden={section !== 'environment'}>
+        <section className="mb-8">
           <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-            {environment.enabled ? 'Collection is active' : 'Collection is paused'}
+            {t('Environment details')}
           </h2>
           <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink">
-            {environment.enabled
-              ? `New pageviews and events are being accepted for ${environment.name}.`
-              : 'Existing analytics are kept. Other environments are unaffected.'}
+            {t('Settings for {environment}.', { environment: environment.name })}
           </p>
-        </div>
-        <Button
-          variant="outline"
-          disabled={busy}
-          onClick={() => update({ enabled: !environment.enabled })}
-        >
-          {environment.enabled ? <Pause size={15} /> : <Play size={15} />}
-          {environment.enabled ? 'Pause collection' : 'Resume collection'}
-        </Button>
-      </section>
-      <LocalhostSetting
-        environment={environment}
-        busy={busy}
-        onChange={(allowLocalhost) => {
-          void update({ allowLocalhost });
-        }}
-      />
+          <form
+            className="mt-5 grid gap-4 sm:grid-cols-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void update({
+                name,
+                ...(!isDefault ? { domain: hostname(domain) } : {}),
+              });
+            }}
+          >
+            <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="environment-name">
+              {t('Environment name')}
+              <Input
+                id="environment-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                required
+                maxLength={40}
+                size="lg"
+              />
+            </label>
+            <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="environment-domain">
+              {t('Environment domain')}
+              <Input
+                id="environment-domain"
+                value={domain}
+                onChange={(event) => setDomain(event.target.value)}
+                required
+                readOnly={isDefault}
+                maxLength={2048}
+                size="lg"
+              />
+              {isDefault && (
+                <span className="text-[13px] leading-normal font-normal text-muted-foreground">
+                  {t('Add an environment to track a different domain.')}
+                </span>
+              )}
+            </label>
+            <Button className="justify-self-start sm:col-span-2" type="submit" loading={busy}>
+              {t('Save environment')}
+            </Button>
+          </form>
+        </section>
+        <section className="mb-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
+              {environment.enabled ? t('Collection is active') : t('Collection is paused')}
+            </h2>
+            <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink">
+              {environment.enabled
+                ? t('New pageviews and events are being accepted for {environment}.', {
+                    environment: environment.name,
+                  })
+                : t('Existing analytics are kept. Other environments are unaffected.')}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            disabled={busy}
+            onClick={() => update({ enabled: !environment.enabled })}
+          >
+            {environment.enabled ? <Pause size={15} /> : <Play size={15} />}
+            {environment.enabled ? t('Pause collection') : t('Resume collection')}
+          </Button>
+        </section>
+        <LocalhostSetting
+          environment={environment}
+          busy={busy}
+          onChange={(allowLocalhost) => {
+            void update({ allowLocalhost });
+          }}
+        />
+      </div>
       {saved && (
         <p className="my-4 text-sm text-success" role="status">
-          {saved}
+          {messageText(saved)}
         </p>
       )}
       {error && !deleting && (
         <p className="text-sm text-danger" role="alert">
-          {error}
+          {messageText(error)}
         </p>
       )}
-      {!isDefault && (
+      {section === 'environment' && !isDefault && (
         <section className="mt-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
           <div className="min-w-0 flex-1">
-            <h2 className="text-[17px] font-medium tracking-[-0.025em]">Remove this environment</h2>
+            <h2 className="text-[17px] font-medium tracking-[-0.025em]">
+              {t('Remove this environment')}
+            </h2>
             <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink">
-              Delete {environment.name} and its traffic. Other environments are kept.
+              {t('Delete {environment} and its traffic. Other environments are kept.', {
+                environment: environment.name,
+              })}
             </p>
           </div>
           <Button
@@ -384,7 +434,7 @@ export function EnvironmentSettings({
             }}
           >
             <Trash2 size={15} />
-            Delete environment
+            {t('Delete environment')}
           </Button>
         </section>
       )}
@@ -396,10 +446,11 @@ export function EnvironmentSettings({
       >
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle>Delete {environment.name}?</DialogTitle>
+            <DialogTitle>{t('Delete {name}?', { name: environment.name })}</DialogTitle>
             <DialogDescription>
-              All pageviews, events, and history for this environment will be permanently deleted.
-              Other environments are unaffected.
+              {t(
+                'All pageviews, events, and history for this environment will be permanently deleted. Other environments are unaffected.',
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-[22px] px-6 pb-6">
@@ -407,7 +458,7 @@ export function EnvironmentSettings({
               className="flex flex-col gap-2 text-sm font-medium"
               htmlFor="delete-environment-confirm"
             >
-              Type {environment.name} to confirm
+              {t('Type {name} to confirm', { name: environment.name })}
               <Input
                 id="delete-environment-confirm"
                 value={confirm}
@@ -418,13 +469,13 @@ export function EnvironmentSettings({
             </label>
             {error && (
               <p className="text-sm text-danger" role="alert">
-                {error}
+                {messageText(error)}
               </p>
             )}
           </div>
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy} />}>
-              Keep environment
+              {t('Keep environment')}
             </DialogClose>
             <Button
               variant="destructive"
@@ -432,7 +483,7 @@ export function EnvironmentSettings({
               disabled={confirm !== environment.name}
               onClick={remove}
             >
-              Delete environment
+              {t('Delete environment')}
             </Button>
           </DialogFooter>
         </DialogPopup>
@@ -450,6 +501,7 @@ export function TrackingModeSetting({
   busy: boolean;
   onChange: (mode: SiteEnvironment['trackingMode']) => void;
 }) {
+  const { t } = useSitePreferences();
   const [mode, setMode] = useState<SiteEnvironment['trackingMode']>(
       environment.trackingMode === 'local' ? 'cookieless' : environment.trackingMode,
     ),
@@ -459,15 +511,17 @@ export function TrackingModeSetting({
   }, [environment.trackingMode]);
   return (
     <section className="mb-9 max-w-[640px]">
-      <h2 className="text-[17px] font-medium">Tracking mode</h2>
+      <h2 className="text-[17px] font-medium">{t('Tracking mode')}</h2>
       <p className="mt-1.5 text-sm leading-relaxed text-secondary-ink">
-        Choose how {environment.name} measures visits. After changing modes, replace the script on
-        your website.
+        {t(
+          'Choose how {environment} measures visits. After changing modes, replace the script on your website.',
+          { environment: environment.name },
+        )}
       </p>
       <label className="mt-4 flex max-w-[440px] flex-col gap-2 text-sm font-medium">
-        Analytics mode
+        {t('Analytics mode')}
         <select
-          aria-label="Analytics mode"
+          aria-label={t('Analytics mode')}
           className="h-11 rounded-md border border-input bg-background px-3 text-foreground"
           value={mode}
           onChange={(event) => {
@@ -475,39 +529,40 @@ export function TrackingModeSetting({
             setAcknowledged(false);
           }}
         >
-          <option value="cookieless">Cookieless · visitors and page journeys</option>
-          <option value="sessions">Cookie-based · sessions and activity</option>
+          <option value="cookieless">{t('Cookieless · visitors and page journeys')}</option>
+          <option value="sessions">{t('Cookie-based · sessions and activity')}</option>
         </select>
       </label>
       {environment.trackingMode === 'local' && (
         <p className="mt-3 text-sm text-secondary-ink">
-          This environment still uses the previous local-storage mode. Save Cookieless and replace
-          your website script to switch to anonymous daily visitors.
+          {t(
+            'This environment still uses the previous local-storage mode. Save Cookieless and replace your website script to switch to anonymous daily visitors.',
+          )}
         </p>
       )}
       {mode === 'cookieless' && (
         <p className="mt-3 text-sm leading-relaxed text-secondary-ink">
-          Anonymous daily visitors, page journeys, browser, device, screen size, clicks, scroll
-          depth, and active time. No cookies or local storage. Identities reset each UTC day; people
-          sharing a network and browser may be grouped together.
+          {t(
+            'Anonymous daily visitors, page journeys, browser, device, screen size, clicks, scroll depth, and active time. No cookies or local storage. Identities reset each UTC day; people sharing a network and browser may be grouped together.',
+          )}
         </p>
       )}
       {mode !== 'cookieless' && (
         <div className="mt-4 rounded-md border border-border bg-muted p-4 text-sm leading-relaxed">
           <p className="font-medium">
             {mode === 'local'
-              ? 'Uses local storage — analytics consent is required.'
-              : 'Uses cookies — a cookie banner is required.'}
+              ? t('Uses local storage \u2014 analytics consent is required.')
+              : t('Uses cookies \u2014 a cookie banner is required.')}
           </p>
           <p className="mt-2 text-secondary-ink">
-            Connect your banner before using this mode. Tracking starts only after analytics consent
-            and must stop when consent is withdrawn. Explain the data collected in your cookie and
-            privacy notices.
+            {t(
+              'Connect your banner before using this mode. Tracking starts only after analytics consent and must stop when consent is withdrawn. Explain the data collected in your cookie and privacy notices.',
+            )}
           </p>
           <p className="mt-2 text-secondary-ink">
-            Includes sessions, page visits, clicks, links, downloads, form submissions, scroll
-            depth, active time, browser, device, and screen size. Field values and page text are
-            excluded. Detailed activity is kept for 30 days.
+            {t(
+              'Includes sessions, page visits, clicks, links, downloads, form submissions, scroll depth, active time, browser, device, and screen size. Field values and page text are excluded. Detailed activity is kept for 30 days.',
+            )}
           </p>
           {environment.trackingMode !== mode && (
             <label className="mt-3 flex items-start gap-3">
@@ -518,8 +573,8 @@ export function TrackingModeSetting({
                 onChange={(event) => setAcknowledged(event.target.checked)}
               />
               {mode === 'local'
-                ? 'I understand that local storage requires analytics consent.'
-                : 'I understand that I need a cookie banner and analytics consent.'}
+                ? t('I understand that local storage requires analytics consent.')
+                : t('I understand that I need a cookie banner and analytics consent.')}
             </label>
           )}
         </div>
@@ -531,12 +586,12 @@ export function TrackingModeSetting({
           disabled={mode !== 'cookieless' && !acknowledged}
           onClick={() => onChange(mode)}
         >
-          Save tracking mode
+          {t('Save tracking mode')}
         </Button>
       )}
       {environment.trackingMode !== 'cookieless' && (
         <p className="mt-3 text-sm text-secondary-ink">
-          Get the consent integration code from Install.
+          {t('Get the consent integration code from Install.')}
         </p>
       )}
     </section>

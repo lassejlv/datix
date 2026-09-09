@@ -1,5 +1,7 @@
-// Source: https://coss.com/ui/r/sheet.json (Coss UI). Adapted to project tokens and breakpoints.
 'use client';
+
+import { useSitePreferences } from '../site-preferences';
+// Source: https://coss.com/ui/r/sheet.json (Coss UI). Adapted to project tokens and breakpoints.
 
 import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
 import { mergeProps } from '@base-ui/react/merge-props';
@@ -80,6 +82,7 @@ export function SheetPopup({
   closeProps?: SheetPrimitive.Close.Props;
   portalProps?: SheetPrimitive.Portal.Props;
 }): React.ReactElement {
+  const { t } = useSitePreferences();
   return (
     <SheetPortal {...portalProps}>
       <SheetBackdrop />
@@ -105,7 +108,7 @@ export function SheetPopup({
           {children}
           {showCloseButton && (
             <SheetPrimitive.Close
-              aria-label="Close"
+              aria-label={t('Close')}
               className="absolute end-2 top-2"
               render={<Button size="icon" variant="ghost" />}
               {...closeProps}

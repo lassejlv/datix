@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check } from './ui/icons';
 import { Button } from './ui/button';
@@ -24,16 +25,17 @@ export function BeerBuddy({
 }
 
 export function WelcomeOnboarding({ onAdd }: { name: string; onAdd: () => void }) {
+  const { t } = useSitePreferences();
   return (
     <div className="max-w-[600px]">
-      <h1 className="text-[22px] font-medium tracking-tight">Getting started</h1>
+      <h1 className="text-[22px] font-medium tracking-tight">{t('Getting started')}</h1>
       <p className="mt-2 text-sm text-secondary-ink">
-        Add your website, then install the tracking script.
+        {t('Add your website, then install the tracking script.')}
       </p>
       <Button className="mt-5" onClick={onAdd}>
-        Add your first website
+        {t('Add your first website')}
       </Button>
-      <p className="mt-3 text-xs text-secondary-ink">Cookieless by default.</p>
+      <p className="mt-3 text-xs text-secondary-ink">{t('Cookieless by default.')}</p>
     </div>
   );
 }
@@ -53,6 +55,7 @@ export function SetupOnboarding({
   onInstallation: () => void;
   onComplete: () => void;
 }) {
+  const { message: messageText, t } = useSitePreferences();
   const [connected, setConnected] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
@@ -87,52 +90,57 @@ export function SetupOnboarding({
     <div className="max-w-[600px]">
       {checking ? (
         <p role="status" className="py-12 text-secondary-ink">
-          Checking your connection…
+          {t('Checking your connection…')}
         </p>
       ) : (
         <PageTransition view={connected ? 'connected' : 'connect'}>
           {connected ? (
             <div>
               <p className="mb-3 flex items-center gap-2 text-xs text-success">
-                <Check size={14} /> Pageview received
+                <Check size={14} /> {t('Pageview received')}
               </p>
               <h1
                 ref={successHeading}
                 tabIndex={-1}
                 className="text-[22px] font-medium tracking-tight focus-visible:outline-2 focus-visible:outline-ring"
               >
-                You’re connected
+                {t('You’re connected')}
               </h1>
               <p className="mt-2 text-sm text-secondary-ink wrap-anywhere">
-                {environment.domain} is sending pageviews.
+                {t('{domain} is sending pageviews.', { domain: environment.domain })}
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
-                <Button onClick={onDashboard}>Open dashboard</Button>
+                <Button onClick={onDashboard}>{t('Open dashboard')}</Button>
                 <Button variant="ghost" onClick={onInstallation}>
-                  Review installation
+                  {t('Review installation')}
                 </Button>
               </div>
             </div>
           ) : (
             <>
               <div className="mb-6">
-                <h1 className="text-[22px] font-medium tracking-tight">Connect your website</h1>
+                <h1 className="text-[22px] font-medium tracking-tight">
+                  {t('Connect your website')}
+                </h1>
                 <p className="mt-2 text-sm text-secondary-ink wrap-anywhere">
-                  Install the script on {environment.domain}, then check the connection.
+                  {t('Install the script on {domain}, then check the connection.', {
+                    domain: environment.domain,
+                  })}
                 </p>
               </div>
               {error && (
                 <div role="alert" className="mb-5 text-sm text-danger">
-                  {error}
+                  {messageText(error)}
                   <Button variant="outline" className="ml-3" onClick={() => setRetry((v) => v + 1)}>
-                    Retry connection check
+                    {t('Retry connection check')}
                   </Button>
                 </div>
               )}
               {!environment.enabled && (
                 <p role="status" className="mb-5 rounded-md bg-muted p-4 text-sm">
-                  Collection is paused. Resume it in Website settings before testing your
-                  connection.
+                  {t(
+                    'Collection is paused. Resume it in Website settings before testing your connection.',
+                  )}
                 </p>
               )}
               <div className="">
@@ -150,10 +158,10 @@ export function SetupOnboarding({
               </div>
               <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs text-secondary-ink">
-                  Your website is saved. You can come back to Getting started anytime.
+                  {t('Your website is saved. You can come back to Getting started anytime.')}
                 </p>
                 <Button variant="ghost" onClick={onDashboard}>
-                  Explore dashboard first <ArrowRight size={14} />
+                  {t('Explore dashboard first')} <ArrowRight size={14} />
                 </Button>
               </div>
             </>

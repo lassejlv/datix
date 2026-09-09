@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { useEffect, useState } from 'react';
 import { apiClient, errorText } from '../lib/client';
 import { Button } from './ui/button';
@@ -12,6 +13,7 @@ export const billingVolumes = [
 ] as const;
 
 export function BillingActions({ active, refresh }: { active: boolean; refresh: () => void }) {
+  const { locale, number, message: messageText, t } = useSitePreferences();
   const [hasCustomer, setHasCustomer] = useState(false);
   const [events, setEvents] = useState<number>(100000);
   const [busy, setBusy] = useState(false);
@@ -44,7 +46,9 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     try {
       const result = await apiClient<{ url?: string }>(path, {
         method: 'POST',
-        body: JSON.stringify(path.endsWith('checkout') ? { events, interval: 'month' } : {}),
+        body: JSON.stringify(
+          path.endsWith('checkout') ? { events, interval: 'month', locale } : {},
+        ),
       });
       if (result.url) window.location.assign(result.url);
       else {
@@ -60,15 +64,16 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     <div className="mt-5 space-y-3">
       {returned && !active && (
         <p role="status" className="text-sm text-secondary-ink">
-          Waiting for Polar to confirm your subscription. Your allowance will appear here once it is
-          active.
+          {t(
+            'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
+          )}
         </p>
       )}
       <div className="flex flex-wrap items-center gap-3">
         {!active && (
           <>
             <label className="sr-only" htmlFor="billing-volume">
-              Monthly plan
+              {t('Monthly plan')}
             </label>
             <select
               id="billing-volume"
@@ -79,18 +84,21 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
             >
               {billingVolumes.map((p) => (
                 <option key={p.events} value={p.events}>
-                  {p.events.toLocaleString('en')} events · ${p.price}/month
+                  {t('{events} events · ${price}/month', {
+                    events: number(p.events),
+                    price: number(p.price),
+                  })}
                 </option>
               ))}
             </select>
             <Button disabled={busy} onClick={() => void act('/billing/checkout')}>
-              {busy ? 'Opening…' : 'Start Pro'}
+              {busy ? t('Opening…') : t('Start Pro')}
             </Button>
           </>
         )}
         {(hasCustomer || active) && (
           <Button variant="outline" disabled={busy} onClick={() => void act('/billing/portal')}>
-            Manage billing
+            {t('Manage billing')}
           </Button>
         )}
         <button
@@ -98,19 +106,19 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
           disabled={busy}
           onClick={() => void act('/billing/sync')}
         >
-          Refresh subscription
+          {t('Refresh subscription')}
         </button>
       </div>
       {!active && (
         <p className="text-xs text-secondary-ink">
           {events === 100000
-            ? '14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.'
-            : 'Paid subscription from the start. This plan has no free trial.'}
+            ? t('14-day trial on Pro 100k, then $9/month. Confirm payment details in Polar.')
+            : t('Paid subscription from the start. This plan has no free trial.')}
         </p>
       )}
       {error && (
         <p role="alert" className="text-sm text-danger">
-          {error}
+          {messageText(error)}
         </p>
       )}
     </div>

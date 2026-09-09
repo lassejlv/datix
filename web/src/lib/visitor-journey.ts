@@ -1,3 +1,5 @@
+import { translate, type Copy } from './i18n/translations';
+import type { Locale } from './i18n/preferences';
 import type { ActivityDetails } from './session-tracking';
 export type Visit = {
   id: string;
@@ -41,13 +43,16 @@ export type VisitReport = {
 };
 const animals = ['Robin', 'Rabbit', 'Cat', 'Fish', 'Squirrel', 'Turtle'] as const;
 const moods = ['Curious', 'Sunny', 'Gentle', 'Bright', 'Cosy', 'Little'] as const;
-export function visitorAlias(key: string) {
+export function visitorAlias(key: string, locale: Locale = 'en') {
   let hash = 0;
   for (const char of key) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
   const animal = animals[hash % animals.length]!;
   return {
     animal,
-    name: `${moods[Math.floor(hash / animals.length) % moods.length]} ${animal}`,
+    name: translate(
+      locale,
+      `${moods[Math.floor(hash / animals.length) % moods.length]} ${animal}` as Copy,
+    ),
   };
 }
 export const activeDuration = (seconds: number) =>
@@ -62,23 +67,23 @@ export const visitDate = (value: string) =>
     minute: '2-digit',
     timeZone: 'UTC',
   });
-export function activityTitle(event: Activity) {
+export function activityTitle(event: Activity, locale: Locale = 'en') {
   switch (event.kind) {
     case 'pageview':
-      return 'Opened a page';
+      return translate(locale, 'Opened a page');
     case 'click':
-      return 'Clicked an element';
+      return translate(locale, 'Clicked an element');
     case 'outbound':
-      return 'Clicked an external link';
+      return translate(locale, 'Clicked an external link');
     case 'download':
-      return 'Clicked a download';
+      return translate(locale, 'Clicked a download');
     case 'form_submit':
-      return 'Submitted a form';
+      return translate(locale, 'Submitted a form');
     case 'scroll':
-      return `Scrolled to ${event.details.scrollDepth ?? 0}%`;
+      return translate(locale, 'Scrolled to {depth}%', { depth: event.details.scrollDepth ?? 0 });
     case 'custom':
-      return event.name || 'Triggered an event';
+      return event.name || translate(locale, 'Triggered an event');
     default:
-      return 'Spent time on the page';
+      return translate(locale, 'Spent time on the page');
   }
 }

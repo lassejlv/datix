@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { agentInstallationInstructions } from '../lib/agent-installation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Check, Copy, ArrowRight, CircleCheck, RefreshCw, Trash2 } from './ui/icons';
@@ -24,6 +25,7 @@ export function AddSiteDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: (site: Site) => void;
 }) {
+  const { t, message: messageText } = useSitePreferences();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
   useEffect(() => {
@@ -63,15 +65,15 @@ export function AddSiteDialog({
     >
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Add a website</DialogTitle>
+          <DialogTitle>{t('Add a website')}</DialogTitle>
           <DialogDescription>
-            Give your website a name and tell us where to find it.
+            {t('Give your website a name and tell us where to find it.')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit}>
           <div className="px-6 pb-6 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="site-name">
-              Website name
+              {t('Website name')}
               <Input
                 id="site-name"
                 name="name"
@@ -82,7 +84,7 @@ export function AddSiteDialog({
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="site-domain">
-              Website domain
+              {t('Website domain')}
               <Input
                 id="site-domain"
                 name="domain"
@@ -92,19 +94,21 @@ export function AddSiteDialog({
                 size="default"
               />
               <span className="text-[13px] leading-normal font-normal text-muted-foreground">
-                Use the exact domain your visitors see, including www if needed.
+                {t('Use the exact domain your visitors see, including www if needed.')}
               </span>
             </label>
             {error && (
               <p className="text-sm leading-normal text-danger" role="alert">
-                {error}
+                {messageText(error)}
               </p>
             )}
           </div>
           <DialogFooter>
-            <DialogClose render={<Button variant="outline" disabled={busy} />}>Cancel</DialogClose>
+            <DialogClose render={<Button variant="outline" disabled={busy} />}>
+              {t('Cancel')}
+            </DialogClose>
             <Button type="submit" loading={busy}>
-              Add website
+              {t('Add website')}
               <ArrowRight size={15} />
             </Button>
           </DialogFooter>
@@ -129,6 +133,7 @@ export function Installation({
   onDashboard: () => void;
   onUpdated: (environment: SiteEnvironment) => void;
 }) {
+  const { t, message: messageText } = useSitePreferences();
   const [origin, setOrigin] = useState(''),
     [copied, setCopied] = useState(false),
     [agentCopied, setAgentCopied] = useState(false),
@@ -152,8 +157,8 @@ export function Installation({
       if (status.receiving) onConnected?.();
       setMessage(
         status.receiving
-          ? 'Your script is working. We received a pageview.'
-          : 'No pageview yet. Visit your website, wait a few seconds, then check again.',
+          ? t('Your script is working. We received a pageview.')
+          : t('No pageview yet. Visit your website, wait a few seconds, then check again.'),
       );
     } catch (error) {
       setError(errorText(error));
@@ -203,16 +208,19 @@ export function Installation({
       {!guided && (
         <div className="mb-6">
           <h1 className="text-[22px] leading-[1.25] font-medium tracking-[-0.025em]">
-            Install your script
+            {t('Install your script')}
           </h1>
           <p className="mt-2 text-secondary-ink wrap-anywhere">
-            Connect {environment.domain} to {environment.name}.
+            {t('Connect {domain} to {environment}.', {
+              domain: environment.domain,
+              environment: environment.name,
+            })}
           </p>
         </div>
       )}
       {agentFallback && (
         <label className="mb-5 block text-sm">
-          Copy these agent instructions manually
+          {t('Copy these agent instructions manually')}
           <textarea
             readOnly
             value={agentInstructions}
@@ -228,10 +236,13 @@ export function Installation({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-              Copy your tracking script
+              {t('Copy your tracking script')}
             </h2>
             <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
-              This script sends traffic only to {environment.name} for {environment.domain}.
+              {t('This script sends traffic only to {environment} for {domain}.', {
+                environment: environment.name,
+                domain: environment.domain,
+              })}
             </p>
           </div>
           <div className="flex gap-2 max-md:ml-10">
@@ -242,11 +253,11 @@ export function Installation({
               title="Copy installation instructions for an AI agent"
             >
               {agentCopied ? <Check size={15} /> : <Copy size={15} />}
-              {agentCopied ? 'Copied for agent' : 'Agent'}
+              {agentCopied ? t('Copied for agent') : t('Agent')}
             </Button>
             <Button variant="outline" disabled={!origin} onClick={copy}>
               {copied ? <Check size={15} /> : <Copy size={15} />}
-              {copied ? 'Copied' : 'Copy script'}
+              {copied ? t('Copied') : t('Copy script')}
             </Button>
           </div>
         </div>
@@ -265,7 +276,7 @@ export function Installation({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-              Add it to your website
+              {t('Add it to your website')}
             </h2>
             <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
               Paste it before the closing{' '}
@@ -274,13 +285,15 @@ export function Installation({
           </div>
         </div>
         <p className="mt-1.5 pl-10 text-sm leading-[1.6] text-secondary-ink md:pl-11">
-          Most website builders have a “Custom code” or “Head code” setting. Save your changes and
-          publish your website.
+          {t(
+            'Most website builders have a “Custom code” or “Head code” setting. Save your changes and publish your website.',
+          )}
         </p>
         {origin && new URL(origin).hostname === 'localhost' && (
           <p className="mt-4 rounded-md bg-muted px-4 py-3 text-[13px] leading-[1.6] text-secondary-ink">
-            You’re running Analytics Beer locally. Use a hosted address in this script when
-            connecting a public website.
+            {t(
+              'You’re running Analytics Beer locally. Use a hosted address in this script when connecting a public website.',
+            )}
           </p>
         )}
       </section>
@@ -293,10 +306,10 @@ export function Installation({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-              {receiving ? 'You’re connected' : 'Check that it’s working'}
+              {receiving ? t('You\u2019re connected') : t('Check that it\u2019s working')}
             </h2>
             <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
-              Visit your website in a browser, then check for your first pageview.
+              {t('Visit your website in a browser, then check for your first pageview.')}
             </p>
           </div>
         </div>
@@ -306,16 +319,17 @@ export function Installation({
               variant="outline"
               render={<a href={`https://${environment.domain}`} target="_blank" rel="noreferrer" />}
             >
-              Open my website <ArrowRight size={15} />
+              {t('Open my website')}
+              <ArrowRight size={15} />
             </Button>
           )}
           <Button onClick={check} variant={receiving ? 'outline' : 'default'} loading={busy}>
             <RefreshCw size={15} />
-            Check installation
+            {t('Check installation')}
           </Button>
           {receiving && (
             <Button onClick={onDashboard}>
-              View dashboard
+              {t('View dashboard')}
               <ArrowRight size={15} />
             </Button>
           )}
@@ -330,7 +344,7 @@ export function Installation({
         )}
         {error && (
           <p className="text-sm leading-normal text-danger" role="alert">
-            {error}
+            {messageText(error)}
           </p>
         )}
       </section>
@@ -338,13 +352,13 @@ export function Installation({
         <section className="mb-6 rounded-md border border-border bg-muted p-5">
           <h2 className="text-[17px] font-medium">
             {environment.trackingMode === 'local'
-              ? 'Uses local storage — connect your consent banner'
-              : 'Uses cookies — connect your cookie banner'}
+              ? t('Uses local storage \u2014 connect your consent banner')
+              : t('Uses cookies \u2014 connect your cookie banner')}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-secondary-ink">
-            No tracking identifiers or activity events are created before consent. Call this from
-            your banner's analytics-consent callback, including its saved choice on every page. Pass
-            false when consent is rejected or withdrawn.
+            {t(
+              "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.",
+            )}
           </p>
           <pre
             aria-label="Consent integration"
@@ -354,14 +368,18 @@ export function Installation({
   window.simpleAnalytics?.consent(granted === true);
 }`}</pre>
           <p className="mt-3 text-sm leading-relaxed text-secondary-ink">
-            This callback connects your existing banner; it does not display one. Provide accept and
-            reject choices and a way to change them. Consent withdrawal deletes this environment's
-            tracking identifiers and stops collection.
+            {t(
+              "This callback connects your existing banner; it does not display one. Provide accept and reject choices and a way to change them. Consent withdrawal deletes this environment's tracking identifiers and stops collection.",
+            )}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-secondary-ink">
             {environment.trackingMode === 'local'
-              ? 'Identifiers are stored in local storage, with no tracking cookies. Visitor expiry: 90 days, renewed with activity. Session expiry: 30 minutes of inactivity. Expired identifiers are replaced when tracking next runs. Storage is scoped to this origin and environment.'
-              : 'First-party visitor cookie: 90 days, renewed with activity. Session cookie: 30 minutes of inactivity. Both are scoped to this hostname and environment.'}{' '}
+              ? t(
+                  'Identifiers are stored in local storage, with no tracking cookies. Visitor expiry: 90 days, renewed with activity. Session expiry: 30 minutes of inactivity. Expired identifiers are replaced when tracking next runs. Storage is scoped to this origin and environment.',
+                )
+              : t(
+                  'First-party visitor cookie: 90 days, renewed with activity. Session cookie: 30 minutes of inactivity. Both are scoped to this hostname and environment.',
+                )}{' '}
             Session details are retained for 30 days.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-secondary-ink">
@@ -376,20 +394,20 @@ export function Installation({
             target="_blank"
             rel="noreferrer"
           >
-            Cookie and consent guidance
+            {t('Cookie and consent guidance')}
           </a>
         </section>
       )}
       <ExtrasContainer>
         {guided && (
           <summary className="mb-5 cursor-pointer text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
-            Testing locally or tracking custom events?
+            {t('Testing locally or tracking custom events?')}
           </summary>
         )}
         <LocalhostSetting environment={environment} busy={busy} onChange={setLocalhost} />
         <div className="pt-2">
           <h3 className="text-[15px] font-medium tracking-[-0.025em]">
-            Want to track a specific action?
+            {t('Want to track a specific action?')}
           </h3>
           <p className="mt-1.5 text-sm leading-[1.8] text-secondary-ink wrap-anywhere">
             Use{' '}
@@ -417,6 +435,10 @@ export function SiteSettings({
   onUpdated: (site: Site) => void;
   onDeleted: () => void;
 }) {
+  const { t, message: messageText } = useSitePreferences();
+  const [tab, setTab] = useState<'website' | 'environment' | 'tracking'>('website');
+  const tabs = ['website', 'environment', 'tracking'] as const;
+  const labels = { website: t('Website'), environment: t('Environment'), tracking: t('Tracking') };
   const [name, setName] = useState(site.name);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
@@ -454,83 +476,135 @@ export function SiteSettings({
     <div className="max-w-[600px]">
       <div className="mb-6">
         <h1 className="text-[22px] leading-[1.25] font-medium tracking-[-0.025em]">
-          Website settings
+          {t('Website settings')}
         </h1>
-        <p className="mt-2 text-secondary-ink wrap-anywhere">Manage {site.domain}.</p>
+        <p className="mt-2 text-secondary-ink wrap-anywhere">
+          {t('Manage {domain}.', { domain: site.domain })}
+        </p>
       </div>
-      <EnvironmentSettings
-        key={environment.id}
-        site={site}
-        environment={environment}
-        onUpdated={onEnvironmentUpdated}
-        onDeleted={onEnvironmentDeleted}
-      />
-      <section className="mb-6">
-        <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-          Website details
-        </h2>
-        <form
-          className="flex flex-col gap-4 mt-5 max-w-[440px]"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void update({ name });
-          }}
-        >
-          <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="settings-name">
-            Website name
-            <Input
-              id="settings-name"
-              name="name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              required
-              maxLength={80}
-              size="default"
-            />
-          </label>
-          <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="settings-domain">
-            Domain
-            <Input id="settings-domain" value={site.domain} readOnly size="default" />
-            <span className="text-[13px] leading-normal font-normal text-muted-foreground">
-              Add an environment to track a staging or testing domain separately.
-            </span>
-          </label>
-          <Button className="self-start" type="submit" loading={busy}>
-            Save changes
-          </Button>
-        </form>
-      </section>
-      {saved && (
-        <p className="my-4 text-sm text-success" role="status">
-          {saved}
-        </p>
-      )}
-      {error && !deleting && (
-        <p className="text-sm leading-normal text-danger" role="alert">
-          {error}
-        </p>
-      )}
-      <section className="mb-6 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6 mt-7">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-            Remove this website
-          </h2>
-          <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
-            Permanently delete this website, every environment, and all their analytics.
-          </p>
+      <div
+        role="tablist"
+        aria-label={t('Website settings')}
+        className="mb-8 flex gap-6 border-b border-border"
+      >
+        {tabs.map((value, index) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            id={`settings-tab-${value}`}
+            aria-selected={tab === value}
+            aria-controls="settings-panel"
+            tabIndex={tab === value ? 0 : -1}
+            className="-mb-px border-b-2 border-transparent py-3 text-sm font-medium text-secondary-ink hover:text-foreground aria-selected:border-foreground aria-selected:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            onClick={() => setTab(value)}
+            onKeyDown={(event) => {
+              const next =
+                event.key === 'ArrowRight'
+                  ? (index + 1) % tabs.length
+                  : event.key === 'ArrowLeft'
+                    ? (index + tabs.length - 1) % tabs.length
+                    : event.key === 'Home'
+                      ? 0
+                      : event.key === 'End'
+                        ? tabs.length - 1
+                        : -1;
+              if (next < 0) return;
+              event.preventDefault();
+              setTab(tabs[next]);
+              document.getElementById(`settings-tab-${tabs[next]}`)?.focus();
+            }}
+          >
+            {labels[value]}
+          </button>
+        ))}
+      </div>
+      <div
+        id="settings-panel"
+        role="tabpanel"
+        aria-labelledby={`settings-tab-${tab}`}
+        tabIndex={0}
+        className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+      >
+        <div hidden={tab === 'website'}>
+          <EnvironmentSettings
+            key={environment.id}
+            section={tab === 'tracking' ? 'tracking' : 'environment'}
+            site={site}
+            environment={environment}
+            onUpdated={onEnvironmentUpdated}
+            onDeleted={onEnvironmentDeleted}
+          />
         </div>
-        <Button
-          variant="destructive-outline"
-          onClick={() => {
-            setConfirm('');
-            setError('');
-            setDeleting(true);
-          }}
-        >
-          <Trash2 size={15} />
-          Delete website
-        </Button>
-      </section>
+        <div hidden={tab !== 'website'}>
+          <section className="mb-6">
+            <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
+              {t('Website details')}
+            </h2>
+            <form
+              className="flex flex-col gap-4 mt-5 max-w-[440px]"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void update({ name });
+              }}
+            >
+              <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="settings-name">
+                {t('Website name')}
+                <Input
+                  id="settings-name"
+                  name="name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  required
+                  maxLength={80}
+                  size="default"
+                />
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="settings-domain">
+                {t('Domain')}
+                <Input id="settings-domain" value={site.domain} readOnly size="default" />
+                <span className="text-[13px] leading-normal font-normal text-muted-foreground">
+                  {t('Add an environment to track a staging or testing domain separately.')}
+                </span>
+              </label>
+              <Button className="self-start" type="submit" loading={busy}>
+                {t('Save changes')}
+              </Button>
+            </form>
+          </section>
+          {saved && (
+            <p className="my-4 text-sm text-success" role="status">
+              {messageText(saved)}
+            </p>
+          )}
+          {error && !deleting && (
+            <p className="text-sm leading-normal text-danger" role="alert">
+              {messageText(error)}
+            </p>
+          )}
+          <section className="mb-6 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6 mt-7">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
+                {t('Remove this website')}
+              </h2>
+              <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
+                {t('Permanently delete this website, every environment, and all their analytics.')}
+              </p>
+            </div>
+            <Button
+              variant="destructive-outline"
+              onClick={() => {
+                setConfirm('');
+                setError('');
+                setDeleting(true);
+              }}
+            >
+              <Trash2 size={15} />
+              {t('Delete website')}
+            </Button>
+          </section>
+        </div>
+      </div>
       <Dialog
         open={deleting}
         onOpenChange={(value) => {
@@ -539,15 +613,17 @@ export function SiteSettings({
       >
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle>Delete {site.name}?</DialogTitle>
+            <DialogTitle>{t('Delete {name}?', { name: site.name })}</DialogTitle>
             <DialogDescription>
-              Every environment and all pageviews, events, and history for {site.domain} will be
-              permanently deleted. This cannot be undone.
+              {t(
+                'Every environment and all pageviews, events, and history for {name} will be permanently deleted. This cannot be undone.',
+                { name: site.domain },
+              )}
             </DialogDescription>
           </DialogHeader>
           <div className="px-6 pb-6 flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="delete-confirm">
-              Type {site.domain} to confirm
+              {t('Type {name} to confirm', { name: site.domain })}
               <Input
                 id="delete-confirm"
                 value={confirm}
@@ -558,13 +634,13 @@ export function SiteSettings({
             </label>
             {error && (
               <p className="text-sm leading-normal text-danger" role="alert">
-                {error}
+                {messageText(error)}
               </p>
             )}
           </div>
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy} />}>
-              Keep website
+              {t('Keep website')}
             </DialogClose>
             <Button
               variant="destructive"
@@ -572,7 +648,7 @@ export function SiteSettings({
               disabled={confirm !== site.domain}
               onClick={remove}
             >
-              Delete website
+              {t('Delete website')}
             </Button>
           </DialogFooter>
         </DialogPopup>

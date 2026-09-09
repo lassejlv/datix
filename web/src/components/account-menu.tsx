@@ -1,3 +1,4 @@
+import { useSitePreferences } from './site-preferences';
 import { useRef } from 'react';
 import { Menu } from '@base-ui/react/menu';
 import { ChevronDown, LogOut, Settings2 } from './ui/icons';
@@ -14,6 +15,7 @@ export function AccountMenu({
   onSettings: () => void;
   onSignOut: () => void;
 }) {
+  const { t } = useSitePreferences();
   const openingSettings = useRef(false);
   const itemClass =
     'flex h-10 cursor-pointer items-center gap-2 rounded-sm px-2 text-sm outline-none data-highlighted:bg-muted data-disabled:opacity-50 sm:h-8';
@@ -24,7 +26,8 @@ export function AccountMenu({
       }}
     >
       <Menu.Trigger
-        aria-label="Account menu"
+        aria-label={t('Account menu')}
+        data-testid="account-menu"
         disabled={signingOut}
         className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-md p-2 text-left outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
       >
@@ -39,7 +42,7 @@ export function AccountMenu({
       <Menu.Portal>
         <Menu.Positioner side="top" align="start" sideOffset={6} className="z-50">
           <Menu.Popup
-            aria-label="Account"
+            aria-label={t('Account')}
             finalFocus={() => !openingSettings.current}
             className="w-(--anchor-width) min-w-44 rounded-md border border-border bg-popover p-1 text-foreground shadow-lg/5 outline-none"
           >
@@ -51,11 +54,11 @@ export function AccountMenu({
               }}
             >
               <Settings2 className="size-4" />
-              Account settings
+              {t('Account settings')}
             </Menu.Item>
             <Menu.Item className={itemClass} disabled={signingOut} onClick={onSignOut}>
               <LogOut className="size-4" />
-              Sign out
+              {t('Sign out')}
             </Menu.Item>
           </Menu.Popup>
         </Menu.Positioner>

@@ -1220,39 +1220,6 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.footer-preferences {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.footer-preferences label {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  font-size: 14px;
-  color: var(--landing-secondary);
-}
-.footer-preferences label > svg {
-  flex-shrink: 0;
-}
-.footer-preferences select {
-  color: var(--landing-secondary);
-  background: var(--landing-canvas);
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 4px;
-  min-height: 40px;
-  font: inherit;
-  cursor: pointer;
-}
-.footer-preferences select:hover {
-  color: var(--landing-ink);
-  border-color: var(--landing-line);
-}
-.footer-preferences select:focus-visible {
-  outline: 2px solid var(--landing-ink);
-  outline-offset: 2px;
-}
 @media (max-width: 600px) {
   .footer-controls {
     align-items: flex-start;

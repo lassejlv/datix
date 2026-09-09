@@ -1,3 +1,6 @@
+import { deviceName } from '../lib/i18n/display';
+import { Translated } from './translated';
+import { useSitePreferences } from './site-preferences';
 import { CountryLabel } from './country-label';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -15,11 +18,10 @@ import {
   RefreshCw,
   Sparkles,
 } from './ui/icons';
-import { apiClient, errorText, number, type SiteEnvironment } from '../lib/client';
+import { apiClient, errorText, type SiteEnvironment } from '../lib/client';
 import {
   activeDuration,
   activityTitle,
-  visitDate,
   visitorAlias,
   type Activity,
   type Visit,
@@ -46,6 +48,7 @@ export function VisitorJourneys({
   environment: SiteEnvironment;
   onInstall: () => void;
 }) {
+  const { locale, t } = useSitePreferences();
   const [days, setDays] = useState('7'),
     [reload, setReload] = useState(0),
     [visitor, setVisitor] = useState<string | null>(null);
@@ -57,21 +60,21 @@ export function VisitorJourneys({
     <div>
       <header className="mb-5 flex flex-wrap items-start justify-between gap-5">
         <div>
-          <h1 className="text-[22px] font-medium tracking-tight">Visitors</h1>
+          <h1 className="text-[22px] font-medium tracking-tight">{t('Visitors')}</h1>
         </div>
         <div className="flex items-center gap-2">
           <select
-            aria-label="Visitor date range"
+            aria-label={t('Visitor date range')}
             value={days}
             onChange={(e) => setDays(e.target.value)}
             className="h-10 sm:h-8 rounded-md border border-input bg-background px-2.5 text-sm focus-visible:outline-2 focus-visible:outline-ring"
           >
-            <option value="1">Today</option>
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
+            <option value="1">{t('Today')}</option>
+            <option value="7">{t('Last 7 days')}</option>
+            <option value="30">{t('Last 30 days')}</option>
           </select>
           <Button
-            aria-label="Refresh visits"
+            aria-label={t('Refresh visits')}
             variant="outline"
             size="icon"
             className="size-10 rounded-md sm:size-8"
@@ -85,11 +88,18 @@ export function VisitorJourneys({
         <div className="mb-5 flex items-center gap-2 rounded-lg bg-muted p-3 text-sm">
           <VisitorAvatar />
           <span className="flex-1">
-            Visits by <strong className="font-medium">{visitorAlias(visitor).name}</strong>
+            <Translated
+              text="Visits by {visitor}"
+              values={{
+                visitor: (
+                  <strong className="font-medium">{visitorAlias(visitor, locale).name}</strong>
+                ),
+              }}
+            />
             <span className="ml-2 text-xs text-secondary-ink">{visitor.slice(0, 8)}</span>
           </span>
           <Button variant="ghost" size="sm" onClick={() => setVisitor(null)}>
-            All visitors
+            {t('All visitors')}
           </Button>
         </div>
       )}
@@ -104,7 +114,7 @@ export function VisitorJourneys({
         onVisitorChange={setVisitor}
       />
       <p className="mt-6 text-xs leading-relaxed text-secondary-ink">
-        Anonymous visitors. Activity kept for 30 days. Times in UTC.
+        {t('Anonymous visitors. Activity kept for 30 days. Times in UTC.')}
       </p>
     </div>
   );
@@ -126,6 +136,7 @@ function VisitExplorer({
   visitor: string | null;
   onVisitorChange: (key: string) => void;
 }) {
+  const { message: messageText, number, locale, dateTime, t } = useSitePreferences();
   const [report, setReport] = useState<VisitReport | null>(null),
     [selected, setSelected] = useState<Visit | null>(null),
     [error, setError] = useState(''),
@@ -178,7 +189,7 @@ function VisitExplorer({
       role="alert"
       className="mb-5 flex items-center justify-between gap-3 rounded-md bg-danger-wash p-4 text-sm text-danger"
     >
-      <span>{error}</span>
+      <span>{messageText(error)}</span>
       <Button
         variant="outline"
         onClick={() => {
@@ -186,7 +197,7 @@ function VisitExplorer({
           else setRetry((value) => value + 1);
         }}
       >
-        Try again
+        {t('Try again')}
       </Button>
     </div>
   );
@@ -194,7 +205,7 @@ function VisitExplorer({
     return error ? (
       recover
     ) : (
-      <div role="status" aria-label="Loading visits" className="space-y-3 py-5">
+      <div role="status" aria-label={t('Loading visits')} className="space-y-3 py-5">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="h-14 rounded-md bg-muted" />
         ))}
@@ -206,12 +217,12 @@ function VisitExplorer({
         <dl className="mb-5 flex flex-wrap gap-x-8 gap-y-3">
           {[
             [
-              environment.trackingMode === 'cookieless' ? 'Daily visits' : 'Visits',
+              environment.trackingMode === 'cookieless' ? t('Daily visits') : t('Visits'),
               number(report.summary.sessions),
             ],
-            ['Visitors', number(report.summary.visitors)],
-            ['Clicks', number(report.summary.clicks)],
-            ['Avg. active', activeDuration(report.summary.averageActiveSeconds)],
+            [t('Visitors'), number(report.summary.visitors)],
+            [t('Clicks'), number(report.summary.clicks)],
+            [t('Avg. active'), activeDuration(report.summary.averageActiveSeconds)],
           ].map(([label, value]) => (
             <div key={label} className="flex items-baseline gap-2">
               <dt className="text-sm text-secondary-ink">{label}</dt>
@@ -222,8 +233,9 @@ function VisitExplorer({
       )}
       {environment.trackingMode === 'cookieless' && (
         <p className="mb-4 text-sm text-secondary-ink">
-          Anonymous page journeys grouped by UTC day. Identities reset daily and may group people
-          sharing a network and browser. No cookies or local storage; history is kept for 30 days.
+          {t(
+            'Anonymous page journeys grouped by UTC day. Identities reset daily and may group people sharing a network and browser. No cookies or local storage; history is kept for 30 days.',
+          )}
         </p>
       )}
       {error && recover}
@@ -232,26 +244,30 @@ function VisitExplorer({
           <span className="mb-4 inline-flex text-secondary-ink">
             <User size={28} />
           </span>
-          <h2 className="text-xl font-medium">No visits yet</h2>
+          <h2 className="text-xl font-medium">{t('No visits yet')}</h2>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-secondary-ink">
             {environment.trackingMode !== 'cookieless'
-              ? 'No visits in this period yet. Try a wider date range, or check your script and analytics consent.'
-              : 'No visits in this period yet. Try a wider date range, or check your tracking script.'}
+              ? t(
+                  'No visits in this period yet. Try a wider date range, or check your script and analytics consent.',
+                )
+              : t(
+                  'No visits in this period yet. Try a wider date range, or check your tracking script.',
+                )}
           </p>
           <Button className="mt-5" variant="outline" onClick={onInstall}>
-            View tracking setup
+            {t('View tracking setup')}
             <ArrowRight size={15} />
           </Button>
         </div>
       ) : (
         <div>
-          <section aria-label="Visitor history" className={selected ? 'hidden' : ''}>
+          <section aria-label={t('Visitor history')} className={selected ? 'hidden' : ''}>
             <div className="mb-2 hidden grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_44px_48px_120px_16px] gap-3 px-2 text-xs text-secondary-ink xl:grid">
-              <span>Visitor</span>
-              <span>First page</span>
-              <span>Pages</span>
-              <span>Active</span>
-              <span>Visited · UTC</span>
+              <span>{t('Visitor')}</span>
+              <span>{t('First page')}</span>
+              <span>{t('Pages')}</span>
+              <span>{t('Active')}</span>
+              <span>{t('Visited · UTC')}</span>
               <span />
             </div>
             <div>
@@ -259,7 +275,7 @@ function VisitExplorer({
                 <button
                   id={`visit-${visit.id}`}
                   key={visit.id}
-                  aria-label={`Open session ${visit.id.slice(0, 8)}`}
+                  aria-label={t('Open session {id}', { id: visit.id.slice(0, 8) })}
                   onClick={() => setSelected(visit)}
                   className="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 rounded-md px-2 py-2 text-left hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_44px_48px_120px_16px]"
                 >
@@ -267,9 +283,9 @@ function VisitExplorer({
                     <VisitorAvatar />
                     <span
                       className="truncate text-sm font-medium"
-                      title={`Anonymous visitor ${visit.visitorKey.slice(0, 8)}`}
+                      title={t('Anonymous visitor {id}', { id: visit.visitorKey.slice(0, 8) })}
                     >
-                      {visitorAlias(visit.visitorKey).name}
+                      {visitorAlias(visit.visitorKey, locale).name}
                     </span>
                   </span>
                   <span
@@ -279,18 +295,20 @@ function VisitExplorer({
                     {visit.entryPath}
                   </span>
                   <span className="hidden text-sm text-secondary-ink tabular-nums xl:block">
-                    {visit.pageviews}
+                    {number(visit.pageviews)}
                   </span>
                   <span className="hidden text-sm text-secondary-ink tabular-nums xl:block">
                     {activeDuration(visit.activeSeconds)}
                   </span>
-                  <time className="text-xs text-secondary-ink">{visitDate(visit.startedAt)}</time>
+                  <time className="text-xs text-secondary-ink">{dateTime(visit.startedAt)}</time>
                   <ArrowRight size={14} className="hidden text-secondary-ink xl:block" />
                   <span className="col-span-2 flex min-w-0 items-center justify-between gap-3 pl-8 text-xs text-secondary-ink xl:hidden">
                     <span className="truncate">{visit.entryPath}</span>
                     <span className="shrink-0">
-                      {visit.pageviews} {visit.pageviews === 1 ? 'page' : 'pages'} ·{' '}
-                      {activeDuration(visit.activeSeconds)}
+                      {t(visit.pageviews === 1 ? '{count} page' : '{count} pages', {
+                        count: number(visit.pageviews),
+                      })}{' '}
+                      · {activeDuration(visit.activeSeconds)}
                     </span>
                   </span>
                 </button>
@@ -298,7 +316,7 @@ function VisitExplorer({
             </div>
             {report.hasMore && (
               <Button className="mt-4" variant="outline" loading={busy} onClick={more}>
-                Load more visits
+                {t('Load more visits')}
               </Button>
             )}
           </section>
@@ -340,6 +358,7 @@ function JourneyTimeline({
   onClose: () => void;
   onVisitorHistory?: () => void;
 }) {
+  const { locale, dateTime, message: messageText, t } = useSitePreferences();
   const [events, setEvents] = useState<Activity[]>([]),
     [hasMore, setHasMore] = useState(false),
     [offset, setOffset] = useState(0),
@@ -406,25 +425,25 @@ function JourneyTimeline({
   }
   const first = events[0];
   return (
-    <section aria-label="Session timeline" className="min-w-0 max-w-[800px]">
+    <section aria-label={t('Session timeline')} className="min-w-0 max-w-[800px]">
       <Button className="mb-5" variant="ghost" size="sm" onClick={onClose}>
         <ArrowLeft size={14} />
-        All visits
+        {t('All visits')}
       </Button>
       <div className="flex items-start gap-3">
         <VisitorAvatar large />
         <div className="min-w-0 flex-1">
           <h2 ref={heading} tabIndex={-1} className="text-xl font-medium outline-none">
-            {visitorAlias(visit.visitorKey).name}
+            {visitorAlias(visit.visitorKey, locale).name}
           </h2>
           <p className="mt-1 text-xs text-secondary-ink">
-            Visitor {visit.visitorKey.slice(0, 8)} · {visitDate(visit.startedAt)}
+            {t('Visitor')} {visit.visitorKey.slice(0, 8)} · {dateTime(visit.startedAt)}
           </p>
         </div>
       </div>
       {onVisitorHistory && (
         <Button className="mt-4" variant="ghost" size="sm" onClick={onVisitorHistory}>
-          View visitor history
+          {t('View visitor history')}
           <ArrowRight size={14} />
         </Button>
       )}
@@ -434,29 +453,32 @@ function JourneyTimeline({
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Monitor size={14} />
-          {visit.device || 'Unknown device'}
+          {deviceName(visit.device, t)}
         </span>
         {visit.activeSeconds > 0 && (
           <span className="inline-flex items-center gap-1.5">
             <Clock3 size={14} />
-            {activeDuration(visit.activeSeconds)} active
+            {activeDuration(visit.activeSeconds)} {t('active')}
           </span>
         )}
       </div>
       {first && (
         <p className="mt-4 text-sm text-secondary-ink">
-          Arrived{' '}
           {first.referrer ? (
-            <>
-              from <span className="font-medium text-foreground break-all">{first.referrer}</span>
-            </>
+            <Translated
+              text="Arrived from {source}."
+              values={{
+                source: (
+                  <span className="font-medium text-foreground break-all">{first.referrer}</span>
+                ),
+              }}
+            />
           ) : (
-            'directly or from an unknown source'
+            t('Arrived directly or from an unknown source.')
           )}
-          .
         </p>
       )}
-      <ol aria-label="Activity events" className="mt-6 border-t border-border pt-3">
+      <ol aria-label={t('Activity events')} className="mt-6 border-t border-border pt-3">
         {events.map((event) => {
           const Icon = eventIcons[event.kind as keyof typeof eventIcons] ?? Sparkles;
           return (
@@ -467,7 +489,7 @@ function JourneyTimeline({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline justify-between gap-1">
                   <h3 className="min-w-0 break-all text-sm">
-                    {event.kind === 'pageview' ? event.path : activityTitle(event)}
+                    {event.kind === 'pageview' ? event.path : activityTitle(event, locale)}
                   </h3>
                   <time className="text-[11px] text-secondary-ink tabular-nums">
                     {new Date(event.occurredAt).toISOString().slice(11, 19)}
@@ -478,12 +500,12 @@ function JourneyTimeline({
                 )}
                 {event.details.target && (
                   <p className="mt-1 break-all text-xs text-secondary-ink">
-                    Element: {event.details.target}
+                    {t('Element:')} {event.details.target}
                   </p>
                 )}
                 {event.details.destination && (
                   <p className="mt-1 break-all text-xs text-secondary-ink">
-                    Destination: {event.details.destination}
+                    {t('Destination:')} {event.details.destination}
                   </p>
                 )}
               </div>
@@ -493,47 +515,47 @@ function JourneyTimeline({
       </ol>
       {busy && (
         <p role="status" className="mt-5 text-sm text-secondary-ink">
-          Loading activity…
+          {t('Loading activity…')}
         </p>
       )}
       {error && (
         <div role="alert" className="mt-5 text-sm text-danger">
-          {error}
+          {messageText(error)}
           <Button
             className="ml-3"
             variant="outline"
             size="sm"
             onClick={() => (events.length ? void more() : setRetry((value) => value + 1))}
           >
-            Try again
+            {t('Try again')}
           </Button>
         </div>
       )}
       {hasMore && (
         <Button className="mt-6" variant="outline" loading={busy} onClick={more}>
-          Load more activity
+          {t('Load more activity')}
         </Button>
       )}
       {first && (
         <details className="mt-6 border-t border-border pt-4 text-xs text-secondary-ink">
           <summary className="cursor-pointer py-1 focus-visible:outline-2 focus-visible:outline-ring">
-            Visit details
+            {t('Visit details')}
           </summary>
           <dl className="mt-3 grid grid-cols-2 gap-3">
             {[
-              ['Browser', first.browser || 'Unknown'],
-              ['System', first.os || 'Unknown'],
-              ['Language', first.details.language || 'Unknown'],
+              [t('Browser'), first.browser || t('Unknown')],
+              [t('System'), first.os || t('Unknown')],
+              [t('Language'), first.details.language || t('Unknown')],
               [
-                'Screen',
+                t('Screen'),
                 first.details.screenWidth === undefined
-                  ? 'Unknown'
+                  ? t('Unknown')
                   : `${first.details.screenWidth} × ${first.details.screenHeight}`,
               ],
               [
-                'Viewport',
+                t('Viewport'),
                 first.details.viewportWidth === undefined
-                  ? 'Unknown'
+                  ? t('Unknown')
                   : `${first.details.viewportWidth} × ${first.details.viewportHeight}`,
               ],
             ].map(([label, value]) => (

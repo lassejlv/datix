@@ -109,3 +109,38 @@
 .dashboard-workspace {
   --sidebar-background: color-mix(in srgb, var(--foreground) 3%, var(--background));
 }
+
+.footer-preferences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.footer-preferences label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--landing-secondary, var(--secondary-ink));
+}
+.footer-preferences label > svg {
+  flex-shrink: 0;
+}
+.footer-preferences select {
+  color: var(--landing-secondary, var(--secondary-ink));
+  background: var(--landing-canvas, var(--background));
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px;
+  min-height: 40px;
+  font: inherit;
+  cursor: pointer;
+}
+.footer-preferences select:hover {
+  color: var(--landing-ink, var(--foreground));
+  border-color: var(--landing-line, var(--border));
+}
+.footer-preferences select:focus-visible {
+  outline: 2px solid var(--landing-ink, var(--foreground));
+  outline-offset: 2px;
+}

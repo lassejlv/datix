@@ -78,6 +78,8 @@ export const write = (method: string, value: unknown): RequestInit => ({
   body: JSON.stringify(value),
 });
 export function errorText(error: unknown) {
+  if (error instanceof TypeError && /fetch|network|load failed/i.test(error.message))
+    return 'Network error. Check your connection and try again.';
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 }
 export function dateLabel(
