@@ -621,7 +621,10 @@ async fn webhooks_verify_deduplicate_order_and_never_link_by_email() {
     fixture!(f, {
         let mock = MockProvider::start().await;
         let state = mock.state(&f);
-        let c = customer(&f.user);
+        let mut c = customer(&f.user);
+        c["granted_benefits"][2]["properties"] = json!({});
+        c["active_subscriptions"][0]["status"] = json!("trialing");
+        c["active_subscriptions"][0]["trial_end"] = json!(Utc::now() + Duration::days(14));
         let at = Utc::now() - Duration::minutes(1);
         let payload = json!({"type":"customer.state_changed","timestamp":at,"data":c});
         let id = format!("{}-state", f.user);

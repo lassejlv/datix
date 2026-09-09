@@ -133,14 +133,18 @@ pub fn subscriptions(value: &Value, now: DateTime<Utc>) -> Result<Value> {
         let Some(credit) = grant(plan.events_benefit_id, "meter_credit") else {
             continue;
         };
-        if uuid(&credit["properties"]["last_credited_meter_id"]) != Some(CATALOG.meter.id) {
-            continue;
-        }
-        let Some(event_limit) = credit["properties"]["last_credited_units"]
-            .as_i64()
-            .filter(|v| *v > 0)
-            .and_then(|v| v.checked_mul(100))
-        else {
+        // Public customer-state payloads omit meter-credit grant internals.
+        // The verified product and granted benefit identify the catalog allowance;
+        // cumulative meter credits/balance must never determine a period's limit.
+        let properties = &credit["properties"];
+        let units = if properties.as_object().is_some_and(|p| p.is_empty()) {
+            Some(plan.events)
+        } else if uuid(&properties["last_credited_meter_id"]) == Some(CATALOG.meter.id) {
+            properties["last_credited_units"].as_i64()
+        } else {
+            None
+        };
+        let Some(event_limit) = units.filter(|v| *v > 0).and_then(|v| v.checked_mul(100)) else {
             continue;
         };
         let Some(start) = date(row, "current_period_start") else {

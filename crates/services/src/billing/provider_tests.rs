@@ -131,3 +131,18 @@ fn checkout_selection_is_usd_only_and_rejects_draft_annual_products() {
         assert!(select(invalid).is_err());
     }
 }
+
+#[test]
+fn public_customer_state_accepts_empty_credit_properties_without_using_meter_balance() {
+    let mut customer = fixture();
+    customer["granted_benefits"][2]["properties"] = json!({});
+    customer["active_meters"][0]["credited_units"] = json!(9000000);
+    customer["active_meters"][0]["balance"] = json!(0);
+    let sub = normalized(&customer).remove(0);
+    assert_eq!(sub.entitlements.unwrap().event_limit, Some(10000000));
+    customer["active_subscriptions"][0]["status"] = json!("trialing");
+    customer["active_subscriptions"][0]["trial_end"] = json!(now() + chrono::Duration::days(14));
+    assert_eq!(normalized(&customer).len(), 1);
+    customer["granted_benefits"][2]["benefit_id"] = json!(Uuid::new_v4());
+    assert!(normalized(&customer).is_empty());
+}
