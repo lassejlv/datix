@@ -71,8 +71,14 @@ async fn mock_provider(
             }
         }
         "/v1/customers/" => {
-            assert_eq!(body["organization_id"], CATALOG.organization_id.to_string());
-            let c = json!({"id":Uuid::new_v4(),"organization_id":body["organization_id"],"external_id":body["external_id"],"active_subscriptions":[],"granted_benefits":[],"deleted_at":null});
+            // Organization tokens infer this field and reject an explicit value.
+            if body.get("organization_id").is_some() {
+                return (
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    axum::Json(json!({"detail":"organization_id is disallowed for organization tokens"})),
+                );
+            }
+            let c = json!({"id":Uuid::new_v4(),"organization_id":CATALOG.organization_id,"external_id":body["external_id"],"active_subscriptions":[],"granted_benefits":[],"deleted_at":null});
             data.customer = Some(c.clone());
             c
         }

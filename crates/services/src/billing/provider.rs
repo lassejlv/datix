@@ -436,7 +436,7 @@ pub async fn handle(
                 Method::POST,
                 "/v1/customers/",
                 Some(json!({
-                    "organization_id":CATALOG.organization_id, "external_id":owner.id,
+                    "external_id":owner.id,
                     "email":owner.email, "name":owner.name, "locale":plan.locale,
                 })),
             )
