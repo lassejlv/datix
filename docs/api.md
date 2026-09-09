@@ -201,3 +201,11 @@ Yearly checkout returns 409 until monthly credit cycling is enabled for annual p
 `POST /api/webhooks/polar` accepts signed `customer.state_changed` and `customer.deleted` events without a session. It requires Standard Webhooks headers (`webhook-id`, `webhook-timestamp`, `webhook-signature`) and an exact raw JSON body up to 256 KiB. Invalid signatures return 400; missing configuration or transient failures return 503. Accepted and ignored deliveries return 200; event IDs are deduplicated transactionally.
 
 See [Polar billing](polar.md) for catalog, access refresh, and usage delivery semantics.
+
+## Optional features
+
+See [Environment features](features.md) for defaults, privacy, metrics, retention and Pulse webhook payloads. Update all five boolean flags through `PATCH /api/sites/:site/environments/:environment` using `featureSettings`. Only `webVitals` defaults to true.
+
+Feature reports: `GET /api/sites/:site/environments/:environment/features/{goals|errors|web-vitals|globe|pulse}`. Goals, errors and vitals accept UTC `from`/`to` dates. Create a goal with `POST .../features/goals`; delete it with `DELETE .../features/goals/:goal`. Resolve an error with `POST .../features/errors` and `{fingerprint}`. Configure Pulse with `POST .../features/pulse` and `{url, webhookUrl?, clearWebhook?}`.
+
+Browser diagnostics use public, origin-validated `POST /api/telemetry`. The tracker supplies stable IDs, consent state and the bounded metric/error payload. This endpoint shares the durable queue but never bills or counts diagnostics as traffic.

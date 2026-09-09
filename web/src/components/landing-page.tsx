@@ -1,7 +1,8 @@
 import { useSitePreferences } from './site-preferences';
-import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, Pause, Play, Plus } from './ui/icons';
+import { useState } from 'react';
+import { ArrowRight, Check, Play, Plus } from './ui/icons';
 import { LandingLayout } from './landing-layout';
+import { DashboardPreview } from './dashboard-preview';
 import {
   Dialog,
   DialogPopup,
@@ -42,127 +43,6 @@ const questions = [
   ],
 ] as const;
 
-function MascotVideo() {
-  const ref = useRef<HTMLVideoElement>(null);
-  const { dark, darkMedia, t } = useSitePreferences();
-  const [mounted, setMounted] = useState(false);
-  const [reduced, setReduced] = useState(true);
-  const [userPaused, setUserPaused] = useState(false);
-  const [userStarted, setUserStarted] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    const syncMotion = () => {
-      setReduced(motion.matches);
-      setUserStarted(false);
-    };
-    syncMotion();
-    setMounted(true);
-    motion.addEventListener('change', syncMotion);
-    return () => {
-      motion.removeEventListener('change', syncMotion);
-    };
-  }, []);
-
-  const enabled = mounted && (!reduced || userStarted);
-  const theme = dark ? 'dark' : 'light';
-  useEffect(() => {
-    const video = ref.current;
-    if (!video || !enabled) return;
-    let inView = true;
-    const sync = () => {
-      if (!inView || document.hidden || userPaused) video.pause();
-      else void video.play().catch(() => setPlaying(false));
-    };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        inView = entry.isIntersecting;
-        sync();
-      },
-      { threshold: 0.15 },
-    );
-    observer.observe(video);
-    document.addEventListener('visibilitychange', sync);
-    sync();
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('visibilitychange', sync);
-      video.pause();
-    };
-  }, [enabled, theme, userPaused]);
-
-  return (
-    <figure className="landing-film">
-      <div className="landing-film-stage">
-        <picture>
-          <source
-            media={darkMedia}
-            srcSet="/media/beer-stop-motion-poster-dark-small.webp 480w, /media/beer-stop-motion-poster-dark.webp 960w"
-            sizes="(max-width: 767px) 100vw, 600px"
-          />
-          <img
-            src="/media/beer-stop-motion-poster-light.webp"
-            srcSet="/media/beer-stop-motion-poster-light-small.webp 480w, /media/beer-stop-motion-poster-light.webp 960w"
-            sizes="(max-width: 767px) 100vw, 600px"
-            width="960"
-            height="600"
-            fetchPriority="high"
-            alt={t('A cheerful beer mug mascot builds an amber glass chart beside a tiny laptop.')}
-          />
-        </picture>
-        <video
-          ref={ref}
-          src={enabled ? `/media/beer-stop-motion-${theme}.mp4` : undefined}
-          muted
-          loop
-          playsInline
-          preload="none"
-          className={ready && !failed && enabled ? 'is-ready' : ''}
-          aria-label={t(
-            'A stop motion beer mascot places a chart block, waves, and gives a friendly wink.',
-          )}
-          onLoadedData={() => {
-            setReady(true);
-            setFailed(false);
-          }}
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-          onError={() => {
-            setFailed(true);
-            setPlaying(false);
-          }}
-        />
-      </div>
-      <button
-        className="landing-motion-button"
-        type="button"
-        aria-label={playing ? t('Pause animation') : t('Play animation')}
-        disabled={failed || !mounted}
-        onClick={() => {
-          if (playing) {
-            setUserPaused(true);
-            ref.current?.pause();
-          } else {
-            setUserStarted(true);
-            setUserPaused(false);
-            if (enabled) void ref.current?.play().catch(() => setPlaying(false));
-          }
-        }}
-      >
-        {playing ? <Pause size={14} /> : <Play size={14} />}
-      </button>
-      {failed && (
-        <figcaption role="status">
-          {t('Animation unavailable. The illustration is still here.')}
-        </figcaption>
-      )}
-    </figure>
-  );
-}
-
 export function LandingPage() {
   const { t, darkMedia } = useSitePreferences();
   const [dialog, setDialog] = useState<'demo' | null>(null);
@@ -171,31 +51,31 @@ export function LandingPage() {
       <main id="main-content" tabIndex={-1}>
         <section className="landing-hero" aria-labelledby="landing-title">
           <div className="landing-intro">
-            <p className="landing-eyebrow">{t('Website analytics, simply.')}</p>
             <h1 id="landing-title">
-              {t('Good insights.')}
+              {t('Understand your traffic.')}
               <br />
-              <span>{t('Less head scratching.')}</span>
+              <span>{t('Respect your visitors.')}</span>
             </h1>
             <p className="landing-description">
-              {t('Understand your visitors, spot what works,')}
-              <br className="landing-desktop-break" /> {t('and get back to building.')}
+              {t('See your top pages, traffic sources, and custom events.')}
+              <br className="landing-desktop-break" />{' '}
+              {t('Cookieless website analytics. One script to get started.')}
             </p>
             <div className="landing-actions">
               <a className="landing-button" href="/signup">
-                {t('Start tracking')} <ArrowRight size={17} aria-hidden="true" />
+                {t('Start 14-day trial')} <ArrowRight size={17} aria-hidden="true" />
               </a>
               <button
                 className="landing-text-button"
                 type="button"
                 onClick={() => setDialog('demo')}
               >
-                <Play size={14} aria-hidden="true" /> {t('Take a look')}
+                <Play size={14} aria-hidden="true" /> {t('Explore dashboard')}
               </button>
             </div>
           </div>
-          <MascotVideo />
         </section>
+        <DashboardPreview />
 
         <div className="landing-reassurance" aria-label={t('A simple place to start')}>
           {[t('Cookieless by default'), t('One script to install'), t('No card needed')].map(
@@ -209,42 +89,31 @@ export function LandingPage() {
         </div>
 
         <section id="how-it-works" className="landing-setup" aria-labelledby="setup-title">
-          <h2 id="setup-title">{t('A small setup. Then you’re set.')}</h2>
-          <ol className="landing-steps">
+          <h2 id="setup-title">{t('Turn your traffic into a next step.')}</h2>
+          <ul className="landing-steps">
             <li>
-              <span className="landing-step-number" aria-hidden="true">
-                1
-              </span>
-              <h3>{t('Add your website')}</h3>
+              <span className="landing-step-label">{t('Traffic sources')}</span>
+              <h3>{t('Know where to focus.')}</h3>
               <p>
-                {t('A name and a domain.')}
-                <br />
-                {t('That’s your starting point.')}
+                {t('See which sites send you visitors. Put your effort where it gets noticed.')}
               </p>
             </li>
             <li>
-              <span className="landing-step-number" aria-hidden="true">
-                2
-              </span>
-              <h3>{t('Paste your script')}</h3>
-              <p>
-                {t('Add it to your site.')}
-                <br />
-                {t('We’ll check it’s working.')}
-              </p>
+              <span className="landing-step-label">{t('Pages & events')}</span>
+              <h3>{t('See what gets a response.')}</h3>
+              <p>{t('Find popular pages and track actions like signups with custom events.')}</p>
             </li>
             <li>
-              <span className="landing-step-number" aria-hidden="true">
-                3
-              </span>
-              <h3>{t('Meet your visitors')}</h3>
+              <span className="landing-step-label">{t('Separate environments')}</span>
+              <h3>{t('Keep test traffic separate.')}</h3>
               <p>
-                {t('See what brings them in.')}
-                <br />
-                {t('Find what keeps them interested.')}
+                {t('Explore changes in a test environment. Keep your production reports clean.')}
               </p>
             </li>
-          </ol>
+          </ul>
+          <p className="landing-setup-summary">
+            {t('Get started: add your website, paste one script, and check your first visit.')}
+          </p>
         </section>
 
         <section id="questions" className="landing-faq" aria-labelledby="questions-title">
@@ -265,7 +134,7 @@ export function LandingPage() {
         <section className="landing-closing" aria-labelledby="closing-title">
           <h2 id="closing-title">{t('Here’s to a clearer picture.')}</h2>
           <a className="landing-button" href="/signup">
-            {t('Start tracking')} <ArrowRight size={17} aria-hidden="true" />
+            {t('Start 14-day trial')} <ArrowRight size={17} aria-hidden="true" />
           </a>
         </section>
       </main>

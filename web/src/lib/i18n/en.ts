@@ -1,4 +1,60 @@
 export const en = {
+  'Understand your traffic.': 'Understand your traffic.',
+  'Respect your visitors.': 'Respect your visitors.',
+  'See your top pages, traffic sources, and custom events.':
+    'See your top pages, traffic sources, and custom events.',
+  'Cookieless website analytics. One script to get started.':
+    'Cookieless website analytics. One script to get started.',
+  'Explore dashboard': 'Explore dashboard',
+  'Dashboard reports': 'Dashboard reports',
+  'Example traffic': 'Example traffic',
+  'Turn your traffic into a next step.': 'Turn your traffic into a next step.',
+  'Traffic sources': 'Traffic sources',
+  'Know where to focus.': 'Know where to focus.',
+  'See which sites send you visitors. Put your effort where it gets noticed.':
+    'See which sites send you visitors. Put your effort where it gets noticed.',
+  'Pages & events': 'Pages & events',
+  'See what gets a response.': 'See what gets a response.',
+  'Find popular pages and track actions like signups with custom events.':
+    'Find popular pages and track actions like signups with custom events.',
+  'Keep test traffic separate.': 'Keep test traffic separate.',
+  'Explore changes in a test environment. Keep your production reports clean.':
+    'Explore changes in a test environment. Keep your production reports clean.',
+  'Get started: add your website, paste one script, and check your first visit.':
+    'Get started: add your website, paste one script, and check your first visit.',
+  'Three plans.': 'Three plans.',
+  'All your analytics.': 'All your analytics.',
+  'Every plan includes every report. Start Basic with 14 days free.':
+    'Every plan includes every report. Start Basic with 14 days free.',
+  '14 days free': '14 days free',
+  'Most popular': 'Most popular',
+  'High volume': 'High volume',
+  'Monthly credits': 'Monthly credits',
+  'Included in every plan': 'Included in every plan',
+  'Date ranges': 'Date ranges',
+  'Referrers and countries': 'Referrers and countries',
+  '{count} websites': '{count} websites',
+  'Choose by traffic, not features.': 'Choose by traffic, not features.',
+  'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
+    'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.',
+  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
+    'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.',
+  'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
+    'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
+  'Before you choose.': 'Before you choose.',
+  'Do I need Pro to get all the reports?': 'Do I need Pro to get all the reports?',
+  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
+    'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.',
+  'Can I use one plan for several websites?': 'Can I use one plan for several websites?',
+  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
+    'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.',
+  'Which plan includes the free trial?': 'Which plan includes the free trial?',
+  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
+    'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.',
+  'Does testing use my credits?': 'Does testing use my credits?',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
+    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.',
+  'Start with your own traffic.': 'Start with your own traffic.',
   'Yearly billing is not available yet. Choose a monthly plan.':
     'Yearly billing is not available yet. Choose a monthly plan.',
   Goals: 'Goals',
@@ -1127,5 +1183,8 @@ export const en = {
     'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
+  'Allowance renews on {date}. Upgrade to resume sooner.':
+    'Allowance renews on {date}. Upgrade to resume sooner.',
+  'Choose a plan to resume tracking.': 'Choose a plan to resume tracking.',
 } as const;
 export type Copy = keyof typeof en;

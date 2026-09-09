@@ -34,6 +34,6 @@ pub fn validate(raw: &Value) -> Result<()> {
 }
 
 pub mod diagnostics;
+pub mod geography;
 pub mod goals;
 pub mod pulse;
-pub mod geography;

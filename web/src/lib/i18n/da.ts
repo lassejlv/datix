@@ -1,5 +1,61 @@
 import type { Copy } from './en';
 export const da = {
+  'Understand your traffic.': 'Forstå din trafik.',
+  'Respect your visitors.': 'Respektér dine besøgende.',
+  'See your top pages, traffic sources, and custom events.':
+    'Se dine mest besøgte sider, trafikkilder og egne hændelser.',
+  'Cookieless website analytics. One script to get started.':
+    'Webanalyse uden cookies. Kom i gang med ét script.',
+  'Explore dashboard': 'Udforsk dashboardet',
+  'Dashboard reports': 'Dashboardrapporter',
+  'Example traffic': 'Eksempeltrafik',
+  'Turn your traffic into a next step.': 'Brug din trafik til at finde næste skridt.',
+  'Traffic sources': 'Trafikkilder',
+  'Know where to focus.': 'Se, hvor du skal fokusere.',
+  'See which sites send you visitors. Put your effort where it gets noticed.':
+    'Se, hvilke sider der sender besøgende til dig. Brug kræfterne dér, hvor du bliver set.',
+  'Pages & events': 'Sider og hændelser',
+  'See what gets a response.': 'Se, hvad der skaber respons.',
+  'Find popular pages and track actions like signups with custom events.':
+    'Find populære sider, og mål handlinger som tilmeldinger med egne hændelser.',
+  'Keep test traffic separate.': 'Hold testtrafik adskilt.',
+  'Explore changes in a test environment. Keep your production reports clean.':
+    'Afprøv ændringer i et testmiljø. Hold dine produktionsrapporter fri for testtrafik.',
+  'Get started: add your website, paste one script, and check your first visit.':
+    'Kom i gang: tilføj din hjemmeside, indsæt ét script, og se dit første besøg.',
+  'Three plans.': 'Tre planer.',
+  'All your analytics.': 'Al din webanalyse.',
+  'Every plan includes every report. Start Basic with 14 days free.':
+    'Alle planer inkluderer alle rapporter. Start med Basic gratis i 14 dage.',
+  '14 days free': '14 dage gratis',
+  'Most popular': 'Mest populær',
+  'High volume': 'Meget trafik',
+  'Monthly credits': 'Månedlige credits',
+  'Included in every plan': 'Inkluderet i alle planer',
+  'Date ranges': 'Datointervaller',
+  'Referrers and countries': 'Henvisninger og lande',
+  '{count} websites': '{count} hjemmesider',
+  'Choose by traffic, not features.': 'Vælg efter trafik, ikke funktioner.',
+  'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
+    'En sidevisning i produktion bruger 1 credit. Klik og andre hændelser bruger 0,5 credits.',
+  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
+    'Basic dækker 100.000 sidevisninger eller 80.000 sidevisninger + 40.000 andre hændelser om måneden.',
+  'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
+    'På localhost: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Aktiv tid er gratis.',
+  'Before you choose.': 'Før du vælger.',
+  'Do I need Pro to get all the reports?': 'Skal jeg have Pro for at få alle rapporter?',
+  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
+    'Nej. Alle planer inkluderer de samme rapporter og sporingsfunktioner. Vælg Basic, Pro eller Ultra efter din forventede trafik.',
+  'Can I use one plan for several websites?': 'Kan jeg bruge én plan til flere hjemmesider?',
+  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
+    'Ja. Alle planer inkluderer op til 10 hjemmesider. Dine månedlige credits deles mellem dem, så beregn din samlede trafik, når du vælger plan.',
+  'Which plan includes the free trial?': 'Hvilken plan har en gratis prøveperiode?',
+  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
+    'Basic inkluderer en gratis prøveperiode på 14 dage. Du kan udforske rapporterne med trafik fra din egen hjemmeside, før du vælger en betalt plan.',
+  'Does testing use my credits?': 'Bruger test mine credits?',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
+    'Trafik fra localhost har en lavere sats: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Separate miljøer holder testaktivitet ude af dine produktionsrapporter.',
+  'Start with your own traffic.': 'Start med din egen trafik.',
   'Yearly billing is not available yet. Choose a monthly plan.':
     'Årlig betaling er ikke tilgængelig endnu. Vælg en månedsplan.',
   Goals: 'Mål',
@@ -1139,4 +1195,7 @@ export const da = {
     'Du behøver ingen betalingsoplysninger for at oprette en konto. For at starte en plan skal du gennemføre checkout og bekræfte betalingsoplysninger og pris.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Venter på, at Polar bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
+  'Allowance renews on {date}. Upgrade to resume sooner.':
+    'Kvoten fornyes den {date}. Opgrader for at fortsætte tidligere.',
+  'Choose a plan to resume tracking.': 'Vælg en plan for at genoptage sporing.',
 } satisfies Record<Copy, string>;

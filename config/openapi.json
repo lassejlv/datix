@@ -22,15 +22,26 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["locale", "theme"],
+                  "required": [
+                    "locale",
+                    "theme"
+                  ],
                   "properties": {
                     "locale": {
                       "type": "string",
-                      "enum": ["en", "de", "da"]
+                      "enum": [
+                        "en",
+                        "de",
+                        "da"
+                      ]
                     },
                     "theme": {
                       "type": "string",
-                      "enum": ["system", "light", "dark"]
+                      "enum": [
+                        "system",
+                        "light",
+                        "dark"
+                      ]
                     }
                   }
                 }
@@ -242,7 +253,10 @@
                   "type": "object",
                   "properties": {
                     "plan": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "properties": {
                         "name": {
                           "type": "string"
@@ -251,17 +265,26 @@
                           "type": "boolean"
                         },
                         "eventLimit": {
-                          "type": ["number", "null"],
+                          "type": [
+                            "number",
+                            "null"
+                          ],
                           "description": "Customer-specific Polar grant allowance; null means unlimited."
                         },
                         "websiteLimit": {
-                          "type": ["integer", "null"],
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
                           "description": "Customer-specific Polar grant allowance; null means unlimited."
                         }
                       }
                     },
                     "period": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "properties": {
                         "start": {
                           "type": "string",
@@ -281,7 +304,10 @@
                           "multipleOf": 0.01
                         },
                         "remaining": {
-                          "type": ["number", "null"],
+                          "type": [
+                            "number",
+                            "null"
+                          ],
                           "multipleOf": 0.01,
                           "description": "Granted credits less committed local usage; null means unlimited."
                         }
@@ -298,7 +324,10 @@
                           "type": "integer"
                         },
                         "lastBlockedAt": {
-                          "type": ["string", "null"],
+                          "type": [
+                            "string",
+                            "null"
+                          ],
                           "format": "date-time"
                         },
                         "learning": {
@@ -313,7 +342,11 @@
                             "type": "object",
                             "properties": {
                               "reason": {
-                                "enum": ["source_limit", "repeated_activity", "unusual_activity"]
+                                "enum": [
+                                  "source_limit",
+                                  "repeated_activity",
+                                  "unusual_activity"
+                                ]
                               },
                               "blocked": {
                                 "type": "integer"
@@ -356,7 +389,10 @@
                             "multipleOf": 0.01
                           },
                           "creditBudget": {
-                            "type": ["number", "null"],
+                            "type": [
+                              "number",
+                              "null"
+                            ],
                             "minimum": 0.15,
                             "maximum": 1000000000,
                             "multipleOf": 0.01
@@ -776,7 +812,10 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["name", "domain"],
+                "required": [
+                  "name",
+                  "domain"
+                ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1058,7 +1097,10 @@
                     "maxLength": 80
                   },
                   "creditBudget": {
-                    "type": ["number", "null"],
+                    "type": [
+                      "number",
+                      "null"
+                    ],
                     "minimum": 0.15,
                     "maximum": 1000000000,
                     "multipleOf": 0.01,
@@ -1445,7 +1487,9 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["name"],
+                "required": [
+                  "name"
+                ],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -1461,7 +1505,11 @@
                   },
                   "trackingMode": {
                     "type": "string",
-                    "enum": ["cookieless", "sessions", "local"],
+                    "enum": [
+                      "cookieless",
+                      "sessions",
+                      "local"
+                    ],
                     "default": "cookieless",
                     "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
                   },
@@ -1513,6 +1561,9 @@
                         "type": "boolean"
                       }
                     }
+                  },
+                  "featureSettings": {
+                    "$ref": "#/components/schemas/FeatureSettings"
                   }
                 }
               }
@@ -1838,7 +1889,11 @@
                   },
                   "trackingMode": {
                     "type": "string",
-                    "enum": ["cookieless", "sessions", "local"],
+                    "enum": [
+                      "cookieless",
+                      "sessions",
+                      "local"
+                    ],
                     "default": "cookieless",
                     "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
                   },
@@ -1856,6 +1911,9 @@
                   },
                   "allowLocalhost": {
                     "type": "boolean"
+                  },
+                  "featureSettings": {
+                    "$ref": "#/components/schemas/FeatureSettings"
                   }
                 }
               }
@@ -2122,7 +2180,10 @@
                       "description": "At least one persisted pageview remains in raw retention."
                     },
                     "lastReceivedAt": {
-                      "type": ["string", "null"],
+                      "type": [
+                        "string",
+                        "null"
+                      ],
                       "format": "date-time"
                     }
                   }
@@ -2616,7 +2677,13 @@
           "in": "query",
           "schema": {
             "type": "string",
-            "enum": ["path", "referrer", "country", "device", "event"],
+            "enum": [
+              "path",
+              "referrer",
+              "country",
+              "device",
+              "event"
+            ],
             "default": "path"
           }
         },
@@ -2657,7 +2724,10 @@
                     },
                     "metric": {
                       "type": "string",
-                      "enum": ["pageviews", "customEvents"]
+                      "enum": [
+                        "pageviews",
+                        "customEvents"
+                      ]
                     },
                     "data": {
                       "type": "array",
@@ -2902,7 +2972,10 @@
                       "type": "integer"
                     },
                     "nextCursor": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     }
                   }
                 }
@@ -3217,80 +3290,37 @@
               "schema": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["events", "interval"],
+                "required": [
+                  "events",
+                  "interval"
+                ],
                 "properties": {
                   "events": {
                     "type": "integer",
-                    "enum": [100000, 1000000, 5000000]
+                    "enum": [
+                      100000,
+                      1000000,
+                      5000000
+                    ]
                   },
                   "interval": {
                     "type": "string",
-                    "enum": ["month", "year"]
+                    "enum": [
+                      "month",
+                      "year"
+                    ]
                   },
                   "locale": {
                     "type": "string",
-                    "enum": ["en", "da", "de"]
+                    "enum": [
+                      "en",
+                      "da",
+                      "de"
+                    ]
                   }
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/webhooks/polar": {
-      "post": {
-        "summary": "Receive a signed Polar customer event",
-        "description": "Standard Webhooks signature over the exact raw body. Accepts customer.state_changed and customer.deleted; deduplicates event IDs and rejects stale snapshot replacement. Maximum body 256 KiB.",
-        "security": [],
-        "parameters": [
-          {
-            "name": "webhook-id",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "webhook-timestamp",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "webhook-signature",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Received or ignored event"
-          },
-          "400": {
-            "description": "Invalid payload or signature"
-          },
-          "413": {
-            "description": "Body too large"
-          },
-          "503": {
-            "description": "Webhook unavailable; retry delivery"
           }
         }
       }
@@ -3358,6 +3388,573 @@
           }
         }
       }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/goals": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getFeatureGoals",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "responses": {
+          "200": {
+            "description": "Feature report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "configureGoals",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 80
+                  },
+                  "matchType": {
+                    "type": "string",
+                    "enum": [
+                      "event",
+                      "page"
+                    ]
+                  },
+                  "matchValue": {
+                    "type": "string",
+                    "maxLength": 2048
+                  }
+                },
+                "required": [
+                  "name",
+                  "matchType",
+                  "matchValue"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/errors": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getFeatureErrors",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "responses": {
+          "200": {
+            "description": "Feature report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "configureErrors",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fingerprint": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                },
+                "required": [
+                  "fingerprint"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/web-vitals": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getFeatureWebVitals",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "responses": {
+          "200": {
+            "description": "Feature report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/globe": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getFeatureGlobe",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "responses": {
+          "200": {
+            "description": "Feature report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/pulse": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getFeaturePulse",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "responses": {
+          "200": {
+            "description": "Feature report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "configurePulse",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "webhookUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  },
+                  "clearWebhook": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "url"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sites/{siteId}/environments/{environmentId}/features/goals/{goalId}": {
+      "parameters": [
+        {
+          "name": "siteId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "environmentId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "goalId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "delete": {
+        "operationId": "deleteGoal",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted goal and conversions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/telemetry": {
+      "post": {
+        "operationId": "collectDiagnostic",
+        "security": [],
+        "description": "Origin-validated, rate-limited, feature-gated browser diagnostics. Not billed as traffic.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "siteId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "environmentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "pageId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "error",
+                      "vital"
+                    ]
+                  },
+                  "payload": {
+                    "type": "object"
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "siteId",
+                  "environmentId",
+                  "id",
+                  "pageId",
+                  "url",
+                  "kind",
+                  "payload",
+                  "consent"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted or skipped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/polar": {
+      "post": {
+        "summary": "Receive a signed Polar customer event",
+        "description": "Standard Webhooks signature over the exact raw body. Accepts customer.state_changed and customer.deleted; deduplicates event IDs and rejects stale snapshot replacement. Maximum body 256 KiB.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Received or ignored event"
+          },
+          "400": {
+            "description": "Invalid payload or signature"
+          },
+          "413": {
+            "description": "Body too large"
+          },
+          "503": {
+            "description": "Webhook unavailable; retry delivery"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3377,7 +3974,10 @@
       "AnonymousActivity": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "details"],
+        "required": [
+          "kind",
+          "details"
+        ],
         "description": "Cookieless activity only. No client visitor/session identifiers. Cannot be combined with session.",
         "properties": {
           "kind": {
@@ -3391,14 +3991,23 @@
       "SessionContext": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["consent", "visitorId", "sessionId", "kind", "details"],
+        "required": [
+          "consent",
+          "visitorId",
+          "sessionId",
+          "kind",
+          "details"
+        ],
         "properties": {
           "consent": {
             "const": true
           },
           "storage": {
             "type": "string",
-            "enum": ["cookie", "local"],
+            "enum": [
+              "cookie",
+              "local"
+            ],
             "default": "cookie",
             "description": "Must match the environment. local mode requires storage=local."
           },
@@ -3509,7 +4118,11 @@
         "properties": {
           "error": {
             "type": "object",
-            "required": ["code", "message", "requestId"],
+            "required": [
+              "code",
+              "message",
+              "requestId"
+            ],
             "properties": {
               "code": {
                 "type": "string"
@@ -3597,7 +4210,11 @@
           },
           "trackingMode": {
             "type": "string",
-            "enum": ["cookieless", "sessions", "local"],
+            "enum": [
+              "cookieless",
+              "sessions",
+              "local"
+            ],
             "default": "cookieless",
             "description": "sessions uses cookies; local uses local storage without tracking cookies. Both persistent modes require affirmative analytics consent before collection. cookieless includes anonymous daily visitors, page journeys, browser/device metadata and activity without persistent visitor identifiers."
           },
@@ -3619,6 +4236,9 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "featureSettings": {
+            "$ref": "#/components/schemas/FeatureSettings"
           }
         }
       },
@@ -3649,7 +4269,10 @@
             "type": "string"
           },
           "creditBudget": {
-            "type": ["number", "null"],
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": 0.15,
             "maximum": 1000000000,
             "multipleOf": 0.01
@@ -3698,7 +4321,12 @@
           {
             "type": "object",
             "additionalProperties": false,
-            "required": ["siteId", "id", "type", "url"],
+            "required": [
+              "siteId",
+              "id",
+              "type",
+              "url"
+            ],
             "properties": {
               "session": {
                 "$ref": "#/components/schemas/SessionContext"
@@ -3737,7 +4365,13 @@
           {
             "type": "object",
             "additionalProperties": false,
-            "required": ["siteId", "id", "type", "url", "name"],
+            "required": [
+              "siteId",
+              "id",
+              "type",
+              "url",
+              "name"
+            ],
             "properties": {
               "session": {
                 "$ref": "#/components/schemas/SessionContext"
@@ -3778,6 +4412,39 @@
             }
           }
         ]
+      },
+      "FeatureSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "goals",
+          "errors",
+          "webVitals",
+          "geography",
+          "pulse"
+        ],
+        "properties": {
+          "goals": {
+            "type": "boolean",
+            "default": false
+          },
+          "errors": {
+            "type": "boolean",
+            "default": false
+          },
+          "webVitals": {
+            "type": "boolean",
+            "default": true
+          },
+          "geography": {
+            "type": "boolean",
+            "default": false
+          },
+          "pulse": {
+            "type": "boolean",
+            "default": false
+          }
+        }
       }
     }
   }

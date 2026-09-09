@@ -831,3 +831,198 @@ async fn redis_workers_recover_abandoned_deliveries_and_quarantine_invalid_envel
         assert_eq!(failed, 1);
     });
 }
+
+#[tokio::test]
+#[ignore = "requires isolated Neon and Redis"]
+async fn optional_features_goals_diagnostics_and_privacy() {
+    fixture!(f, {
+        f.pro().await;
+        let site = f.site().await;
+        let base = format!("/api/sites/{site}/environments/{site}/features");
+        let (_, config, _) = f
+            .request(&format!("/api/tracker-config?siteId={site}"), "GET", None)
+            .await;
+        assert_eq!(
+            config["features"],
+            json!({"goals":false,"errors":false,"webVitals":true,"geography":false,"pulse":false})
+        );
+        let flags =
+            json!({"goals":true,"errors":true,"webVitals":true,"geography":true,"pulse":false});
+        let (status, body, _) = f
+            .request(
+                &format!("/api/sites/{site}/environments/{site}"),
+                "PATCH",
+                Some(json!({"featureSettings":flags})),
+            )
+            .await;
+        assert_eq!(status, 200, "{body}");
+        let (status, goal, _) = f
+            .request(
+                &format!("{base}/goals"),
+                "POST",
+                Some(json!({"name":"Pricing visit","matchType":"page","matchValue":"/pricing"})),
+            )
+            .await;
+        assert_eq!(status, 200, "{goal}");
+        let event = f.event(site);
+        assert!(ingest::ingest(&f.state, &event, Utc::now()).await.unwrap());
+        assert!(!ingest::ingest(&f.state, &event, Utc::now()).await.unwrap());
+        let (status, report, _) = f.request(&format!("{base}/goals"), "GET", None).await;
+        assert_eq!(status, 200, "{report}");
+        assert_eq!(report["goals"][0]["conversions"], 1);
+        assert_eq!(report["visitors"], 1);
+        let other = Uuid::new_v4();
+        assert_eq!(
+            f.request(
+                &format!("/api/sites/{other}/environments/{site}/features/goals"),
+                "GET",
+                None
+            )
+            .await
+            .0,
+            404
+        );
+        let page = Uuid::new_v4();
+        let id = Uuid::new_v4();
+        let diagnostic = json!({"siteId":site,"environmentId":site,"id":id,"pageId":page,"url":"https://example.com/pricing?private=secret","kind":"error","payload":{"message":"Failure for test@example.org","source":"https://example.com/app.js?token=secret","stack":"Error at https://example.com/app.js?secret=yes:10"},"consent":false});
+        let (status, reply, h) = f
+            .request_headers(
+                "/api/telemetry",
+                "POST",
+                Some(diagnostic.clone()),
+                &[("origin", "https://example.com")],
+            )
+            .await;
+        assert_eq!(status, 202, "{reply}");
+        assert_eq!(reply["accepted"], true);
+        assert_eq!(h["access-control-allow-origin"], "*");
+        let jobs = analytics_server::jobs::Jobs::start_events(f.state.clone())
+            .await
+            .unwrap();
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(15);
+        loop {
+            let count: i64 = sqlx::query_scalar(
+                "SELECT count(*) FROM diagnostic_events WHERE environment_id=$1",
+            )
+            .bind(site)
+            .fetch_one(&f.state.db)
+            .await
+            .unwrap();
+            if count == 1 {
+                break;
+            }
+            assert!(std::time::Instant::now() < deadline);
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+        }
+        jobs.close().await;
+        let (_, errors, _) = f.request(&format!("{base}/errors"), "GET", None).await;
+        let text = errors.to_string();
+        assert!(!text.contains("test@example.org"));
+        assert!(!text.contains("token=secret"));
+        assert!(!text.contains("secret=yes"));
+        assert_eq!(errors["items"][0]["occurrences"], 1);
+        let fp = errors["items"][0]["fingerprint"].as_str().unwrap();
+        assert_eq!(
+            f.request(
+                &format!("{base}/errors"),
+                "POST",
+                Some(json!({"fingerprint":fp}))
+            )
+            .await
+            .0,
+            200
+        );
+        assert_eq!(
+            f.request(&format!("{base}/errors"), "GET", None).await.1["items"][0]["resolved"],
+            true
+        );
+        assert_eq!(
+            f.request_headers(
+                "/api/telemetry",
+                "POST",
+                Some(diagnostic.clone()),
+                &[("origin", "https://evil.example")]
+            )
+            .await
+            .0,
+            403
+        );
+        assert_eq!(
+            f.request_headers(
+                "/api/telemetry",
+                "POST",
+                Some(diagnostic.clone()),
+                &[("origin", "https://example.com"), ("dnt", "1")]
+            )
+            .await
+            .1["accepted"],
+            false
+        );
+        let mut redis = f.state.redis.clone();
+        let envelope = |name: &str, value: f64, at: chrono::DateTime<Utc>| {
+            serde_json::from_value::<analytics_services::features::diagnostics::Envelope>(json!({"diagnostic":{"site":site,"env":site,"id":id,"page":page,"at":at,"kind":"vital","path":"/pricing","device":"desktop","visitor":"a".repeat(64),"fingerprint":"b".repeat(64),"payload":{"name":name,"value":value},"consent":false}})).unwrap()
+        };
+        // An error ID cannot be overwritten by a metric, even with a valid envelope.
+        analytics_services::features::diagnostics::ingest(
+            &f.state,
+            &envelope("LCP", 1200., Utc::now()).diagnostic,
+        )
+        .await
+        .unwrap();
+        let vital_id = Uuid::new_v4();
+        let now = Utc::now();
+        for (value, at) in [
+            (1000., now),
+            (1500., now + Duration::milliseconds(1)),
+            (900., now - Duration::milliseconds(1)),
+        ] {
+            let mut raw = serde_json::to_value(envelope("LCP", value, at)).unwrap();
+            raw["diagnostic"]["id"] = json!(vital_id);
+            let e: analytics_services::features::diagnostics::Envelope =
+                serde_json::from_value(raw).unwrap();
+            analytics_services::features::diagnostics::ingest(&f.state, &e.diagnostic)
+                .await
+                .unwrap();
+        }
+        let (status, vitals, _) = f.request(&format!("{base}/web-vitals"), "GET", None).await;
+        assert_eq!(status, 200, "{vitals}");
+        assert_eq!(vitals["items"][0]["samples"], 1);
+        assert_eq!(vitals["items"][0]["p75"], 1500.);
+        let usage = billing::account_usage(&f.state, &f.user).await.unwrap();
+        assert_eq!(usage["events"]["used"], 1.0);
+        let (status, globe, _) = f.request(&format!("{base}/globe"), "GET", None).await;
+        assert_eq!(status, 200, "{globe}");
+        assert_eq!(globe["countries"][0]["code"], "DK");
+        sqlx::query(
+            "UPDATE environments SET feature_settings='{}',tracking_mode='sessions' WHERE id=$1",
+        )
+        .bind(site)
+        .execute(&f.state.db)
+        .await
+        .unwrap();
+        assert_eq!(
+            f.request_headers(
+                "/api/telemetry",
+                "POST",
+                Some(diagnostic),
+                &[("origin", "https://example.com")]
+            )
+            .await
+            .1["accepted"],
+            false
+        );
+        let (status, pulse, _) = f
+            .request(
+                &format!("{base}/pulse"),
+                "POST",
+                Some(json!({"url":"https://127.0.0.1"})),
+            )
+            .await;
+        assert_eq!(status, 400, "{pulse}");
+        let _: i64 = redis::cmd("DEL")
+            .arg(&f.state.config.event_stream)
+            .query_async(&mut redis)
+            .await
+            .unwrap();
+    });
+}

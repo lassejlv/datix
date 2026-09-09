@@ -52,12 +52,11 @@ pub fn validate_url(value: &str) -> Result<Url> {
     {
         return Err(Error::invalid("Use a public HTTPS URL."));
     }
-    if let Some(host) = u.host_str() {
-        if let Ok(ip) = host.trim_matches(['[', ']']).parse::<IpAddr>() {
-            if !public_ip(ip) {
-                return Err(Error::invalid("Use a public HTTPS URL."));
-            }
-        }
+    if let Some(host) = u.host_str()
+        && let Ok(ip) = host.trim_matches(['[', ']']).parse::<IpAddr>()
+        && !public_ip(ip)
+    {
+        return Err(Error::invalid("Use a public HTTPS URL."));
     }
     Ok(u)
 }
@@ -254,7 +253,7 @@ struct Alert {
     attempts: i32,
 }
 async fn deliver(state: &State) -> Result<()> {
-    let alerts:Vec<Alert>=sqlx::query_as("WITH due AS (SELECT a.id FROM pulse_alerts a JOIN pulse_monitors m ON m.environment_id=a.environment_id AND m.config_version=a.config_version JOIN environments e ON e.id=a.environment_id WHERE a.delivered_at IS NULL AND a.attempts<5 AND a.available_at<=now() AND m.webhook_url IS NOT NULL AND e.enabled AND e.feature_settings->>'pulse'='true' ORDER BY a.available_at LIMIT 5 FOR UPDATE OF a SKIP LOCKED) UPDATE pulse_alerts a SET attempts=a.attempts+1,available_at=now()+interval '2 minutes' FROM due,pulse_monitors m WHERE a.id=due.id AND m.environment_id=a.environment_id RETURNING a.id,a.environment_id,a.config_version,a.state,m.url,m.webhook_url,a.attempts")
+    let alerts:Vec<Alert>=sqlx::query_as("WITH due AS (SELECT a.id FROM pulse_alerts a JOIN pulse_monitors m ON m.environment_id=a.environment_id AND m.config_version=a.config_version JOIN environments e ON e.id=a.environment_id WHERE a.delivered_at IS NULL AND a.attempts<5 AND a.available_at<=now() AND NOT EXISTS(SELECT 1 FROM pulse_alerts older WHERE older.environment_id=a.environment_id AND older.config_version=a.config_version AND older.created_at<a.created_at AND older.delivered_at IS NULL AND older.attempts<5) AND m.webhook_url IS NOT NULL AND e.enabled AND e.feature_settings->>'pulse'='true' ORDER BY a.available_at LIMIT 5 FOR UPDATE OF a SKIP LOCKED) UPDATE pulse_alerts a SET attempts=a.attempts+1,available_at=now()+interval '2 minutes' FROM due,pulse_monitors m WHERE a.id=due.id AND m.environment_id=a.environment_id RETURNING a.id,a.environment_id,a.config_version,a.state,m.url,m.webhook_url,a.attempts")
         .fetch_all(&state.db).await?;
     for a in alerts {
         // Recheck immediately before a side effect, including stale outbox records after reconfiguration.

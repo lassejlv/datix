@@ -9,7 +9,7 @@ export const Route = createFileRoute('/pricing')({
       {
         name: 'description',
         content:
-          'Explore Datix Basic, Pro, and Ultra. Start Basic with a 14-day free trial, or contact sales above 5 million monthly events.',
+          'Compare Datix Basic, Pro, and Ultra. Every plan includes all reports and 10 websites. Start Basic with a 14-day free trial.',
       },
     ],
   }),

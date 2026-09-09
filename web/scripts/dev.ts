@@ -42,5 +42,3 @@ async function stop(code: number) {
 }
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => void stop(0));
 await Promise.race([frontend.exited, backend.exited]).then((code) => stop(code));
-
-export {};

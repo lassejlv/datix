@@ -1130,6 +1130,391 @@
       "since_version": 7
     },
     {
+      "table_name": "environments",
+      "column_name": "feature_settings",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "name",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "match_type",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "match_value",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "conversion_goals",
+      "column_name": "created_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "goal_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "event_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "received_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "day",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "visitor",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "goal_conversions",
+      "column_name": "path",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "page_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "received_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "kind",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "path",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "device",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "visitor",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "fingerprint",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "diagnostic_events",
+      "column_name": "payload",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "error_resolutions",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "error_resolutions",
+      "column_name": "fingerprint",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "error_resolutions",
+      "column_name": "resolved_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "url",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "webhook_url",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "config_version",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "state",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "failures",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "checked_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "next_check_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "last_status",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "last_latency_ms",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "last_error",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_monitors",
+      "column_name": "changed_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "checked_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "available",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "status_code",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "latency_ms",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_checks",
+      "column_name": "error",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "environment_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "config_version",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "state",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "created_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "delivered_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "attempts",
+      "udt_name": "int4",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "available_at",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 8
+    },
+    {
+      "table_name": "pulse_alerts",
+      "column_name": "last_error",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "since_version": 8
+    },
+    {
       "table_name": "billing_customers",
       "column_name": "organization_id",
       "udt_name": "uuid",

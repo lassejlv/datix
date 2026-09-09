@@ -8,6 +8,7 @@ const tracker = readFileSync(
   'utf8',
 );
 function run({
+  features = { errors: false, webVitals: false },
   settings = defaultTrackingSettings,
   configStatus = 200,
   hostname = 'localhost',
@@ -21,6 +22,7 @@ function run({
   status = 202,
   storageDisabled = false,
 }: {
+  features?: { errors: boolean; webVitals: boolean };
   settings?: typeof defaultTrackingSettings;
   configStatus?: number;
   hostname?: string;
@@ -34,9 +36,12 @@ function run({
   status?: number;
   storageDisabled?: boolean;
 } = {}) {
+  const listeners = new Map<string, (event: unknown) => void>();
   const logs: string[] = [],
     requests: string[] = [];
-  const window = {} as { simpleAnalytics?: { track(name: string): void } };
+  const window = {} as {
+    simpleAnalytics?: { track(name: string): void; consent(granted: boolean): void };
+  };
   const location = {
     hostname,
     href: `http://${hostname}/test?secret=discard`,
@@ -94,16 +99,19 @@ function run({
       visibilityState: 'visible',
     },
     navigator: { doNotTrack: dnt, globalPrivacyControl: gpc },
-    addEventListener() {},
+    addEventListener(name: string, callback: (event: unknown) => void) {
+      listeners.set(name, callback);
+    },
     console: { info: (message: string) => logs.push(message) },
     fetch: async (_endpoint: string, options: { body: string }) => {
       if (_endpoint.includes('/api/tracker-config'))
-        return { status: configStatus, json: async () => ({ enabled: true, settings }) };
+        return { status: configStatus, json: async () => ({ enabled: true, settings, features }) };
       requests.push(options.body);
       return { status, json: async () => ({ accepted: status === 202 }) };
     },
   });
   return {
+    emit: (name: string, event: unknown) => listeners.get(name)?.(event),
     logs,
     requests,
     window,
@@ -259,4 +267,36 @@ test('tracker blocks disabled activity, strips details, refreshes policy and fai
   await settle();
   expect(result.requests).toHaveLength(1);
   expect((await readyRun({ configStatus: 503 })).requests).toHaveLength(0);
+});
+
+test('JavaScript error capture is opt-in, bounded, redacted and stops after consent revocation', async () => {
+  const event = {
+    message: 'Failure for private@example.org',
+    filename: 'https://example.com/app.js?token=secret',
+    error: { stack: 'at https://example.com/app.js?token=secret' },
+    lineno: 8,
+    colno: 2,
+  };
+  const off = await readyRun();
+  off.emit('error', event);
+  await settle();
+  expect(
+    off.requests.map((value) => JSON.parse(value)).filter((value) => value.kind === 'error'),
+  ).toHaveLength(0);
+  const on = await readyRun({ features: { errors: true, webVitals: false } });
+  on.emit('error', event);
+  on.emit('error', event);
+  await settle();
+  const rows = on.requests
+    .map((value) => JSON.parse(value))
+    .filter((value) => value.kind === 'error');
+  expect(rows).toHaveLength(1);
+  expect(rows[0].payload.message).toBe('Failure for [redacted]');
+  expect(JSON.stringify(rows)).not.toContain('token=secret');
+  on.window.simpleAnalytics!.consent(false);
+  on.emit('error', { ...event, message: 'Different failure' });
+  await settle();
+  expect(
+    on.requests.map((value) => JSON.parse(value)).filter((value) => value.kind === 'error'),
+  ).toHaveLength(1);
 });

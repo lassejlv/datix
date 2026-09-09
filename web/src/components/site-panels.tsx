@@ -439,7 +439,12 @@ export function SiteSettings({
   const { t, message: messageText } = useSitePreferences();
   const [tab, setTab] = useState<'website' | 'environment' | 'tracking' | 'features'>('website');
   const tabs = ['website', 'environment', 'tracking', 'features'] as const;
-  const labels = { website: t('Website'), environment: t('Environment'), tracking: t('Tracking'), features: t('Features') };
+  const labels = {
+    website: t('Website'),
+    environment: t('Environment'),
+    tracking: t('Tracking'),
+    features: t('Features'),
+  };
   const [name, setName] = useState(site.name);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
@@ -527,7 +532,13 @@ export function SiteSettings({
         tabIndex={0}
         className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       >
-        {tab === 'features' && <FeatureSettings siteId={site.id} environment={environment} onUpdated={onEnvironmentUpdated} />}
+        {tab === 'features' && (
+          <FeatureSettings
+            siteId={site.id}
+            environment={environment}
+            onUpdated={onEnvironmentUpdated}
+          />
+        )}
         <div hidden={tab === 'website' || tab === 'features'}>
           <EnvironmentSettings
             key={environment.id}

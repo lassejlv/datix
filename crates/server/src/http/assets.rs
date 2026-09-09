@@ -21,7 +21,9 @@ pub(super) async fn fallback(AppState(state): AppState<State>, request: Request)
         Ok(response) if response.status() != StatusCode::NOT_FOUND => {
             let mut response = response.map(Body::new);
             if path == "/web-vitals.js" {
-                response.headers_mut().insert("access-control-allow-origin",HeaderValue::from_static("*"));
+                response
+                    .headers_mut()
+                    .insert("access-control-allow-origin", HeaderValue::from_static("*"));
             }
             let cache = if path == "/" || path.ends_with("/index.html") {
                 "no-cache"

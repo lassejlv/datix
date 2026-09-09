@@ -1,5 +1,61 @@
 import type { Copy } from './en';
 export const de = {
+  'Understand your traffic.': 'Verstehe deinen Traffic.',
+  'Respect your visitors.': 'Respektiere deine Besucher.',
+  'See your top pages, traffic sources, and custom events.':
+    'Sieh deine beliebtesten Seiten, Traffic-Quellen und eigenen Ereignisse.',
+  'Cookieless website analytics. One script to get started.':
+    'Webanalyse ohne Cookies. Ein Skript für den Einstieg.',
+  'Explore dashboard': 'Dashboard entdecken',
+  'Dashboard reports': 'Dashboard-Berichte',
+  'Example traffic': 'Beispieldaten',
+  'Turn your traffic into a next step.': 'Mach aus deinem Traffic den nächsten Schritt.',
+  'Traffic sources': 'Traffic-Quellen',
+  'Know where to focus.': 'Erkenne, worauf es ankommt.',
+  'See which sites send you visitors. Put your effort where it gets noticed.':
+    'Sieh, welche Websites dir Besucher bringen. Setze dort an, wo du wahrgenommen wirst.',
+  'Pages & events': 'Seiten & Ereignisse',
+  'See what gets a response.': 'Sieh, was eine Reaktion auslöst.',
+  'Find popular pages and track actions like signups with custom events.':
+    'Finde beliebte Seiten und erfasse Aktionen wie Anmeldungen mit eigenen Ereignissen.',
+  'Keep test traffic separate.': 'Halte Test-Traffic getrennt.',
+  'Explore changes in a test environment. Keep your production reports clean.':
+    'Probiere Änderungen in einer Testumgebung aus. Halte deine Produktionsberichte frei von Test-Traffic.',
+  'Get started: add your website, paste one script, and check your first visit.':
+    'So geht’s: Website hinzufügen, ein Skript einfügen und den ersten Besuch prüfen.',
+  'Three plans.': 'Drei Tarife.',
+  'All your analytics.': 'Deine gesamte Webanalyse.',
+  'Every plan includes every report. Start Basic with 14 days free.':
+    'Jeder Tarif enthält alle Berichte. Starte mit Basic und 14 kostenlosen Tagen.',
+  '14 days free': '14 Tage kostenlos',
+  'Most popular': 'Am beliebtesten',
+  'High volume': 'Viel Traffic',
+  'Monthly credits': 'Monatliche Credits',
+  'Included in every plan': 'In jedem Tarif enthalten',
+  'Date ranges': 'Zeiträume',
+  'Referrers and countries': 'Verweisquellen und Länder',
+  '{count} websites': '{count} Websites',
+  'Choose by traffic, not features.': 'Wähle nach Traffic, nicht nach Funktionen.',
+  'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
+    'Ein Seitenaufruf in Produktion verbraucht 1 Credit. Klicks und andere Ereignisse verbrauchen 0,5 Credits.',
+  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
+    'Basic deckt 100.000 Seitenaufrufe oder 80.000 Seitenaufrufe + 40.000 andere Ereignisse pro Monat ab.',
+  'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
+    'Auf localhost: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Aktive Zeit ist kostenlos.',
+  'Before you choose.': 'Bevor du dich entscheidest.',
+  'Do I need Pro to get all the reports?': 'Brauche ich Pro für alle Berichte?',
+  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
+    'Nein. Jeder Tarif enthält dieselben Berichte und Tracking-Funktionen. Wähle Basic, Pro oder Ultra nach deinem erwarteten Traffic.',
+  'Can I use one plan for several websites?': 'Kann ich einen Tarif für mehrere Websites nutzen?',
+  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
+    'Ja. Jeder Tarif umfasst bis zu 10 Websites. Deine monatlichen Credits werden gemeinsam genutzt. Berücksichtige daher deinen gesamten Traffic bei der Tarifwahl.',
+  'Which plan includes the free trial?': 'Welcher Tarif enthält die kostenlose Testphase?',
+  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
+    'Basic enthält eine kostenlose Testphase von 14 Tagen. Du kannst die Berichte mit dem Traffic deiner eigenen Website ausprobieren, bevor du einen kostenpflichtigen Tarif wählst.',
+  'Does testing use my credits?': 'Verbrauchen Tests meine Credits?',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
+    'Für localhost-Traffic gilt ein reduzierter Verbrauch: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Getrennte Umgebungen halten Testaktivitäten aus deinen Produktionsberichten heraus.',
+  'Start with your own traffic.': 'Starte mit deinem eigenen Traffic.',
   'Yearly billing is not available yet. Choose a monthly plan.':
     'Jährliche Abrechnung ist noch nicht verfügbar. Wähle einen monatlichen Tarif.',
   Goals: 'Ziele',
@@ -1150,4 +1206,7 @@ export const de = {
     'Für ein Konto sind keine Zahlungsdaten nötig. Um einen Tarif zu starten, bestätigst du beim Checkout deine Zahlungsdaten und den Preis.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Polar muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
+  'Allowance renews on {date}. Upgrade to resume sooner.':
+    'Das Kontingent wird am {date} erneuert. Mit einem Upgrade geht es früher weiter.',
+  'Choose a plan to resume tracking.': 'Wähle einen Tarif, um das Tracking fortzusetzen.',
 } satisfies Record<Copy, string>;

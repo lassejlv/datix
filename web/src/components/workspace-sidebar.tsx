@@ -113,7 +113,18 @@ export function WorkspaceSidebar({
                 { page: 'setup', label: 'Setup', icon: Sparkles },
                 { page: 'overview', label: 'Overview', icon: BarChart3 },
                 { page: 'visitors', label: 'Visitors', icon: Footprints },
-                ...featureDefinitions.filter((feature) => featureSettings(environment?.featureSettings)[feature.key]).map((feature) => ({page: feature.page, label: feature.label, icon: feature.key === 'geography' ? Globe2 : feature.key === 'goals' ? CircleCheck : Activity})),
+                ...featureDefinitions
+                  .filter((feature) => featureSettings(environment?.featureSettings)[feature.key])
+                  .map((feature) => ({
+                    page: feature.page,
+                    label: feature.label,
+                    icon:
+                      feature.key === 'geography'
+                        ? Globe2
+                        : feature.key === 'goals'
+                          ? CircleCheck
+                          : Activity,
+                  })),
                 { page: 'installation', label: 'Install', icon: Code2 },
                 { page: 'imports', label: 'Imports', icon: FileText },
                 { page: 'settings', label: 'Settings', icon: Settings2 },

@@ -309,41 +309,79 @@
     let vitalsStarted = false;
     let errorsStarted = false;
     const diagnosticEndpoint = new URL('/api/telemetry', script.src).href;
-    const cleanDiagnostic = (value, limit) => String(value || '')
-      .slice(0, limit)
-      .replace(/https?:\/\/[^\s)"']+/g, (value) => {
-        try { const url = new URL(value); url.search = ''; url.hash = ''; url.username = ''; url.password = ''; return url.href; }
-        catch { return ''; }
-      })
-      .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[redacted]')
-      .replace(/["'][^"'\n]*["']|\b[A-Za-z0-9_-]{32,}\b/g, '[redacted]');
+    const cleanDiagnostic = (value, limit) =>
+      String(value || '')
+        .slice(0, limit)
+        .replace(/https?:\/\/[^\s)"']+/g, (value) => {
+          try {
+            const url = new URL(value);
+            url.search = '';
+            url.hash = '';
+            url.username = '';
+            url.password = '';
+            return url.href;
+          } catch {
+            return '';
+          }
+        })
+        .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[redacted]')
+        .replace(/["'][^"'\n]*["']|\b[A-Za-z0-9_-]{32,}\b/g, '[redacted]');
     async function diagnostic(kind, payload, metricId) {
       if (!consent || pageIgnored() || navigator.doNotTrack === '1') return;
       const epoch = generation;
       const url = location.origin + location.pathname;
       const config = await getPolicy();
-      if (!config?.enabled || config.features?.[kind === 'error' ? 'errors' : 'webVitals'] !== true || !consent || generation !== epoch || pageIgnored() || navigator.doNotTrack === '1') return;
+      if (
+        !config?.enabled ||
+        config.features?.[kind === 'error' ? 'errors' : 'webVitals'] !== true ||
+        !consent ||
+        generation !== epoch ||
+        pageIgnored() ||
+        navigator.doNotTrack === '1'
+      )
+        return;
       let id = diagnosticIds.get(metricId);
       if (!id) {
         if (diagnosticIds.size >= 40) return;
-        id = crypto.randomUUID(); diagnosticIds.set(metricId, id);
+        id = crypto.randomUUID();
+        diagnosticIds.set(metricId, id);
       }
       const controller = new AbortController();
       pending.add(controller);
       try {
         await fetch(diagnosticEndpoint, {
-          method: 'POST', credentials: 'omit', keepalive: true,
-          headers: { 'Content-Type': 'text/plain' }, signal: controller.signal,
-          body: JSON.stringify({ siteId, environmentId: scope, id, pageId: diagnosticPage,
-            url, kind, payload, consent: !cookieless && consent }),
+          method: 'POST',
+          credentials: 'omit',
+          keepalive: true,
+          headers: { 'Content-Type': 'text/plain' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            siteId,
+            environmentId: scope,
+            id,
+            pageId: diagnosticPage,
+            url,
+            kind,
+            payload,
+            consent: !cookieless && consent,
+          }),
         });
-      } catch { /* Diagnostics never disrupt the monitored page. */ }
-      finally { pending.delete(controller); }
+      } catch {
+        /* Diagnostics never disrupt the monitored page. */
+      } finally {
+        pending.delete(controller);
+      }
     }
     function captureError(message, source, stack, line, column) {
-      if (!consent || pageIgnored() || seenErrors.size >= 10 || policy?.features?.errors !== true) return;
-      const payload = { message: cleanDiagnostic(message, 500), source: cleanDiagnostic(source, 512),
-        stack: cleanDiagnostic(stack, 2000), line: Number(line) || 0, column: Number(column) || 0 };
+      if (!consent || pageIgnored() || seenErrors.size >= 10 || policy?.features?.errors !== true)
+        return;
+      const payload = {
+        message: cleanDiagnostic(message, 500),
+        source: cleanDiagnostic(source, 512),
+        stack: cleanDiagnostic(stack, 2000),
+        line: Number(line) || 0,
+        column: Number(column) || 0,
+      };
       if (!payload.message) return;
       const key = JSON.stringify(payload);
       if (seenErrors.has(key)) return;
@@ -357,19 +395,47 @@
       if (config.features?.errors === true && !errorsStarted) {
         errorsStarted = true;
         addEventListener('error', (event) => {
-          try { captureError(event.message, event.filename, event.error?.stack, event.lineno, event.colno); } catch { /* Ignore hostile error getters. */ }
+          try {
+            captureError(
+              event.message,
+              event.filename,
+              event.error?.stack,
+              event.lineno,
+              event.colno,
+            );
+          } catch {
+            /* Ignore hostile error getters. */
+          }
         });
         addEventListener('unhandledrejection', (event) => {
-          try { captureError(event.reason?.message || (typeof event.reason === 'string' ? event.reason : 'Unhandled promise rejection'), '', event.reason?.stack, 0, 0); } catch { /* Ignore hostile rejection getters. */ }
+          try {
+            captureError(
+              event.reason?.message ||
+                (typeof event.reason === 'string' ? event.reason : 'Unhandled promise rejection'),
+              '',
+              event.reason?.stack,
+              0,
+              0,
+            );
+          } catch {
+            /* Ignore hostile rejection getters. */
+          }
         });
       }
       if (config.features?.webVitals === true && !vitalsStarted) {
         vitalsStarted = true;
         try {
           const module = await import(new URL('/web-vitals.js', script.src).href);
-          if (!consent || pageIgnored() || navigator.doNotTrack === '1') { vitalsStarted = false; return; }
-          module.observe((id, name, value) => { void diagnostic('vital', { name, value }, id); });
-        } catch { vitalsStarted = false; }
+          if (!consent || pageIgnored() || navigator.doNotTrack === '1') {
+            vitalsStarted = false;
+            return;
+          }
+          module.observe((id, name, value) => {
+            void diagnostic('vital', { name, value }, id);
+          });
+        } catch {
+          vitalsStarted = false;
+        }
       }
     }
     function setConsent(granted, broadcast = true) {
@@ -521,7 +587,9 @@
       lastBeat = now;
     }
     setInterval(engagement, 15000);
-    setInterval(() => { void startDiagnostics(); }, 60000);
+    setInterval(() => {
+      void startDiagnostics();
+    }, 60000);
     document.addEventListener('visibilitychange', () => {
       lastBeat = Date.now();
     });

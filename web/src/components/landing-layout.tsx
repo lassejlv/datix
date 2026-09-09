@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { useSitePreferences, FooterPreferences } from './site-preferences';
-import { ArrowRight } from './ui/icons';
+import { useSitePreferences } from './site-preferences';
 import { Brand } from './brand';
 import {
   Dialog,
@@ -37,9 +36,14 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
             </a>
             <a href="/#questions">{t('FAQ')}</a>
           </div>
-          <a className="landing-sign-in" href="/signin">
-            {t('Sign in')} <ArrowRight size={14} aria-hidden="true" />
-          </a>
+          <div className="landing-nav-actions">
+            <a className="landing-sign-in" href="/signin">
+              {t('Sign in')}
+            </a>
+            <a className="landing-button landing-nav-cta" href="/signup">
+              {t('Start 14-day trial')}
+            </a>
+          </div>
         </nav>
       </header>
 
@@ -51,9 +55,6 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
               <Brand />
             </a>
             <p>{t('Website analytics. A little more human.')}</p>
-            <a className="landing-footer-email" href="mailto:hello@usedatix.com">
-              hello@usedatix.com
-            </a>
           </div>
           <nav className="landing-footer-nav" aria-label={t('Footer navigation')}>
             <ul>
@@ -75,14 +76,18 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
           </nav>
         </div>
         <div className="footer-controls">
-          <button
-            type="button"
-            className="landing-inline-link"
-            onClick={() => setDialog('privacy')}
-          >
-            {t('Tracking & privacy')}
-          </button>
-          <FooterPreferences />
+          <div className="footer-contact">
+            <a className="landing-footer-email" href="mailto:hello@usedatix.com">
+              hello@usedatix.com
+            </a>
+            <button
+              type="button"
+              className="landing-inline-link"
+              onClick={() => setDialog('privacy')}
+            >
+              {t('Tracking & privacy')}
+            </button>
+          </div>
         </div>
       </footer>
 
