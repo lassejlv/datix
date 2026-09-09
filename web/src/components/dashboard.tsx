@@ -1,3 +1,5 @@
+import { FeaturePageView } from './feature-pages';
+import { featureDefinitions, isFeaturePage } from '../lib/features';
 import { deviceName } from '../lib/i18n/display';
 import { useSitePreferences } from './site-preferences';
 import { AccountSettings } from './account-settings';
@@ -365,15 +367,17 @@ function Dashboard({
                 ? t('Usage')
                 : !site || panel === 'setup'
                   ? t('Setup')
-                  : panel === 'settings'
-                    ? t('Settings')
-                    : panel === 'installation'
-                      ? t('Install')
-                      : panel === 'imports'
-                        ? t('Imports')
-                        : panel === 'visitors'
-                          ? t('Visitors')
-                          : t('Overview')}
+                  : isFeaturePage(panel)
+                    ? t(featureDefinitions.find((feature) => feature.page === panel)!.label)
+                    : panel === 'settings'
+                      ? t('Settings')
+                      : panel === 'installation'
+                        ? t('Install')
+                        : panel === 'imports'
+                          ? t('Imports')
+                          : panel === 'visitors'
+                            ? t('Visitors')
+                            : t('Overview')}
             </span>
           </div>
         </header>
@@ -442,6 +446,14 @@ function Dashboard({
                 onDashboard={() => show('overview')}
                 onInstallation={() => show('installation')}
                 onComplete={completeSetup}
+              />
+            ) : isFeaturePage(panel) ? (
+              <FeaturePageView
+                key={`${environment.id}:${panel}`}
+                page={panel}
+                siteId={site.id}
+                environment={environment}
+                onSettings={() => show('settings')}
               />
             ) : panel === 'visitors' ? (
               <VisitorJourneys

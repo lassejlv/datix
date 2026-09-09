@@ -1,0 +1,170 @@
+.visitor-globe {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #273345;
+  border-radius: 12px;
+  background: #080f1c;
+  color: #e5eaf2;
+  min-height: 600px;
+}
+.visitor-globe-full {
+  position: fixed;
+  inset: 12px;
+  z-index: 1000;
+  overflow: auto;
+}
+.globe-canvas {
+  display: block;
+  width: 100%;
+  min-height: 470px;
+  touch-action: none;
+  cursor: grab;
+}
+.globe-canvas:active {
+  cursor: grabbing;
+}
+.globe-summary {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  z-index: 2;
+  width: 245px;
+  border: 1px solid #34405380;
+  background: #101a29eb;
+  border-radius: 10px;
+  padding: 16px;
+  backdrop-filter: blur(12px);
+}
+.globe-controls {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 3;
+}
+.globe-controls button {
+  background: #172234;
+  color: #dce5f1;
+  border-color: #364257;
+}
+.globe-bottom {
+  display: flex;
+  position: absolute;
+  bottom: 45px;
+  left: 20px;
+  right: 20px;
+  justify-content: space-between;
+  gap: 20px;
+  pointer-events: none;
+}
+.globe-bottom > section {
+  pointer-events: auto;
+  border: 1px solid #34405380;
+  background: #101a29ed;
+  border-radius: 10px;
+  padding: 14px;
+  backdrop-filter: blur(12px);
+}
+.globe-bottom h2 {
+  font-size: 11px;
+  color: #8796ac;
+  font-weight: 500;
+}
+.globe-activity {
+  width: 270px;
+}
+.globe-countries {
+  width: 230px;
+}
+.globe-note {
+  position: absolute;
+  bottom: 15px;
+  left: 20px;
+  right: 20px;
+  text-align: center;
+  font-size: 10px;
+  color: #76859c;
+}
+.globe-rotation {
+  position: absolute;
+  top: 60px;
+  z-index: 3;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #172234db;
+  border: 1px solid #344053;
+  border-radius: 8px;
+  padding: 3px;
+}
+.globe-rotation button {
+  height: 28px;
+  min-width: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  padding: 0 5px;
+  border-radius: 4px;
+}
+.globe-rotation button:hover {
+  background: #304159;
+}
+.globe-rotation button:focus-visible,
+.visitor-globe button:focus-visible {
+  outline: 2px solid #a7c5ed;
+  outline-offset: 2px;
+}
+.visitor-globe-full .globe-canvas {
+  height: calc(100dvh - 26px);
+}
+@media (max-width: 640px) {
+  .visitor-globe {
+    min-height: 760px;
+  }
+  .globe-summary {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 15px;
+    width: calc(100% - 30px);
+    padding: 13px;
+  }
+  .globe-controls {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 15px 0;
+  }
+  .globe-canvas {
+    min-height: 340px;
+    margin-top: -30px;
+  }
+  .globe-bottom {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: -15px 15px 45px;
+    gap: 10px;
+  }
+  .globe-bottom > section {
+    width: 50%;
+    padding: 10px;
+  }
+  .globe-rotation {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: fit-content;
+    margin: -5px auto 25px;
+  }
+  .visitor-globe-full .globe-canvas {
+    height: 45dvh;
+  }
+  .globe-note {
+    font-size: 9px;
+  }
+}
