@@ -25,7 +25,18 @@ export function TrafficChart({ data, metric }: { data: Point[]; metric: Metric }
     [data, dateLabel],
   );
   const config = useMemo(() => {
-    const ink: Rgb = dark ? [222, 222, 222] : [51, 51, 51];
+    const inks: Record<Metric, Rgb> = dark
+      ? {
+          pageviews: [245, 173, 104],
+          dailyUniqueVisitors: [94, 211, 191],
+          customEvents: [185, 164, 243],
+        }
+      : {
+          pageviews: [173, 69, 25],
+          dailyUniqueVisitors: [20, 117, 103],
+          customEvents: [117, 78, 168],
+        };
+    const ink = inks[metric];
     return {
       [metric]: {
         label: t(metricLabels[metric]),

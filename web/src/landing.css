@@ -3,14 +3,14 @@
    Radius: 8px for controls, full radius only for the navigation island.
    Layer order: page 0, film controls 1, keyboard skip link 2, shared dialogs 50. */
 .landing-page {
-  --landing-canvas: #fff;
-  --landing-ink: #202020;
-  --landing-secondary: rgb(0 0 0 / 62%);
-  --landing-line: rgb(0 0 0 / 10%);
-  --landing-wash: rgb(0 0 0 / 3%);
-  --landing-hover: rgb(0 0 0 / 6%);
-  --landing-button: #242424;
-  --landing-on-button: #fafafa;
+  --landing-canvas: var(--background);
+  --landing-ink: var(--foreground);
+  --landing-secondary: var(--secondary-ink);
+  --landing-line: var(--border);
+  --landing-wash: var(--wash);
+  --landing-hover: var(--hover);
+  --landing-button: var(--primary);
+  --landing-on-button: var(--on-primary);
   --landing-ease: cubic-bezier(0.32, 0.72, 0, 1);
   min-height: 100dvh;
   background: var(--landing-canvas);
@@ -935,7 +935,7 @@
   }
   .landing-page .landing-button:hover {
     transform: translateY(-2px);
-    background: #393939;
+    background: color-mix(in srgb, var(--landing-button) 88%, var(--landing-ink));
   }
   .landing-text-button:hover {
     color: var(--landing-ink);
@@ -986,31 +986,31 @@
   }
 }
 :root[data-theme='dark'] .landing-page {
-  --landing-canvas: #181818;
+  --landing-canvas: var(--background);
   --landing-ink: var(--foreground);
   --landing-secondary: var(--secondary-ink);
   --landing-line: var(--border);
-  --landing-wash: rgb(255 255 255 / 3%);
-  --landing-hover: rgb(255 255 255 / 9%);
+  --landing-wash: var(--wash);
+  --landing-hover: var(--hover);
   --landing-button: var(--primary);
-  --landing-on-button: #202020;
+  --landing-on-button: var(--on-primary);
 }
 :root[data-theme='dark'] .landing-page .landing-button:hover {
-  background: #d5d5d5;
+  background: color-mix(in srgb, var(--landing-button) 88%, var(--landing-ink));
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not([data-theme='dark']) .landing-page {
-    --landing-canvas: #181818;
+    --landing-canvas: var(--background);
     --landing-ink: var(--foreground);
     --landing-secondary: var(--secondary-ink);
     --landing-line: var(--border);
-    --landing-wash: rgb(255 255 255 / 3%);
-    --landing-hover: rgb(255 255 255 / 9%);
+    --landing-wash: var(--wash);
+    --landing-hover: var(--hover);
     --landing-button: var(--primary);
-    --landing-on-button: #202020;
+    --landing-on-button: var(--on-primary);
   }
   :root:not([data-theme='light']):not([data-theme='dark']) .landing-page .landing-button:hover {
-    background: #d5d5d5;
+    background: color-mix(in srgb, var(--landing-button) 88%, var(--landing-ink));
   }
 }
 @media (max-width: 767px) {
