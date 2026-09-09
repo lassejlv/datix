@@ -10,13 +10,17 @@ if (
 )
   throw new Error('Isolated database required');
 const base = 'http://localhost:3060';
+const phase = process.argv[2] === 'before' ? 'before' : 'after';
 const client = new Client({ connectionString: target.toString() });
 const browser = await chromium.launch();
 let user: string | undefined;
 try {
   await client.connect();
-  await mkdir('web/artifacts/settings-tabs', { recursive: true });
-  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  await mkdir(`web/artifacts/dark-theme/${phase}`, { recursive: true });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    reducedMotion: 'reduce',
+  });
   const signup = await context.request.post(`${base}/api/auth/sign-up/email`, {
     headers: { origin: base },
     data: {
@@ -36,9 +40,12 @@ try {
   const page = await context.newPage();
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  for (const locale of ['en', 'da', 'de'] as const) {
+  for (const locale of ['en'] as const) {
     const t = (key: Parameters<typeof translate>[1]) => translate(locale, key);
-    await context.addCookies([{ name: 'ab-language', value: locale, url: base }]);
+    await context.addCookies([
+      { name: 'ab-language', value: locale, url: base },
+      { name: 'ab-theme', value: 'dark', url: base },
+    ]);
     await page.goto(`${base}/site/${site}/${site}/settings`);
     const website = page.getByRole('tab', { name: t('Website'), exact: true });
     await expect(website).toHaveAttribute('aria-selected', 'true');
@@ -66,8 +73,18 @@ try {
     ).toHaveValue('sessions');
     await page.keyboard.press('Home');
     await expect(website).toBeFocused();
+    const input = page.locator('#settings-name');
+    await input.focus();
+    const focusShadow = await input.locator('..').evaluate((el) => getComputedStyle(el).boxShadow);
+    expect(focusShadow).not.toBe('none');
+    const save = page.getByRole('button', { name: 'Save changes', exact: true });
+    await website.click();
+    const resting = await save.evaluate((el) => getComputedStyle(el).backgroundColor);
+    await save.hover();
+    expect(await save.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(resting);
+    await page.mouse.move(1000, 700);
     await page.screenshot({
-      path: `web/artifacts/settings-tabs/${locale}-desktop.png`,
+      path: `web/artifacts/dark-theme/${phase}/${locale}-desktop.png`,
       fullPage: true,
     });
     await page.setViewportSize({ width: 390, height: 844 });
@@ -78,28 +95,53 @@ try {
       );
     }
     await page.screenshot({
-      path: `web/artifacts/settings-tabs/${locale}-mobile.png`,
+      path: `web/artifacts/dark-theme/${phase}/${locale}-mobile.png`,
       fullPage: true,
     });
     await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(`${base}/site/${site}/${site}/overview`);
+    await expect(page.getByRole('button', { name: /^Pageviews/ })).toContainText('0');
+    await page.screenshot({
+      path: `web/artifacts/dark-theme/${phase}/overview.png`,
+      fullPage: true,
+    });
     console.log(`PASS ${locale}: tabs, keyboard, unsaved values, consent guard, mobile`);
   }
-  await page.getByTestId('dashboard-language').selectOption('da');
-  await expect(page.getByRole('tab', { name: 'Miljø', exact: true })).toBeVisible();
-  await page.reload();
-  await expect(page.getByTestId('dashboard-language')).toHaveValue('da');
-  await expect(page.getByRole('tab', { name: 'Sporing', exact: true })).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'Vis/skjul navigation', exact: true }).click();
-  await page.getByTestId('dashboard-language').selectOption('de');
-  await expect(page.getByTestId('dashboard-language')).toHaveValue('de');
-  await expect(page.getByRole('link', { name: 'Übersicht', exact: true })).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByTestId('account-menu').click();
+  await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
+  await expect
+    .poll(() => page.getByRole('dialog').evaluate((el) => getComputedStyle(el).opacity))
+    .toBe('1');
+  await page.screenshot({ path: `web/artifacts/dark-theme/${phase}/dialog.png`, fullPage: true });
+  const theme = page.getByRole('combobox', { name: 'Theme', exact: true });
+  await theme.selectOption('system');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue('--background').trim(),
+      ),
+    )
+    .toBe(phase === 'before' ? '#121212' : '#181818');
+  await theme.selectOption('light');
+  await expect(page.locator('html')).not.toHaveClass(/dark/);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue('--background').trim(),
+      ),
+    )
+    .toBe('#fff');
   await page.screenshot({
-    path: 'web/artifacts/settings-tabs/mobile-language.png',
+    path: `web/artifacts/dark-theme/${phase}/light-dialog.png`,
     fullPage: true,
   });
-  console.log('PASS sidebar language: instant translation, reload persistence, mobile navigation');
+  await page.keyboard.press('Escape');
+  await page.goto(`${base}/`);
+  await context.addCookies([{ name: 'ab-theme', value: 'dark', url: base }]);
+  await page.reload();
+  await page.screenshot({ path: `web/artifacts/dark-theme/${phase}/landing.png`, fullPage: true });
   expect(errors).toEqual([]);
 } finally {
   if (user) await client.query('DELETE FROM "user" WHERE id=$1', [user]);

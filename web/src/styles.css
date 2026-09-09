@@ -26,7 +26,7 @@
   --color-accent-foreground: var(--foreground);
   --color-card: var(--background);
   --color-card-foreground: var(--foreground);
-  --color-popover: var(--background);
+  --color-popover: var(--popover, var(--background));
   --color-popover-foreground: var(--foreground);
   --color-border: var(--border);
   --color-input: var(--input-border);
@@ -67,19 +67,22 @@
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #121212;
-  --foreground: #ededed;
-  --primary: #ededed;
+  --popover: #222;
+  --workspace-sidebar: #141414;
+  --control-background: #202020;
+  --background: #181818;
+  --foreground: #e5e5e5;
+  --primary: #d9d9d9;
   --on-primary: #171717;
-  --secondary-ink: rgb(255 255 255 / 68%);
-  --muted-ink: rgb(255 255 255 / 60%);
-  --border: rgb(255 255 255 / 12%);
-  --input-border: rgb(255 255 255 / 28%);
-  --wash: rgb(255 255 255 / 5%);
-  --hover: rgb(255 255 255 / 9%);
-  --pressed: rgb(255 255 255 / 14%);
-  --focus: #bdbdbd;
-  --chart-ink: #dedede;
+  --secondary-ink: #adadad;
+  --muted-ink: #9e9e9e;
+  --border: #303030;
+  --input-border: #6c6c6c;
+  --wash: #202020;
+  --hover: #292929;
+  --pressed: #323232;
+  --focus: #a3a3a3;
+  --chart-ink: #c9c9c9;
   --danger: #ff9e95;
   --danger-wash: #2c1917;
   --success: #87d9a8;
@@ -87,19 +90,22 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not([data-theme='dark']) {
     color-scheme: dark;
-    --background: #121212;
-    --foreground: #ededed;
-    --primary: #ededed;
+    --popover: #222;
+    --workspace-sidebar: #141414;
+    --control-background: #202020;
+    --background: #181818;
+    --foreground: #e5e5e5;
+    --primary: #d9d9d9;
     --on-primary: #171717;
-    --secondary-ink: rgb(255 255 255 / 68%);
-    --muted-ink: rgb(255 255 255 / 60%);
-    --border: rgb(255 255 255 / 12%);
-    --input-border: rgb(255 255 255 / 28%);
-    --wash: rgb(255 255 255 / 5%);
-    --hover: rgb(255 255 255 / 9%);
-    --pressed: rgb(255 255 255 / 14%);
-    --focus: #bdbdbd;
-    --chart-ink: #dedede;
+    --secondary-ink: #adadad;
+    --muted-ink: #9e9e9e;
+    --border: #303030;
+    --input-border: #6c6c6c;
+    --wash: #202020;
+    --hover: #292929;
+    --pressed: #323232;
+    --focus: #a3a3a3;
+    --chart-ink: #c9c9c9;
     --danger: #ff9e95;
     --danger-wash: #2c1917;
     --success: #87d9a8;
@@ -107,7 +113,10 @@
 }
 
 .dashboard-workspace {
-  --sidebar-background: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  --sidebar-background: var(
+    --workspace-sidebar,
+    color-mix(in srgb, var(--foreground) 3%, var(--background))
+  );
 }
 
 .footer-preferences {
@@ -143,4 +152,18 @@
 .footer-preferences select:focus-visible {
   outline: 2px solid var(--landing-ink, var(--foreground));
   outline-offset: 2px;
+}
+
+/* Flatten decorative control highlights while retaining keyboard focus rings. */
+.dark [data-slot='input-control'] {
+  background: var(--control-background);
+}
+.dark [data-slot='button'],
+.dark [data-slot='input-control'] {
+  --tw-shadow: 0 0 #0000;
+  --tw-inset-shadow: 0 0 #0000;
+}
+.dark [data-slot='button']::before,
+.dark [data-slot='input-control']::before {
+  box-shadow: none;
 }

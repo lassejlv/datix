@@ -40,6 +40,7 @@ try {
     userAgent:
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36',
   });
+  await context.addCookies([{ name: 'ab-language', value: 'en', url: base }]);
   const post = (path: string, data: unknown) =>
     context.request.post(`${base}/api${path}`, { headers: { origin: base }, data });
   if (mode === 'cleanup') {

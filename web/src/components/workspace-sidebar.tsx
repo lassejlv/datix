@@ -1,7 +1,9 @@
+import type { Locale } from '../lib/i18n/preferences';
 import { useSitePreferences } from './site-preferences';
 import { AccountMenu } from './account-menu';
 import { Link } from '@tanstack/react-router';
 import {
+  Globe2,
   Sparkles,
   BarChart3,
   Footprints,
@@ -56,7 +58,7 @@ export function WorkspaceSidebar({
   onSignOut: () => void;
   onAccountSettings: () => void;
 }) {
-  const { t } = useSitePreferences();
+  const { t, locale, setLocale } = useSitePreferences();
   const { setOpenMobile } = useSidebar();
   const action = (callback: () => void) => {
     setOpenMobile(false);
@@ -157,6 +159,20 @@ export function WorkspaceSidebar({
         </nav>
       </SidebarContent>
       <SidebarFooter className="px-2 py-2">
+        <label className="mx-1 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-secondary-ink hover:bg-accent focus-within:ring-2 focus-within:ring-ring">
+          <Globe2 size={16} aria-hidden="true" />
+          <span className="sr-only">{t('Language')}</span>
+          <select
+            data-testid="dashboard-language"
+            className="min-w-0 flex-1 cursor-pointer bg-transparent py-2 text-inherit outline-none"
+            value={locale}
+            onChange={(event) => setLocale(event.target.value as Locale)}
+          >
+            <option value="en">English</option>
+            <option value="da">Dansk</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </label>
         <AccountMenu
           user={user}
           signingOut={signingOut}

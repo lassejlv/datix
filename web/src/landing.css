@@ -987,12 +987,12 @@
 }
 :root[data-theme='dark'] .landing-page {
   --landing-canvas: #181818;
-  --landing-ink: #ededed;
-  --landing-secondary: rgb(255 255 255 / 60%);
-  --landing-line: rgb(255 255 255 / 12%);
+  --landing-ink: var(--foreground);
+  --landing-secondary: var(--secondary-ink);
+  --landing-line: var(--border);
   --landing-wash: rgb(255 255 255 / 3%);
   --landing-hover: rgb(255 255 255 / 9%);
-  --landing-button: #ededed;
+  --landing-button: var(--primary);
   --landing-on-button: #202020;
 }
 :root[data-theme='dark'] .landing-page .landing-button:hover {
@@ -1001,12 +1001,12 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not([data-theme='dark']) .landing-page {
     --landing-canvas: #181818;
-    --landing-ink: #ededed;
-    --landing-secondary: rgb(255 255 255 / 60%);
-    --landing-line: rgb(255 255 255 / 12%);
+    --landing-ink: var(--foreground);
+    --landing-secondary: var(--secondary-ink);
+    --landing-line: var(--border);
     --landing-wash: rgb(255 255 255 / 3%);
     --landing-hover: rgb(255 255 255 / 9%);
-    --landing-button: #ededed;
+    --landing-button: var(--primary);
     --landing-on-button: #202020;
   }
   :root:not([data-theme='light']):not([data-theme='dark']) .landing-page .landing-button:hover {
