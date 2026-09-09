@@ -1,5 +1,6 @@
 // Keep operational paths stable when invoked from either the repository or web/.
 process.chdir(new URL('../..', import.meta.url).pathname);
+import catalog from '../../config/polar-catalog.json';
 import { chromium, expect } from '@playwright/test';
 import { Client } from 'pg';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -69,8 +70,8 @@ try {
   await seedPro(client, ownerId!);
   const period = (await readUsage()).period;
   await client.query(
-    'insert into billing_usage (owner_id,site_id,period_start,period_end,events) values ($1,$2,$3,$4,70020)',
-    [ownerId, siteId, period.start, period.end],
+    'insert into billing_organization_usage (owner_id,site_id,period_start,period_end,events,organization_id) values ($1,$2,$3,$4,70020,$5)',
+    [ownerId, siteId, period.start, period.end, catalog.organizationId],
   );
   await refresh();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '70020');
@@ -88,7 +89,9 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.emulateMedia({ colorScheme: 'light' });
-  await client.query('update billing_usage set events=99999 where owner_id=$1', [ownerId]);
+  await client.query('update billing_organization_usage set events=99999 where owner_id=$1', [
+    ownerId,
+  ]);
   fixture = Bun.serve({
     port: 0,
     hostname: '127.0.0.1',

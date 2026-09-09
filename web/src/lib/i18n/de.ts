@@ -1,5 +1,114 @@
 import type { Copy } from './en';
 export const de = {
+  'Yearly billing is not available yet. Choose a monthly plan.':
+    'Jährliche Abrechnung ist noch nicht verfügbar. Wähle einen monatlichen Tarif.',
+  Goals: 'Ziele',
+  'Error Tracking': 'Fehlertracking',
+  'Web Vitals': 'Web Vitals',
+  Globe: 'Globus',
+  Pulse: 'Pulse',
+  Features: 'Funktionen',
+  'Track signups, purchases, and other single-step conversions.':
+    'Registrierungen, Käufe und andere einstufige Conversions erfassen.',
+  'Find JavaScript errors and see how many visitors they affect.':
+    'JavaScript-Fehler finden und betroffene Besucher ermitteln.',
+  'Measure loading speed, responsiveness, and visual stability.':
+    'Ladegeschwindigkeit, Reaktionsfähigkeit und visuelle Stabilität messen.',
+  'Explore your visitors on an interactive Earth.':
+    'Besucher auf einem interaktiven Globus erkunden.',
+  'Monitor availability and send outage alerts to a webhook.':
+    'Verfügbarkeit überwachen und Ausfallmeldungen an einen Webhook senden.',
+  'Choose the features for this environment. Web Vitals is on by default.':
+    'Funktionen für diese Umgebung auswählen. Web Vitals ist standardmäßig aktiviert.',
+  'Enable this feature in Settings to get started.':
+    'Diese Funktion zum Starten in den Einstellungen aktivieren.',
+  'Open settings': 'Einstellungen öffnen',
+  'Loading…': 'Wird geladen…',
+  Conversions: 'Conversions',
+  'Conversion rate': 'Conversion-Rate',
+  'Delete goal {name}': 'Ziel {name} löschen',
+  Delete: 'Löschen',
+  'Create your first goal to track a signup, purchase, or activation.':
+    'Das erste Ziel erstellen, um Registrierung, Kauf oder Aktivierung zu erfassen.',
+  'Conversions start when a goal is created. Rates use daily unique visitors.':
+    'Conversions werden ab Erstellung des Ziels gezählt. Raten basieren auf täglich eindeutigen Besuchern.',
+  'Create goal': 'Ziel erstellen',
+  'Goal name': 'Zielname',
+  Signup: 'Registrierung',
+  Match: 'Übereinstimmung',
+  'Custom event': 'Benutzerdefiniertes Ereignis',
+  'Page path': 'Seitenpfad',
+  'Event name': 'Ereignisname',
+  'Last 24 hours': 'Letzte 24 Stunden',
+  Refresh: 'Aktualisieren',
+  'No JavaScript errors recorded in this period.':
+    'In diesem Zeitraum wurden keine JavaScript-Fehler erfasst.',
+  'Waiting for Web Vitals. Measurements arrive from real visitors as they use and leave a page.':
+    'Warten auf Web Vitals. Messungen stammen von echten Besuchern beim Nutzen und Verlassen einer Seite.',
+  '{count} occurrences · {visitors} visitors': '{count} Vorkommen · {visitors} Besucher',
+  Resolved: 'Behoben',
+  Open: 'Offen',
+  'Mark resolved': 'Als behoben markieren',
+  'Loading speed': 'Ladegeschwindigkeit',
+  Responsiveness: 'Reaktionsfähigkeit',
+  'Visual stability': 'Visuelle Stabilität',
+  Good: 'Gut',
+  'Needs improvement': 'Verbesserungsbedarf',
+  Poor: 'Schlecht',
+  '{count} measurements': '{count} Messungen',
+  'No measurements yet': 'Noch keine Messungen',
+  'Errors are grouped by message and source. A new occurrence reopens a resolved error.':
+    'Fehler werden nach Meldung und Quelle gruppiert. Ein erneutes Auftreten öffnet einen behobenen Fehler wieder.',
+  'Values show the 75th percentile by device. Small samples may vary; INP requires interaction.':
+    'Werte zeigen das 75. Perzentil je Gerät. Kleine Stichproben können schwanken; INP erfordert Interaktion.',
+  'Pulse settings': 'Pulse-Einstellungen',
+  'Checked every minute. Two failed checks confirm an outage.':
+    'Prüfung jede Minute. Zwei fehlgeschlagene Prüfungen bestätigen einen Ausfall.',
+  'Monitor URL': 'Überwachungs-URL',
+  'Webhook URL': 'Webhook-URL',
+  'A webhook is linked. Leave blank to keep it.':
+    'Ein Webhook ist verknüpft. Zum Beibehalten leer lassen.',
+  'Link a webhook to receive outage and recovery alerts.':
+    'Einen Webhook für Ausfall- und Wiederherstellungsmeldungen verknüpfen.',
+  'Remove linked webhook': 'Verknüpften Webhook entfernen',
+  'Save monitor': 'Überwachung speichern',
+  'Add a monitor URL in Settings to start checking availability.':
+    'In den Einstellungen eine Überwachungs-URL hinzufügen, um die Verfügbarkeit zu prüfen.',
+  Operational: 'Betriebsbereit',
+  'Site down': 'Website nicht erreichbar',
+  'Waiting for checks': 'Warten auf Prüfungen',
+  'Uptime · 24h': 'Verfügbarkeit · 24h',
+  'Uptime · 7d': 'Verfügbarkeit · 7T',
+  'Response time': 'Antwortzeit',
+  'Recent checks': 'Letzte Prüfungen',
+  'Last checked': 'Zuletzt geprüft',
+  'The latest availability check failed.': 'Die letzte Verfügbarkeitsprüfung ist fehlgeschlagen.',
+  'No webhook linked. Add one in Settings to receive alerts.':
+    'Kein Webhook verknüpft. In den Einstellungen hinzufügen, um Meldungen zu erhalten.',
+  'Latest alert delivered.': 'Letzte Meldung zugestellt.',
+  'Webhook delivery failed after five attempts. Check the linked URL.':
+    'Webhook-Zustellung nach fünf Versuchen fehlgeschlagen. Die verknüpfte URL prüfen.',
+  'Alert delivery pending.': 'Zustellung der Meldung ausstehend.',
+  'Webhook linked. Alerts will be sent for outages and recoveries.':
+    'Webhook verknüpft. Meldungen werden bei Ausfällen und Wiederherstellungen gesendet.',
+  'Uptime is based on recorded checks. Monitoring gaps are not counted.':
+    'Verfügbarkeit basiert auf erfassten Prüfungen. Überwachungslücken werden nicht berücksichtigt.',
+  Fullscreen: 'Vollbild',
+  'Visitors around the world': 'Besucher weltweit',
+  '{count} active in the last 5 minutes': '{count} aktiv in den letzten 5 Minuten',
+  Direct: 'Direkt',
+  'The map could not be loaded. Refresh to try again.':
+    'Die Karte konnte nicht geladen werden. Zum Wiederholen aktualisieren.',
+  'Interactive visitor globe': 'Interaktiver Besucherglobus',
+  'Rotate left': 'Nach links drehen',
+  'Rotate right': 'Nach rechts drehen',
+  'Zoom in': 'Vergrößern',
+  'Zoom out': 'Verkleinern',
+  Reset: 'Zurücksetzen',
+  'Recent activity': 'Letzte Aktivitäten',
+  'Waiting for visitors': 'Warten auf Besucher',
+  'Country-level locations · Last 24 hours · Refreshes every 30 seconds':
+    'Standorte auf Länderebene · Letzte 24 Stunden · Aktualisierung alle 30 Sekunden',
   Journey: 'Besuchsverlauf',
   Timeline: 'Zeitleiste',
   'Activity view': 'Aktivitätsansicht',
@@ -1035,10 +1144,10 @@ export const de = {
   'An active plan is required': 'Ein aktiver Tarif ist erforderlich',
   'An active subscription or trial is required to collect events. Your existing reports remain available.':
     'Ein aktives Abonnement oder eine Testphase ist erforderlich, um Ereignisse zu erfassen. Deine bisherigen Berichte bleiben verfügbar.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
     'Basic umfasst 14 kostenlose Testtage. Pro und Ultra haben keine kostenlose Testphase. Wähle monatliche oder jährliche Zahlung.',
   'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
     'Für ein Konto sind keine Zahlungsdaten nötig. Um einen Tarif zu starten, bestätigst du beim Checkout deine Zahlungsdaten und den Preis.',
-  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
-    'Autumn muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
+  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
+    'Polar muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
 } satisfies Record<Copy, string>;

@@ -20,6 +20,7 @@
 !web/public/**
 !web/scripts
 !web/scripts/build-tracker.ts
+!web/scripts/build-vitals.ts
 !Dockerfile
 !Dockerfile.worker
 !railway.json

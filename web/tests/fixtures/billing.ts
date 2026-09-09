@@ -1,10 +1,11 @@
 import type { Client } from 'pg';
 import type { BillingSubscription } from '../../src/billing/types';
-export const testProId = 'basic';
-export const testLargerProId = 'pro';
-export const testAnnualProId = 'basic_annual';
+import catalog from '../../../config/polar-catalog.json';
+export const testProId = catalog.plans.find((p) => p.id === 'basic')!.productId;
+export const testLargerProId = catalog.plans.find((p) => p.id === 'pro')!.productId;
+export const testAnnualProId = catalog.plans.find((p) => p.id === 'basic_annual')!.productId;
 
-/** Disposable database fixture only; this does not create an Autumn subscription. */
+/** Disposable database fixture only; this does not create a Polar subscription. */
 export async function seedPro(
   client: Client,
   ownerId: string,
@@ -13,7 +14,7 @@ export async function seedPro(
   const now = new Date();
   const subscription: BillingSubscription = {
     id: crypto.randomUUID(),
-    productId: testAnnualProId,
+    productId: testProId,
     status: 'active',
     currentPeriodStart: new Date(Date.UTC(now.getUTCFullYear() - 1, 0, 1)).toISOString(),
     currentPeriodEnd: new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1)).toISOString(),
@@ -34,9 +35,9 @@ export async function seedPro(
     ...overrides,
   };
   await client.query(
-    `insert into billing_customers (customer_id, owner_id, subscriptions, occurred_at, provider) values ($1,$2,$3,now(),'autumn')
+    `insert into billing_customers (customer_id, owner_id, subscriptions, occurred_at, provider, organization_id) values ($1,$2,$3,now(),'polar',$4)
     on conflict (customer_id) do update set owner_id=excluded.owner_id, subscriptions=excluded.subscriptions, deleted=false, occurred_at=excluded.occurred_at, updated_at=now()`,
-    [`qa-billing-${ownerId}`, ownerId, JSON.stringify([subscription])],
+    [`qa-billing-${ownerId}`, ownerId, JSON.stringify([subscription]), catalog.organizationId],
   );
   return subscription;
 }

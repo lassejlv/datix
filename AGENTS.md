@@ -8,7 +8,7 @@ Privacy-first website analytics. Axum serves `/api` and `web/dist/client`; Vite 
 - `crates/services` — auth, sites, collect, ingest, reports, billing, imports, abuse, retention, queue
 - `crates/server` — Axum routes, static fallback, jobs; bins `analytics-server`, `analytics-db`, `analytics-queue`
 - `web/` — the only JS package (Bun). No root `package.json`
-- `config/openapi.json` — HTTP contract; `config/autumn-catalog.json` — Autumn plans
+- `config/openapi.json` — HTTP contract; `config/polar-catalog.json` — Datix Polar plans (USD)
 
 JS/Cargo commands from the paths above. `web/scripts/*.ts` `chdir` to the repo root, so run them as `bun web/scripts/<name>.ts`.
 

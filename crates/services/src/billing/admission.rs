@@ -1,5 +1,5 @@
 //! The collection endpoint needs one admission snapshot, not a serialized account dashboard.
-use super::allowance;
+use super::{allowance, catalog::CATALOG};
 use analytics_core::{Error, Result, State};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
@@ -29,6 +29,7 @@ pub async fn load(state: &State, site: Uuid, environment: Uuid) -> Result<Admiss
     sqlx::query_as::<_, Admission>(include_str!("sql/admission.sql"))
         .bind(site)
         .bind(environment)
+        .bind(CATALOG.organization_id)
         .fetch_optional(&mut *conn)
         .await?
         .ok_or_else(|| Error::new(404, "site_not_found", "Website is unavailable."))

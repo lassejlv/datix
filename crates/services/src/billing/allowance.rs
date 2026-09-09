@@ -1,12 +1,5 @@
 use chrono::{DateTime, Datelike, Months, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::sync::LazyLock;
-
-pub static CATALOG: LazyLock<Value> = LazyLock::new(|| {
-    serde_json::from_str(include_str!("../../../../config/autumn-catalog.json"))
-        .expect("checked-in catalog")
-});
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Subscription {
@@ -21,7 +14,9 @@ pub struct Subscription {
     #[serde(default)]
     pub entitlements: Option<Entitlements>,
 }
-/// Customer balances, never the public plan template. Amounts use hundredths of a credit.
+/// Verified subscription entitlements. Amounts use hundredths of a credit.
+/// Polar snapshots leave balance offsets at zero: the local ledger is authoritative,
+/// independent of asynchronous meter processing and usage delivery retries.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Entitlements {

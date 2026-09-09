@@ -15,6 +15,11 @@ static UPGRADES: &[(i64, &str)] = &[
     ),
     (7, include_str!("../upgrades/0007_checkout_options.sql")),
     (8, include_str!("../upgrades/0008_features.sql")),
+    (9, include_str!("../upgrades/0009_polar_datix.sql")),
+    (
+        10,
+        include_str!("../upgrades/0010_polar_usage_compatibility.sql"),
+    ),
 ];
 
 pub async fn check(pool: &PgPool) -> Result<Value> {

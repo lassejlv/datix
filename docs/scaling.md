@@ -71,7 +71,7 @@ For application rollback, deploy the preceding Rust commit `a21cfc0` on web in i
 
 ## Reproducible evidence
 
-All integration/load tests require the explicitly matched isolated `api-tests` Neon branch and loopback Redis (port 6394). Load fixtures have no live Autumn key. They clean their accounts; the retention test additionally removes expired records in this disposable test branch. Never point these tests at production or a shared development database.
+All integration/load tests require the explicitly matched isolated `api-tests` Neon branch and loopback Redis (port 6394). Load fixtures have no live Polar token. They clean their accounts; the retention test additionally removes expired records in this disposable test branch. Never point these tests at production or a shared development database.
 
 ```sh
 cargo test --locked --workspace

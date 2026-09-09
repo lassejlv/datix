@@ -1128,6 +1128,76 @@
       "udt_name": "jsonb",
       "is_nullable": "NO",
       "since_version": 7
+    },
+    {
+      "table_name": "billing_customers",
+      "column_name": "organization_id",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "since_version": 9
+    },
+    {
+      "table_name": "billing_outbox",
+      "column_name": "organization_id",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "since_version": 9
+    },
+    {
+      "table_name": "billing_checkouts",
+      "column_name": "organization_id",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "since_version": 9
+    },
+    {
+      "table_name": "billing_usage",
+      "column_name": "organization_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 9
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "organization_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 10
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "owner_id",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "since_version": 10
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "site_id",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "since_version": 10
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "period_start",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 10
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "period_end",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "since_version": 10
+    },
+    {
+      "table_name": "billing_organization_usage",
+      "column_name": "events",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "since_version": 10
     }
   ],
   "constraints": [

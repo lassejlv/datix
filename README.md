@@ -11,7 +11,7 @@ Rust/Axum API, React + TanStack Router frontend, Neon Postgres, Redis Streams. P
 ```
 web/      frontend, tracker, tests
 crates/   core, services, Axum server
-config/   OpenAPI contract and Autumn catalog
+config/   OpenAPI contract and Polar catalog
 docs/     API, deployment, schema
 ```
 
@@ -54,5 +54,5 @@ The tracker respects Do Not Track, sets no cookies in the default mode, and igno
 
 - [API](docs/api.md)
 - [Deployment](docs/deployment.md)
-- [Billing](docs/autumn.md)
+- [Billing](docs/polar.md)
 - [Agent notes](AGENTS.md)

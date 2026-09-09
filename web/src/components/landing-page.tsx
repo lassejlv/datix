@@ -34,7 +34,7 @@ const questions = [
   ],
   [
     'Is there a free trial?',
-    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.',
+    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
   ],
   [
     'Do I need a credit card?',

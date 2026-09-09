@@ -88,6 +88,7 @@ pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
         .route("/api/usage", get(usage))
         .route("/api/billing", any(billing_root))
         .route("/api/billing/{*path}", any(billing_operation))
+        .route("/api/webhooks/polar", post(polar_webhook))
         .route("/api/sites", get(list_sites).post(create_site))
         .route(
             "/api/sites/{site}",
@@ -228,6 +229,13 @@ async fn read_body(request: Request, max: usize) -> Result<Vec<u8>> {
         .await
         .map(|b| b.to_vec())
         .map_err(|_| Error::new(413, "body_too_large", "Request body is too large."))
+}
+async fn polar_webhook(AppState(state): AppState<State>, request: Request) -> Result<Json<Value>> {
+    let headers = request.headers().clone();
+    let body = read_body(request, 256 * 1024).await?;
+    Ok(Json(
+        billing::webhook::receive(&state, &headers, &body).await?,
+    ))
 }
 async fn preferences(Extension(context): Extension<Context>, request: Request) -> Json<Value> {
     let raw = request

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { apiClient, errorText } from '../lib/client';
 import { Button } from './ui/button';
 
-import { billingPlans, billingPrice } from '../lib/billing-plans';
+import { billingPlans, billingPrice, billingAvailable } from '../lib/billing-plans';
 export const billingVolumes = billingPlans;
 
 export function BillingActions({ active, refresh }: { active: boolean; refresh: () => void }) {
@@ -14,6 +14,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [returned, setReturned] = useState(false);
+  const selectedPlan = billingVolumes.find((plan) => plan.events === events)!;
   useEffect(() => {
     void apiClient<{ hasCustomer: boolean }>('/billing')
       .then((r) => setHasCustomer(r.hasCustomer))
@@ -23,7 +24,11 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       // Browser storage is unavailable during SSR; apply the saved selection after hydration.
       // oxlint-disable-next-line react/set-state-in-effect
       if (billingVolumes.some((p) => p.events === pending)) setEvents(pending);
-      if (sessionStorage.getItem('ab-checkout-interval') === 'year') setInterval('year');
+      if (
+        sessionStorage.getItem('ab-checkout-interval') === 'year' &&
+        billingVolumes.some((plan) => plan.events === pending && plan.yearlyAvailable)
+      )
+        setInterval('year');
       sessionStorage.removeItem('ab-checkout-events');
       sessionStorage.removeItem('ab-checkout-interval');
     } catch {
@@ -60,7 +65,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       {returned && !active && (
         <p role="status" className="text-sm text-secondary-ink">
           {t(
-            'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.',
+            'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
           )}
         </p>
       )}
@@ -100,9 +105,15 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
               className="h-9 rounded-md border border-border bg-background px-3 text-sm"
             >
               <option value="month">{t('Monthly')}</option>
-              <option value="year">{t('Yearly')}</option>
+              <option value="year" disabled={!selectedPlan.yearlyAvailable}>
+                {t('Yearly')}
+                {!selectedPlan.yearlyAvailable ? ` · ${t('Coming soon')}` : ''}
+              </option>
             </select>
-            <Button disabled={busy} onClick={() => void act('/billing/checkout')}>
+            <Button
+              disabled={busy || !billingAvailable(selectedPlan, interval === 'year')}
+              onClick={() => void act('/billing/checkout')}
+            >
               {busy ? t('Opening…') : t('Choose plan')}
             </Button>
           </>

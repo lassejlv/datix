@@ -96,7 +96,7 @@ async fn session_rollups_match_raw_reports_and_cursors_cover_ties_and_date_bound
     fixture!(f, {
         f.pro().await;
         let site = f.site().await;
-        sqlx::query("UPDATE billing_customers SET subscriptions=jsonb_set(subscriptions,'{0,currentPeriodStart}',$1) WHERE owner_id=$2")
+        sqlx::query("UPDATE billing_customers SET subscriptions=jsonb_set(jsonb_set(subscriptions,'{0,currentPeriodStart}',$1),'{0,entitlements,periodStart}',$1) WHERE owner_id=$2")
             .bind(json!(Utc::now()-Duration::days(60))).bind(&f.user).execute(&f.state.db).await.unwrap();
         let now = Utc::now();
         let mut events = vec![];

@@ -252,11 +252,11 @@
                         },
                         "eventLimit": {
                           "type": ["number", "null"],
-                          "description": "Customer-specific Autumn allowance; null means unlimited."
+                          "description": "Customer-specific Polar grant allowance; null means unlimited."
                         },
                         "websiteLimit": {
                           "type": ["integer", "null"],
-                          "description": "Customer-specific Autumn allowance; null means unlimited."
+                          "description": "Customer-specific Polar grant allowance; null means unlimited."
                         }
                       }
                     },
@@ -283,7 +283,7 @@
                         "remaining": {
                           "type": ["number", "null"],
                           "multipleOf": 0.01,
-                          "description": "Autumn remaining credits less locally pending usage; null means unlimited."
+                          "description": "Granted credits less committed local usage; null means unlimited."
                         }
                       }
                     },
@@ -3146,7 +3146,7 @@
     "/api/billing": {
       "get": {
         "operationId": "getBilling",
-        "description": "Refresh Autumn customer availability.",
+        "description": "Refresh Polar customer availability.",
         "security": [
           {
             "SessionCookie": []
@@ -3180,7 +3180,7 @@
     "/api/billing/checkout": {
       "post": {
         "operationId": "createBillingCheckout",
-        "description": "Create or reuse a hosted Autumn checkout; an already-active selected plan opens the billing portal.",
+        "description": "Create or reuse a USD Polar checkout; existing subscriptions open the billing portal. Annual plans return 409 while unavailable.",
         "security": [
           {
             "SessionCookie": []
@@ -3238,6 +3238,63 @@
         }
       }
     },
+    "/api/webhooks/polar": {
+      "post": {
+        "summary": "Receive a signed Polar customer event",
+        "description": "Standard Webhooks signature over the exact raw body. Accepts customer.state_changed and customer.deleted; deduplicates event IDs and rejects stale snapshot replacement. Maximum body 256 KiB.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "webhook-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "webhook-timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "webhook-signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Received or ignored event"
+          },
+          "400": {
+            "description": "Invalid payload or signature"
+          },
+          "413": {
+            "description": "Body too large"
+          },
+          "503": {
+            "description": "Webhook unavailable; retry delivery"
+          }
+        }
+      }
+    },
     "/api/billing/portal": {
       "post": {
         "operationId": "openBillingPortal",
@@ -3276,7 +3333,7 @@
     "/api/billing/sync": {
       "post": {
         "operationId": "syncBilling",
-        "description": "Refresh subscription state from Autumn and return the current usage response.",
+        "description": "Refresh subscription state from Polar and return the current usage response.",
         "security": [
           {
             "SessionCookie": []

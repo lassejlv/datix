@@ -1,5 +1,114 @@
 import type { Copy } from './en';
 export const da = {
+  'Yearly billing is not available yet. Choose a monthly plan.':
+    'Årlig betaling er ikke tilgængelig endnu. Vælg en månedsplan.',
+  Goals: 'Mål',
+  'Error Tracking': 'Fejlsporing',
+  'Web Vitals': 'Web Vitals',
+  Globe: 'Globus',
+  Pulse: 'Pulse',
+  Features: 'Funktioner',
+  'Track signups, purchases, and other single-step conversions.':
+    'Mål tilmeldinger, køb og andre konverteringer i ét trin.',
+  'Find JavaScript errors and see how many visitors they affect.':
+    'Find JavaScript-fejl, og se hvor mange besøgende de påvirker.',
+  'Measure loading speed, responsiveness, and visual stability.':
+    'Mål indlæsningshastighed, reaktionstid og visuel stabilitet.',
+  'Explore your visitors on an interactive Earth.':
+    'Udforsk dine besøgende på en interaktiv jordklode.',
+  'Monitor availability and send outage alerts to a webhook.':
+    'Overvåg tilgængelighed, og send driftsalarmer til en webhook.',
+  'Choose the features for this environment. Web Vitals is on by default.':
+    'Vælg funktioner for dette miljø. Web Vitals er aktiveret som standard.',
+  'Enable this feature in Settings to get started.':
+    'Aktivér funktionen i Indstillinger for at komme i gang.',
+  'Open settings': 'Åbn indstillinger',
+  'Loading…': 'Indlæser…',
+  Conversions: 'Konverteringer',
+  'Conversion rate': 'Konverteringsrate',
+  'Delete goal {name}': 'Slet målet {name}',
+  Delete: 'Slet',
+  'Create your first goal to track a signup, purchase, or activation.':
+    'Opret dit første mål for at måle tilmelding, køb eller aktivering.',
+  'Conversions start when a goal is created. Rates use daily unique visitors.':
+    'Konverteringer tælles fra målets oprettelse. Rater bruger daglige unikke besøgende.',
+  'Create goal': 'Opret mål',
+  'Goal name': 'Målnavn',
+  Signup: 'Tilmelding',
+  Match: 'Match',
+  'Custom event': 'Brugerdefineret hændelse',
+  'Page path': 'Sidesti',
+  'Event name': 'Hændelsesnavn',
+  'Last 24 hours': 'Seneste 24 timer',
+  Refresh: 'Opdatér',
+  'No JavaScript errors recorded in this period.':
+    'Ingen JavaScript-fejl registreret i denne periode.',
+  'Waiting for Web Vitals. Measurements arrive from real visitors as they use and leave a page.':
+    'Venter på Web Vitals. Målinger kommer fra rigtige besøgende, når de bruger og forlader en side.',
+  '{count} occurrences · {visitors} visitors': '{count} forekomster · {visitors} besøgende',
+  Resolved: 'Løst',
+  Open: 'Åben',
+  'Mark resolved': 'Markér som løst',
+  'Loading speed': 'Indlæsningshastighed',
+  Responsiveness: 'Reaktionstid',
+  'Visual stability': 'Visuel stabilitet',
+  Good: 'God',
+  'Needs improvement': 'Bør forbedres',
+  Poor: 'Dårlig',
+  '{count} measurements': '{count} målinger',
+  'No measurements yet': 'Ingen målinger endnu',
+  'Errors are grouped by message and source. A new occurrence reopens a resolved error.':
+    'Fejl grupperes efter besked og kilde. En ny forekomst genåbner en løst fejl.',
+  'Values show the 75th percentile by device. Small samples may vary; INP requires interaction.':
+    'Værdier viser 75-percentilen pr. enhed. Små stikprøver kan variere; INP kræver interaktion.',
+  'Pulse settings': 'Pulse-indstillinger',
+  'Checked every minute. Two failed checks confirm an outage.':
+    'Kontrolleres hvert minut. To mislykkede kontroller bekræfter et nedbrud.',
+  'Monitor URL': 'Overvågningsadresse',
+  'Webhook URL': 'Webhook-adresse',
+  'A webhook is linked. Leave blank to keep it.':
+    'En webhook er tilknyttet. Lad feltet være tomt for at beholde den.',
+  'Link a webhook to receive outage and recovery alerts.':
+    'Tilknyt en webhook for at modtage besked om nedbrud og genoprettelse.',
+  'Remove linked webhook': 'Fjern tilknyttet webhook',
+  'Save monitor': 'Gem overvågning',
+  'Add a monitor URL in Settings to start checking availability.':
+    'Tilføj en overvågningsadresse i Indstillinger for at kontrollere tilgængelighed.',
+  Operational: 'I drift',
+  'Site down': 'Hjemmesiden er nede',
+  'Waiting for checks': 'Venter på kontroller',
+  'Uptime · 24h': 'Oppetid · 24t',
+  'Uptime · 7d': 'Oppetid · 7d',
+  'Response time': 'Svartid',
+  'Recent checks': 'Seneste kontroller',
+  'Last checked': 'Senest kontrolleret',
+  'The latest availability check failed.': 'Den seneste tilgængelighedskontrol mislykkedes.',
+  'No webhook linked. Add one in Settings to receive alerts.':
+    'Ingen webhook tilknyttet. Tilføj en i Indstillinger for at modtage alarmer.',
+  'Latest alert delivered.': 'Seneste alarm leveret.',
+  'Webhook delivery failed after five attempts. Check the linked URL.':
+    'Webhook-levering mislykkedes efter fem forsøg. Kontrollér den tilknyttede adresse.',
+  'Alert delivery pending.': 'Alarm afventer levering.',
+  'Webhook linked. Alerts will be sent for outages and recoveries.':
+    'Webhook tilknyttet. Alarmer sendes ved nedbrud og genoprettelse.',
+  'Uptime is based on recorded checks. Monitoring gaps are not counted.':
+    'Oppetid er baseret på registrerede kontroller. Huller i overvågningen tælles ikke med.',
+  Fullscreen: 'Fuld skærm',
+  'Visitors around the world': 'Besøgende verden over',
+  '{count} active in the last 5 minutes': '{count} aktive de seneste 5 minutter',
+  Direct: 'Direkte',
+  'The map could not be loaded. Refresh to try again.':
+    'Kortet kunne ikke indlæses. Opdatér for at prøve igen.',
+  'Interactive visitor globe': 'Interaktiv globus med besøgende',
+  'Rotate left': 'Drej til venstre',
+  'Rotate right': 'Drej til højre',
+  'Zoom in': 'Zoom ind',
+  'Zoom out': 'Zoom ud',
+  Reset: 'Nulstil',
+  'Recent activity': 'Seneste aktivitet',
+  'Waiting for visitors': 'Venter på besøgende',
+  'Country-level locations · Last 24 hours · Refreshes every 30 seconds':
+    'Placering pr. land · Seneste 24 timer · Opdateres hvert 30. sekund',
   Journey: 'Rejse',
   Timeline: 'Tidslinje',
   'Activity view': 'Aktivitetsvisning',
@@ -1024,10 +1133,10 @@ export const da = {
   'An active plan is required': 'En aktiv plan er påkrævet',
   'An active subscription or trial is required to collect events. Your existing reports remain available.':
     'Et aktivt abonnement eller en prøveperiode er påkrævet for at indsamle hændelser. Dine eksisterende rapporter er stadig tilgængelige.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
-    'Basic inkluderer 14 dage gratis. Pro og Ultra har ingen gratis prøveperiode. Vælg månedlig eller årlig betaling.',
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
+    'Basic inkluderer 14 dage gratis. Pro og Ultra har ingen gratis prøveperiode. Årlig betaling kommer snart.',
   'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
     'Du behøver ingen betalingsoplysninger for at oprette en konto. For at starte en plan skal du gennemføre checkout og bekræfte betalingsoplysninger og pris.',
-  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
-    'Venter på, at Autumn bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
+  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
+    'Venter på, at Polar bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
 } satisfies Record<Copy, string>;

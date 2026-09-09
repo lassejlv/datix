@@ -1,3 +1,5 @@
+> Historical integration. The current Rust application uses [Polar billing](polar.md). Do not use these instructions to configure the current release.
+
 # Autumn billing
 
 Autumn owns subscription state and handles Stripe payment webhooks. This application has no billing webhook endpoint. Its authenticated Rust API creates hosted checkout and billing portal links; the browser never receives the Autumn secret key.
@@ -52,7 +54,7 @@ They verify hosted checkout, annual selection, customer ownership, cancellation,
 
 Live checkout also requires an explicit eligible Stripe tax code on each mapped product. An account-wide preset is insufficient. The Basic, Pro, and Ultra production products use `txcd_10103001` (SaaS, business use); their annual variants share those products.
 
-Production was upgraded to schema 7 and both Railway services deployed on September 9, 2026. `web/scripts/autumn-production-qa.ts --production` verified hosted Managed Payments checkout for all six plans and all three currencies without submitting payment. This check requires the production database variables and live Autumn key; it deletes only its disposable customer and app account.
+Production was upgraded to schema 7 and both Railway services deployed on September 9, 2026. The former `web/scripts/autumn-production-qa.ts --production` script (available in version history) verified hosted Managed Payments checkout for all six plans and all three currencies without submitting payment. That historical check used the production database variables and live Autumn key and deleted only its disposable customer and app account. The current release replaces these scripts with the local Polar integration smoke.
 
 ## Customer overrides
 

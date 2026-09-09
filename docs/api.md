@@ -79,7 +79,7 @@ The consumer writes raw events, visitor deduplication records, and summary incre
 
 The scheduled job runs at 03:17 UTC. It removes raw events/visitor records beyond approximately 30 days and summaries outside 730 calendar days, and cleans expired auth sessions/rate limits/verifications. Raw retention is a cleanup target, not immediate deletion at exactly 30 days: daily scheduling and backlog can delay removal. Each invocation deletes at most 100,000 rows per table in bounded chunks; `backlogPossible=true` requires follow-up. Keep queue and retention alerts enabled when the service is deployed.
 
-Rate limiting currently allows up to 120 collector requests per IP per minute, 20 auth requests per IP per minute, and 120 API requests per IP and account per minute, with additional database-backed Better Auth limits. Cloudflare's limiters operate per location and are best-effort abuse controls, not globally exact billing quotas. Shared public IPs share limits. Paid collection requires a current Autumn subscription and available local event credits.
+Rate limiting currently allows up to 120 collector requests per IP per minute, 20 auth requests per IP per minute, and 120 API requests per IP and account per minute, with additional database-backed Better Auth limits. Cloudflare's limiters operate per location and are best-effort abuse controls, not globally exact billing quotas. Shared public IPs share limits. Paid collection requires a current Polar subscription and available local event credits.
 
 ### Repeated pageviews
 
@@ -189,11 +189,15 @@ Network source identities are HMACs of environment, UTC day and the trusted clie
 
 ## Billing
 
-Autumn manages subscriptions; the app has no billing webhook endpoint. All billing routes require the owner session, and POST requests require the trusted app Origin.
+Polar manages subscriptions. All billing routes require the owner session, and POST requests require the trusted app Origin.
 
 - `GET /api/billing` returns `{hasCustomer}`.
 - `POST /api/billing/checkout` accepts `{events: 100000 | 1000000 | 5000000, interval: "month" | "year", locale?: "en" | "da" | "de"}` and returns `{url}` for hosted confirmation.
 - `POST /api/billing/portal` returns `{url}` for the customer portal.
-- `POST /api/billing/sync` refreshes Autumn state and returns the usage response.
+- `POST /api/billing/sync` refreshes Polar state and returns the usage response.
 
-See [Autumn billing](autumn.md) for catalog, access refresh, and usage delivery semantics.
+Yearly checkout returns 409 until monthly credit cycling is enabled for annual products. Checkout is always USD; existing subscriptions open the portal.
+
+`POST /api/webhooks/polar` accepts signed `customer.state_changed` and `customer.deleted` events without a session. It requires Standard Webhooks headers (`webhook-id`, `webhook-timestamp`, `webhook-signature`) and an exact raw JSON body up to 256 KiB. Invalid signatures return 400; missing configuration or transient failures return 503. Accepted and ignored deliveries return 200; event IDs are deduplicated transactionally.
+
+See [Polar billing](polar.md) for catalog, access refresh, and usage delivery semantics.

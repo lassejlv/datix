@@ -1,4 +1,111 @@
 export const en = {
+  'Yearly billing is not available yet. Choose a monthly plan.':
+    'Yearly billing is not available yet. Choose a monthly plan.',
+  Goals: 'Goals',
+  'Error Tracking': 'Error Tracking',
+  'Web Vitals': 'Web Vitals',
+  Globe: 'Globe',
+  Pulse: 'Pulse',
+  Features: 'Features',
+  'Track signups, purchases, and other single-step conversions.':
+    'Track signups, purchases, and other single-step conversions.',
+  'Find JavaScript errors and see how many visitors they affect.':
+    'Find JavaScript errors and see how many visitors they affect.',
+  'Measure loading speed, responsiveness, and visual stability.':
+    'Measure loading speed, responsiveness, and visual stability.',
+  'Explore your visitors on an interactive Earth.':
+    'Explore your visitors on an interactive Earth.',
+  'Monitor availability and send outage alerts to a webhook.':
+    'Monitor availability and send outage alerts to a webhook.',
+  'Choose the features for this environment. Web Vitals is on by default.':
+    'Choose the features for this environment. Web Vitals is on by default.',
+  'Enable this feature in Settings to get started.':
+    'Enable this feature in Settings to get started.',
+  'Open settings': 'Open settings',
+  'Loading…': 'Loading…',
+  Conversions: 'Conversions',
+  'Conversion rate': 'Conversion rate',
+  'Delete goal {name}': 'Delete goal {name}',
+  Delete: 'Delete',
+  'Create your first goal to track a signup, purchase, or activation.':
+    'Create your first goal to track a signup, purchase, or activation.',
+  'Conversions start when a goal is created. Rates use daily unique visitors.':
+    'Conversions start when a goal is created. Rates use daily unique visitors.',
+  'Create goal': 'Create goal',
+  'Goal name': 'Goal name',
+  Signup: 'Signup',
+  Match: 'Match',
+  'Custom event': 'Custom event',
+  'Page path': 'Page path',
+  'Event name': 'Event name',
+  'Last 24 hours': 'Last 24 hours',
+  Refresh: 'Refresh',
+  'No JavaScript errors recorded in this period.': 'No JavaScript errors recorded in this period.',
+  'Waiting for Web Vitals. Measurements arrive from real visitors as they use and leave a page.':
+    'Waiting for Web Vitals. Measurements arrive from real visitors as they use and leave a page.',
+  '{count} occurrences · {visitors} visitors': '{count} occurrences · {visitors} visitors',
+  Resolved: 'Resolved',
+  Open: 'Open',
+  'Mark resolved': 'Mark resolved',
+  'Loading speed': 'Loading speed',
+  Responsiveness: 'Responsiveness',
+  'Visual stability': 'Visual stability',
+  Good: 'Good',
+  'Needs improvement': 'Needs improvement',
+  Poor: 'Poor',
+  '{count} measurements': '{count} measurements',
+  'No measurements yet': 'No measurements yet',
+  'Errors are grouped by message and source. A new occurrence reopens a resolved error.':
+    'Errors are grouped by message and source. A new occurrence reopens a resolved error.',
+  'Values show the 75th percentile by device. Small samples may vary; INP requires interaction.':
+    'Values show the 75th percentile by device. Small samples may vary; INP requires interaction.',
+  'Pulse settings': 'Pulse settings',
+  'Checked every minute. Two failed checks confirm an outage.':
+    'Checked every minute. Two failed checks confirm an outage.',
+  'Monitor URL': 'Monitor URL',
+  'Webhook URL': 'Webhook URL',
+  'A webhook is linked. Leave blank to keep it.': 'A webhook is linked. Leave blank to keep it.',
+  'Link a webhook to receive outage and recovery alerts.':
+    'Link a webhook to receive outage and recovery alerts.',
+  'Remove linked webhook': 'Remove linked webhook',
+  'Save monitor': 'Save monitor',
+  'Add a monitor URL in Settings to start checking availability.':
+    'Add a monitor URL in Settings to start checking availability.',
+  Operational: 'Operational',
+  'Site down': 'Site down',
+  'Waiting for checks': 'Waiting for checks',
+  'Uptime · 24h': 'Uptime · 24h',
+  'Uptime · 7d': 'Uptime · 7d',
+  'Response time': 'Response time',
+  'Recent checks': 'Recent checks',
+  'Last checked': 'Last checked',
+  'The latest availability check failed.': 'The latest availability check failed.',
+  'No webhook linked. Add one in Settings to receive alerts.':
+    'No webhook linked. Add one in Settings to receive alerts.',
+  'Latest alert delivered.': 'Latest alert delivered.',
+  'Webhook delivery failed after five attempts. Check the linked URL.':
+    'Webhook delivery failed after five attempts. Check the linked URL.',
+  'Alert delivery pending.': 'Alert delivery pending.',
+  'Webhook linked. Alerts will be sent for outages and recoveries.':
+    'Webhook linked. Alerts will be sent for outages and recoveries.',
+  'Uptime is based on recorded checks. Monitoring gaps are not counted.':
+    'Uptime is based on recorded checks. Monitoring gaps are not counted.',
+  Fullscreen: 'Fullscreen',
+  'Visitors around the world': 'Visitors around the world',
+  '{count} active in the last 5 minutes': '{count} active in the last 5 minutes',
+  Direct: 'Direct',
+  'The map could not be loaded. Refresh to try again.':
+    'The map could not be loaded. Refresh to try again.',
+  'Interactive visitor globe': 'Interactive visitor globe',
+  'Rotate left': 'Rotate left',
+  'Rotate right': 'Rotate right',
+  'Zoom in': 'Zoom in',
+  'Zoom out': 'Zoom out',
+  Reset: 'Reset',
+  'Recent activity': 'Recent activity',
+  'Waiting for visitors': 'Waiting for visitors',
+  'Country-level locations · Last 24 hours · Refreshes every 30 seconds':
+    'Country-level locations · Last 24 hours · Refreshes every 30 seconds',
   Journey: 'Journey',
   Timeline: 'Timeline',
   'Activity view': 'Activity view',
@@ -1014,11 +1121,11 @@ export const en = {
   'An active plan is required': 'An active plan is required',
   'An active subscription or trial is required to collect events. Your existing reports remain available.':
     'An active subscription or trial is required to collect events. Your existing reports remain available.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.':
-    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Choose monthly or yearly billing.',
+  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
+    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
   'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
     'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
-  'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.':
-    'Waiting for Autumn to confirm your subscription. Your allowance will appear here once it is active.',
+  'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
+    'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
 } as const;
 export type Copy = keyof typeof en;

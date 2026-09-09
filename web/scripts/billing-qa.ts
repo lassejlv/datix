@@ -1,2 +1,2 @@
-// Compatibility entry point for the Autumn sandbox billing smoke.
-import './autumn-qa';
+// Compatibility entry point for the local Polar integration smoke.
+import './polar-qa';

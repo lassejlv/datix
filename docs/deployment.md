@@ -14,9 +14,9 @@ Cloudflare proxies `usedatix.com` and `analytics.beer` to Railway. Both Railway 
 
 The existing Neon production branch is retained: project `billowing-night-55335840`, branch `br-frosty-frost-b18zvthi`, database `analytics`, Frankfurt. SQLx uses the restricted `analytics_runtime` role, separate budgets of six API and eight worker connections, certificate/hostname-verified TLS and a 15-second statement timeout. The subsequent scaling release explicitly upgrades the existing database to schema version 3; startup verifies its checksums without running migrations.
 
-Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, and `VISITOR_HASH_SECRET`. Production also retains `APP_LEGACY_URL`, `AUTUMN_SECRET_KEY`, and `CLOUDFLARE_ORIGIN_SECRET`. Preserve signing secrets to keep existing sessions and visitor hashes valid. Railway's private Redis URL stays unchanged. Keep credentials out of build arguments and source control.
+Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`, and `VISITOR_HASH_SECRET`. Production also retains `APP_LEGACY_URL`, `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, and `CLOUDFLARE_ORIGIN_SECRET`. Preserve signing secrets to keep existing sessions and visitor hashes valid. Railway's private Redis URL stays unchanged. Keep credentials out of build arguments and source control.
 
-`CLOUDFLARE_ORIGIN_SECRET` verifies the `x-analytics-origin-key` transform before trusting Cloudflare country metadata. Railway's resolved client IP is used only in the Railway runtime; direct requests cannot supply trusted country information. Optional variables are `STATIC_DIR` (default `web/dist/client`), `EVENT_STREAM` (default `analytics:events:v2`), `AUTUMN_API_URL` (for isolated provider tests), and `RUST_LOG`.
+`CLOUDFLARE_ORIGIN_SECRET` verifies the `x-analytics-origin-key` transform before trusting Cloudflare country metadata. Railway's resolved client IP is used only in the Railway runtime; direct requests cannot supply trusted country information. Optional variables are `STATIC_DIR` (default `web/dist/client`), `EVENT_STREAM` (default `analytics:events:v2`), `POLAR_API_URL` (for isolated provider tests), and `RUST_LOG`.
 
 ## Deploying
 
@@ -46,7 +46,7 @@ The live schema snapshot is `docs/database/schema.sql`; the corresponding SQLx b
 
 The Rust consumer group `analytics-rust` reads `analytics:events:v2`. An event is acknowledged and deleted only after its PostgreSQL transaction commits. Four consumers reclaim deliveries abandoned for at least 60 seconds. After ten failed deliveries, the original payload moves atomically into `analytics:events:v2:failed`; malformed envelopes also remain there for inspection. No event ID is regenerated. Duplicate redelivery does not charge twice.
 
-Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Autumn idempotency keys, drained every second under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
+Redis must retain its persistent volume, append-only persistence and `noeviction` policy. Billing remains a PostgreSQL outbox with stable Polar external event IDs, drained every second under a Redis lease. Daily retention runs at or after 03:17 UTC and catches up after downtime; its completion marker is written only after successful cleanup.
 
 For the initial cutover, let Railway switch traffic to the healthy Rust deployment and stop the old application, then run inside that service:
 
@@ -76,6 +76,10 @@ The native release passed 12 Rust unit tests, 11 isolated Neon/Redis integration
 
 Railway deployment `183d57ef-cc45-4b3b-a324-8c6cba59a946` was verified running Rust/Axum with the actual restricted runtime database role. The original Better Auth cookie and password remained usable after cutover. A real public browser tracker round trip increased the disposable account from one to two pageviews and from 0.45 to 0.9 credits. Desktop/mobile reports showed no browser errors. Both event streams and all unfinished legacy event queues were empty. The fixture account and saved credentials were removed. Local reports are under `web/artifacts/rust-production/`.
 
-## Autumn cutover
+## Polar cutover
 
-Before deploying this release, apply schema upgrades 0005 through 0007 and configure the live Autumn catalog/key on API and worker. Local development uses the sandbox. Review existing Polar subscriptions and pending usage before cutover; they are retained but are not migrated or charged automatically. See [Autumn billing](autumn.md). Remove the former Polar webhook registration when its consumers have been transitioned.
+Apply all registered schema upgrades through 0010 with the database owner role before deploying API and worker. Configure `POLAR_ACCESS_TOKEN` and `POLAR_WEBHOOK_SECRET`; see [Polar billing](polar.md) for scopes, the Datix organization and webhook registration. Startup only checks compatibility.
+
+Upgrades 0009 and 0010 scope current billing records to the Datix organization and place its usage in `billing_organization_usage`. Historical usage and provider records remain intact; existing subscriptions and pending usage are not migrated or charged automatically. Coordinate the API and worker cutover to avoid running different billing providers for the same account. A rollback must explicitly restore the previous provider configuration and reconcile activity during the cutover; do not assume billing state transfers automatically.
+
+The code integration does not establish production readiness by itself. Complete Polar organization payment onboarding, install credentials, register the new signed webhook endpoint, and verify an actual subscription benefit grant before enabling purchases. Annual products remain unavailable until their event credits renew monthly.

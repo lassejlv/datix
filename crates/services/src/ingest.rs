@@ -1,6 +1,6 @@
 //! Bounded owner batches amortize quota checks and writes without weakening transactional admission.
 use crate::{
-    billing::{allowance, usage},
+    billing::{allowance, catalog::CATALOG, usage},
     tracking::Event,
 };
 use analytics_core::{Error, Result, State};
@@ -190,8 +190,8 @@ async fn ingest_owner(
     }
     let periods: Vec<_> = candidates.iter().map(|(_, _, p, _)| p.start).collect();
     let usage_rows: Vec<(Uuid, DateTime<Utc>, i64)> = sqlx::query_as(
-        "SELECT site_id,period_start,(events*100)::bigint FROM billing_usage WHERE owner_id=$1 AND period_start=ANY($2)"
-    ).bind(owner).bind(&periods).fetch_all(&mut *tx).await?;
+        "SELECT site_id,period_start,(events*100)::bigint FROM billing_organization_usage WHERE owner_id=$1 AND period_start=ANY($2) AND organization_id=$3"
+    ).bind(owner).bind(&periods).bind(CATALOG.organization_id).fetch_all(&mut *tx).await?;
     let mut site_used: HashMap<(DateTime<Utc>, Uuid), i64> = HashMap::new();
     let mut account_used: HashMap<DateTime<Utc>, i64> = HashMap::new();
     for (site, start, units) in usage_rows {
@@ -322,14 +322,14 @@ async fn ingest_owner(
     }
     if !usage.is_empty() {
         let rows: Vec<_> = usage.iter().map(|((site, start, end), units)| json!({"site":site,"start":start,"end":end,"units":units})).collect();
-        sqlx::query("INSERT INTO billing_usage(owner_id,site_id,period_start,period_end,events) SELECT $1,r.site,r.start,r.\"end\",r.units::numeric/100 FROM jsonb_to_recordset($2) r(site uuid,start timestamptz,\"end\" timestamptz,units bigint) ON CONFLICT(owner_id,period_start,site_id) DO UPDATE SET events=billing_usage.events+excluded.events,period_end=excluded.period_end")
-            .bind(owner).bind(json!(rows)).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO billing_organization_usage(owner_id,site_id,period_start,period_end,events,organization_id) SELECT $1,r.site,r.start,r.\"end\",r.units::numeric/100,$3 FROM jsonb_to_recordset($2) r(site uuid,start timestamptz,\"end\" timestamptz,units bigint) ON CONFLICT(owner_id,period_start,site_id,organization_id) DO UPDATE SET events=billing_organization_usage.events+excluded.events,period_end=excluded.period_end")
+            .bind(owner).bind(json!(rows)).bind(CATALOG.organization_id).execute(&mut *tx).await?;
         let rows: Vec<_> = outbox
             .iter()
             .map(|((kind, _, _), (units, at))| json!({"kind":kind,"units":units,"at":at}))
             .collect();
-        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider) SELECT $1,r.kind,r.units::numeric/100,r.at,'autumn' FROM jsonb_to_recordset($2) r(kind text,units bigint,at timestamptz)")
-            .bind(owner).bind(json!(rows)).execute(&mut *tx).await?;
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider,organization_id) SELECT $1,r.kind,r.units::numeric/100,r.at,'polar',$3 FROM jsonb_to_recordset($2) r(kind text,units bigint,at timestamptz)")
+            .bind(owner).bind(json!(rows)).bind(CATALOG.organization_id).execute(&mut *tx).await?;
     }
     let visitors: Vec<_> = admitted
         .iter()

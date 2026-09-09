@@ -3,9 +3,10 @@ WORKDIR /app/web
 COPY web/package.json web/bun.lock ./
 RUN bun install --frozen-lockfile
 COPY web/vite.config.ts web/tsconfig.json web/index.html ./
+COPY config/polar-catalog.json /app/config/polar-catalog.json
 COPY web/src ./src
 COPY web/public ./public
-COPY web/scripts/build-tracker.ts ./scripts/build-tracker.ts
+COPY web/scripts/build-tracker.ts web/scripts/build-vitals.ts ./scripts/
 RUN bun run build
 
 FROM rust:1.96-bookworm AS backend

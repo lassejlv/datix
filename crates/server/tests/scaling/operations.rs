@@ -1,12 +1,13 @@
 use super::*;
+use crate::polar::MockProvider;
 use analytics_core::config::Role;
 
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]
 async fn billing_drains_more_than_five_batches_with_exact_quantities() {
     fixture!(f, {
-        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider) SELECT $1,'pageview',0.15,now(),'autumn' FROM generate_series(1,601)")
-            .bind(&f.user).execute(&f.state.db).await.unwrap();
+        sqlx::query("INSERT INTO billing_outbox(owner_id,event_type,event_count,occurred_at,provider,organization_id) SELECT $1,'pageview',0.15,now(),'polar',$2 FROM generate_series(1,601)")
+            .bind(&f.user).bind(billing::catalog::CATALOG.organization_id).execute(&f.state.db).await.unwrap();
         let provider = MockProvider::start().await;
         let state = provider.state(&f);
         let deadline = Instant::now() + StdDuration::from_secs(120);
@@ -24,18 +25,22 @@ async fn billing_drains_more_than_five_batches_with_exact_quantities() {
                 .unwrap();
         assert_eq!(remaining, 0);
         let data = provider.data.lock().await;
-        let events: Vec<_> = data.ingested.iter().map(|event| &event["body"]).collect();
+        let events: Vec<_> = data
+            .ingested
+            .iter()
+            .flat_map(|event| event["events"].as_array().unwrap())
+            .collect();
         assert_eq!(events.len(), 601);
         assert_eq!(
             events
                 .iter()
-                .map(|e| (e["value"].as_f64().unwrap() * 100.).round() as i64)
+                .map(|e| (e["metadata"]["quantity"].as_f64().unwrap() * 100.).round() as i64)
                 .sum::<i64>(),
             9015
         );
         let ids: std::collections::HashSet<_> = events
             .iter()
-            .map(|e| e["properties"]["delivery_id"].as_str().unwrap())
+            .map(|e| e["external_id"].as_str().unwrap())
             .collect();
         assert_eq!(ids.len(), 601);
     });

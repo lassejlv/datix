@@ -133,8 +133,9 @@ pub struct Config {
     pub auth_secret: String,
     pub visitor_secret: String,
     pub origin_secret: Option<String>,
-    pub autumn_key: Option<String>,
-    pub autumn_url: String,
+    pub polar_token: Option<String>,
+    pub polar_url: String,
+    pub polar_webhook_secret: Option<String>,
     pub railway: bool,
     pub port: u16,
     pub static_dir: String,
@@ -176,11 +177,14 @@ impl Config {
             auth_secret: required("BETTER_AUTH_SECRET")?,
             visitor_secret: required("VISITOR_HASH_SECRET")?,
             origin_secret,
-            autumn_key: std::env::var("AUTUMN_SECRET_KEY")
+            polar_token: std::env::var("POLAR_ACCESS_TOKEN")
                 .ok()
                 .filter(|v| !v.trim().is_empty()),
-            autumn_url: std::env::var("AUTUMN_API_URL")
-                .unwrap_or_else(|_| "https://api.useautumn.com".into()),
+            polar_url: std::env::var("POLAR_API_URL")
+                .unwrap_or_else(|_| "https://api.polar.sh".into()),
+            polar_webhook_secret: std::env::var("POLAR_WEBHOOK_SECRET")
+                .ok()
+                .filter(|v| !v.trim().is_empty()),
             railway,
             port: std::env::var("PORT")
                 .unwrap_or_else(|_| "3000".into())

@@ -356,7 +356,7 @@ async fn billing_loop(state: State, mut stop: watch::Receiver<bool>) {
         if *stop.borrow() {
             break;
         }
-        if state.config.autumn_key.is_none() {
+        if state.config.polar_token.is_none() {
             continue;
         }
         let work = async {
@@ -411,7 +411,8 @@ pub async fn observe(state: &State) -> Result<()> {
         .first()
         .and_then(|v| v.id.split('-').next())
         .and_then(|s| s.parse::<i64>().ok());
-    let (billing, billing_age): (i64, i64) = sqlx::query_as("SELECT count(*)::bigint,coalesce(greatest(extract(epoch FROM now()-min(occurred_at)),0)::bigint,0) FROM billing_outbox WHERE provider='autumn'")
+    let (billing, billing_age): (i64, i64) = sqlx::query_as("SELECT count(*)::bigint,coalesce(greatest(extract(epoch FROM now()-min(occurred_at)),0)::bigint,0) FROM billing_outbox WHERE provider='polar' AND organization_id=$1")
+        .bind(billing::catalog::CATALOG.organization_id)
         .fetch_one(&state.db).await?;
     let m = &state.metrics;
     m.queue_depth.store(depth, Ordering::Relaxed);

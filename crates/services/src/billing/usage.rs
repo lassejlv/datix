@@ -1,4 +1,7 @@
-use super::allowance::{self, Allowance, Subscription};
+use super::{
+    allowance::{self, Allowance, Subscription},
+    catalog::CATALOG,
+};
 use analytics_core::{Result, State};
 use chrono::{DateTime, Utc};
 use serde_json::{Value, json};
@@ -23,9 +26,10 @@ pub async fn account_allowance(
     now: DateTime<Utc>,
 ) -> Result<(Option<Allowance>, Vec<Website>)> {
     let rows: Vec<Value> = sqlx::query_scalar(
-        "SELECT subscriptions FROM billing_customers WHERE owner_id=$1 AND deleted=false AND provider='autumn' AND updated_at>now()-interval '5 minutes'",
+        "SELECT subscriptions FROM billing_customers WHERE owner_id=$1 AND deleted=false AND provider='polar' AND organization_id=$2 AND updated_at>now()-interval '5 minutes'",
     )
     .bind(owner)
+    .bind(CATALOG.organization_id)
     .fetch_all(&mut *conn)
     .await?;
     let subscriptions: Vec<Subscription> = rows
@@ -40,7 +44,7 @@ pub async fn period_usage(
     owner: &str,
     start: DateTime<Utc>,
 ) -> Result<Vec<Count>> {
-    Ok(sqlx::query_as::<_,Count>("SELECT site_id,(events*100)::bigint AS units FROM billing_usage WHERE owner_id=$1 AND period_start=$2").bind(owner).bind(start).fetch_all(conn).await?)
+    Ok(sqlx::query_as::<_,Count>("SELECT site_id,(events*100)::bigint AS units FROM billing_organization_usage WHERE owner_id=$1 AND period_start=$2 AND organization_id=$3").bind(owner).bind(start).bind(CATALOG.organization_id).fetch_all(conn).await?)
 }
 pub fn budget_units(value: &Option<String>) -> Option<i64> {
     value

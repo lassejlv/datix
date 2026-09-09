@@ -1,5 +1,10 @@
 import { ApiError, apiClient, errorText } from '../lib/client';
-import { billingPlans, billingPrice, billingCurrency } from '../lib/billing-plans';
+import {
+  billingPlans,
+  billingPrice,
+  billingCurrency,
+  billingAvailable,
+} from '../lib/billing-plans';
 import { useSitePreferences } from './site-preferences';
 import { useRef, useState } from 'react';
 import { ArrowRight } from './ui/icons';
@@ -100,6 +105,7 @@ export function PricingSection() {
               <div className="pricing-action">
                 <button
                   className="pricing-select"
+                  disabled={!billingAvailable(plan, yearly)}
                   type="button"
                   onClick={(event) => {
                     returnFocus.current = event.currentTarget;
@@ -108,9 +114,11 @@ export function PricingSection() {
                     setOpen(true);
                   }}
                 >
-                  {plan.id === 'basic'
-                    ? t('Start 14-day trial')
-                    : t('Choose {plan}', { plan: plan.name })}
+                  {!billingAvailable(plan, yearly)
+                    ? t('Coming soon')
+                    : plan.id === 'basic'
+                      ? t('Start 14-day trial')
+                      : t('Choose {plan}', { plan: plan.name })}
                   <ArrowRight size={16} aria-hidden="true" />
                 </button>
               </div>
@@ -118,8 +126,13 @@ export function PricingSection() {
           </article>
         ))}
       </div>
+      {yearly && !billingPlans.some((plan) => billingAvailable(plan, true)) && (
+        <p role="status" className="pricing-currency-note">
+          {t('Yearly billing is not available yet. Choose a monthly plan.')}
+        </p>
+      )}
       <p className="pricing-currency-note">
-        {t('All prices in {currency}.', { currency: billingCurrency(locale).toUpperCase() })}
+        {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
       </p>
       <div className="pricing-event-note">
         <h4>{t('What counts as an event?')}</h4>
@@ -177,7 +190,7 @@ export function PricingSection() {
               <button
                 className="pricing-checkout"
                 type="button"
-                disabled={busy}
+                disabled={busy || !billingAvailable(selected, yearly)}
                 onClick={() => void checkout()}
               >
                 {busy ? t('Opening checkout…') : t('Continue to checkout')}

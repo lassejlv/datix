@@ -1,10 +1,10 @@
 // Read-only pricing UI checks; no checkout is submitted.
 process.chdir(new URL('../..', import.meta.url).pathname);
 import { chromium, expect } from '@playwright/test';
-import { billingPlans, billingPrice } from '../src/lib/billing-plans';
+import { billingPlans, billingPrice, billingAvailable } from '../src/lib/billing-plans';
 import { mkdir } from 'node:fs/promises';
 const base = process.env.PRICING_QA_URL ?? 'http://localhost:3058';
-const output = 'web/artifacts/pricing/autumn';
+const output = 'web/artifacts/pricing/polar';
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const errors: string[] = [];
@@ -34,6 +34,10 @@ try {
           const formatted = billingPrice(billingPlans[index]!, locale, multiplier === 10);
           await expect(page.locator('.pricing-amount').nth(index)).toContainText(formatted);
           const action = page.locator('.pricing-select').nth(index);
+          if (!billingAvailable(billingPlans[index]!, multiplier === 10)) {
+            await expect(action).toBeDisabled();
+            continue;
+          }
           await action.click();
           await expect(page.getByRole('dialog')).toContainText(formatted);
           await expect(page.locator('.pricing-checkout')).toBeEnabled();
