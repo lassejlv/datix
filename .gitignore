@@ -17,5 +17,6 @@ output/
 .DS_Store
 
 /target/
+appendonlydir/
 
 /web/public/web-vitals.js
