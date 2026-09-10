@@ -30,7 +30,7 @@ function CartesianSeries({
   isClickable = false,
   children,
 }: SeriesProps & { part: string; kind: SeriesKind }) {
-  const ctx = useChartPart(part, kind === 'line' ? 'line' : 'area');
+  const ctx = useChartPart(part, kind === 'line' ? ['line', 'area'] : 'area');
   const { registerSeries, unregisterSeries } = ctx;
 
   if (process.env.NODE_ENV !== 'production' && !ctx.config[dataKey]) {

@@ -241,6 +241,8 @@ macro_rules! fixture {($name:ident,$body:block)=>{{let $name=Fixture::new().awai
 
 #[path = "imports/mod.rs"]
 mod imports;
+#[path = "integration/overview.rs"]
+mod overview;
 #[path = "integration/polar.rs"]
 mod polar;
 #[path = "scaling/mod.rs"]

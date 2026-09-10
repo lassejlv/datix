@@ -1,3 +1,9 @@
+import {
+  LiveVisitors,
+  OverviewAnnotations,
+  OverviewGoal,
+  type OverviewReport,
+} from './overview-extras';
 import { Alert } from './ui/alert';
 import { Hint, HintText } from './ui/tooltip';
 import { DatePicker } from './ui/date-picker';
@@ -34,7 +40,6 @@ import {
   write,
   type Breakdown,
   type Metric,
-  type Reports,
   type Site,
   type SiteEnvironment,
   type User,
@@ -593,20 +598,25 @@ function Overview({
   onExpired: () => void;
   initialRange?: { from?: string; to?: string };
 }) {
-  const { message: messageText, number, dateLabel, t } = useSitePreferences();
+  const { message: messageText, number, dateLabel, dateTime, t } = useSitePreferences();
   const [days, setDays] = useState(initialRange?.from && initialRange?.to ? 'custom' : '30'),
     [metric, setMetric] = useState<Metric>('pageviews'),
-    [reports, setReports] = useState<Reports | null>(null),
+    [reports, setReports] = useState<OverviewReport | null>(null),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true),
     [reload, setReload] = useState(0);
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [compare, setCompare] = useState(true);
+  const filterQuery = new URLSearchParams(filters).toString();
   const today = new Date().toISOString().slice(0, 10);
   const [customFrom, setCustomFrom] = useState(initialRange?.from ?? today),
     [customTo, setCustomTo] = useState(initialRange?.to ?? today);
   const from =
     days === 'custom'
       ? customFrom
-      : new Date(Date.parse(today) - (Number(days) - 1) * 86400000).toISOString().slice(0, 10);
+      : new Date(Date.parse(today) - (days === '24h' ? 1 : Number(days) - 1) * 86400000)
+          .toISOString()
+          .slice(0, 10);
   const to = days === 'custom' ? customTo : today;
   const rangeValid =
     !!from &&
@@ -625,29 +635,12 @@ function Overview({
     setLoading(true);
     setError('');
     setReports(null);
-    const query = `from=${from}&to=${to}&environment=${environment.id}`;
-    const endpoints = [
-      'overview',
-      'timeseries',
-      'path',
-      'referrer',
-      'country',
-      'device',
-      'event',
-    ] as const;
-    Promise.all(
-      endpoints.map(
-        async (key) =>
-          [
-            key,
-            await apiClient(
-              `/sites/${site.id}/${key === 'overview' || key === 'timeseries' ? key : 'breakdown'}?${query}${key === 'overview' || key === 'timeseries' ? '' : `&dimension=${key}`}`,
-              { signal: controller.signal },
-            ),
-          ] as const,
-      ),
+    const query = `${days === '24h' ? 'window=24h' : `from=${from}&to=${to}`}&${filterQuery}`;
+    apiClient<OverviewReport>(
+      `/sites/${site.id}/environments/${environment.id}/features/overview?${query}`,
+      { signal: controller.signal },
     )
-      .then((results) => setReports(Object.fromEntries(results) as Reports))
+      .then((result) => setReports(result))
       .catch((error) => {
         if (controller.signal.aborted) return;
         if (error instanceof ApiError && error.status === 401) onExpired();
@@ -657,7 +650,7 @@ function Overview({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [site.id, environment.id, from, to, reload, rangeValid, onExpired]);
+  }, [site.id, environment.id, from, to, reload, rangeValid, onExpired, filterQuery, days]);
   const metrics = [
     { key: 'pageviews', name: 'Pageviews', caption: 'Every page opened' },
     {
@@ -692,6 +685,12 @@ function Overview({
           <p className="mt-1 text-sm text-secondary-ink">
             {site.name} · {environment.name}
           </p>
+          <LiveVisitors
+            key={environment.id}
+            siteId={site.id}
+            environmentId={environment.id}
+            onExpired={onExpired}
+          />
         </div>
         <div className="flex shrink-0 items-center gap-2 max-md:self-stretch">
           <div className="flex min-w-0 max-md:flex-1">
@@ -702,6 +701,9 @@ function Overview({
               value={days}
               onValueChange={(value) => setDays(value)}
             >
+              <option className="bg-background" value="24h">
+                {t('Last 24 hours')}
+              </option>
               <option className="bg-background" value="7">
                 {t('Last 7 days')}
               </option>
@@ -767,6 +769,7 @@ function Overview({
       )}
       {!loading &&
         reports &&
+        !filterQuery &&
         reports.overview.pageviews === 0 &&
         reports.overview.customEvents === 0 && (
           <div className="mb-6 flex items-center gap-3 rounded-md bg-muted px-4 py-3.5 text-sm max-md:flex-wrap">
@@ -792,6 +795,45 @@ function Overview({
           </div>
         </Alert>
       )}
+      {Object.keys(filters).length > 0 && (
+        <div className="mb-5 flex flex-wrap gap-2" aria-label={t('Active filters')}>
+          {Object.entries(filters).map(([key, value]) => (
+            <Button
+              key={key}
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setFilters((current) => {
+                  const next = { ...current };
+                  delete next[key];
+                  return next;
+                })
+              }
+            >
+              {t(
+                key === 'path'
+                  ? 'Page'
+                  : key === 'referrer'
+                    ? 'Source'
+                    : key === 'country'
+                      ? 'Country'
+                      : 'Device',
+              )}
+              : {value || t('Direct / none')} ×
+            </Button>
+          ))}
+          <Button variant="ghost" size="sm" onClick={() => setFilters({})}>
+            {t('Clear filters')}
+          </Button>
+        </div>
+      )}
+      {reports?.filtered && (
+        <p className="mb-4 text-xs text-secondary-ink">
+          {t('Filters use tracked events from {date}; imported history is excluded.', {
+            date: dateLabel(reports.retainedFrom),
+          })}
+        </p>
+      )}
       <section className="w-full" aria-label={t('Traffic overview')}>
         <div className="grid grid-cols-3 gap-2 md:max-w-[580px] md:gap-6">
           {metrics.map((item) => (
@@ -811,14 +853,34 @@ function Overview({
                     '-'
                   )}
                 </strong>
+                {compare && reports?.previous && (
+                  <span className="block text-[11px] text-secondary-ink tabular-nums md:text-xs">
+                    {reports.previous.overview[item.key] === 0
+                      ? reports.overview[item.key] === 0
+                        ? t('No change')
+                        : t('No previous traffic')
+                      : `${reports.overview[item.key] >= reports.previous.overview[item.key] ? '+' : ''}${number(Math.round((reports.overview[item.key] / reports.previous.overview[item.key] - 1) * 1000) / 10)}%`}
+                  </span>
+                )}
               </button>
             </Hint>
           ))}
         </div>
         <div className="flex justify-between gap-4 pt-4 text-xs text-secondary-ink md:pt-4">
-          <span>{t(metrics.find((item) => item.key === metric)!.name)}</span>
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={compare}
+              onChange={(event) => setCompare(event.target.checked)}
+            />
+            {t('Previous period')}
+          </label>
           <span>
-            {from && to ? `${dateLabel(from)} - ${dateLabel(to)}` : ''}
+            {days === '24h'
+              ? t('Last 24 hours')
+              : from && to
+                ? `${dateLabel(from)} - ${dateLabel(to)}`
+                : ''}
             <span className="ml-2 text-muted-foreground">
               {reports?.overview.imports?.calendarDayWarning ? t('Source dates') : 'UTC'}
             </span>
@@ -833,13 +895,52 @@ function Overview({
             <span>{t('Loading analytics…')}</span>
           </div>
         ) : reports ? (
-          <TrafficChart data={reports.timeseries.data} metric={metric} />
+          <TrafficChart
+            data={reports.timeseries.data}
+            metric={metric}
+            previous={compare ? reports.previous?.timeseries.data : undefined}
+            annotations={reports.annotations}
+          />
         ) : (
           <div className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink">
             {t('No report to display.')}
           </div>
         )}
       </section>
+      {reports && (
+        <>
+          {compare && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {reports.previous
+                ? t('Dashed line: {from} – {to}', {
+                    from: reports.window
+                      ? dateTime(reports.previousRange.from)
+                      : dateLabel(reports.previousRange.from),
+                    to: reports.window
+                      ? dateTime(reports.previousRange.to)
+                      : dateLabel(reports.previousRange.to),
+                  })
+                : t('Previous period is outside retained history.')}
+            </p>
+          )}
+          <OverviewAnnotations
+            key={`${environment.id}:${from}:${to}`}
+            annotations={reports.annotations}
+            siteId={site.id}
+            environmentId={environment.id}
+            from={from}
+            to={to}
+            onChange={() => setReload((value) => value + 1)}
+            onExpired={onExpired}
+          />
+          <OverviewGoal
+            key={environment.id}
+            report={reports}
+            siteId={site.id}
+            environmentId={environment.id}
+          />
+        </>
+      )}
 
       {!!reports?.overview.imports?.importedDays && (
         <details className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-secondary-ink">
@@ -884,23 +985,26 @@ function Overview({
         </details>
       )}
 
-      {(!reports || reports.overview.pageviews > 0) && (
+      {(!reports || reports.overview.pageviews > 0 || !!filterQuery) && (
         <div className="mt-9 grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-x-12 md:gap-y-9">
           <BreakdownCard
             title={t('Top pages')}
             label={t('Page')}
+            onSelect={(value) => setFilters((current) => ({ ...current, path: value }))}
             report={reports?.path}
             loading={loading}
           />
           <BreakdownCard
             title={t('Referrers')}
             label={t('Source')}
+            onSelect={(value) => setFilters((current) => ({ ...current, referrer: value }))}
             report={reports?.referrer}
             loading={loading}
           />
           <BreakdownCard
             title={t('Countries')}
             label={t('Country')}
+            onSelect={(value) => setFilters((current) => ({ ...current, country: value }))}
             report={reports?.country}
             loading={loading}
             countries
@@ -909,6 +1013,7 @@ function Overview({
             title={t('Devices')}
             label={t('Device')}
             devices
+            onSelect={(value) => setFilters((current) => ({ ...current, device: value }))}
             report={reports?.device}
             loading={loading}
           />
@@ -947,6 +1052,7 @@ function BreakdownCard({
   loading,
   countries = false,
   devices = false,
+  onSelect,
 }: {
   title: string;
   label: string;
@@ -954,6 +1060,7 @@ function BreakdownCard({
   loading: boolean;
   countries?: boolean;
   devices?: boolean;
+  onSelect?: (value: string) => void;
 }) {
   const { locale, number, t } = useSitePreferences();
   return (
@@ -996,9 +1103,15 @@ function BreakdownCard({
                 className="flex min-h-10 items-center justify-between gap-4 py-2 text-sm md:min-h-9"
                 key={item.value}
               >
-                <HintText content={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
-                  {countries ? <CountryLabel code={item.value} /> : text}
-                </HintText>
+                <button
+                  className="min-w-0 flex-1 cursor-pointer rounded-sm text-left hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                  aria-label={t('Filter by {value}', { value: text })}
+                  onClick={() => onSelect?.(item.value)}
+                >
+                  <HintText content={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
+                    {countries ? <CountryLabel code={item.value} /> : text}
+                  </HintText>
+                </button>
                 <strong className="shrink-0 text-[13px] font-normal tabular-nums">
                   {number(item.count)}
                 </strong>

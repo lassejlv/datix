@@ -1583,6 +1583,51 @@
       "udt_name": "numeric",
       "is_nullable": "NO",
       "since_version": 10
+    },
+    {
+      "table_name": "overview_annotations",
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()",
+      "since_version": 11
+    },
+    {
+      "table_name": "overview_annotations",
+      "column_name": "environment_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null,
+      "since_version": 11
+    },
+    {
+      "table_name": "overview_annotations",
+      "column_name": "day",
+      "data_type": "date",
+      "udt_name": "date",
+      "is_nullable": "NO",
+      "column_default": null,
+      "since_version": 11
+    },
+    {
+      "table_name": "overview_annotations",
+      "column_name": "label",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "since_version": 11
+    },
+    {
+      "table_name": "overview_annotations",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "since_version": 11
     }
   ],
   "constraints": [

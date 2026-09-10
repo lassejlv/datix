@@ -100,6 +100,14 @@ function startCartesianLoop({
         // so order the pair (a no-op for the common positive case).
         const a = cur.top[x] ?? 0;
         const b = cur.floor[x] ?? 0;
+        if (isLine && s.seriesSpecs[key]?.strokeVariant === 'dashed') {
+          // Comparison lines stay quiet: a dashed stroke without an area/glow band.
+          if (Math.floor(x / 3) % 2 === 0) {
+            octx.fillStyle = rgb(seed.line, 1, dim * 0.8);
+            octx.fillRect(x, Math.round(a), 1, 1);
+          }
+          continue;
+        }
         paintColumn(octx, x, Math.min(a, b), Math.max(a, b), seed, {
           variant,
           intensity,
@@ -202,7 +210,10 @@ function startCartesianLoop({
     // Repaint when a tweak-driven paint input changes (variant, stacking) so
     // the panel updates the fill live — without resetting the entrance reveal.
     const paintSig = `${s.stackType}|${s.configKeys
-      .map((k) => `${s.seriesSpecs[k]?.variant ?? ''}:${s.seedOf(k).fill.join(',')}`)
+      .map(
+        (k) =>
+          `${s.seriesSpecs[k]?.kind ?? ''}:${s.seriesSpecs[k]?.strokeVariant ?? ''}:${s.seriesSpecs[k]?.variant ?? ''}:${s.seedOf(k).fill.join(',')}`,
+      )
       .join(',')}`;
     const sigChanged = paintSig !== lastPaintSig;
     if (sigChanged) {

@@ -1,5 +1,36 @@
 import type { Copy } from './en';
 export const da = {
+  'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
+    'Trafikdiagram pr. time. Brug venstre og højre piletast til at undersøge hver time.',
+  'Live data is temporarily unavailable.': 'Livedata er midlertidigt utilgængelige.',
+  'Visitors active in the last 5 minutes across this environment':
+    'Besøgende aktive de sidste 5 minutter i dette miljø',
+  'Live view': 'Livevisning',
+  '{count} live': '{count} live',
+  'Primary goal': 'Primært mål',
+  '{count} conversions': '{count} konverteringer',
+  '{rate}% conversion rate': '{rate}% konverteringsrate',
+  'No visitors yet': 'Ingen besøgende endnu',
+  'Tracked data · last 30 days within selection': 'Sporede data · seneste 30 dage inden for valget',
+  'Choose a conversion goal': 'Vælg et konverteringsmål',
+  'Chart notes': 'Diagramnoter',
+  'Delete note: {label}': 'Slet note: {label}',
+  'Note date': 'Notedato',
+  'Note label': 'Notetekst',
+  'Deployment or campaign…': 'Udgivelse eller kampagne…',
+  'Add note': 'Tilføj note',
+  'Active filters': 'Aktive filtre',
+  'Clear filters': 'Ryd filtre',
+  'Filters use tracked events from {date}; imported history is excluded.':
+    'Filtre bruger sporede hændelser fra {date}; importeret historik er ikke med.',
+  'No change': 'Ingen ændring',
+  'No previous traffic': 'Ingen tidligere trafik',
+  'Previous period': 'Forrige periode',
+  'Dashed line: {from} – {to}': 'Stiplet linje: {from} – {to}',
+  'Previous period is outside retained history.':
+    'Forrige periode ligger uden for den gemte historik.',
+  'Filter by {value}': 'Filtrer efter {value}',
+
   'Error resolved.': 'Fejl løst.',
   'Previous month': 'Forrige måned',
   'Next month': 'Næste måned',

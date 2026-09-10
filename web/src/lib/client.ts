@@ -28,6 +28,7 @@ export type Site = {
 export type Metric = 'pageviews' | 'dailyUniqueVisitors' | 'customEvents';
 export type Point = {
   day: string;
+  at?: string;
   pageviews: number;
   dailyUniqueVisitors: number;
   customEvents: number;

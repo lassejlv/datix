@@ -4,6 +4,7 @@ use serde_json::{Value, json};
 use std::collections::HashMap;
 use uuid::Uuid;
 mod cursor;
+pub mod overview_page;
 
 // Late native queue deliveries can move the live boundary back after an import.
 // Store source intervals at import time and prefer native history on every read.

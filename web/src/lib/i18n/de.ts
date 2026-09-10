@@ -1,5 +1,37 @@
 import type { Copy } from './en';
 export const de = {
+  'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
+    'Stündliches Traffic-Diagramm. Verwende die linke und rechte Pfeiltaste, um jede Stunde anzusehen.',
+  'Live data is temporarily unavailable.': 'Live-Daten sind vorübergehend nicht verfügbar.',
+  'Visitors active in the last 5 minutes across this environment':
+    'Aktive Besucher in den letzten 5 Minuten in dieser Umgebung',
+  'Live view': 'Live-Ansicht',
+  '{count} live': '{count} live',
+  'Primary goal': 'Primäres Ziel',
+  '{count} conversions': '{count} Conversions',
+  '{rate}% conversion rate': '{rate}% Conversion-Rate',
+  'No visitors yet': 'Noch keine Besucher',
+  'Tracked data · last 30 days within selection':
+    'Erfasste Daten · letzte 30 Tage innerhalb der Auswahl',
+  'Choose a conversion goal': 'Conversion-Ziel auswählen',
+  'Chart notes': 'Diagrammnotizen',
+  'Delete note: {label}': 'Notiz löschen: {label}',
+  'Note date': 'Notizdatum',
+  'Note label': 'Notiztext',
+  'Deployment or campaign…': 'Bereitstellung oder Kampagne…',
+  'Add note': 'Notiz hinzufügen',
+  'Active filters': 'Aktive Filter',
+  'Clear filters': 'Filter löschen',
+  'Filters use tracked events from {date}; imported history is excluded.':
+    'Filter verwenden erfasste Ereignisse ab {date}; importierter Verlauf ist ausgeschlossen.',
+  'No change': 'Keine Änderung',
+  'No previous traffic': 'Kein vorheriger Traffic',
+  'Previous period': 'Vorheriger Zeitraum',
+  'Dashed line: {from} – {to}': 'Gestrichelte Linie: {from} – {to}',
+  'Previous period is outside retained history.':
+    'Der vorherige Zeitraum liegt außerhalb des gespeicherten Verlaufs.',
+  'Filter by {value}': 'Nach {value} filtern',
+
   'Error resolved.': 'Fehler behoben.',
   'Previous month': 'Vorheriger Monat',
   'Next month': 'Nächster Monat',

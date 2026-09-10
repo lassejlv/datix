@@ -20,6 +20,10 @@ static UPGRADES: &[(i64, &str)] = &[
         10,
         include_str!("../upgrades/0010_polar_usage_compatibility.sql"),
     ),
+    (
+        11,
+        include_str!("../upgrades/0011_overview_annotations.sql"),
+    ),
 ];
 
 pub async fn check(pool: &PgPool) -> Result<Value> {

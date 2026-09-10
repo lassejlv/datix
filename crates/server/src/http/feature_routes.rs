@@ -18,6 +18,11 @@ pub(super) async fn report(
     let env = environment(&state, &c, &site, &env).await?;
     let range = DateRange::parse(&params)?;
     Ok(Json(match feature.as_str() {
+        "live" => reports::overview_page::live(&state, env.id).await?,
+        "overview" => {
+            reports::overview_page::report(&state, env.id, env.import_revision, &range, &params)
+                .await?
+        }
         "goals" => goals::report(&state, env.id, &range).await?,
         "errors" => diagnostics::report(&state, env.id, "error", &range).await?,
         "web-vitals" => diagnostics::report(&state, env.id, "vital", &range).await?,
@@ -35,6 +40,7 @@ pub(super) async fn configure(
     let env = environment(&state, &c, &site, &env).await?;
     let body = read_json(request).await?;
     Ok(Json(match feature.as_str() {
+        "annotations" => reports::overview_page::annotate(&state, env.id, body).await?,
         "goals" => goals::create(&state, env.id, body).await?,
         "pulse" => pulse::configure(&state, env.id, &env.domain, body).await?,
         "errors" => {

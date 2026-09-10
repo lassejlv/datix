@@ -58,6 +58,8 @@ async function fixtures(context: BrowserContext) {
   };
   const state = {
     failSave: false,
+    notes: [] as { id: string; day: string; label: string }[],
+    overviewQueries: [] as string[],
     signedIn: true,
     site,
     environment,
@@ -137,7 +139,104 @@ async function fixtures(context: BrowserContext) {
         result = { environment };
       }
     } else if (path.endsWith('/installation')) result = { receiving: true, lastReceivedAt: at };
-    else if (path.endsWith('/overview'))
+    else if (path.endsWith('/features/annotations')) {
+      const body = req.postDataJSON();
+      if (body.action === 'create') {
+        const annotation = { id: crypto.randomUUID(), day: body.day, label: body.label };
+        state.notes.push(annotation);
+        result = { annotation };
+      } else {
+        state.notes = state.notes.filter((note) => note.id !== body.id);
+        result = { deleted: true };
+      }
+    } else if (path.endsWith('/features/live')) {
+      result = { active: 24, recent: [{ path: '/journal', country: 'DK', at }] };
+    } else if (path.endsWith('/features/overview')) {
+      state.overviewQueries.push(url.search);
+      const hourly = url.searchParams.get('window') === '24h';
+      const end = new Date().toISOString();
+      const start = new Date(Date.parse(end) - 86400000).toISOString();
+      const from = hourly ? start.slice(0, 10) : url.searchParams.get('from')!;
+      const to = hourly ? end.slice(0, 10) : url.searchParams.get('to')!;
+      const days = hourly ? 24 : Math.round((Date.parse(to) - Date.parse(from)) / 86400000) + 1;
+      const filtered = ['path', 'referrer', 'country', 'device'].some((key) =>
+        url.searchParams.has(key),
+      );
+      const factor = filtered ? 0.25 : 1;
+      const shift = (day: string, offset: number) =>
+        new Date(Date.parse(day) + offset * 86400000).toISOString().slice(0, 10);
+      const overview = {
+        pageviews: Math.round(24810 * factor),
+        dailyUniqueVisitors: Math.round(8932 * factor),
+        customEvents: Math.round(1624 * factor),
+      };
+      const series = Array.from({ length: days }, (_, i) => ({
+        day: hourly
+          ? new Date(Date.parse(start) + i * 3600000).toISOString().slice(0, 10)
+          : shift(from, i),
+        ...(hourly ? { at: new Date(Date.parse(start) + i * 3600000).toISOString() } : {}),
+        pageviews: Math.round((420 + ((i * 67) % 920)) * factor),
+        dailyUniqueVisitors: Math.round((180 + ((i * 29) % 350)) * factor),
+        customEvents: Math.round((18 + ((i * 7) % 80)) * factor),
+      }));
+      const values: Record<string, string[]> = {
+        path: ['/', '/journal', '/work', '/about'],
+        referrer: ['google.com', 'github.com', '', 'news.ycombinator.com'],
+        country: ['DK', 'DE', 'US', 'GB'],
+        device: ['desktop', 'mobile', 'tablet'],
+        event: ['signup', 'download', 'contact'],
+      };
+      result = {
+        overview,
+        timeseries: { data: series },
+        ...Object.fromEntries(
+          Object.entries(values).map(([key, list]) => [
+            key,
+            {
+              data: (url.searchParams.has(key) ? [url.searchParams.get(key)!] : list).map(
+                (value, i) => ({ value, count: Math.round((3250 - i * 580) * factor) }),
+              ),
+            },
+          ]),
+        ),
+        previous:
+          !hourly && filtered && days > 14
+            ? null
+            : {
+                overview: { pageviews: 18000, dailyUniqueVisitors: 6500, customEvents: 1200 },
+                timeseries: {
+                  data: series.map((point) => ({
+                    ...point,
+                    day: shift(point.day, hourly ? -1 : -days),
+                    ...(point.at
+                      ? { at: new Date(Date.parse(point.at) - 86400000).toISOString() }
+                      : {}),
+                    pageviews: Math.round(point.pageviews * 0.7),
+                  })),
+                },
+              },
+        previousRange: hourly
+          ? { from: new Date(Date.parse(start) - 86400000).toISOString(), to: start }
+          : { from: shift(from, -days), to: shift(from, -1) },
+        ...(hourly ? { window: { from: start, to: end, interval: 'hour' } } : {}),
+        filtered,
+        partial: filtered && days > 30,
+        retainedFrom: shift(today, -29),
+        annotations: state.notes.filter((note) => note.day >= from && note.day <= to),
+        goals: {
+          visitors: Math.round(8932 * factor),
+          goals: [
+            {
+              id: 'goal-1',
+              name: 'Signup',
+              conversions: Math.round(420 * factor),
+              visitors: Math.round(400 * factor),
+            },
+            { id: 'goal-2', name: 'Purchase', conversions: 120, visitors: 100 },
+          ],
+        },
+      };
+    } else if (path.endsWith('/overview'))
       result = { pageviews: 24810, dailyUniqueVisitors: 8932, customEvents: 1624 };
     else if (path.endsWith('/timeseries'))
       result = {
@@ -472,6 +571,81 @@ try {
       if (message.type() === 'error' && /Base UI|React|hydration|uncontrolled/.test(message.text()))
         errors.push(message.text());
     });
+    if (process.argv.includes('--overview-only')) {
+      try {
+        const path = `${base}/site/${state.site.id}/${state.environment.id}/overview`;
+        await page.goto(path);
+        await expect(page.getByTestId('traffic-chart')).toBeVisible();
+        await expect(page.getByText('24,810', { exact: true })).toBeVisible();
+        await expect(page.getByText(/Dashed line:/)).toBeVisible();
+        await page.getByRole('checkbox', { name: 'Previous period' }).uncheck();
+        await expect(page.getByText(/Dashed line:/)).toHaveCount(0);
+        await page.getByRole('checkbox', { name: 'Previous period' }).check();
+        await page.getByRole('combobox', { name: 'Date range' }).click();
+        await page.getByRole('option', { name: 'Last 24 hours', exact: true }).click();
+        await expect.poll(() => state.overviewQueries.at(-1)).toContain('window=24h');
+        await expect(
+          page.getByRole('group', {
+            name: 'Hourly traffic chart. Use left and right arrow keys to inspect each hour.',
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(page.getByText(/Dashed line:/)).not.toContainText('Invalid Date');
+        await page.getByRole('button', { name: 'Filter by /journal', exact: true }).click();
+        await expect
+          .poll(() => state.overviewQueries.at(-1))
+          .toContain('window=24h&path=%2Fjournal');
+        await expect(page.getByText('6,203', { exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
+        await capture(page, { path: `${dir}/${theme}-overview-24h.png`, fullPage: true });
+        await page.getByRole('combobox', { name: 'Date range' }).click();
+        await page.getByRole('option', { name: 'Last 7 days', exact: true }).click();
+        await page.getByRole('button', { name: 'Filter by /journal', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Page: /journal ×' })).toBeVisible();
+        await page.getByRole('button', { name: 'Filter by Denmark', exact: true }).click();
+        await expect.poll(() => state.overviewQueries.at(-1)).toContain('country=DK');
+        await expect.poll(() => state.overviewQueries.at(-1)).toContain('path=%2Fjournal');
+        await expect(page.getByText('6,203', { exact: true })).toBeVisible();
+        await page.getByRole('button', { name: 'Page: /journal ×' }).click();
+        await expect.poll(() => state.overviewQueries.at(-1)).not.toContain('path=');
+        await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
+        await page.getByRole('combobox', { name: 'Primary goal' }).click();
+        await page.getByRole('option', { name: 'Purchase', exact: true }).click();
+        await page.reload();
+        await expect(page.getByRole('combobox', { name: 'Primary goal' })).toHaveText('Purchase');
+        await page.getByText('Chart notes', { exact: false }).click();
+        await page.getByRole('textbox', { name: 'Note label' }).fill('Autumn campaign');
+        await page.getByRole('button', { name: 'Add note', exact: true }).click();
+        await expect(page.getByTestId('annotation-marker')).toHaveCount(1);
+        await page.reload();
+        await expect(page.getByTestId('annotation-marker')).toHaveCount(1);
+        await page.getByText('Chart notes', { exact: false }).click();
+        await expect(page.getByText('Autumn campaign', { exact: true })).toBeVisible();
+        await capture(page, { path: `${dir}/${theme}-overview-enhanced.png`, fullPage: true });
+        await page.getByRole('button', { name: '24 live', exact: true }).click();
+        await expect(page.getByRole('dialog', { name: 'Live view', exact: true })).toBeVisible();
+        await expect(page.getByRole('dialog').getByText('/journal', { exact: true })).toBeVisible();
+        await page.keyboard.press('Escape');
+        await page.setViewportSize({ width: 390, height: 844 });
+        await capture(page, { path: `${dir}/${theme}-overview-mobile.png`, fullPage: true });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+          true,
+        );
+        await page
+          .getByRole('button', { name: 'Delete note: Autumn campaign', exact: true })
+          .click();
+        await expect(page.getByTestId('annotation-marker')).toHaveCount(0);
+        pass(
+          `${theme}: rolling 24h selector and hourly chart, comparison toggle, combined filters, removable chips, saved goal choice, note creation/reload/deletion, live dialog, mobile layout`,
+        );
+      } catch (error) {
+        await page.screenshot({ path: `${dir}/overview-failure.png`, fullPage: true });
+        console.error(await page.locator('body').innerText());
+        throw error;
+      }
+      await context.close();
+      continue;
+    }
     if (process.argv.includes('--motion-only')) {
       try {
         await verifyMotion(page, theme);
@@ -754,11 +928,13 @@ try {
   }
   expect(errors).toEqual([]);
   expect(unexpected).toEqual([]);
-  const report = process.argv.includes('--motion-only')
-    ? 'motion-results'
-    : process.argv.includes('--loading-only')
-      ? 'loading-results'
-      : 'results';
+  const report = process.argv.includes('--overview-only')
+    ? 'overview-results'
+    : process.argv.includes('--motion-only')
+      ? 'motion-results'
+      : process.argv.includes('--loading-only')
+        ? 'loading-results'
+        : 'results';
   await writeFile(`${dir}/${report}.json`, JSON.stringify({ checks, errors, unexpected }, null, 2));
 } finally {
   await browser.close();
