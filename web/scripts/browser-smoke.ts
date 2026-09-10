@@ -44,7 +44,7 @@ try {
   await client.connect();
   await mkdir('web/artifacts', { recursive: true });
   await page.goto(`${base}/signin`);
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await expect(page).toHaveTitle('Datix | Website analytics');
   await page.screenshot({ path: 'web/artifacts/sign-in-desktop.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -406,7 +406,7 @@ try {
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await page.getByRole('button', { name: 'Account menu', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password', { exact: true }).fill('wrong-password');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();

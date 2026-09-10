@@ -1,0 +1,599 @@
+<h1 id="analytiks-privacy-policy">Analytiks Privacy Policy</h1>
+<p>Effective date: 8 September 2026</p>
+<p>
+  Draft for owner and legal review. Not yet published. The consent flow described for analytiks.app
+  must be implemented before this policy is published; the current site starts its default analytics
+  automatically.
+</p>
+<h2 id="1-who-is-responsible">1. Who is responsible</h2>
+<p>
+  <strong>Lasse Vestergaard</strong>, operating Analytiks personally and based in
+  <strong>9000 Aalborg, Denmark</strong>, is responsible for personal data used to operate
+  <a href="https://analytiks.app">analytiks.app</a> and
+  <a href="https://analytics.beer">analytics.beer</a>, manage customer accounts, administer the
+  service, and answer support and privacy requests. Our contact for privacy requests, support, and
+  legal matters is <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>.
+</p>
+<p>
+  This policy covers our website, application, API, tracking service, billing integration, and
+  correspondence. Our role depends on the data:
+</p>
+<ul>
+  <li>
+    <strong>Our accounts, own website, and business administration:</strong> we determine the
+    purposes and means of processing and act as controller.
+  </li>
+  <li>
+    <strong>Analytics collected for a customer's website:</strong> the customer normally acts as
+    controller and we process visitor data on its behalf. If the customer is itself a processor, we
+    act as its subprocessor. The customer's privacy notice and any applicable data processing
+    agreement also apply.
+  </li>
+</ul>
+<p>
+  If your question concerns a website using Analytiks, contact that website's operator first. We can
+  assist with requests concerning information we process on its behalf.
+</p>
+<h2 id="2-account-billing-and-support-information">2. Account, billing, and support information</h2>
+<p>
+  When you register, we collect your name, email address, and password. Passwords are stored as
+  hashes. We also store an account identifier and account creation and update times. Authentication
+  records include session identifiers, expiry times, the account's IP address, and browser
+  user-agent information. This account security information is separate from website visitor
+  analytics.
+</p>
+<p>
+  We store the website names, domains, environments, settings, and collection budgets you enter.
+  Account use generates usage totals and operational information needed to provide, secure, and
+  troubleshoot the service.
+</p>
+<p>
+  When you start a Polar checkout, we send Polar your name, email address, account identifier,
+  selected plan, and checkout language. Polar collects the payment and billing information needed
+  for the purchase, which can include your billing address, tax information, and payment details.
+  Our application stores customer and checkout identifiers and selected subscription information,
+  including plan, status, billing period, trial end, and cancellation state. It does not store your
+  full payment-card number.
+</p>
+<p>
+  Our usage integration sends Polar your account identifier, event category, credit quantity,
+  timestamp, and a delivery identifier. It does not include tracked visitors' identifiers, page
+  paths, or IP addresses in those billing usage messages. Information entered directly into Polar's
+  checkout is governed by
+  <a href="https://polar.sh/legal/privacy-policy">Polar's Privacy Policy</a>.
+</p>
+<p>
+  If you email us, we receive your email address, message content, any information or attachments
+  you choose to include, and related correspondence metadata. Please avoid sending passwords, full
+  card details, or unnecessary personal information.
+</p>
+<h2 id="3-information-collected-by-the-tracker">3. Information collected by the tracker</h2>
+<p>
+  Collection depends on the website operator's settings and tracking mode. The tracker can collect:
+</p>
+<ul>
+  <li>
+    page paths, custom event names, timestamps, referrer hostnames, and country derived from the
+    network request;
+  </li>
+  <li>
+    browser family, operating system, device category, language, and viewport and screen dimensions;
+  </li>
+  <li>clicks, outbound links, downloads, form submission events, scroll depth, and active time;</li>
+  <li>
+    a structural description of the interacted element or an explicit analytics label, click
+    position expressed relative to the viewport, and link destinations without query strings or
+    fragments;
+  </li>
+  <li>pseudonymous identifiers used to group the recorded activity, as described below.</li>
+</ul>
+<p>
+  The standard tracker excludes typed field values, passwords, keystroke values, page text, and full
+  page contents. It produces an activity timeline, not video or visual session replay. Query strings
+  and URL fragments are removed from the page and destination URLs it sends, and the collector
+  stores referrer hostnames.
+</p>
+<p>
+  Page paths, event names, link paths, or labels can nevertheless contain personal information.
+  Customers must avoid including it and exclude inappropriate pages or elements. A pseudonymous
+  identifier or a report containing a sensitive path should not be treated as necessarily anonymous.
+</p>
+<p>
+  IP addresses and browser headers are processed when requests reach our infrastructure. The
+  collector uses them for visitor estimates, browser classification, security, and abuse prevention.
+  Raw visitor IP addresses and full browser headers are not stored in our analytics event tables or
+  normal analytics queue payloads. Our network providers process request information, and account
+  authentication records can retain raw IP addresses and browser headers as explained above.
+</p>
+<h2 id="4-tracking-modes-and-visitor-choices">4. Tracking modes and visitor choices</h2>
+<h3 id="default-cookieless-mode">Default cookieless mode</h3>
+<p>
+  The default mode does not create a persistent browser visitor or session identifier. It groups
+  activity using a server-generated, keyed hash based on the environment, UTC date, IP address, and
+  a bounded browser header. The grouping changes each UTC day and is scoped to the environment.
+  Shared networks and browsers can be grouped together, and changing network information can split
+  one person's activity.
+</p>
+<p>
+  This mode can still record the detailed activity listed above. It also uses
+  <code>sessionStorage</code> to prevent repeated pageviews of the same page from being counted
+  within one minute. That storage contains page addresses and timestamps, not visitor identifiers.
+  Calling the mode cookieless does not mean that it is free of browser storage or automatically
+  exempt from consent requirements.
+</p>
+<h3 id="optional-cookie-based-visitors">Optional cookie-based visitors</h3>
+<p>
+  This mode requires affirmative analytics consent before visitor cookies or events are created. It
+  uses first-party cookies scoped to the tracked environment:
+</p>
+<div class="legal-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Cookie</th>
+        <th>Purpose</th>
+        <th>Expiry</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>ab_visitor_&lt;environment&gt;</code></td>
+        <td>Recognize a returning browser</td>
+        <td>90 days, renewed with activity</td>
+      </tr>
+      <tr>
+        <td><code>ab_session_&lt;environment&gt;</code></td>
+        <td>Group a browser's current visit</td>
+        <td>30 minutes, renewed with activity</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The cookies hold randomly generated identifiers. The server converts them into keyed,
+  environment-specific identifiers for stored analytics. This mode can link visits across days while
+  the identifier remains valid and the relevant activity is retained.
+</p>
+<h3 id="optional-local-storage-visitors">Optional local-storage visitors</h3>
+<p>
+  This mode also requires affirmative analytics consent. It stores a record named
+  <code>analytics-beer:identity:&lt;environment&gt;</code> in the tracked site's local storage
+  instead of using visitor cookies. It contains random visitor and session identifiers and expiry
+  timestamps. The visitor identifier is renewed for 90 days and the session identifier for 30
+  minutes with activity.
+</p>
+<p>
+  Expiry timestamps control whether identifiers are reused; local storage does not physically remove
+  a record merely because its timestamp has expired. The record is removed when consent is withdrawn
+  through the integration or when the browser's site data is cleared. If identity storage is
+  blocked, this mode stops visitor collection rather than creating replacement in-memory identities.
+</p>
+<h3 id="consent-and-withdrawal">Consent and withdrawal</h3>
+<p>
+  On <strong>analytiks.app and analytics.beer</strong>, we ask for consent before loading
+  nonessential analytics or allowing its associated device access and browser storage. Rejecting
+  optional analytics does not prevent access to the website or the account functions needed to
+  provide the service. You can withdraw consent through the site's consent controls. Withdrawal
+  stops future analytics; it does not retrospectively make earlier processing unlawful or
+  automatically erase information already received.
+</p>
+<p>
+  On <strong>customer websites</strong>, the website operator supplies the consent controls and
+  determines when tracking may start. The tracker does not itself remember the visitor's consent
+  choice across page loads. The operator must restore that choice and obtain consent wherever
+  legally required, including for default tracking where applicable. Persistent modes wait for the
+  affirmative consent signal.
+</p>
+<p>
+  Withdrawal through the tracker integration stops future activity, cancels retries and pending
+  requests where possible, and clears the relevant persistent visitor identifiers. Withdrawal is
+  also communicated to other open tabs of the same site where browser support allows. Previously
+  delivered records are handled through retention or a separate deletion request.
+</p>
+<p>
+  The tracker respects <strong>Do Not Track</strong>. It does not currently use
+  <strong>Global Privacy Control</strong> as a signal to disable analytics. Browser site-data
+  controls can remove stored information, but clearing data alone does not prevent a script from
+  creating new data on a later visit. Use the site's consent controls or an appropriate browser
+  blocking control as well.
+</p>
+<h2 id="5-other-browser-storage-on-analytiksapp">5. Other browser storage on analytiks.app</h2>
+<p>
+  We use storage for account and interface functions independently of optional visitor analytics:
+</p>
+<div class="legal-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Storage</th>
+        <th>Purpose</th>
+        <th>Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>__Secure-better-auth.session_token</code> cookie</td>
+        <td>Maintain your signed-in session</td>
+        <td>
+          Browser session if not remembered; otherwise up to seven days, renewed with continued use
+        </td>
+      </tr>
+      <tr>
+        <td><code>__Secure-better-auth.dont_remember</code> cookie</td>
+        <td>Record a non-remembered sign-in choice</td>
+        <td>Browser session; the corresponding server session expires after one day</td>
+      </tr>
+      <tr>
+        <td><code>ab-language</code> and <code>ab-theme</code> cookies</td>
+        <td>Remember your selected language and appearance</td>
+        <td>One year from the setting being saved</td>
+      </tr>
+      <tr>
+        <td>Dashboard preferences in local storage</td>
+        <td>Remember your selected website, environment, and unfinished setup</td>
+        <td>Until cleared or removed; these records have no fixed time expiry</td>
+      </tr>
+      <tr>
+        <td>Checkout selection in session storage</td>
+        <td>Carry your selected plan through sign-in</td>
+        <td>Until consumed by the checkout flow or cleared with the tab session</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  The default tracker's separate pageview-throttle entry uses the key
+  <code>analytics-beer:pageviews:&lt;environment&gt;</code>. Entries stop affecting counts after one
+  minute, but stored entries may remain until a later cleanup or the browser session ends. On our
+  own site, this is part of the analytics controlled by consent.
+</p>
+<p>
+  You can change language and appearance using the website controls and remove cookies or other site
+  data through your browser. Blocking sign-in storage can prevent account access. Cloudflare and
+  Polar may also use storage on requests or pages they handle, according to their applicable
+  services and privacy information.
+</p>
+<h2 id="6-purposes-and-legal-bases">6. Purposes and legal bases</h2>
+<p>Where the GDPR applies, we use the following bases for data for which we act as controller:</p>
+<div class="legal-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Purpose</th>
+        <th>Information used</th>
+        <th>Basis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Create and operate your account and provide the service</td>
+        <td>Account details, website settings, sessions, and usage</td>
+        <td>
+          Performance of our contract with you; legitimate interests in serving an organization
+          where you act as its representative
+        </td>
+      </tr>
+      <tr>
+        <td>Administer subscriptions and resolve payment issues</td>
+        <td>Account identifiers, subscription state, usage, and correspondence</td>
+        <td>
+          Contract; legitimate interests in administering business customer relationships; legal
+          obligations where applicable
+        </td>
+      </tr>
+      <tr>
+        <td>Protect accounts, prevent abuse, and troubleshoot failures</td>
+        <td>
+          Request information, session records, rate-limit and abuse signals, and operational
+          records
+        </td>
+        <td>Legitimate interests in protecting the service, customers, and visitors</td>
+      </tr>
+      <tr>
+        <td>Understand use of our own site through optional analytics</td>
+        <td>Consented visitor and activity information</td>
+        <td>Consent</td>
+      </tr>
+      <tr>
+        <td>Remember requested interface choices</td>
+        <td>Language, appearance, and navigation preferences</td>
+        <td>Legitimate interests in providing the interface and preferences you request</td>
+      </tr>
+      <tr>
+        <td>Answer support requests and business correspondence</td>
+        <td>Contact details, messages, and relevant account information</td>
+        <td>Contract or legitimate interests in responding and resolving the matter</td>
+      </tr>
+      <tr>
+        <td>Comply with legal duties and handle legal claims</td>
+        <td>Information relevant to the particular duty or claim</td>
+        <td>
+          Legal obligation or legitimate interests in establishing, exercising, or defending legal
+          claims
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Our legitimate interests are limited to the purposes stated and must be balanced against your
+  rights. You can object as explained below. Optional analytics consent is separate from accepting
+  the service contract. You do not have to provide optional analytics information to buy or use the
+  service, although information needed to create an account and process a payment is required for
+  those functions.
+</p>
+<p>
+  For analytics collected on a customer's behalf, that customer determines the relevant legal basis
+  and supplies the required visitor information. We process that information to provide its
+  configured analytics service.
+</p>
+<h2 id="7-who-receives-information">7. Who receives information</h2>
+<p>We use the following providers for the stated functions:</p>
+<div class="legal-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Function and relevant information</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Railway</strong></td>
+        <td>
+          Runs our application, background workers, and Redis queues. Processes service requests,
+          account and event data passing through those systems, and operational information. See its
+          <a href="https://railway.com/legal/privacy">Privacy Policy</a> and
+          <a href="https://railway.com/legal/dpa">data processing terms</a>.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Neon</strong></td>
+        <td>
+          Hosts the PostgreSQL database containing accounts, analytics, settings, and billing
+          metadata. Neon is part of Databricks; see the current
+          <a href="https://neon.com/platform-terms">Neon platform terms</a>.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Cloudflare</strong></td>
+        <td>
+          Provides the public site's proxy, network delivery, DNS, and security functions, including
+          processing request information. Its Email Routing service also forwards messages sent to
+          our contact address. See its
+          <a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a> and
+          <a href="https://www.cloudflare.com/cloudflare-customer-dpa/">data processing terms</a>.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Polar</strong></td>
+        <td>
+          Provides checkout, merchant-of-record services, subscription administration, and billing
+          usage processing. It receives account and billing information described above. Polar has
+          its own responsibilities for payment, tax, fraud prevention, and other processing
+          described in its <a href="https://polar.sh/legal/privacy-policy">Privacy Policy</a>; its
+          <a href="https://polar.sh/legal/data-processing-addendum">data processing terms</a> apply
+          to covered processing on our behalf.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Google/Gmail</strong></td>
+        <td>
+          Receives and stores support and privacy correspondence forwarded from our contact address.
+          This includes message content, attachments, and metadata. See
+          <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  These providers do not all have the same legal role. Hosting and database providers process
+  service data to support our operation. Polar also acts for its own transaction-related purposes.
+  Google/Gmail handles correspondence under the privacy terms linked above.
+</p>
+<p>
+  We may disclose relevant information where a binding legal obligation requires it or where
+  necessary and lawful to establish, exercise, or defend legal claims. Customer analytics reports
+  are made available to the account authorized to access the relevant website and environment. They
+  are not published as a public visitor directory.
+</p>
+<h2 id="8-processing-locations-and-international-transfers">
+  8. Processing locations and international transfers
+</h2>
+<p>
+  Our application, worker, and Redis services are currently deployed in a European Railway region.
+  The primary Neon database is configured in Frankfurt, Germany. Those deployment locations do not
+  mean that all processing stays in the EEA: network delivery, provider administration, support,
+  payment processing, email, and provider subprocessors can involve other countries, including the
+  United States.
+</p>
+<p>
+  We have agreed to Railway's <a href="https://railway.com/legal/dpa">data processing agreement</a>,
+  which contains provisions for international transfers, including standard contractual clauses for
+  relevant restricted transfers. Cloudflare's and Polar's applicable data processing terms also
+  provide standard contractual clauses for relevant restricted transfers. Neon's current platform
+  terms incorporate Databricks' contractual framework. Google's Privacy Policy describes
+  international processing and its transfer arrangements.
+</p>
+<p>
+  Where we transfer personal data subject to the GDPR outside the EEA, an applicable adequacy
+  decision or another valid safeguard, such as the European Commission's standard contractual
+  clauses with any necessary supplementary measures, is required. Contact
+  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a> for information about the safeguards
+  applicable to your data and how to obtain a copy, subject to necessary redactions.
+</p>
+<h2 id="9-retention-and-deletion">9. Retention and deletion</h2>
+<p>Different records serve different purposes and follow different retention rules:</p>
+<div class="legal-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Information</th>
+        <th>Retention or deletion rule</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Raw analytics events and detailed activity</td>
+        <td>Scheduled deletion after approximately 30 days</td>
+      </tr>
+      <tr>
+        <td>Daily visitor and session-grouping records</td>
+        <td>Approximately 30 days</td>
+      </tr>
+      <tr>
+        <td>Event receipt identifiers used to prevent duplicate processing</td>
+        <td>Approximately 31 days</td>
+      </tr>
+      <tr>
+        <td>Daily aggregate reports</td>
+        <td>
+          A rolling 730-calendar-day reporting window; report dimensions can still contain paths or
+          event names
+        </td>
+      </tr>
+      <tr>
+        <td>Detailed abuse-source records</td>
+        <td>Eligible for cleanup after two days without an update</td>
+      </tr>
+      <tr>
+        <td>Daily abuse summaries</td>
+        <td>Approximately 90 days</td>
+      </tr>
+      <tr>
+        <td>Account and website settings</td>
+        <td>
+          Kept while the account or website exists, unless removed earlier through a relevant
+          deletion request
+        </td>
+      </tr>
+      <tr>
+        <td>Authentication sessions</td>
+        <td>
+          Until sign-out, revocation, expiry, or account deletion, as applicable; expired records
+          are removed by scheduled cleanup
+        </td>
+      </tr>
+      <tr>
+        <td>Usage counters</td>
+        <td>
+          Kept for account usage and billing administration; website deletion does not reset them;
+          account deletion removes account-linked usage counters
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<p>
+  Scheduled cleanup uses bounded batches. The stated analytics periods are cleanup targets, not a
+  promise that every copy disappears at the exact end of that period; scheduling, interruptions, or
+  a processing backlog can delay removal.
+</p>
+<p>
+  Support and privacy correspondence is kept only while needed to resolve the matter, meet an
+  applicable legal obligation, or establish, exercise, or defend a related legal claim. We assess
+  that need according to whether the request remains open, whether follow-up is necessary, and
+  whether a relevant legal duty or dispute requires continued retention. Correspondence is stored
+  separately from the application database, so deleting an account does not automatically delete its
+  email threads.
+</p>
+<p>
+  Successfully processed event messages are removed from the active processing queue. Failed or
+  interrupted records can remain in recovery queues until reviewed, replayed, or removed. Failed
+  queue records currently have no fixed automatic expiry. Database retention rules do not
+  automatically erase these separate recovery records.
+</p>
+<p>
+  Account deletion removes the account and its linked websites, environments, analytics records, and
+  authentication sessions from the active application database. A billing customer identifier and
+  subscription snapshot can remain after the link to the deleted account is removed. Billing webhook
+  delivery identifiers also remain separately; these records do not currently have an automatic
+  scheduled expiry. Removing an account link is not a guarantee that the remaining billing
+  information is anonymous.
+</p>
+<p>
+  Polar retains transaction information under its own legal and operational obligations. Deleting an
+  Analytiks account does not erase Polar's records or complete a separate privacy request to Polar.
+  Recovery copies, provider logs, and backups can also remain beyond deletion from the active
+  application database, according to the relevant provider's recovery and retention processes. We do
+  not promise that all provider logs or backups share the analytics retention period.
+</p>
+<p>
+  Use <strong>Usage → Manage billing</strong> to cancel renewal before deleting your account in
+  account settings. Canceling a subscription alone stops future renewal; it does not delete
+  historical reports or your account. Contact us if you need assistance with deletion, including
+  residual records that require manual handling.
+</p>
+<h2 id="10-your-rights-and-requests">10. Your rights and requests</h2>
+<p>
+  Depending on the applicable law and circumstances, you may request access to your personal data,
+  correction, deletion, restriction of processing, or a portable copy. You may object to processing
+  based on legitimate interests and withdraw consent at any time without affecting the lawfulness of
+  processing before withdrawal.
+</p>
+<p>
+  We handle support and privacy requests through
+  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>, including requests that require
+  manual review or action. We may ask for information reasonably needed to verify your identity and
+  locate the relevant records. We handle requests within the time required by applicable law; under
+  the GDPR this is normally one month, with a permitted extension for complex or numerous requests
+  and notice of the extension.
+</p>
+<p>
+  The dashboard supports account and website management and deletion, but there is no dedicated
+  self-service personal-data export button. Contact us for access or portability assistance. Request
+  information you need before deleting the account.
+</p>
+<p>
+  For a visit to a customer's website, contact its operator first and identify the website and
+  approximate time of the visit. Pseudonymous records may not be identifiable from a name or email
+  address alone. We do not need to collect additional identifying information solely to identify a
+  person where the law does not require it, but we will consider information you provide that
+  enables a request to be handled.
+</p>
+<p>
+  You can complain to the
+  <a href="https://www.datatilsynet.dk/">Danish Data Protection Agency, Datatilsynet</a>, or another
+  competent supervisory authority, including the authority in the EEA country where you live or
+  work. Contacting us first is not a condition of that right.
+</p>
+<h2 id="11-security-and-automated-controls">11. Security and automated controls</h2>
+<p>
+  Technical protections include password hashing, signed sign-in cookies, account-based access
+  checks, and controls intended to limit unauthorized origins, duplicate events, and abusive
+  traffic. These measures reduce risk; no service can guarantee absolute security. Report a
+  suspected security or privacy issue to
+  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>.
+</p>
+<p>
+  Automated rules can reject events or pause collection when traffic appears abusive or a
+  subscription, allowance, or website budget prevents further collection. Contact us to request
+  review if you believe a restriction is incorrect. These controls manage the service; they are not
+  used to make credit, employment, or similar decisions about tracked visitors.
+</p>
+<h2 id="12-children">12. Children</h2>
+<p>
+  Analytiks accounts are intended for business or professional users aged 18 or older. Contact us if
+  you believe an account has been created by someone below that age.
+</p>
+<p>
+  The tracker does not determine a website visitor's age. The account age restriction therefore does
+  not mean that children's visits can never be recorded on customer websites. Customers are
+  responsible for the requirements applicable to their audience and for avoiding unlawful collection
+  or profiling of children.
+</p>
+<h2 id="13-changes-and-contact">13. Changes and contact</h2>
+<p>
+  We will update this policy when our practices change and show the new effective date. For material
+  changes, we will provide additional information through the service or another appropriate
+  channel. Where a new purpose requires fresh consent, we will ask for it.
+</p>
+<p>
+  <strong>Controller for our own processing:</strong> Lasse Vestergaard<br />
+  <strong>City and country:</strong> 9000 Aalborg, Denmark<br />
+  <strong>Privacy, support, and legal requests:</strong>
+  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a><br />
+  <strong>Website:</strong> <a href="https://analytiks.app">analytiks.app</a> (also
+  <a href="https://analytics.beer">analytics.beer</a>)
+</p>

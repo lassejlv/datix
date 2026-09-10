@@ -1,4 +1,18 @@
 export const en = {
+  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
+    'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.',
+  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
+    'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.',
+  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
+    'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.',
+  'Does testing use my event allowance?': 'Does testing use my event allowance?',
+  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
+    'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.',
+  Menu: 'Menu',
+  'Terms of service': 'Terms of service',
+  Terms: 'Terms',
+  'Privacy policy': 'Privacy policy',
+  Privacy: 'Privacy',
   'Understand your traffic.': 'Understand your traffic.',
   'Respect your visitors.': 'Respect your visitors.',
   'See your top pages, traffic sources, and custom events.':
@@ -37,8 +51,8 @@ export const en = {
   'Choose by traffic, not features.': 'Choose by traffic, not features.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.',
-  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
-    'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.',
+  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
+    'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
   'Before you choose.': 'Before you choose.',
@@ -452,6 +466,7 @@ export const en = {
   'Create account': 'Create account',
   'Create an account': 'Create an account',
   'Create an account to get started.': 'Create an account to get started.',
+  'Create an account. Get to know your traffic.': 'Create an account. Get to know your traffic.',
   'Create an account, add your website, and paste the tracking script into your site. The installation screen checks that your first pageview has arrived.':
     'Create an account, add your website, and paste the tracking script into your site. The installation screen checks that your first pageview has arrived.',
   'Credits per allowance period': 'Credits per allowance period',
@@ -502,7 +517,6 @@ export const en = {
   Devices: 'Devices',
   'Direct / none': 'Direct / none',
   Disabled: 'Disabled',
-  'Do I need a credit card?': 'Do I need a credit card?',
   'Does it use cookies?': 'Does it use cookies?',
   Domain: 'Domain',
   Downloads: 'Downloads',
@@ -738,11 +752,7 @@ export const en = {
   'New to Datix?': 'New to Datix?',
   'No active plan': 'No active plan',
   'No activity in this period': 'No activity in this period',
-  'No card needed': 'No card needed',
-  'No card needed. No trial or subscription starts at signup.':
-    'No card needed. No trial or subscription starts at signup.',
-  'No credit card required.': 'No credit card required.',
-  'No credit card. No trial countdown.': 'No credit card. No trial countdown.',
+  'No trial or subscription starts at signup.': 'No trial or subscription starts at signup.',
   'No data in this period.': 'No data in this period.',
   'No environments found.': 'No environments found.',
   'No free trial.': 'No free trial.',
@@ -751,8 +761,6 @@ export const en = {
     'No history imported into this environment yet.',
   'No pageview yet. Visit your website, wait a few seconds, then check again.':
     'No pageview yet. Visit your website, wait a few seconds, then check again.',
-  'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
-    'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.',
   'No report to display.': 'No report to display.',
   'No time limit': 'No time limit',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -904,6 +912,7 @@ export const en = {
   'Show password': 'Show password',
   'Sign in': 'Sign in',
   'Sign in to continue.': 'Sign in to continue.',
+  'Sign in to see how your website is doing.': 'Sign in to see how your website is doing.',
   'Sign out': 'Sign out',
   'Signing in uses an account session cookie. Account security records may contain IP and browser information. Avoid putting personal information in page paths or event names.':
     'Signing in uses an account session cookie. Account security records may contain IP and browser information. Avoid putting personal information in page paths or event names.',
@@ -1109,6 +1118,7 @@ export const en = {
   Visits: 'Visits',
   'Visits by {visitor}': 'Visits by {visitor}',
   'Want to track a specific action?': 'Want to track a specific action?',
+  'Welcome back.': 'Welcome back.',
   'We’ll check it’s working.': 'We’ll check it’s working.',
   'Website analytics': 'Website analytics',
   'Website analytics, simply.': 'Website analytics, simply.',
@@ -1179,8 +1189,6 @@ export const en = {
     'An active subscription or trial is required to collect events. Your existing reports remain available.',
   'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
     'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
-  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
-    'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
   'Allowance renews on {date}. Upgrade to resume sooner.':

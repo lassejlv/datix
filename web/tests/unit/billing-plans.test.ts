@@ -21,7 +21,7 @@ describe('Polar pricing', () => {
     }
   });
   test('monthly plans are selectable while annual draft prices remain previews', () => {
-    expect(billingPlans.map((p) => p.events)).toEqual([100000, 1000000, 5000000]);
+    expect(billingPlans.map((p) => p.events)).toEqual([15000, 500000, 5000000]);
     for (const plan of billingPlans) {
       expect(billingAvailable(plan)).toBe(true);
       expect(billingAvailable(plan, true)).toBe(false);

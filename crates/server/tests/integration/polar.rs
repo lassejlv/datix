@@ -177,7 +177,7 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
                     &owner,
                     "checkout",
                     "POST",
-                    json!({"events":100000,"interval":"month","locale":locale}),
+                    json!({"events":15000,"interval":"month","locale":locale}),
                 )
                 .await
                 .unwrap();
@@ -216,13 +216,13 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
                 &owner,
                 "checkout",
                 "POST",
-                json!({"events":100000,"interval":"month","locale":"de"}),
+                json!({"events":15000,"interval":"month","locale":"de"}),
             )
             .await
             .unwrap();
             assert_eq!(mock.data.lock().await.created, before + 1);
         }
-        for events in [100000, 1000000, 5000000] {
+        for events in [15000, 500000, 5000000] {
             assert_eq!(
                 billing::provider::handle(
                     &state,
@@ -237,7 +237,7 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
                 "plan_unavailable"
             );
         }
-        for events in [1000000, 5000000] {
+        for events in [500000, 5000000] {
             billing::provider::handle(
                 &state,
                 &owner,
@@ -259,7 +259,7 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
             &owner,
             "checkout",
             "POST",
-            json!({"events":1000000,"interval":"month"}),
+            json!({"events":500000,"interval":"month"}),
         )
         .await
         .unwrap();
@@ -297,7 +297,7 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
                     &owner,
                     "checkout",
                     "POST",
-                    json!({"events":100000,"interval":"month"})
+                    json!({"events":15000,"interval":"month"})
                 )
                 .await
                 .unwrap()["url"],

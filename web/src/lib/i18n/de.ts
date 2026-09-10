@@ -1,5 +1,19 @@
 import type { Copy } from './en';
 export const de = {
+  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
+    'Ein Seitenaufruf in der Produktion zählt als 1 Ereignis zu deinem Kontingent. Klicks und andere Ereignisse zählen als 0,5.',
+  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
+    'Auf localhost zählen Seitenaufrufe als 0,3 Ereignisse und andere Ereignisse als 0,15 zu deinem Kontingent. Die Interaktionszeit ist kostenlos.',
+  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
+    'Ja. Jeder Tarif umfasst bis zu 10 Websites. Dein monatliches Ereigniskontingent wird zwischen ihnen geteilt. Schätze daher deinen gesamten Traffic bei der Tarifwahl.',
+  'Does testing use my event allowance?': 'Verbrauchen Tests mein Ereigniskontingent?',
+  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
+    'Seitenaufrufe auf localhost zählen als 0,3 Ereignisse und andere Ereignisse als 0,15 zu deinem Kontingent. Getrennte Umgebungen halten Testaktivität aus deinen Produktionsberichten heraus.',
+  Menu: 'Menü',
+  'Terms of service': 'Nutzungsbedingungen',
+  Terms: 'Nutzungsbedingungen',
+  'Privacy policy': 'Datenschutzerklärung',
+  Privacy: 'Datenschutz',
   'Understand your traffic.': 'Verstehe deinen Traffic.',
   'Respect your visitors.': 'Respektiere deine Besucher.',
   'See your top pages, traffic sources, and custom events.':
@@ -38,8 +52,8 @@ export const de = {
   'Choose by traffic, not features.': 'Wähle nach Traffic, nicht nach Funktionen.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'Ein Seitenaufruf in Produktion verbraucht 1 Credit. Klicks und andere Ereignisse verbrauchen 0,5 Credits.',
-  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
-    'Basic deckt 100.000 Seitenaufrufe oder 80.000 Seitenaufrufe + 40.000 andere Ereignisse pro Monat ab.',
+  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
+    'Basic deckt 15.000 Seitenaufrufe oder 12.000 Seitenaufrufe + 6.000 andere Ereignisse pro Monat ab.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'Auf localhost: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Aktive Zeit ist kostenlos.',
   'Before you choose.': 'Bevor du dich entscheidest.',
@@ -458,6 +472,8 @@ export const de = {
   'Create account': 'Konto erstellen',
   'Create an account': 'Konto erstellen',
   'Create an account to get started.': 'Erstelle ein Konto, um loszulegen.',
+  'Create an account. Get to know your traffic.':
+    'Erstelle ein Konto. Lerne deinen Traffic kennen.',
   'Create an account, add your website, and paste the tracking script into your site. The installation screen checks that your first pageview has arrived.':
     'Erstelle ein Konto, füge deine Website hinzu und kopiere das Tracking-Skript auf deine Seite. Die Installationsansicht prüft, ob dein erster Seitenaufruf angekommen ist.',
   'Credits per allowance period': 'Credits pro Kontingentzeitraum',
@@ -509,7 +525,6 @@ export const de = {
   Devices: 'Geräte',
   'Direct / none': 'Direkt / keine',
   Disabled: 'Deaktiviert',
-  'Do I need a credit card?': 'Brauche ich eine Kreditkarte?',
   'Does it use cookies?': 'Werden Cookies verwendet?',
   Domain: 'Domain',
   Downloads: 'Downloads',
@@ -748,11 +763,8 @@ export const de = {
   'New to Datix?': 'Neu bei Datix?',
   'No active plan': 'Kein aktiver Tarif',
   'No activity in this period': 'Keine Aktivitäten in diesem Zeitraum',
-  'No card needed': 'Keine Kreditkarte nötig',
-  'No card needed. No trial or subscription starts at signup.':
-    'Keine Karte nötig. Bei der Registrierung beginnt weder eine Testphase noch ein Abonnement.',
-  'No credit card required.': 'Keine Kreditkarte erforderlich.',
-  'No credit card. No trial countdown.': 'Keine Kreditkarte. Keine ablaufende Testphase.',
+  'No trial or subscription starts at signup.':
+    'Bei der Registrierung beginnt weder eine Testphase noch ein Abonnement.',
   'No data in this period.': 'Keine Daten in diesem Zeitraum.',
   'No environments found.': 'Keine Umgebungen gefunden.',
   'No free trial.': 'Keine kostenlose Testphase.',
@@ -761,8 +773,6 @@ export const de = {
     'In diese Umgebung wurde noch kein Verlauf importiert.',
   'No pageview yet. Visit your website, wait a few seconds, then check again.':
     'Noch kein Seitenaufruf. Besuche deine Website, warte einige Sekunden und prüfe erneut.',
-  'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
-    'Für ein Konto brauchst du keine Zahlungsdaten. Eine Tarifvorschau startet weder ein Abonnement noch eine Testphase. Es entstehen keine Kosten.',
   'No report to display.': 'Kein Bericht zum Anzeigen.',
   'No time limit': 'Ohne Zeitlimit',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -917,6 +927,8 @@ export const de = {
   'Show password': 'Passwort anzeigen',
   'Sign in': 'Anmelden',
   'Sign in to continue.': 'Melde dich an, um fortzufahren.',
+  'Sign in to see how your website is doing.':
+    'Melde dich an, um zu sehen, wie es deiner Website geht.',
   'Sign out': 'Abmelden',
   'Signing in uses an account session cookie. Account security records may contain IP and browser information. Avoid putting personal information in page paths or event names.':
     'Die Anmeldung verwendet ein Sitzungscookie für dein Konto. Sicherheitsprotokolle können IP- und Browserinformationen enthalten. Vermeide personenbezogene Daten in Seitenpfaden oder Ereignisnamen.',
@@ -1132,6 +1144,7 @@ export const de = {
   Visits: 'Besuche',
   'Visits by {visitor}': 'Besuche von {visitor}',
   'Want to track a specific action?': 'Möchtest du eine bestimmte Aktion erfassen?',
+  'Welcome back.': 'Willkommen zurück.',
   'We’ll check it’s working.': 'Wir prüfen, ob es funktioniert.',
   'Website analytics': 'Website-Analyse',
   'Website analytics, simply.': 'Website-Analyse. Ganz einfach.',
@@ -1202,8 +1215,6 @@ export const de = {
     'Ein aktives Abonnement oder eine Testphase ist erforderlich, um Ereignisse zu erfassen. Deine bisherigen Berichte bleiben verfügbar.',
   'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
     'Basic umfasst 14 kostenlose Testtage. Pro und Ultra haben keine kostenlose Testphase. Wähle monatliche oder jährliche Zahlung.',
-  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
-    'Für ein Konto sind keine Zahlungsdaten nötig. Um einen Tarif zu starten, bestätigst du beim Checkout deine Zahlungsdaten und den Preis.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Polar muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
   'Allowance renews on {date}. Upgrade to resume sooner.':

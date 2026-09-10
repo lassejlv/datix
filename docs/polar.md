@@ -8,8 +8,8 @@ Datix uses Polar for hosted checkout, subscription management and usage reportin
 
 | Plan | Monthly USD | Annual USD (unavailable) | Monthly credits | Websites |
 | --- | ---: | ---: | ---: | ---: |
-| Basic | 9 | 90 | 100,000 | 10 |
-| Pro | 49 | 490 | 1,000,000 | 10 |
+| Basic | 9 | 90 | 15,000 | 10 |
+| Pro | 49 | 490 | 500,000 | 10 |
 | Ultra | 149 | 1490 | 5,000,000 | 10 |
 
 Basic includes a 14-day trial. Annual products are drafts: the current organization cannot cycle their event-credit benefit monthly. The UI displays their prices as coming soon and the API rejects annual checkout. Do not enable them merely by changing a frontend flag; first configure and verify monthly credit renewal in Polar, then update the shared catalog and tests.

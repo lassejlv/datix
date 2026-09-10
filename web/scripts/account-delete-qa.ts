@@ -143,7 +143,7 @@ try {
   await page.screenshot({ path: `${dir}/mobile-dark.png`, fullPage: true });
   await cleanupPro(db, [userId]);
   await dialog.getByRole('button', { name: 'Permanently delete account' }).click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   expect((await owner.request.get(`${base}/api/me`)).status()).toBe(401);
   expect((await secondSession.request.get(`${base}/api/me`)).status()).toBe(401);
   expect((await post(anon, '/auth/sign-in/email', { email, password })).status()).toBe(401);

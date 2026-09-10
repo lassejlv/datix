@@ -245,9 +245,9 @@ try {
   ).toBe(true);
   await page.getByRole('link', { name: 'Datix home' }).click();
   await page.getByRole('link', { name: 'Sign in', exact: false }).first().click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await page.goto(`${base}/?site=${crypto.randomUUID()}&view=installation`);
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await page.goto(`${base}/page-that-does-not-exist`);
   await expect(page.getByRole('heading', { name: 'Nothing brewing here.' })).toBeVisible();
   await page.getByRole('link', { name: 'Back to home' }).click();

@@ -42,7 +42,7 @@
       },
       "properties": {
         "last_credited_meter_id": "774b9590-ae5d-4d44-a046-2cba78bc25c3",
-        "last_credited_units": 100000,
+        "last_credited_units": 15000,
         "last_credited_at": "2026-09-01T00:00:01Z"
       }
     }
@@ -51,8 +51,8 @@
     {
       "meter_id": "774b9590-ae5d-4d44-a046-2cba78bc25c3",
       "consumed_units": 0,
-      "credited_units": 100000,
-      "balance": 100000
+      "credited_units": 15000,
+      "balance": 15000
     }
   ]
 }

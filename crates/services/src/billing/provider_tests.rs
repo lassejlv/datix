@@ -18,21 +18,21 @@ fn polar_grants_and_local_ledger_control_access() {
     let sub = normalized(&customer).remove(0);
     assert_eq!(sub.product_id, CATALOG.plans[0].product_id.to_string());
     let active = allowance::active(vec![sub], now()).unwrap();
-    assert_eq!(active.event_limit, Some(10000000));
+    assert_eq!(active.event_limit, Some(1500000));
     assert_eq!(active.website_limit, Some(10));
     assert_eq!(active.used(150), 150);
-    assert_eq!(active.remaining(150), Some(9999850));
+    assert_eq!(active.remaining(150), Some(1499850));
     // Provider usage can lag or reset. Neither may reset local consumption or count it twice.
     customer["active_meters"][0]["consumed_units"] = json!(100000);
     customer["active_meters"][0]["balance"] = json!(0);
     let active = allowance::active(normalized(&customer), now()).unwrap();
-    assert_eq!(active.used(10000000), 10000000);
-    assert_eq!(active.remaining(10000000), Some(0));
+    assert_eq!(active.used(1500000), 1500000);
+    assert_eq!(active.remaining(1500000), Some(0));
     customer["active_meters"] = json!([]);
     assert_eq!(
         allowance::active(normalized(&customer), now())
             .unwrap()
-            .remaining(10000000),
+            .remaining(1500000),
         Some(0)
     );
     // Exact grant quantities are honored, including an operator-adjusted benefit.
@@ -124,9 +124,9 @@ fn checkout_selection_is_usd_only_and_rejects_draft_annual_products() {
     }
     for invalid in [
         json!({"events":1,"interval":"month"}),
-        json!({"events":100000,"interval":"month","currency":"usd"}),
-        json!({"events":100000,"interval":"month","locale":"xx"}),
-        json!({"events":100000,"interval":"month","product_id":"anything"}),
+        json!({"events":15000,"interval":"month","currency":"usd"}),
+        json!({"events":15000,"interval":"month","locale":"xx"}),
+        json!({"events":15000,"interval":"month","product_id":"anything"}),
     ] {
         assert!(select(invalid).is_err());
     }
@@ -139,7 +139,7 @@ fn public_customer_state_accepts_empty_credit_properties_without_using_meter_bal
     customer["active_meters"][0]["credited_units"] = json!(9000000);
     customer["active_meters"][0]["balance"] = json!(0);
     let sub = normalized(&customer).remove(0);
-    assert_eq!(sub.entitlements.unwrap().event_limit, Some(10000000));
+    assert_eq!(sub.entitlements.unwrap().event_limit, Some(1500000));
     customer["active_subscriptions"][0]["status"] = json!("trialing");
     customer["active_subscriptions"][0]["trial_end"] = json!(now() + chrono::Duration::days(14));
     assert_eq!(normalized(&customer).len(), 1);

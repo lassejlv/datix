@@ -83,7 +83,7 @@ try {
   await page.screenshot({ path: `${output}/da-signin.png`, fullPage: true });
   await page.reload();
   await expect(
-    page.getByRole('heading', { name: translate('da', 'Sign in'), exact: true }),
+    page.getByRole('heading', { name: translate('da', 'Welcome back.'), exact: true }),
   ).toBeVisible();
   await page
     .getByRole('combobox', { name: translate('da', 'Language'), exact: true })

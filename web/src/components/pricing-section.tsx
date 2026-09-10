@@ -24,15 +24,15 @@ const pricingQuestions = [
   ],
   [
     'Can I use one plan for several websites?',
-    'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.',
+    'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.',
   ],
   [
     'Which plan includes the free trial?',
     'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.',
   ],
   [
-    'Does testing use my credits?',
-    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.',
+    'Does testing use my event allowance?',
+    'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.',
   ],
 ] as const;
 
@@ -120,7 +120,7 @@ export function PricingSection() {
                 </p>
                 <dl className="pricing-limits">
                   <div>
-                    <dt>{t('Monthly credits')}</dt>
+                    <dt>{t('Monthly events')}</dt>
                     <dd>{number(plan.events)}</dd>
                   </div>
                 </dl>
@@ -179,15 +179,19 @@ export function PricingSection() {
       </p>
       <section className="pricing-event-note" aria-labelledby="usage-guide-title">
         <h2 id="usage-guide-title">{t('Choose by traffic, not features.')}</h2>
-        <p>{t('A production pageview uses 1 credit. Clicks and other events use 0.5 credits.')}</p>
+        <p>
+          {t(
+            'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.',
+          )}
+        </p>
         <p className="pricing-example">
           {t(
-            'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.',
+            'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.',
           )}
         </p>
         <p className="pricing-localhost-note">
           {t(
-            'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
+            'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.',
           )}
         </p>
       </section>
@@ -228,7 +232,7 @@ export function PricingSection() {
           <DialogPanel>
             <dl className="pricing-dialog-limits">
               <div>
-                <dt>{t('Monthly credits')}</dt>
+                <dt>{t('Monthly events')}</dt>
                 <dd>{number(selected.events)}</dd>
               </div>
               <div>

@@ -192,7 +192,7 @@ Network source identities are HMACs of environment, UTC day and the trusted clie
 Polar manages subscriptions. All billing routes require the owner session, and POST requests require the trusted app Origin.
 
 - `GET /api/billing` returns `{hasCustomer}`.
-- `POST /api/billing/checkout` accepts `{events: 100000 | 1000000 | 5000000, interval: "month" | "year", locale?: "en" | "da" | "de"}` and returns `{url}` for hosted confirmation.
+- `POST /api/billing/checkout` accepts `{events: 15000 | 500000 | 5000000, interval: "month" | "year", locale?: "en" | "da" | "de"}` and returns `{url}` for hosted confirmation.
 - `POST /api/billing/portal` returns `{url}` for the customer portal.
 - `POST /api/billing/sync` refreshes Polar state and returns the usage response.
 

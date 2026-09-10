@@ -18,7 +18,7 @@ export const Route = createFileRoute('/pricing')({
 
 function PricingPage() {
   return (
-    <LandingLayout>
+    <LandingLayout pricing>
       <main id="main-content" className="pricing-page-content" tabIndex={-1}>
         <PricingSection />
       </main>

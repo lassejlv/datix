@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from 'react';
-import { useSitePreferences } from './site-preferences';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { Brand } from './brand';
 import {
   Dialog,
@@ -11,7 +11,15 @@ import {
 } from './ui/dialog';
 import '../landing.css';
 
-export function LandingLayout({ children, home = false }: { children: ReactNode; home?: boolean }) {
+export function LandingLayout({
+  children,
+  home = false,
+  pricing = false,
+}: {
+  children: ReactNode;
+  home?: boolean;
+  pricing?: boolean;
+}) {
   const { t } = useSitePreferences();
   const [dialog, setDialog] = useState<'privacy' | null>(null);
   return (
@@ -31,7 +39,7 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
           </a>
           <div className="landing-nav-links">
             <a href="/#how-it-works">{t('How it works')}</a>
-            <a href="/pricing" aria-current={!home ? 'page' : undefined}>
+            <a href="/pricing" aria-current={pricing ? 'page' : undefined}>
               {t('Pricing')}
             </a>
             <a href="/#questions">{t('FAQ')}</a>
@@ -44,6 +52,7 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
               {t('Start 14-day trial')}
             </a>
           </div>
+          <MobileNavigation pricing={pricing} />
         </nav>
       </header>
 
@@ -62,7 +71,7 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
                 <a href="/#how-it-works">{t('How it works')}</a>
               </li>
               <li>
-                <a href="/pricing" aria-current={!home ? 'page' : undefined}>
+                <a href="/pricing" aria-current={pricing ? 'page' : undefined}>
                   {t('Pricing')}
                 </a>
               </li>
@@ -87,6 +96,13 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
             >
               {t('Tracking & privacy')}
             </button>
+          </div>
+          <div className="footer-end">
+            <div className="footer-legal">
+              <a href="/terms">{t('Terms of service')}</a>
+              <a href="/privacy">{t('Privacy policy')}</a>
+            </div>
+            <FooterPreferences />
           </div>
         </div>
       </footer>
@@ -135,5 +151,68 @@ export function LandingLayout({ children, home = false }: { children: ReactNode;
         </DialogPopup>
       </Dialog>
     </div>
+  );
+}
+
+function MobileNavigation({ pricing }: { pricing: boolean }) {
+  const { t } = useSitePreferences();
+  const menu = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const closeOutside = (event: PointerEvent) => {
+      if (menu.current && event.target instanceof Node && !menu.current.contains(event.target)) {
+        menu.current.open = false;
+      }
+    };
+    const desktop = matchMedia('(min-width: 768px)');
+    const closeOnDesktop = () => {
+      if (desktop.matches && menu.current) menu.current.open = false;
+    };
+    document.addEventListener('pointerdown', closeOutside);
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside);
+      desktop.removeEventListener('change', closeOnDesktop);
+    };
+  }, []);
+  return (
+    <details
+      ref={menu}
+      className="landing-mobile-menu"
+      onKeyDown={(event) => {
+        if (event.key === 'Escape' && event.currentTarget.open) {
+          event.currentTarget.open = false;
+          event.currentTarget.querySelector('summary')?.focus();
+        }
+      }}
+      onBlur={(event) => {
+        if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) {
+          event.currentTarget.open = false;
+        }
+      }}
+    >
+      <summary aria-label={t('Menu')}>
+        <span className="landing-menu-icon" aria-hidden="true">
+          <span />
+          <span />
+        </span>
+      </summary>
+      <div
+        className="landing-mobile-links"
+        onClick={(event) => {
+          if (event.target instanceof Element && event.target.closest('a') && menu.current) {
+            menu.current.open = false;
+          }
+        }}
+      >
+        <a href="/#how-it-works">{t('How it works')}</a>
+        <a href="/pricing" aria-current={pricing ? 'page' : undefined}>
+          {t('Pricing')}
+        </a>
+        <a href="/#questions">{t('FAQ')}</a>
+        <a className="landing-mobile-sign-in" href="/signin">
+          {t('Sign in')}
+        </a>
+      </div>
+    </details>
   );
 }

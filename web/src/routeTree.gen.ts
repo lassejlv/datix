@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppSigninRouteImport } from './routes/_app.signin'
 import { Route as AppSignupRouteImport } from './routes/_app.signup'
@@ -32,6 +34,16 @@ const AppRoute = AppRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -75,6 +87,8 @@ const AppSiteSiteIdEnvironmentIdPageRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AppDashboardRoute
   '/signin': typeof AppSigninRoute
   '/signup': typeof AppSignupRoute
@@ -86,6 +100,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/dashboard': typeof AppDashboardRoute
   '/signin': typeof AppSigninRoute
   '/signup': typeof AppSignupRoute
@@ -99,6 +115,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/signin': typeof AppSigninRoute
   '/_app/signup': typeof AppSignupRoute
@@ -112,6 +130,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/pricing'
+    | '/privacy'
+    | '/terms'
     | '/dashboard'
     | '/signin'
     | '/signup'
@@ -123,6 +143,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/pricing'
+    | '/privacy'
+    | '/terms'
     | '/dashboard'
     | '/signin'
     | '/signup'
@@ -135,6 +157,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/pricing'
+    | '/privacy'
+    | '/terms'
     | '/_app/dashboard'
     | '/_app/signin'
     | '/_app/signup'
@@ -148,6 +172,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,6 +197,20 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/dashboard': {
@@ -273,6 +313,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

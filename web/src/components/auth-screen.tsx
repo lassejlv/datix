@@ -1,12 +1,10 @@
 import { FooterPreferences, useSitePreferences } from './site-preferences';
-import { useEffect, useState, type FormEvent } from 'react';
-import { Eye, EyeOff } from './ui/icons';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { useState, type FormEvent } from 'react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff } from './ui/icons';
 import { Brand } from './brand';
-import { BeerBuddy } from './onboarding';
 import { PageTransition } from './page-transition';
 import { apiClient, errorText, write, type User } from '../lib/client';
+import '../landing.css';
 
 export function AuthScreen({
   onSignedIn,
@@ -18,8 +16,7 @@ export function AuthScreen({
   onModeChange?: (signup: boolean) => void;
 }) {
   const { message: messageText, t } = useSitePreferences();
-  const [signup, setSignup] = useState(initialSignup);
-  useEffect(() => setSignup(initialSignup), [initialSignup]);
+  const signup = initialSignup;
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -45,68 +42,52 @@ export function AuthScreen({
       setBusy(false);
     }
   }
+  const switchMode = () => {
+    onModeChange?.(!signup);
+    setError('');
+    setVisible(false);
+  };
   return (
-    <main
-      className={`mx-auto min-h-dvh w-full px-6 py-7 md:px-10 md:py-10 ${signup ? 'max-w-[960px]' : 'max-w-[440px]'}`}
-    >
-      <div className="flex flex-col gap-1">
-        <a
-          href="/"
-          aria-label={t('Datix home')}
-          className="w-fit rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-        >
+    <div className="landing-page auth-page">
+      <a className="landing-skip" href="#main-content">
+        {t('Skip to content')}
+      </a>
+      <header className="auth-header">
+        <a className="auth-brand" href="/" aria-label={t('Datix home')}>
           <Brand />
         </a>
-        {!signup && <span className="text-[13px] text-muted-foreground">usedatix.com</span>}
-      </div>
-      <div
-        className={signup ? 'mt-8 grid items-center gap-8 lg:mt-16 lg:grid-cols-2 lg:gap-16' : ''}
-      >
-        {signup && (
-          <aside className="hidden lg:block">
-            <h2 className="text-[34px] font-medium leading-[1.15] tracking-tight">
-              {t('Small script.')}
-              <br />
-              {t('Lovely insights.')}
-            </h2>
-            <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-secondary-ink">
-              {t('See your visitors, popular pages, and traffic sources.')}
+        <a className="auth-back" href="/">
+          <ArrowLeft size={14} aria-hidden="true" />
+          {t('Back to home')}
+        </a>
+      </header>
+      <main id="main-content" className="auth-main" tabIndex={-1}>
+        <PageTransition view={signup ? 'sign-up' : 'sign-in'} className="auth-panel">
+          <div className="auth-intro">
+            <h1>{signup ? t('Make yourself at home.') : t('Welcome back.')}</h1>
+            <p>
+              {signup
+                ? t('Create an account. Get to know your traffic.')
+                : t('Sign in to see how your website is doing.')}
             </p>
-            <BeerBuddy className="mt-6 h-40 w-40" />
-          </aside>
-        )}
-        <PageTransition
-          view={signup ? 'sign-up' : 'sign-in'}
-          className={signup ? 'mx-auto w-full max-w-[360px] py-2' : 'mt-12 md:mt-16'}
-        >
-          {signup && <BeerBuddy className="mb-4 h-16 w-16 lg:hidden" />}
-          <h1 className="text-[24px] leading-[1.25] font-medium tracking-[-0.025em]">
-            {signup ? t('Make yourself at home.') : t('Sign in')}
-          </h1>
-          <p className="mt-2 text-sm text-secondary-ink">
-            {signup ? t('Create an account to get started.') : t('View your website analytics.')}
-          </p>
-          <form
-            onSubmit={submit}
-            className={signup ? 'mt-6 flex flex-col gap-4' : 'mt-8 flex flex-col gap-[22px]'}
-          >
+          </div>
+          <form className="auth-form" onSubmit={submit}>
             {signup && (
-              <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-name">
+              <label htmlFor="auth-name">
                 {t('Your name')}
-                <Input
+                <input
                   id="auth-name"
                   name="name"
                   autoComplete="name"
                   placeholder="Sam Taylor"
                   required
                   maxLength={80}
-                  size={signup ? 'default' : 'lg'}
                 />
               </label>
             )}
-            <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-email">
+            <label htmlFor="auth-email">
               {t('Email address')}
-              <Input
+              <input
                 id="auth-email"
                 name="email"
                 type="email"
@@ -114,14 +95,12 @@ export function AuthScreen({
                 placeholder="you@example.com"
                 required
                 maxLength={254}
-                size={signup ? 'default' : 'lg'}
               />
             </label>
-            <label className="flex flex-col gap-2 text-sm font-medium" htmlFor="auth-password">
+            <label htmlFor="auth-password">
               {t('Password')}
-              <div data-testid="password-control" className="relative">
-                <Input
-                  className="[&_input]:pr-[46px]"
+              <div data-testid="password-control" className="auth-password">
+                <input
                   id="auth-password"
                   name="password"
                   type={visible ? 'text' : 'password'}
@@ -130,10 +109,8 @@ export function AuthScreen({
                   required
                   minLength={signup ? 12 : undefined}
                   maxLength={128}
-                  size={signup ? 'default' : 'lg'}
                 />
                 <button
-                  className={`absolute top-0 right-0 grid ${signup ? 'h-full w-9' : 'size-11'} cursor-pointer place-items-center text-secondary-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring`}
                   type="button"
                   aria-label={visible ? t('Hide password') : t('Show password')}
                   onClick={() => setVisible(!visible)}
@@ -143,44 +120,40 @@ export function AuthScreen({
               </div>
             </label>
             {error && (
-              <p className="text-sm leading-normal text-danger" role="alert">
+              <p className="auth-error" role="alert">
                 {messageText(error)}
               </p>
             )}
-            <Button
+            <button
+              className="landing-button auth-submit"
               type="submit"
-              size={signup ? 'default' : 'xl'}
               data-testid="auth-submit"
-              className="mt-0.5 w-full text-sm sm:text-sm"
-              loading={busy}
+              disabled={busy}
+              aria-busy={busy}
             >
               {signup ? t('Create account') : t('Sign in')}
-            </Button>
+              <ArrowRight size={17} aria-hidden="true" />
+            </button>
           </form>
           {signup && (
-            <p className="mt-4 text-xs leading-relaxed text-secondary-ink">
-              {t('No card needed. No trial or subscription starts at signup.')}
-            </p>
+            <p className="auth-reassurance">{t('No trial or subscription starts at signup.')}</p>
           )}
-          <p className="mt-7 text-[13px] text-secondary-ink">
+          <p className="auth-switch">
             {signup ? t('Already have an account?') : t('New to Datix?')}{' '}
-            <button
-              className="ml-[3px] cursor-pointer text-foreground underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              type="button"
-              onClick={() => {
-                setSignup(!signup);
-                onModeChange?.(!signup);
-                setError('');
-              }}
-            >
+            <button type="button" onClick={switchMode}>
               {signup ? t('Sign in') : t('Create an account')}
             </button>
           </p>
         </PageTransition>
-      </div>
-      <div className="mt-10 flex justify-center">
-        <FooterPreferences />
-      </div>
-    </main>
+      </main>
+      <footer className="auth-footer">
+        <p>{t('Website analytics. A little more human.')}</p>
+        <nav aria-label={t('Footer navigation')}>
+          <a href="/privacy">{t('Privacy')}</a>
+          <a href="/terms">{t('Terms')}</a>
+          <FooterPreferences />
+        </nav>
+      </footer>
+    </div>
   );
 }

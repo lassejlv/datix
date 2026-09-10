@@ -1,5 +1,19 @@
 import type { Copy } from './en';
 export const da = {
+  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
+    'En sidevisning i produktion tæller som 1 hændelse i din kvote. Klik og andre hændelser tæller som 0,5.',
+  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
+    'På localhost tæller sidevisninger som 0,3 hændelser og andre hændelser som 0,15 i din kvote. Aktiv tid er gratis.',
+  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
+    'Ja. Alle planer inkluderer op til 10 hjemmesider. Din månedlige hændelseskvote deles mellem dem, så beregn din samlede trafik, når du vælger en plan.',
+  'Does testing use my event allowance?': 'Bruger test min hændelseskvote?',
+  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
+    'Sidevisninger på localhost tæller som 0,3 hændelser og andre hændelser som 0,15 i din kvote. Separate miljøer holder testaktivitet ude af dine produktionsrapporter.',
+  Menu: 'Menu',
+  'Terms of service': 'Brugervilkår',
+  Terms: 'Vilkår',
+  'Privacy policy': 'Privatlivspolitik',
+  Privacy: 'Privatliv',
   'Understand your traffic.': 'Forstå din trafik.',
   'Respect your visitors.': 'Respektér dine besøgende.',
   'See your top pages, traffic sources, and custom events.':
@@ -38,8 +52,8 @@ export const da = {
   'Choose by traffic, not features.': 'Vælg efter trafik, ikke funktioner.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'En sidevisning i produktion bruger 1 credit. Klik og andre hændelser bruger 0,5 credits.',
-  'Basic covers 100,000 pageviews, or 80,000 pageviews + 40,000 other events per month.':
-    'Basic dækker 100.000 sidevisninger eller 80.000 sidevisninger + 40.000 andre hændelser om måneden.',
+  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
+    'Basic dækker 15.000 sidevisninger eller 12.000 sidevisninger + 6.000 andre hændelser om måneden.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'På localhost: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Aktiv tid er gratis.',
   'Before you choose.': 'Før du vælger.',
@@ -458,6 +472,7 @@ export const da = {
   'Create account': 'Opret konto',
   'Create an account': 'Opret en konto',
   'Create an account to get started.': 'Opret en konto for at komme i gang.',
+  'Create an account. Get to know your traffic.': 'Opret en konto. Lær din trafik at kende.',
   'Create an account, add your website, and paste the tracking script into your site. The installation screen checks that your first pageview has arrived.':
     'Opret en konto, tilføj dit website, og indsæt sporingsscriptet på dit site. Installationssiden tjekker, at din første sidevisning er modtaget.',
   'Credits per allowance period': 'Kreditter pr. forbrugsperiode',
@@ -509,7 +524,6 @@ export const da = {
   Devices: 'Enheder',
   'Direct / none': 'Direkte / ingen',
   Disabled: 'Deaktiveret',
-  'Do I need a credit card?': 'Skal jeg bruge et kreditkort?',
   'Does it use cookies?': 'Bruger det cookies?',
   Domain: 'Domæne',
   Downloads: 'Downloads',
@@ -745,11 +759,8 @@ export const da = {
   'New to Datix?': 'Ny hos Datix?',
   'No active plan': 'Ingen aktiv plan',
   'No activity in this period': 'Ingen aktivitet i denne periode',
-  'No card needed': 'Intet kort nødvendigt',
-  'No card needed. No trial or subscription starts at signup.':
-    'Intet kort nødvendigt. Der starter ingen prøveperiode eller abonnement, når du opretter en konto.',
-  'No credit card required.': 'Intet kreditkort nødvendigt.',
-  'No credit card. No trial countdown.': 'Intet kreditkort. Ingen prøveperiode, der udløber.',
+  'No trial or subscription starts at signup.':
+    'Der starter ingen prøveperiode eller et abonnement, når du opretter en konto.',
   'No data in this period.': 'Ingen data i denne periode.',
   'No environments found.': 'Ingen miljøer fundet.',
   'No free trial.': 'Ingen gratis prøveperiode.',
@@ -759,8 +770,6 @@ export const da = {
     'Der er endnu ikke importeret historik til dette miljø.',
   'No pageview yet. Visit your website, wait a few seconds, then check again.':
     'Ingen sidevisning endnu. Besøg dit website, vent et par sekunder, og kontrollér igen.',
-  'No payment details are needed to create an account. Previewing a plan does not start a subscription or trial, and you will not be charged.':
-    'Du behøver ingen betalingsoplysninger for at oprette en konto. En forhåndsvisning starter hverken et abonnement eller en prøveperiode, og du bliver ikke opkrævet noget.',
   'No report to display.': 'Ingen rapport at vise.',
   'No time limit': 'Ingen tidsgrænse',
   "No tracking identifiers or activity events are created before consent. Call this from your banner's analytics-consent callback, including its saved choice on every page. Pass false when consent is rejected or withdrawn.":
@@ -913,6 +922,7 @@ export const da = {
   'Show password': 'Vis adgangskode',
   'Sign in': 'Log ind',
   'Sign in to continue.': 'Log ind for at fortsætte.',
+  'Sign in to see how your website is doing.': 'Log ind for at se, hvordan dit website klarer sig.',
   'Sign out': 'Log ud',
   'Signing in uses an account session cookie. Account security records may contain IP and browser information. Avoid putting personal information in page paths or event names.':
     'Login bruger en sessionscookie til din konto. Sikkerhedsoplysninger kan indeholde IP- og browserinformation. Undgå personoplysninger i sidestier eller hændelsesnavne.',
@@ -1121,6 +1131,7 @@ export const da = {
   Visits: 'Besøg',
   'Visits by {visitor}': 'Besøg fra {visitor}',
   'Want to track a specific action?': 'Vil du måle en bestemt handling?',
+  'Welcome back.': 'Velkommen tilbage.',
   'We’ll check it’s working.': 'Vi tjekker, at det virker.',
   'Website analytics': 'Websiteanalyse',
   'Website analytics, simply.': 'Webanalyse, helt enkelt.',
@@ -1191,8 +1202,6 @@ export const da = {
     'Et aktivt abonnement eller en prøveperiode er påkrævet for at indsamle hændelser. Dine eksisterende rapporter er stadig tilgængelige.',
   'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
     'Basic inkluderer 14 dage gratis. Pro og Ultra har ingen gratis prøveperiode. Årlig betaling kommer snart.',
-  'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.':
-    'Du behøver ingen betalingsoplysninger for at oprette en konto. For at starte en plan skal du gennemføre checkout og bekræfte betalingsoplysninger og pris.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Venter på, at Polar bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
   'Allowance renews on {date}. Upgrade to resume sooner.':

@@ -1,6 +1,6 @@
 import { useSitePreferences } from './site-preferences';
 import { useState } from 'react';
-import { ArrowRight, Check, Play, Plus } from './ui/icons';
+import { ArrowRight, Check, Code2, Globe2, MousePointer2, Play, Plus } from './ui/icons';
 import { LandingLayout } from './landing-layout';
 import { DashboardPreview } from './dashboard-preview';
 import {
@@ -37,14 +37,10 @@ const questions = [
     'Is there a free trial?',
     'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
   ],
-  [
-    'Do I need a credit card?',
-    'No payment details are needed to create an account. Starting a plan requires completing checkout, where you confirm payment details and the price.',
-  ],
 ] as const;
 
 export function LandingPage() {
-  const { t, darkMedia } = useSitePreferences();
+  const { t } = useSitePreferences();
   const [dialog, setDialog] = useState<'demo' | null>(null);
   return (
     <LandingLayout home>
@@ -78,20 +74,21 @@ export function LandingPage() {
         <DashboardPreview />
 
         <div className="landing-reassurance" aria-label={t('A simple place to start')}>
-          {[t('Cookieless by default'), t('One script to install'), t('No card needed')].map(
-            (label) => (
-              <span key={label}>
-                <Check size={15} aria-hidden="true" />
-                {label}
-              </span>
-            ),
-          )}
+          {[t('Cookieless by default'), t('One script to install')].map((label) => (
+            <span key={label}>
+              <Check size={15} aria-hidden="true" />
+              {label}
+            </span>
+          ))}
         </div>
 
         <section id="how-it-works" className="landing-setup" aria-labelledby="setup-title">
           <h2 id="setup-title">{t('Turn your traffic into a next step.')}</h2>
           <ul className="landing-steps">
             <li>
+              <span className="landing-step-icon" aria-hidden="true">
+                <Globe2 size={20} />
+              </span>
               <span className="landing-step-label">{t('Traffic sources')}</span>
               <h3>{t('Know where to focus.')}</h3>
               <p>
@@ -99,11 +96,17 @@ export function LandingPage() {
               </p>
             </li>
             <li>
+              <span className="landing-step-icon" aria-hidden="true">
+                <MousePointer2 size={20} />
+              </span>
               <span className="landing-step-label">{t('Pages & events')}</span>
               <h3>{t('See what gets a response.')}</h3>
               <p>{t('Find popular pages and track actions like signups with custom events.')}</p>
             </li>
             <li>
+              <span className="landing-step-icon" aria-hidden="true">
+                <Code2 size={20} />
+              </span>
               <span className="landing-step-label">{t('Separate environments')}</span>
               <h3>{t('Keep test traffic separate.')}</h3>
               <p>
@@ -158,10 +161,9 @@ export function LandingPage() {
           </DialogHeader>
           <DialogPanel>
             <picture>
-              <source media={darkMedia} srcSet="/media/dashboard-dark.webp" />
               <img
                 className="landing-demo"
-                src="/media/dashboard-light.webp"
+                src="/media/dashboard-dark.webp"
                 alt={t(
                   'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
                 )}

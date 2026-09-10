@@ -9,7 +9,7 @@ export const billingVolumes = billingPlans;
 export function BillingActions({ active, refresh }: { active: boolean; refresh: () => void }) {
   const { locale, number, message: messageText, t } = useSitePreferences();
   const [hasCustomer, setHasCustomer] = useState(false);
-  const [events, setEvents] = useState<number>(100000);
+  const [events, setEvents] = useState<number>(billingPlans[0].events);
   const [interval, setInterval] = useState('month');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -133,7 +133,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       </div>
       {!active && (
         <p className="text-xs text-secondary-ink">
-          {events === 100000
+          {events === billingPlans[0].events
             ? t('Basic includes a 14-day trial. Confirm the price and payment details at checkout.')
             : t('Paid subscription from the start. This plan has no free trial.')}
         </p>

@@ -114,7 +114,7 @@ try {
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await menu.click();
   await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   expect((await context.request.get(`${base}/api/me`)).status()).toBe(401);
   expect(errors).toEqual([]);
   pass('Mobile dropdown to settings, focus restoration, dark layout and account-menu sign-out');

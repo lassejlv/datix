@@ -153,7 +153,7 @@ try {
   await open();
   await page.getByRole('button', { name: 'Account menu', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await expect(page).toHaveURL(`${base}/signin`);
   pass(
     'Add website, environment and sign out remain reachable on mobile; dark mode and reduced motion work',

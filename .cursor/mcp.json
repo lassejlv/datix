@@ -2,6 +2,9 @@
   "mcpServers": {
     "useautumn": {
       "url": "https://mcp.useautumn.com/mcp"
+    },
+    "polar": {
+      "url": "https://mcp.polar.sh/mcp/polar-mcp"
     }
   }
 }

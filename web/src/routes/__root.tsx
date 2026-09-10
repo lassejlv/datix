@@ -65,6 +65,8 @@ function DocumentMetadata() {
       signin: 'Sign in',
       signup: 'Create account',
       pricing: 'Pricing',
+      terms: 'Terms of service',
+      privacy: 'Privacy policy',
       usage: 'Usage',
       dashboard: 'Your workspace',
       overview: 'Overview',

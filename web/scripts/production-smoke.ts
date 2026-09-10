@@ -52,7 +52,7 @@ try {
       ),
     ).toBe(true);
   await expect(page).toHaveTitle('Datix | Website analytics');
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   await page.screenshot({ path: 'web/artifacts/production/sign-in.png', fullPage: true });
   await page.getByRole('button', { name: 'Create an account' }).click();
   await page.getByLabel('Your name', { exact: true }).fill('Production verification');
@@ -194,7 +194,7 @@ try {
     .join('; ');
   await page.getByRole('button', { name: 'Account menu', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   expect(
     (await context.request.get(`${base}/api/me`, { headers: { Cookie: oldCookie } })).status(),
   ).toBe(401);
