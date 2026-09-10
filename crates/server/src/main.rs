@@ -27,7 +27,12 @@ async fn run() -> Result<(), String> {
         .map_err(|_| "Failed to connect to database or Redis")?;
     analytics_core::database::check(&state.db)
         .await
-        .map_err(|_| "Database schema is incompatible with this release")?;
+        .map_err(|error| {
+            format!(
+                "Database schema check failed ({}): {}. Apply analytics-db upgrade with the database owner before deploying.",
+                error.code, error.message
+            )
+        })?;
     let jobs = Jobs::start(state.clone())
         .await
         .map_err(|_| "Failed to start background jobs")?;

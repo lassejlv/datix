@@ -20,7 +20,7 @@ Required variables: `APP_URL`, `DATABASE_URL`, `REDIS_URL`, `BETTER_AUTH_SECRET`
 
 ## Deploying
 
-The private repository [lassejlv/analytics-beer](https://github.com/lassejlv/analytics-beer) deploys its `main` branch to Railway web service `a5cb579e-e445-4882-a49f-6aea52c8480a` in environment `3f8cf4d9-b6d5-4532-8e1c-dc8ced8a1b76`.
+The private repository [lassejlv/datix](https://github.com/lassejlv/datix) deploys its `main` branch to Railway web service `a5cb579e-e445-4882-a49f-6aea52c8480a` in environment `3f8cf4d9-b6d5-4532-8e1c-dc8ced8a1b76`.
 
 ```sh
 bun run --cwd web typecheck
@@ -31,8 +31,14 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --locked --workspace
 cargo test --locked -p analytics-server --test integration -- --ignored --test-threads=1
 cargo build --locked --release --workspace
+# Before pushing a release that adds upgrades, point DATABASE_URL at the
+# production database using its owner role, then run:
+cargo run --locked -p analytics-server --bin analytics-db -- upgrade
+cargo run --locked -p analytics-server --bin analytics-db -- check
 git push origin main
 ```
+
+Railway automatically deploys pushes to `main`. Apply pending upgrades **before pushing**, using the production database owner connection. The local `.env` normally points to development; verify the target host against both Railway services. Never change their restricted runtime role to perform an upgrade. `railway.json` runs `analytics-db check` as a pre-deploy gate so a missing upgrade fails with its exact schema error before the container starts. This gate checks compatibility and does not migrate.
 
 For a deliberate upload of the working tree, use `railway up` with the explicit project, environment and service IDs above. Wait for the exact deployment to succeed, inspect its runtime logs for `runtime=rust` and `framework=axum`, then verify an existing session and a public tracker → Redis → Neon → report round trip. A successful build or health response alone is insufficient.
 
@@ -78,8 +84,12 @@ Railway deployment `183d57ef-cc45-4b3b-a324-8c6cba59a946` was verified running R
 
 ## Polar cutover
 
-Apply all registered schema upgrades through 0010 with the database owner role before deploying API and worker. Configure `POLAR_ACCESS_TOKEN` and `POLAR_WEBHOOK_SECRET`; see [Polar billing](polar.md) for scopes, the Datix organization and webhook registration. Startup only checks compatibility.
+Apply all registered schema upgrades (currently through 0011) with the database owner role before deploying API and worker. Configure `POLAR_ACCESS_TOKEN` and `POLAR_WEBHOOK_SECRET`; see [Polar billing](polar.md) for scopes, the Datix organization and webhook registration. Startup only checks compatibility.
 
 Upgrades 0009 and 0010 scope current billing records to the Datix organization and place its usage in `billing_organization_usage`. Historical usage and provider records remain intact; existing subscriptions and pending usage are not migrated or charged automatically. Coordinate the API and worker cutover to avoid running different billing providers for the same account. A rollback must explicitly restore the previous provider configuration and reconcile activity during the cutover; do not assume billing state transfers automatically.
 
 The code integration does not establish production readiness by itself. Complete Polar organization payment onboarding, install credentials, register the new signed webhook endpoint, and verify an actual subscription benefit grant before enabling purchases. Annual products remain unavailable until their event credits renew monthly.
+
+## Overview deployment recovery — 2026-09-10
+
+Both deployments of `e81cacb` built successfully but failed startup because production still had schema version 10. Upgrade 0011 creates `overview_annotations` and grants the existing `analytics_runtime` role access. It was applied to production as `analytics_owner` in one transaction under the migration advisory lock, after confirming all earlier checksums. Application startup remains validation-only. Future releases must apply newly registered upgrades before pushing to the automatic deployment branch.
