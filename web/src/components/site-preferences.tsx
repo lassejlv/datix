@@ -1,3 +1,4 @@
+import { Select } from './ui/select';
 import { Globe2, Monitor } from './ui/icons';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Locale, Preferences, Theme } from '../lib/i18n/preferences';
@@ -112,28 +113,28 @@ export function FooterPreferences() {
       <label>
         <span className="sr-only">{t('Language')}</span>
         <Globe2 size={14} />
-        <select
+        <Select
           disabled={!mounted}
           value={locale}
-          onChange={(event) => setLocale(event.target.value as Locale)}
+          onValueChange={(value) => setLocale(value as Locale)}
         >
           <option value="en">English</option>
           <option value="de">Deutsch</option>
           <option value="da">Dansk</option>
-        </select>
+        </Select>
       </label>
       <label>
         <span className="sr-only">{t('Theme')}</span>
         <Monitor size={14} />
-        <select
+        <Select
           disabled={!mounted}
           value={theme}
-          onChange={(event) => setTheme(event.target.value as Theme)}
+          onValueChange={(value) => setTheme(value as Theme)}
         >
           <option value="system">{t('System')}</option>
           <option value="light">{t('Light')}</option>
           <option value="dark">{t('Dark')}</option>
-        </select>
+        </Select>
       </label>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Alert } from './ui/alert';
 import { createPortal } from 'react-dom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -109,24 +110,24 @@ export default function VisitorGlobe({ path }: { path: string }) {
         <h2 className="text-sm font-medium">{t('Visitors around the world')}</h2>
         <p className="mt-2 text-xl font-medium tabular-nums">
           {total.toLocaleString(locale)}{' '}
-          <span className="text-xs font-normal text-slate-400">{t('Last 24 hours')}</span>
+          <span className="text-xs font-normal text-secondary-ink">{t('Last 24 hours')}</span>
         </p>
-        <p className="mt-2 text-xs text-slate-300">
+        <p className="mt-2 text-xs text-foreground">
           <span className="mr-2 inline-block size-1.5 rounded-full bg-emerald-400" />
           {t('{count} active in the last 5 minutes', { count: String(data?.active ?? 0) })}
         </p>
-        <div className="mt-4 flex flex-wrap gap-1.5 border-t border-white/10 pt-3">
+        <div className="mt-4 flex flex-wrap gap-1.5 border-t border-line pt-3">
           {data?.referrers.map((r) => (
-            <span key={r.value} className="rounded bg-white/5 px-2 py-1 text-[10px] text-slate-300">
-              {r.value || t('Direct')} <span className="text-slate-500">{r.count}</span>
+            <span key={r.value} className="rounded bg-raised px-2 py-1 text-xs text-foreground">
+              {r.value || t('Direct')} <span className="text-secondary-ink">{r.count}</span>
             </span>
           ))}
         </div>
       </section>
       {mapError ? (
-        <p role="alert" className="p-10 text-sm">
+        <Alert className="p-10 text-sm">
           {t('The map could not be loaded. Refresh to try again.')}
-        </p>
+        </Alert>
       ) : (
         <svg
           viewBox="0 0 900 650"
@@ -284,13 +285,25 @@ export default function VisitorGlobe({ path }: { path: string }) {
         </svg>
       )}
       <div className="globe-rotation">
-        <button aria-label={t('Rotate left')} onClick={() => setRotation(([x, y]) => [x - 25, y])}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('Rotate left')}
+          onClick={() => setRotation(([x, y]) => [x - 25, y])}
+        >
           <ArrowLeft size={15} />
-        </button>
-        <button aria-label={t('Zoom out')} onClick={() => setZoom((z) => Math.max(0.75, z - 0.15))}>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('Zoom out')}
+          onClick={() => setZoom((z) => Math.max(0.75, z - 0.15))}
+        >
           −
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => {
             setRotation([-15, -25]);
             setZoom(1);
@@ -298,28 +311,38 @@ export default function VisitorGlobe({ path }: { path: string }) {
           }}
         >
           {t('Reset')}
-        </button>
-        <button aria-label={t('Zoom in')} onClick={() => setZoom((z) => Math.min(1.8, z + 0.15))}>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('Zoom in')}
+          onClick={() => setZoom((z) => Math.min(1.8, z + 0.15))}
+        >
           +
-        </button>
-        <button aria-label={t('Rotate right')} onClick={() => setRotation(([x, y]) => [x + 25, y])}>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('Rotate right')}
+          onClick={() => setRotation(([x, y]) => [x + 25, y])}
+        >
           <ArrowRight size={15} />
-        </button>
+        </Button>
       </div>
       <div className="globe-bottom">
         <section className="globe-activity">
           <h2>{t('Recent activity')}</h2>
           {data?.recent.slice(0, 4).map((event, i) => (
             <div key={event.id + event.at + i} className="mt-3 flex items-start gap-2">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-slate-700">
+              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-raised">
                 <User size={13} />
               </span>
               <div className="min-w-0">
-                <p className="truncate text-xs text-slate-300">
+                <p className="truncate text-xs text-foreground">
                   {event.country ? <CountryLabel code={event.country} /> : t('Unknown location')}{' '}
-                  <span className="text-slate-500">·</span> {event.name || event.path}
+                  <span className="text-secondary-ink">·</span> {event.name || event.path}
                 </p>
-                <p className="mt-1 text-[10px] text-slate-500">
+                <p className="mt-1 text-xs text-secondary-ink">
                   {new Date(event.at).toLocaleTimeString(locale, {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -329,7 +352,7 @@ export default function VisitorGlobe({ path }: { path: string }) {
             </div>
           ))}
           {!data?.recent.length && (
-            <p className="mt-3 text-xs text-slate-400">{t('Waiting for visitors')}</p>
+            <p className="mt-3 text-xs text-secondary-ink">{t('Waiting for visitors')}</p>
           )}
         </section>
         <section className="globe-countries">
@@ -338,12 +361,12 @@ export default function VisitorGlobe({ path }: { path: string }) {
             {data?.countries.map((c) => (
               <button
                 key={c.code}
-                className="flex w-full items-center justify-between gap-4 rounded px-2 py-1.5 text-xs hover:bg-white/5"
+                className="flex w-full items-center justify-between gap-4 rounded px-2 py-1.5 text-xs hover:bg-hover"
                 aria-pressed={selected === c.code}
                 onClick={() => focus(c.code)}
               >
                 <CountryLabel code={c.code} />
-                <span className="tabular-nums text-slate-400">{c.visitors}</span>
+                <span className="tabular-nums text-secondary-ink">{c.visitors}</span>
               </button>
             ))}
           </div>

@@ -1,3 +1,7 @@
+import { Alert } from './ui/alert';
+import { Hint, HintText } from './ui/tooltip';
+import { DatePicker } from './ui/date-picker';
+import { Select } from './ui/select';
 import { FeaturePageView } from './feature-pages';
 import { featureDefinitions, isFeaturePage } from '../lib/features';
 import { deviceName } from '../lib/i18n/display';
@@ -8,7 +12,7 @@ import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { isDashboardPage, siteRoute, type DashboardPage } from '../lib/dashboard-route';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, ChevronDown, Code2, ExternalLink, RefreshCw } from './ui/icons';
+import { ArrowRight, Code2, ExternalLink, RefreshCw } from './ui/icons';
 import { Button } from './ui/button';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from './ui/sidebar';
@@ -68,9 +72,7 @@ export function AnalyticsApp() {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-5 text-secondary-ink">
         <Brand />
-        <p className="max-w-[420px] text-center" role="alert">
-          {messageText(error)}
-        </p>
+        <Alert className="max-w-[420px] text-center">{messageText(error)}</Alert>
         <Button onClick={() => setReload((value) => value + 1)}>{t('Try again')}</Button>
       </main>
     );
@@ -387,15 +389,14 @@ function Dashboard({
           tabIndex={-1}
         >
           {error && (
-            <div
-              className="mb-6 flex items-center justify-between gap-3 rounded-md bg-danger-wash px-4 py-3.5 text-sm text-danger max-md:flex-wrap"
-              role="alert"
-            >
-              {messageText(error)}
-              <Button variant="outline" size="sm" onClick={loadSites}>
-                {t('Try again')}
-              </Button>
-            </div>
+            <Alert className="mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {messageText(error)}
+                <Button variant="outline" size="sm" onClick={loadSites}>
+                  {t('Try again')}
+                </Button>
+              </div>
+            </Alert>
           )}
           {!isUsage && (usage.data?.paused || websiteUsage?.pauseReason === 'website_budget') && (
             <div
@@ -693,12 +694,12 @@ function Overview({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2 max-md:self-stretch">
-          <div className="relative flex h-8 items-center gap-2 rounded-md border border-input px-3 text-secondary-ink max-md:flex-1">
-            <select
+          <div className="flex min-w-0 max-md:flex-1">
+            <Select
               className="cursor-pointer appearance-none bg-transparent pr-2 text-[13px] text-foreground max-md:flex-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               aria-label={t('Date range')}
               value={days}
-              onChange={(event) => setDays(event.target.value)}
+              onValueChange={(value) => setDays(value)}
             >
               <option className="bg-background" value="7">
                 {t('Last 7 days')}
@@ -715,8 +716,7 @@ function Overview({
               <option className="bg-background" value="custom">
                 {t('Custom dates')}
               </option>
-            </select>
-            <ChevronDown size={13} />
+            </Select>
           </div>
           <Button
             className="size-8 rounded-md sm:size-8"
@@ -734,24 +734,22 @@ function Overview({
         <div className="mb-6 flex items-end justify-start gap-2 md:justify-end md:gap-3">
           <label className="flex flex-col gap-1.5 text-[13px] text-secondary-ink max-md:min-w-0 max-md:flex-1">
             {t('From')}
-            <input
-              className="min-w-0 rounded-md border border-input bg-background px-2.5 py-1 max-md:w-full max-md:text-[13px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              aria-label={t('From date')}
-              type="date"
+            <DatePicker
+              label={t('From date')}
+
               value={customFrom}
-              onChange={(event) => setCustomFrom(event.target.value)}
+              onValueChange={setCustomFrom}
               max={customTo || today}
             />
           </label>
           <span className="pb-2 text-[13px] text-muted-foreground">{t('to')}</span>
           <label className="flex flex-col gap-1.5 text-[13px] text-secondary-ink max-md:min-w-0 max-md:flex-1">
             {t('To')}
-            <input
-              className="min-w-0 rounded-md border border-input bg-background px-2.5 py-1 max-md:w-full max-md:text-[13px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              aria-label={t('To date')}
-              type="date"
+            <DatePicker
+              label={t('To date')}
+
               value={customTo}
-              onChange={(event) => setCustomTo(event.target.value)}
+              onValueChange={setCustomTo}
               min={customFrom}
               max={today}
             />
@@ -782,39 +780,38 @@ function Overview({
           </div>
         )}
       {error && (
-        <div
-          className="mb-6 flex items-center justify-between gap-3 rounded-md bg-danger-wash px-4 py-3.5 text-sm text-danger max-md:flex-wrap"
-          role="alert"
-        >
-          {messageText(error)}
-          {rangeValid && (
-            <Button variant="outline" size="sm" onClick={() => setReload((value) => value + 1)}>
-              {t('Try again')}
-            </Button>
-          )}
-        </div>
+        <Alert className="mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {messageText(error)}
+            {rangeValid && (
+              <Button variant="outline" size="sm" onClick={() => setReload((value) => value + 1)}>
+                {t('Try again')}
+              </Button>
+            )}
+          </div>
+        </Alert>
       )}
       <section className="w-full" aria-label={t('Traffic overview')}>
         <div className="grid grid-cols-3 gap-2 md:max-w-[580px] md:gap-6">
           {metrics.map((item) => (
-            <button
-              key={item.key}
-              className="relative min-w-0 cursor-pointer rounded-md px-3 py-3 text-left hover:bg-muted aria-pressed:bg-pressed focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              title={t(item.caption)}
-              onClick={() => setMetric(item.key)}
-              aria-pressed={metric === item.key}
-            >
-              <span className="text-xs text-secondary-ink md:text-sm">{t(item.name)}</span>
-              <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
-                {loading ? (
-                  <span className="block h-[38px] w-[72px] rounded-sm bg-pressed" />
-                ) : reports ? (
-                  number(reports.overview[item.key])
-                ) : (
-                  '-'
-                )}
-              </strong>
-            </button>
+            <Hint key={item.key} content={t(item.caption)}>
+              <button
+                className="relative min-w-0 cursor-pointer rounded-md px-3 py-3 text-left hover:bg-muted aria-pressed:bg-raised focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                onClick={() => setMetric(item.key)}
+                aria-pressed={metric === item.key}
+              >
+                <span className="text-xs text-secondary-ink md:text-sm">{t(item.name)}</span>
+                <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
+                  {loading ? (
+                    <span className="block h-[38px] w-[72px] rounded-sm bg-pressed" />
+                  ) : reports ? (
+                    number(reports.overview[item.key])
+                  ) : (
+                    '-'
+                  )}
+                </strong>
+              </button>
+            </Hint>
           ))}
         </div>
         <div className="flex justify-between gap-4 pt-4 text-xs text-secondary-ink md:pt-4">
@@ -998,9 +995,9 @@ function BreakdownCard({
                 className="flex min-h-10 items-center justify-between gap-4 py-2 text-sm md:min-h-9"
                 key={item.value}
               >
-                <span title={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
+                <HintText content={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
                   {countries ? <CountryLabel code={item.value} /> : text}
-                </span>
+                </HintText>
                 <strong className="shrink-0 text-[13px] font-normal tabular-nums">
                   {number(item.count)}
                 </strong>

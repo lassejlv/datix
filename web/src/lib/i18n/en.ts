@@ -1,4 +1,19 @@
 export const en = {
+  'Error resolved.': 'Error resolved.',
+  'Previous month': 'Previous month',
+  'Next month': 'Next month',
+  'Website added.': 'Website added.',
+  'Environment added.': 'Environment added.',
+  'Environment deleted.': 'Environment deleted.',
+  'Website deleted.': 'Website deleted.',
+  'Account deleted.': 'Account deleted.',
+  'Tracking script copied.': 'Tracking script copied.',
+  'Installation instructions copied.': 'Installation instructions copied.',
+  'Goal created.': 'Goal created.',
+  'Goal deleted.': 'Goal deleted.',
+  'Website budget saved.': 'Website budget saved.',
+  'Subscription refreshed.': 'Subscription refreshed.',
+  'Dismiss notification': 'Dismiss notification',
   'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
     'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.',
   'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':

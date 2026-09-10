@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
+import { Checkbox } from './ui/checkbox';
 import { translate } from '../lib/i18n/translations';
 import { Translated } from './translated';
 import { useSitePreferences } from './site-preferences';
@@ -49,7 +52,6 @@ export function AnalyticsImports({
   const [busy, setBusy] = useState<'preview' | 'import' | 'remove' | null>(null);
   const [error, setError] = useState('');
   const [historyError, setHistoryError] = useState('');
-  const [message, setMessage] = useState('');
   const [removing, setRemoving] = useState<ImportSummary | null>(null);
   const picker = useRef<HTMLInputElement>(null);
   const request = useRef<AbortController | null>(null);
@@ -78,7 +80,6 @@ export function AnalyticsImports({
   function resetPreview() {
     setPreview(null);
     setError('');
-    setMessage('');
   }
   function selectFile(selected: File | undefined) {
     resetPreview();
@@ -109,7 +110,6 @@ export function AnalyticsImports({
     if (!file) return;
     setBusy('preview');
     setError('');
-    setMessage('');
     const controller = new AbortController();
     request.current = controller;
     try {
@@ -155,11 +155,11 @@ export function AnalyticsImports({
           signal: controller.signal,
         },
       );
-      setMessage(
+      toast.success(
         result.duplicate
-          ? 'This export is already imported. Your totals have not changed.'
+          ? t('This export is already imported. Your totals have not changed.')
           : translate(
-              'en',
+              locale,
               result.import.days === 1
                 ? '{count} day imported from {provider}. Your history is ready in Overview.'
                 : '{count} days imported from {provider}. Your history is ready in Overview.',
@@ -183,7 +183,7 @@ export function AnalyticsImports({
     try {
       await apiClient(`${endpoint}/${removing.id}`, { method: 'DELETE' });
       setRemoving(null);
-      setMessage('Import removed. Your tracked analytics are unchanged.');
+      toast.success(t('Import removed. Your tracked analytics are unchanged.'));
       reloadHistory();
     } catch (error) {
       setError(errorText(error));
@@ -371,15 +371,13 @@ export function AnalyticsImports({
           </p>
           {provider === 'ga4' && (
             <label className="mt-5 flex items-start gap-3 text-sm leading-relaxed">
-              <input
-                type="checkbox"
+              <Checkbox
                 required
                 checked={webOnly}
                 onChange={(event) => {
                   setWebOnly(event.target.checked);
                   resetPreview();
                 }}
-                className="mt-1 size-4 shrink-0 accent-foreground"
               />
               {t('This export contains only my website’s web traffic, with no app screens.')}
             </label>
@@ -441,17 +439,7 @@ export function AnalyticsImports({
         </fieldset>
       </form>
       {error && !removing && (
-        <p className="mt-4 text-sm leading-relaxed text-danger" role="alert">
-          {messageText(error)}
-        </p>
-      )}
-      {message && (
-        <p
-          className="mt-5 rounded-lg border border-border p-4 text-sm leading-relaxed"
-          role="status"
-        >
-          {messageText(message)}
-        </p>
+        <Alert className="mt-4 text-sm leading-relaxed text-danger">{messageText(error)}</Alert>
       )}
       {preview && (
         <section className="mt-7 border-t border-border pt-6" aria-labelledby="import-review-title">
@@ -524,9 +512,7 @@ export function AnalyticsImports({
           </div>
         ) : historyError ? (
           <div className="mt-4">
-            <p role="alert" className="mb-3 text-sm text-danger">
-              {messageText(historyError)}
-            </p>
+            <Alert className="mb-3 text-sm text-danger">{messageText(historyError)}</Alert>
             <Button variant="outline" onClick={reloadHistory}>
               {t('Try again')}
             </Button>
@@ -601,11 +587,7 @@ export function AnalyticsImports({
               )}
             </DialogDescription>
           </DialogHeader>
-          {error && (
-            <p className="px-6 pb-4 text-sm text-danger" role="alert">
-              {messageText(error)}
-            </p>
-          )}
+          {error && <Alert className="px-6 pb-4 text-sm text-danger">{messageText(error)}</Alert>}
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy === 'remove'} />}>
               {t('Keep import')}

@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
+import { Select } from './ui/select';
 import { lazy, Suspense, useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type SiteEnvironment } from '../lib/client';
 import { featureDefinitions, featureSettings, type FeaturePage } from '../lib/features';
@@ -89,6 +92,7 @@ function Goals({ path }: { path: string }) {
           matchValue: fields.get('value'),
         }),
       );
+      toast.success(t('Goal created.'));
       form.reset();
       setRefresh((n) => n + 1);
     } catch (error) {
@@ -102,6 +106,7 @@ function Goals({ path }: { path: string }) {
     setFailure('');
     try {
       await apiClient(`${path}/${goal.id}`, { method: 'DELETE' });
+      toast.success(t('Goal deleted.'));
       setRefresh((n) => n + 1);
     } catch (error) {
       setFailure(errorText(error));
@@ -173,14 +178,14 @@ function Goals({ path }: { path: string }) {
         </label>
         <label className="flex flex-col gap-2 text-sm">
           {t('Match')}
-          <select
+          <Select
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onValueChange={(value) => setType(value)}
             className="rounded-md border border-border bg-background px-3 py-2"
           >
             <option value="event">{t('Custom event')}</option>
             <option value="page">{t('Page path')}</option>
-          </select>
+          </Select>
         </label>
         <label className="flex flex-col gap-2 text-sm">
           {t(type === 'event' ? 'Event name' : 'Page path')}
@@ -195,11 +200,7 @@ function Goals({ path }: { path: string }) {
         <Button type="submit" loading={busy} disabled={(data?.goals.length ?? 0) >= 20}>
           {t('Create goal')}
         </Button>
-        {failure && (
-          <p role="alert" className="text-sm text-danger">
-            {message(failure)}
-          </p>
-        )}
+        {failure && <Alert className="text-sm text-danger">{message(failure)}</Alert>}
       </form>
     </>
   );
@@ -231,6 +232,7 @@ function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
     setFailure('');
     try {
       await apiClient(path, write('POST', { fingerprint }));
+      toast.success(t('Error resolved.'));
       setRefresh((n) => n + 1);
     } catch (error) {
       setFailure(errorText(error));
@@ -357,11 +359,7 @@ function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
           )}
         </p>
       </ReportStatus>
-      {failure && (
-        <p role="alert" className="mt-4 text-sm text-danger">
-          {message(failure)}
-        </p>
-      )}
+      {failure && <Alert className="mt-4 text-sm text-danger">{message(failure)}</Alert>}
     </>
   );
 }

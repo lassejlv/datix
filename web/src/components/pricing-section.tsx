@@ -1,3 +1,4 @@
+import { Alert } from './ui/alert';
 import { ApiError, apiClient, errorText } from '../lib/client';
 import {
   billingPlans,
@@ -185,9 +186,7 @@ export function PricingSection() {
           )}
         </p>
         <p className="pricing-example">
-          {t(
-            'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.',
-          )}
+          {t('Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.')}
         </p>
         <p className="pricing-localhost-note">
           {t(
@@ -249,11 +248,7 @@ export function PricingSection() {
                     'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.',
                   )}
             </p>
-            {error && (
-              <p role="alert" className="text-sm text-danger">
-                {messageText(error)}
-              </p>
-            )}
+            {error && <Alert className="text-sm text-danger">{messageText(error)}</Alert>}
             <div className="pricing-dialog-actions">
               <button type="button" onClick={() => setOpen(false)}>
                 {t('Back to plans')}

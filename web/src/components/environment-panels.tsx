@@ -1,3 +1,7 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
+import { Checkbox } from './ui/checkbox';
+import { Select } from './ui/select';
 import { useSitePreferences } from './site-preferences';
 import { trackingSettingLabels, trackingSettings } from '../lib/tracking-settings';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
@@ -81,6 +85,7 @@ export function AddEnvironmentDialog({
           allowLocalhost: form.get('localhost') === 'on',
         }),
       );
+      toast.success(t('Environment added.'));
       onCreated(result.environment);
       onOpenChange(false);
     } catch (error) {
@@ -144,19 +149,10 @@ export function AddEnvironmentDialog({
               className="flex cursor-pointer items-start gap-3 text-sm"
               htmlFor="new-environment-localhost"
             >
-              <input
-                id="new-environment-localhost"
-                name="localhost"
-                type="checkbox"
-                className="mt-1 size-4 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-              />
+              <Checkbox id="new-environment-localhost" name="localhost" />
               {t('Allow localhost for testing')}
             </label>
-            {error && (
-              <p className="text-sm text-danger" role="alert">
-                {messageText(error)}
-              </p>
-            )}
+            {error && <Alert className="text-sm text-danger">{messageText(error)}</Alert>}
           </div>
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy} />}>
@@ -191,14 +187,13 @@ export function LocalhostSetting({
         className="flex cursor-pointer items-start gap-3 has-disabled:cursor-default"
         htmlFor="allow-localhost"
       >
-        <input
+        <Checkbox
           id="allow-localhost"
-          type="checkbox"
+
           checked={environment.allowLocalhost}
           disabled={busy}
           onChange={(event) => onChange(event.target.checked)}
           aria-describedby="localhost-help"
-          className="mt-1 size-4 shrink-0 cursor-pointer accent-primary disabled:cursor-default disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         />
         <span className={subsectionTitle}>{t('Allow localhost for testing')}</span>
       </label>
@@ -230,14 +225,12 @@ export function EnvironmentSettings({
     [domain, setDomain] = useState(environment.domain);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
-    [saved, setSaved] = useState(''),
     [deleting, setDeleting] = useState(false),
     [confirm, setConfirm] = useState('');
   const isDefault = environment.id === site.id;
   async function update(value: Partial<SiteEnvironment>) {
     setBusy(true);
     setError('');
-    setSaved('');
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${site.id}/environments/${environment.id}`,
@@ -246,7 +239,7 @@ export function EnvironmentSettings({
       onUpdated(result.environment);
       setName(result.environment.name);
       setDomain(result.environment.domain);
-      setSaved('Environment saved.');
+      toast.success(t('Environment saved.'));
     } catch (error) {
       setError(errorText(error));
     } finally {
@@ -261,6 +254,7 @@ export function EnvironmentSettings({
         method: 'DELETE',
       });
       setDeleting(false);
+      toast.success(t('Environment deleted.'));
       onDeleted();
     } catch (error) {
       setError(errorText(error));
@@ -296,9 +290,7 @@ export function EnvironmentSettings({
               const setting = key as keyof typeof trackingSettingLabels;
               return (
                 <label key={key} className="flex items-center gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    className="size-4 accent-primary"
+                  <Checkbox
                     checked={trackingSettings(environment.trackingSettings)[setting]}
                     disabled={busy}
                     onChange={(event) => {
@@ -403,16 +395,7 @@ export function EnvironmentSettings({
           }}
         />
       </div>
-      {saved && (
-        <p className="my-4 text-sm text-success" role="status">
-          {messageText(saved)}
-        </p>
-      )}
-      {error && !deleting && (
-        <p className="text-sm text-danger" role="alert">
-          {messageText(error)}
-        </p>
-      )}
+      {error && !deleting && <Alert className="text-sm text-danger">{messageText(error)}</Alert>}
       {section === 'environment' && !isDefault && (
         <section className="mt-8 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
           <div className="min-w-0 flex-1">
@@ -467,11 +450,7 @@ export function EnvironmentSettings({
                 size="lg"
               />
             </label>
-            {error && (
-              <p className="text-sm text-danger" role="alert">
-                {messageText(error)}
-              </p>
-            )}
+            {error && <Alert className="text-sm text-danger">{messageText(error)}</Alert>}
           </div>
           <DialogFooter>
             <DialogClose render={<Button variant="outline" disabled={busy} />}>
@@ -520,18 +499,18 @@ export function TrackingModeSetting({
       </p>
       <label className="mt-4 flex max-w-[440px] flex-col gap-2 text-sm font-medium">
         {t('Analytics mode')}
-        <select
+        <Select
           aria-label={t('Analytics mode')}
           className="h-11 rounded-md border border-input bg-background px-3 text-foreground"
           value={mode}
-          onChange={(event) => {
-            setMode(event.target.value as SiteEnvironment['trackingMode']);
+          onValueChange={(value) => {
+            setMode(value as SiteEnvironment['trackingMode']);
             setAcknowledged(false);
           }}
         >
           <option value="cookieless">{t('Cookieless · visitors and page journeys')}</option>
           <option value="sessions">{t('Cookie-based · sessions and activity')}</option>
-        </select>
+        </Select>
       </label>
       {environment.trackingMode === 'local' && (
         <p className="mt-3 text-sm text-secondary-ink">
@@ -566,9 +545,7 @@ export function TrackingModeSetting({
           </p>
           {environment.trackingMode !== mode && (
             <label className="mt-3 flex items-start gap-3">
-              <input
-                className="mt-1 accent-primary"
-                type="checkbox"
+              <Checkbox
                 checked={acknowledged}
                 onChange={(event) => setAcknowledged(event.target.checked)}
               />

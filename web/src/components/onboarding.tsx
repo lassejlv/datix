@@ -1,3 +1,4 @@
+import { Alert } from './ui/alert';
 import { useSitePreferences } from './site-preferences';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check } from './ui/icons';
@@ -129,12 +130,12 @@ export function SetupOnboarding({
                 </p>
               </div>
               {error && (
-                <div role="alert" className="mb-5 text-sm text-danger">
+                <Alert className="mb-5">
                   {messageText(error)}
                   <Button variant="outline" className="ml-3" onClick={() => setRetry((v) => v + 1)}>
                     {t('Retry connection check')}
                   </Button>
-                </div>
+                </Alert>
               )}
               {!environment.enabled && (
                 <p role="status" className="mb-5 rounded-md bg-muted p-4 text-sm">

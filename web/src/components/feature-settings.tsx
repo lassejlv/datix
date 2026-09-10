@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
+import { Switch } from './ui/checkbox';
 import { useState } from 'react';
 import { apiClient, errorText, write, type SiteEnvironment } from '../lib/client';
 import { featureDefinitions, featureSettings, type FeatureKey } from '../lib/features';
@@ -16,19 +19,17 @@ export function FeatureSettings({
   const { t, message } = useSitePreferences();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [saved, setSaved] = useState(false);
   const settings = featureSettings(environment.featureSettings);
   async function toggle(key: FeatureKey) {
     setBusy(true);
     setError('');
-    setSaved(false);
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${siteId}/environments/${environment.id}`,
         write('PATCH', { featureSettings: { ...settings, [key]: !settings[key] } }),
       );
       onUpdated(result.environment);
-      setSaved(true);
+      toast.success(t('Changes saved.'));
     } catch (error) {
       setError(errorText(error));
     } finally {
@@ -53,28 +54,16 @@ export function FeatureSettings({
                 {t(feature.description)}
               </span>
             </span>
-            <input
-              type="checkbox"
-              role="switch"
+            <Switch
               aria-label={t(feature.label)}
               checked={settings[feature.key]}
               disabled={busy}
               onChange={() => void toggle(feature.key)}
-              className="size-4 shrink-0 accent-primary"
             />
           </label>
         ))}
       </div>
-      {error && (
-        <p role="alert" className="mt-3 text-sm text-danger">
-          {message(error)}
-        </p>
-      )}
-      {saved && (
-        <p role="status" className="mt-3 text-sm text-secondary-ink">
-          {t('Changes saved.')}
-        </p>
-      )}
+      {error && <Alert className="mt-3 text-sm text-danger">{message(error)}</Alert>}
       {settings.pulse && (
         <div className="mt-8 border-t border-border pt-6">
           <PulseSettings siteId={siteId} environment={environment} />

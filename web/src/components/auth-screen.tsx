@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from './ui/icons';
@@ -75,7 +78,7 @@ export function AuthScreen({
             {signup && (
               <label htmlFor="auth-name">
                 {t('Your name')}
-                <input
+                <Input
                   id="auth-name"
                   name="name"
                   autoComplete="name"
@@ -87,7 +90,7 @@ export function AuthScreen({
             )}
             <label htmlFor="auth-email">
               {t('Email address')}
-              <input
+              <Input
                 id="auth-email"
                 name="email"
                 type="email"
@@ -100,7 +103,7 @@ export function AuthScreen({
             <label htmlFor="auth-password">
               {t('Password')}
               <div data-testid="password-control" className="auth-password">
-                <input
+                <Input
                   id="auth-password"
                   name="password"
                   type={visible ? 'text' : 'password'}
@@ -110,22 +113,21 @@ export function AuthScreen({
                   minLength={signup ? 12 : undefined}
                   maxLength={128}
                 />
-                <button
+                <Button
+                  size="icon"
+                  variant="ghost"
                   type="button"
                   aria-label={visible ? t('Hide password') : t('Show password')}
                   onClick={() => setVisible(!visible)}
                 >
                   {visible ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                </Button>
               </div>
             </label>
-            {error && (
-              <p className="auth-error" role="alert">
-                {messageText(error)}
-              </p>
-            )}
-            <button
-              className="landing-button auth-submit"
+            {error && <Alert className="auth-error">{messageText(error)}</Alert>}
+            <Button
+              loading={busy}
+              className="auth-submit"
               type="submit"
               data-testid="auth-submit"
               disabled={busy}
@@ -133,7 +135,7 @@ export function AuthScreen({
             >
               {signup ? t('Create account') : t('Sign in')}
               <ArrowRight size={17} aria-hidden="true" />
-            </button>
+            </Button>
           </form>
           <p className="auth-switch">
             {signup ? t('Already have an account?') : t('New to Datix?')}{' '}

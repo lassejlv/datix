@@ -1,3 +1,4 @@
+import { Hint, HintText } from './ui/tooltip';
 import { useSitePreferences } from './site-preferences';
 import { useState } from 'react';
 import { ChevronDown, Search, Plus } from './ui/icons';
@@ -43,31 +44,35 @@ export function WorkspaceSwitcher({
         if (item && item.id !== selectedId) onChange(item.id);
       }}
     >
-      <ComboboxTrigger
-        aria-label={website ? t('Selected website') : t('Selected environment')}
-        data-value={selectedId ?? ''}
-        title={website ? selected?.description : undefined}
-        className={`group flex h-10 w-full min-w-0 cursor-pointer items-center gap-2 rounded-md px-3 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default sm:h-8 ${website ? 'text-sm font-medium' : 'text-xs text-secondary-ink'}`}
+      <Hint
+        content={
+          selected?.description ||
+          selected?.name ||
+          (website ? t('Choose a website') : t('Choose an environment'))
+        }
       >
-        <span className="min-w-0 flex-1 truncate">
-          {selected?.name ?? (website ? t('Choose a website') : t('Choose an environment'))}
-        </span>
-        <ChevronDown
-          size={12}
-          className="shrink-0 text-secondary-ink transition-transform duration-150 group-data-popup-open:rotate-180 motion-reduce:transition-none"
-        />
-      </ComboboxTrigger>
-      <ComboboxPopup
-        className="w-(--anchor-width) overflow-hidden border-border shadow-lg/5"
-        sideOffset={6}
-      >
-        <div className="p-2">
+        <ComboboxTrigger
+          aria-label={website ? t('Selected website') : t('Selected environment')}
+          data-value={selectedId ?? ''}
+          className={`group flex h-10 w-full min-w-0 cursor-pointer items-center gap-2 rounded-md px-3 text-left outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default sm:h-8 ${website ? 'text-sm font-medium' : 'text-xs text-secondary-ink'}`}
+        >
+          <span className="min-w-0 flex-1 truncate">
+            {selected?.name ?? (website ? t('Choose a website') : t('Choose an environment'))}
+          </span>
+          <ChevronDown
+            size={12}
+            className="shrink-0 text-secondary-ink transition-transform duration-150 group-data-popup-open:rotate-180 motion-reduce:transition-none"
+          />
+        </ComboboxTrigger>
+      </Hint>
+      <ComboboxPopup className="w-(--anchor-width) overflow-hidden" sideOffset={6}>
+        <div className="border-b border-line px-1.5 pt-0.5 pb-1.5">
           <ComboboxInput
             aria-label={website ? t('Search websites') : t('Search environments')}
             placeholder={website ? t('Find a website…') : t('Find an environment…')}
             showTrigger={false}
             startAddon={<Search size={16} />}
-            className="w-full rounded-md has-focus-visible:ring-0 has-focus-visible:border-ring"
+            className="w-full rounded-none border-0 bg-transparent has-focus-visible:border-transparent has-focus-visible:shadow-none"
           />
         </div>
         <ComboboxEmpty className="empty:hidden px-4 py-5 text-left text-sm text-secondary-ink">
@@ -81,16 +86,17 @@ export function WorkspaceSwitcher({
               data-value={item.id}
               className="min-h-10 cursor-pointer px-2 py-1 sm:min-h-8 data-selected:bg-muted"
             >
-              <span title={item.name} className="block truncate text-sm">
+              <HintText tabIndex={-1} content={item.name} className="block truncate text-sm">
                 {item.name}
-              </span>
+              </HintText>
               {item.description && (
-                <span
-                  title={item.description}
-                  className="mt-0.5 block truncate text-xs text-secondary-ink"
+                <HintText
+                  tabIndex={-1}
+                  content={item.description}
+                  className="mt-0.5 block break-all text-xs text-secondary-ink"
                 >
                   {item.description}
-                </span>
+                </HintText>
               )}
             </ComboboxItem>
           )}

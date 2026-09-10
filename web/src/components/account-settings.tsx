@@ -1,3 +1,5 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
 import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type User } from '../lib/client';
@@ -55,9 +57,7 @@ function AccountForm({
   const [newPassword, setNewPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [busy, setBusy] = useState<'profile' | 'password' | 'delete' | null>(null);
-  const [profileMessage, setProfileMessage] = useState('');
   const [profileError, setProfileError] = useState('');
-  const [passwordMessage, setPasswordMessage] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -65,12 +65,11 @@ function AccountForm({
     event.preventDefault();
     if (busy || !name.trim()) return;
     setBusy('profile');
-    setProfileMessage('');
     setProfileError('');
     try {
       await apiClient('/auth/update-user', write('POST', { name: name.trim() }));
       onUpdated({ ...user, name: name.trim() });
-      setProfileMessage('Name saved.');
+      toast.success(t('Name saved.'));
     } catch (error) {
       setProfileError(errorText(error));
     } finally {
@@ -81,7 +80,6 @@ function AccountForm({
     event.preventDefault();
     if (busy) return;
     setPasswordError('');
-    setPasswordMessage('');
     if (newPassword !== confirmation) {
       setPasswordError('The new passwords do not match.');
       return;
@@ -95,7 +93,7 @@ function AccountForm({
       setCurrentPassword('');
       setNewPassword('');
       setConfirmation('');
-      setPasswordMessage('Password changed. Other sessions are signed out.');
+      toast.success(t('Password changed. Other sessions are signed out.'));
     } catch (error) {
       setPasswordError(errorText(error));
     } finally {
@@ -113,6 +111,7 @@ function AccountForm({
         write('POST', { password: deletePassword }),
       );
       if (!result.success) throw new Error('Account deletion could not be completed.');
+      toast.success(t('Account deleted.'));
       onDeleted();
     } catch (error) {
       setDeleteError(errorText(error));
@@ -140,7 +139,6 @@ function AccountForm({
             disabled={!!busy}
             onChange={(event) => {
               setName(event.target.value);
-              setProfileMessage('');
             }}
           />
         </label>
@@ -162,16 +160,7 @@ function AccountForm({
         >
           {t('Save name')}
         </Button>
-        {profileMessage && (
-          <p role="status" className="text-xs text-success">
-            {messageText(profileMessage)}
-          </p>
-        )}
-        {profileError && (
-          <p role="alert" className="text-sm text-danger">
-            {messageText(profileError)}
-          </p>
-        )}
+        {profileError && <Alert className="text-sm text-danger">{messageText(profileError)}</Alert>}
       </form>
       <details className="mt-5 border-t border-border pt-4">
         <summary className="cursor-pointer text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
@@ -227,15 +216,8 @@ function AccountForm({
           >
             {t('Update password')}
           </Button>
-          {passwordMessage && (
-            <p role="status" className="text-xs text-success">
-              {messageText(passwordMessage)}
-            </p>
-          )}
           {passwordError && (
-            <p role="alert" className="text-sm text-danger">
-              {messageText(passwordError)}
-            </p>
+            <Alert className="text-sm text-danger">{messageText(passwordError)}</Alert>
           )}
         </form>
       </details>
@@ -270,11 +252,7 @@ function AccountForm({
           >
             {t('Permanently delete account')}
           </Button>
-          {deleteError && (
-            <p role="alert" className="text-sm text-danger">
-              {messageText(deleteError)}
-            </p>
-          )}
+          {deleteError && <Alert className="text-sm text-danger">{messageText(deleteError)}</Alert>}
         </form>
       </details>
     </div>

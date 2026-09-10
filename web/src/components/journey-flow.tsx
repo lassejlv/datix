@@ -1,3 +1,4 @@
+import { Hint, HintText } from './ui/tooltip';
 import { useState } from 'react';
 import { journeyStops } from '../lib/journey-flow';
 import { activityTitle, type Activity } from '../lib/visitor-journey';
@@ -38,18 +39,19 @@ export function JourneyFlow({ events, hasMore }: { events: Activity[]; hasMore: 
       event.kind === 'pageview' ? (first ? 'entry' : 'page') : passive ? 'passive' : 'action';
     const label = event.kind === 'pageview' ? event.path : activityTitle(event, locale);
     return (
-      <button
-        type="button"
-        className="journey-node"
-        data-tone={tone}
-        aria-expanded={selectedId === event.id}
-        aria-controls={selectedId === event.id ? `journey-event-${event.id}` : undefined}
-        title={`${label} · ${new Date(event.occurredAt).toISOString().slice(11, 19)} UTC`}
-        onClick={() => setSelectedId(selectedId === event.id ? null : event.id)}
-      >
-        <Icon size={14} />
-        <span>{label}</span>
-      </button>
+      <Hint content={`${label} · ${new Date(event.occurredAt).toISOString().slice(11, 19)} UTC`}>
+        <button
+          type="button"
+          className="journey-node"
+          data-tone={tone}
+          aria-expanded={selectedId === event.id}
+          aria-controls={selectedId === event.id ? `journey-event-${event.id}` : undefined}
+          onClick={() => setSelectedId(selectedId === event.id ? null : event.id)}
+        >
+          <Icon size={14} />
+          <span>{label}</span>
+        </button>
+      </Hint>
     );
   }
   function detail(event: Activity) {
@@ -108,10 +110,10 @@ export function JourneyFlow({ events, hasMore }: { events: Activity[]; hasMore: 
                 {stop.page ? (
                   node(stop.page, index === 0)
                 ) : (
-                  <span className="journey-node journey-context" title={t('Page context')}>
+                  <HintText className="journey-node journey-context" content={t('Page context')}>
                     <Globe2 size={14} />
                     <span>{stop.path}</span>
-                  </span>
+                  </HintText>
                 )}
                 {stop.page && detail(stop.page)}
               </div>

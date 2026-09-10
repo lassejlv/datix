@@ -1,5 +1,20 @@
 import type { Copy } from './en';
 export const de = {
+  'Error resolved.': 'Fehler behoben.',
+  'Previous month': 'Vorheriger Monat',
+  'Next month': 'Nächster Monat',
+  'Website added.': 'Website hinzugefügt.',
+  'Environment added.': 'Umgebung hinzugefügt.',
+  'Environment deleted.': 'Umgebung gelöscht.',
+  'Website deleted.': 'Website gelöscht.',
+  'Account deleted.': 'Konto gelöscht.',
+  'Tracking script copied.': 'Tracking-Skript kopiert.',
+  'Installation instructions copied.': 'Installationsanleitung kopiert.',
+  'Goal created.': 'Ziel erstellt.',
+  'Goal deleted.': 'Ziel gelöscht.',
+  'Website budget saved.': 'Website-Budget gespeichert.',
+  'Subscription refreshed.': 'Abonnement aktualisiert.',
+  'Dismiss notification': 'Benachrichtigung schließen',
   'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
     'Ein Seitenaufruf in der Produktion zählt als 1 Ereignis zu deinem Kontingent. Klicks und andere Ereignisse zählen als 0,5.',
   'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':

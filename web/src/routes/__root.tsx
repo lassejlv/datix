@@ -1,3 +1,5 @@
+import { ToastProvider } from '../components/ui/toast';
+import { TooltipProvider } from '../components/ui/tooltip';
 import { SitePreferences, useSitePreferences } from '../components/site-preferences';
 import { getPreferences } from '../lib/i18n/get-preferences';
 import { createRootRoute, HeadContent, Outlet, useLocation } from '@tanstack/react-router';
@@ -30,8 +32,12 @@ function RootDocument() {
     <>
       <HeadContent />
       <SitePreferences initial={preferences}>
-        <DocumentMetadata />
-        <Outlet />
+        <TooltipProvider delay={400}>
+          <ToastProvider>
+            <DocumentMetadata />
+            <Outlet />
+          </ToastProvider>
+        </TooltipProvider>
       </SitePreferences>
     </>
   );

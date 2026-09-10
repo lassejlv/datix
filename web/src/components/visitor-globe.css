@@ -2,16 +2,16 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border: 1px solid #273345;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #080f1c;
-  color: #e5eaf2;
+  background: var(--canvas);
+  color: var(--foreground);
   min-height: 600px;
 }
 .visitor-globe-full {
   position: fixed;
   inset: 12px;
-  z-index: 1000;
+  z-index: 60;
   overflow: auto;
 }
 .globe-canvas {
@@ -30,11 +30,10 @@
   top: 20px;
   z-index: 2;
   width: 245px;
-  border: 1px solid #34405380;
-  background: #101a29eb;
+  border: 1px solid var(--line);
+  background: var(--popover);
   border-radius: 10px;
   padding: 16px;
-  backdrop-filter: blur(12px);
 }
 .globe-controls {
   position: absolute;
@@ -43,9 +42,9 @@
   z-index: 3;
 }
 .globe-controls button {
-  background: #172234;
-  color: #dce5f1;
-  border-color: #364257;
+  background: var(--raised);
+  color: var(--foreground);
+  border-color: var(--input-border);
 }
 .globe-bottom {
   display: flex;
@@ -59,15 +58,14 @@
 }
 .globe-bottom > section {
   pointer-events: auto;
-  border: 1px solid #34405380;
-  background: #101a29ed;
+  border: 1px solid var(--line);
+  background: var(--popover);
   border-radius: 10px;
   padding: 14px;
-  backdrop-filter: blur(12px);
 }
 .globe-bottom h2 {
-  font-size: 11px;
-  color: #8796ac;
+  font-size: 12px;
+  color: var(--secondary-ink);
   font-weight: 500;
 }
 .globe-activity {
@@ -82,8 +80,8 @@
   left: 20px;
   right: 20px;
   text-align: center;
-  font-size: 10px;
-  color: #76859c;
+  font-size: 12px;
+  color: var(--secondary-ink);
 }
 .globe-rotation {
   position: absolute;
@@ -93,8 +91,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #172234db;
-  border: 1px solid #344053;
+  background: var(--popover);
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 3px;
 }
@@ -103,16 +101,16 @@
   min-width: 28px;
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 12px;
   padding: 0 5px;
   border-radius: 4px;
 }
 .globe-rotation button:hover {
-  background: #304159;
+  background: var(--hover);
 }
 .globe-rotation button:focus-visible,
 .visitor-globe button:focus-visible {
-  outline: 2px solid #a7c5ed;
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 .visitor-globe-full .globe-canvas {
@@ -165,6 +163,6 @@
     height: 45dvh;
   }
   .globe-note {
-    font-size: 9px;
+    font-size: 11px;
   }
 }

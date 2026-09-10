@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { toast } from './ui/toast';
+import { Select } from './ui/select';
 import { useSitePreferences } from './site-preferences';
 import { useEffect, useState } from 'react';
 import { apiClient, errorText } from '../lib/client';
@@ -52,6 +55,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       });
       if (result.url) window.location.assign(result.url);
       else {
+        toast.success(t('Subscription refreshed.'));
         refresh();
         setBusy(false);
       }
@@ -75,12 +79,12 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
             <label className="sr-only" htmlFor="billing-volume">
               {t('Monthly plan')}
             </label>
-            <select
+            <Select
               id="billing-volume"
               className="h-9 rounded-md border border-border bg-background px-3 text-sm"
               value={events}
               disabled={busy}
-              onChange={(e) => setEvents(Number(e.target.value))}
+              onValueChange={(value) => setEvents(Number(value))}
             >
               {billingVolumes.map((p) => (
                 <option key={p.events} value={p.events}>
@@ -96,12 +100,12 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
                   )}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               aria-label={t('Billing period')}
               value={interval}
               disabled={busy}
-              onChange={(e) => setInterval(e.target.value)}
+              onValueChange={(value) => setInterval(value)}
               className="h-9 rounded-md border border-border bg-background px-3 text-sm"
             >
               <option value="month">{t('Monthly')}</option>
@@ -109,7 +113,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
                 {t('Yearly')}
                 {!selectedPlan.yearlyAvailable ? ` · ${t('Coming soon')}` : ''}
               </option>
-            </select>
+            </Select>
             <Button
               disabled={busy || !billingAvailable(selectedPlan, interval === 'year')}
               onClick={() => void act('/billing/checkout')}
@@ -138,11 +142,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
             : t('Paid subscription from the start. This plan has no free trial.')}
         </p>
       )}
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {messageText(error)}
-        </p>
-      )}
+      {error && <Alert className="text-sm text-danger">{messageText(error)}</Alert>}
     </div>
   );
 }

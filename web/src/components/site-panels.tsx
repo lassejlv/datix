@@ -1,10 +1,13 @@
+import { Alert } from './ui/alert';
+import { Tabs } from './ui/tabs';
+import { toast } from './ui/toast';
 import { FeatureSettings } from './feature-settings';
 import { useSitePreferences } from './site-preferences';
 import { agentInstallationInstructions } from '../lib/agent-installation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Check, Copy, ArrowRight, CircleCheck, RefreshCw, Trash2 } from './ui/icons';
 import { Button } from './ui/button';
-import { Input } from './ui/input';
+import { Input, Textarea } from './ui/input';
 import {
   Dialog,
   DialogPopup,
@@ -49,6 +52,7 @@ export function AddSiteDialog({
         '/sites',
         write('POST', { name: form.get('name'), domain }),
       );
+      toast.success(t('Website added.'));
       onCreated(result.site);
       onOpenChange(false);
     } catch (error) {
@@ -99,9 +103,7 @@ export function AddSiteDialog({
               </span>
             </label>
             {error && (
-              <p className="text-sm leading-normal text-danger" role="alert">
-                {messageText(error)}
-              </p>
+              <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
             )}
           </div>
           <DialogFooter>
@@ -186,16 +188,18 @@ export function Installation({
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
+      toast.success(t('Tracking script copied.'));
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setError('Copy is unavailable in this browser. Select and copy the code below.');
+      toast.error(t('Copy is unavailable in this browser. Select and copy the code below.'));
     }
   }
   const agentInstructions = agentInstallationInstructions(code, environment);
   async function copyAgent() {
     try {
       await navigator.clipboard.writeText(agentInstructions);
+      toast.success(t('Installation instructions copied.'));
       setAgentCopied(true);
       setAgentFallback(false);
       setTimeout(() => setAgentCopied(false), 2000);
@@ -222,11 +226,11 @@ export function Installation({
       {agentFallback && (
         <label className="mb-5 block text-sm">
           {t('Copy these agent instructions manually')}
-          <textarea
+          <Textarea
             readOnly
             value={agentInstructions}
             onFocus={(event) => event.currentTarget.select()}
-            className="mt-2 h-48 w-full rounded-md border border-input bg-background p-3 text-xs"
+            className="mt-2 h-48 text-xs"
           />
         </label>
       )}
@@ -251,7 +255,7 @@ export function Installation({
               variant="outline"
               disabled={!origin}
               onClick={copyAgent}
-              title="Copy installation instructions for an AI agent"
+              tooltip={t('Copy installation instructions for an AI agent')}
             >
               {agentCopied ? <Check size={15} /> : <Copy size={15} />}
               {agentCopied ? t('Copied for agent') : t('Agent')}
@@ -344,9 +348,7 @@ export function Installation({
           </p>
         )}
         {error && (
-          <p className="text-sm leading-normal text-danger" role="alert">
-            {messageText(error)}
-          </p>
+          <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
         )}
       </section>
       {environment.trackingMode !== 'cookieless' && (
@@ -448,17 +450,15 @@ export function SiteSettings({
   const [name, setName] = useState(site.name);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
-    [saved, setSaved] = useState(''),
     [deleting, setDeleting] = useState(false),
     [confirm, setConfirm] = useState('');
   async function update(value: Partial<Site>) {
     setBusy(true);
     setError('');
-    setSaved('');
     try {
       const result = await apiClient<{ site: Site }>(`/sites/${site.id}`, write('PATCH', value));
       onUpdated(result.site);
-      setSaved('Changes saved.');
+      toast.success(t('Changes saved.'));
     } catch (error) {
       setError(errorText(error));
     } finally {
@@ -471,6 +471,7 @@ export function SiteSettings({
     try {
       await apiClient(`/sites/${site.id}`, { method: 'DELETE' });
       setDeleting(false);
+      toast.success(t('Website deleted.'));
       onDeleted();
     } catch (error) {
       setError(errorText(error));
@@ -488,43 +489,13 @@ export function SiteSettings({
           {t('Manage {domain}.', { domain: site.domain })}
         </p>
       </div>
-      <div
-        role="tablist"
-        aria-label={t('Website settings')}
-        className="mb-8 flex gap-4 overflow-x-auto border-b border-border sm:gap-6"
-      >
-        {tabs.map((value, index) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            id={`settings-tab-${value}`}
-            aria-selected={tab === value}
-            aria-controls="settings-panel"
-            tabIndex={tab === value ? 0 : -1}
-            className="-mb-px border-b-2 border-transparent py-3 text-sm font-medium text-secondary-ink hover:text-foreground aria-selected:border-foreground aria-selected:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-            onClick={() => setTab(value)}
-            onKeyDown={(event) => {
-              const next =
-                event.key === 'ArrowRight'
-                  ? (index + 1) % tabs.length
-                  : event.key === 'ArrowLeft'
-                    ? (index + tabs.length - 1) % tabs.length
-                    : event.key === 'Home'
-                      ? 0
-                      : event.key === 'End'
-                        ? tabs.length - 1
-                        : -1;
-              if (next < 0) return;
-              event.preventDefault();
-              setTab(tabs[next]);
-              document.getElementById(`settings-tab-${tabs[next]}`)?.focus();
-            }}
-          >
-            {labels[value]}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        id="settings"
+        label={t('Website settings')}
+        value={tab}
+        items={tabs.map((value) => ({ value, label: labels[value] }))}
+        onValueChange={setTab}
+      />
       <div
         id="settings-panel"
         role="tabpanel"
@@ -585,15 +556,8 @@ export function SiteSettings({
               </Button>
             </form>
           </section>
-          {saved && (
-            <p className="my-4 text-sm text-success" role="status">
-              {messageText(saved)}
-            </p>
-          )}
           {error && !deleting && (
-            <p className="text-sm leading-normal text-danger" role="alert">
-              {messageText(error)}
-            </p>
+            <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
           )}
           <section className="mb-6 flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6 mt-7">
             <div className="min-w-0 flex-1">
@@ -646,9 +610,7 @@ export function SiteSettings({
               />
             </label>
             {error && (
-              <p className="text-sm leading-normal text-danger" role="alert">
-                {messageText(error)}
-              </p>
+              <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
             )}
           </div>
           <DialogFooter>

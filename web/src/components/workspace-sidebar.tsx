@@ -1,3 +1,4 @@
+import { Select } from './ui/select';
 import { featureDefinitions, featureSettings } from '../lib/features';
 import type { Locale } from '../lib/i18n/preferences';
 import { useSitePreferences } from './site-preferences';
@@ -13,6 +14,9 @@ import {
   FileText,
   Settings2,
   Activity,
+  Warning,
+  PulseIcon,
+  Gauge,
   X,
 } from './ui/icons';
 import { WorkspaceSwitcher } from './workspace-switcher';
@@ -123,7 +127,11 @@ export function WorkspaceSidebar({
                         ? Globe2
                         : feature.key === 'goals'
                           ? CircleCheck
-                          : Activity,
+                          : feature.key === 'errors'
+                            ? Warning
+                            : feature.key === 'pulse'
+                              ? PulseIcon
+                              : Gauge,
                   })),
                 { page: 'installation', label: 'Install', icon: Code2 },
                 { page: 'imports', label: 'Imports', icon: FileText },
@@ -176,16 +184,16 @@ export function WorkspaceSidebar({
         <label className="mx-1 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-secondary-ink hover:bg-accent focus-within:ring-2 focus-within:ring-ring">
           <Globe2 size={16} aria-hidden="true" />
           <span className="sr-only">{t('Language')}</span>
-          <select
+          <Select
             data-testid="dashboard-language"
             className="min-w-0 flex-1 cursor-pointer bg-transparent py-2 text-inherit outline-none"
             value={locale}
-            onChange={(event) => setLocale(event.target.value as Locale)}
+            onValueChange={(value) => setLocale(value as Locale)}
           >
             <option value="en">English</option>
             <option value="da">Dansk</option>
             <option value="de">Deutsch</option>
-          </select>
+          </Select>
         </label>
         <AccountMenu
           user={user}

@@ -178,7 +178,7 @@ export function ComboboxPopup({
       >
         <span
           className={cn(
-            'relative flex max-h-full min-w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) rounded-lg border bg-popover not-dark:bg-clip-padding shadow-lg/5 transition-[scale,opacity] motion-reduce:transition-none before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+            'relative flex max-h-full min-w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) rounded-xl bg-popover p-1.5 shadow-[var(--menu-shadow)] transition-[scale,opacity] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none',
             className,
           )}
         >
@@ -203,7 +203,7 @@ export function ComboboxItem({
   return (
     <ComboboxPrimitive.Item
       className={cn(
-        "grid min-h-8 in-data-[side=none]:min-w-[calc(var(--anchor-width)+1.25rem)] cursor-default grid-cols-[1rem_minmax(0,1fr)] items-center gap-2 rounded-sm py-1 ps-2 pe-4 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        "grid min-h-8 in-data-[side=none]:min-w-[calc(var(--anchor-width)+1.25rem)] cursor-default grid-cols-[16px_minmax(0,1fr)] items-center gap-1 rounded-md py-1.5 ps-2 pe-2 text-sm leading-5 outline-none data-disabled:pointer-events-none data-highlighted:bg-pressed data-highlighted:text-foreground data-disabled:opacity-40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
         className,
       )}
       data-slot="combobox-item"
@@ -249,7 +249,7 @@ export function ComboboxGroupLabel({
 }: ComboboxPrimitive.GroupLabel.Props): React.ReactElement {
   return (
     <ComboboxPrimitive.GroupLabel
-      className={cn('px-2 py-1.5 font-medium text-muted-foreground text-xs', className)}
+      className={cn('px-2 py-2 text-xs leading-[18px] text-muted-foreground', className)}
       data-slot="combobox-group-label"
       {...props}
     />
@@ -288,10 +288,7 @@ export function ComboboxList({
   return (
     <ScrollArea overscrollContain scrollbarGutter scrollFade>
       <ComboboxPrimitive.List
-        className={cn(
-          'not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3',
-          className,
-        )}
+        className={cn('not-empty:scroll-py-0 not-empty:px-0 not-empty:py-0', className)}
         data-slot="combobox-list"
         {...props}
       />
@@ -337,7 +334,7 @@ export function ComboboxChips({
   return (
     <ComboboxPrimitive.Chips
       className={cn(
-        'relative inline-flex min-h-9 w-full flex-wrap gap-1 rounded-lg border border-input bg-background not-dark:bg-clip-padding p-[calc(--spacing(1)-1px)] text-base shadow-xs/5 outline-none ring-ring/24 transition-shadow *:min-h-7 before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-within:border-ring focus-within:ring-[3px] has-disabled:pointer-events-none has-data-[size=lg]:min-h-10 has-data-[size=sm]:min-h-8 has-aria-invalid:border-destructive/36 has-disabled:opacity-64 has-[:disabled,:focus-within,[aria-invalid]]:shadow-none focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 has-data-[size=lg]:*:min-h-8 has-data-[size=sm]:*:min-h-6 sm:min-h-8 sm:text-sm sm:has-data-[size=lg]:min-h-9 sm:has-data-[size=sm]:min-h-7 sm:*:min-h-6 sm:has-data-[size=lg]:*:min-h-7 sm:has-data-[size=sm]:*:min-h-5 dark:not-has-disabled:bg-input/32 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+        'relative inline-flex min-h-8 w-full flex-wrap gap-1 rounded-lg border border-input bg-transparent p-1 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] *:min-h-6 focus-within:border-[var(--input-focus)] focus-within:shadow-[0_0_0_1px_var(--input-focus)] has-disabled:pointer-events-none has-aria-invalid:border-danger has-disabled:opacity-40',
         className,
       )}
       data-slot="combobox-chips"

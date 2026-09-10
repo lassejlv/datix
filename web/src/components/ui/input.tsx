@@ -22,10 +22,9 @@ export function Input({
   ...props
 }: InputProps): React.ReactElement {
   const inputClassName = cn(
-    'h-8.5 w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)] text-foreground leading-8.5 outline-none [transition:background-color_5000000s_ease-in-out_0s] placeholder:text-muted-foreground placeholder:opacity-100 sm:h-7.5 sm:leading-7.5 autofill:[-webkit-text-fill-color:var(--foreground)]',
-    size === 'sm' && 'h-7.5 px-[calc(--spacing(2.5)-1px)] leading-7.5 sm:h-6.5 sm:leading-6.5',
-    size === 'lg' &&
-      'h-[42px] text-base leading-[42px] sm:h-[42px] sm:leading-[42px] md:text-[15px]',
+    'h-8 w-full min-w-0 rounded-[inherit] px-3 text-foreground text-sm leading-5 outline-none placeholder:text-muted-foreground placeholder:opacity-100 autofill:[-webkit-text-fill-color:var(--foreground)]',
+    size === 'sm' && 'h-7 px-2.5',
+    size === 'lg' && 'h-9 px-3.5 text-base leading-6',
     props.type === 'search' &&
       '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
     props.type === 'file' &&
@@ -37,7 +36,7 @@ export function Input({
       className={
         cn(
           !unstyled &&
-            'relative inline-flex w-full rounded-lg border border-input bg-background not-dark:bg-clip-padding text-base shadow-xs/5 ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-aria-invalid:border-destructive/36 has-focus-visible:border-ring has-autofill:bg-foreground/4 has-disabled:opacity-64 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none has-focus-visible:ring-[3px] sm:text-sm dark:bg-input/32 dark:has-autofill:bg-foreground/8 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+            'relative inline-flex w-full rounded-lg border border-input bg-transparent text-sm transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none has-focus-visible:border-[var(--input-focus)] has-focus-visible:shadow-[0_0_0_1px_var(--input-focus)] has-aria-invalid:border-danger has-focus-visible:has-aria-invalid:border-danger has-disabled:opacity-40',
           className,
         ) || undefined
       }
@@ -66,3 +65,16 @@ export function Input({
 }
 
 export { InputPrimitive };
+
+export function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
+  return (
+    <textarea
+      data-slot="textarea"
+      className={cn(
+        'min-h-24 w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 motion-reduce:transition-none focus-visible:border-[var(--input-focus)] focus-visible:shadow-[0_0_0_1px_var(--input-focus)] aria-invalid:border-danger disabled:opacity-40',
+        className,
+      )}
+      {...props}
+    />
+  );
+}

@@ -9,8 +9,8 @@ import { rgb } from './palette';
 export type TooltipVariant = 'default' | 'frosted-glass';
 
 const VARIANT: Record<TooltipVariant, string> = {
-  default: 'bg-popover',
-  'frosted-glass': 'bg-popover/70 backdrop-blur-sm',
+  default: 'bg-tooltip',
+  'frosted-glass': 'bg-tooltip',
 };
 
 /**
@@ -96,26 +96,26 @@ export function Tooltip({
             mass: 0.6,
           }}
           className={cn(
-            'pointer-events-none absolute z-10 max-w-[calc(100%-8px)] rounded-md border border-border px-3 py-2 shadow-sm',
+            'pointer-events-none absolute z-10 max-w-[calc(100%-8px)] rounded-lg px-2 py-1.5 text-tooltip-foreground shadow-[var(--menu-shadow)]',
             VARIANT[variant],
           )}
         >
           {heading && (
-            <div className="mb-0.5 font-sans text-xs text-muted-foreground">{heading}</div>
+            <div className="mb-0.5 font-sans text-sm text-tooltip-foreground">{heading}</div>
           )}
           <div className="flex flex-col gap-0.5">
             {items.map((item) => (
               <div
                 key={item.name}
-                className="flex items-center gap-1.5 font-sans text-xs text-popover-foreground tabular-nums"
+                className="flex items-center gap-1.5 font-sans text-sm text-tooltip-foreground tabular-nums"
                 style={{ opacity: item.dimmed ? 0.4 : 1 }}
               >
                 <span
                   className="size-2 rounded-[1px]"
                   style={{ backgroundColor: rgb(item.seed.fill) }}
                 />
-                <span className="text-muted-foreground">{item.label}</span>
-                <span className="ml-auto pl-2 text-foreground">
+                <span className="text-tooltip-foreground">{item.label}</span>
+                <span className="ml-auto pl-2 text-tooltip-foreground">
                   {valueFormatter
                     ? valueFormatter(item.value, item.name)
                     : item.value.toLocaleString()}

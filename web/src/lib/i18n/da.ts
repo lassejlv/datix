@@ -1,5 +1,20 @@
 import type { Copy } from './en';
 export const da = {
+  'Error resolved.': 'Fejl løst.',
+  'Previous month': 'Forrige måned',
+  'Next month': 'Næste måned',
+  'Website added.': 'Website tilføjet.',
+  'Environment added.': 'Miljø tilføjet.',
+  'Environment deleted.': 'Miljø slettet.',
+  'Website deleted.': 'Website slettet.',
+  'Account deleted.': 'Konto slettet.',
+  'Tracking script copied.': 'Sporingsscript kopieret.',
+  'Installation instructions copied.': 'Installationsvejledning kopieret.',
+  'Goal created.': 'Mål oprettet.',
+  'Goal deleted.': 'Mål slettet.',
+  'Website budget saved.': 'Websitebudget gemt.',
+  'Subscription refreshed.': 'Abonnement opdateret.',
+  'Dismiss notification': 'Luk meddelelse',
   'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
     'En sidevisning i produktion tæller som 1 hændelse i din kvote. Klik og andre hændelser tæller som 0,5.',
   'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':

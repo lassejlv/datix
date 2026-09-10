@@ -1,3 +1,7 @@
+import { Alert } from './ui/alert';
+import { HintText } from './ui/tooltip';
+import { toast } from './ui/toast';
+import { Checkbox } from './ui/checkbox';
 import { useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type SiteEnvironment } from '../lib/client';
 import { useFeatureReport, ReportStatus, EmptyFeature } from './feature-report';
@@ -35,15 +39,13 @@ export function PulseSettings({
   const [refresh, setRefresh] = useState(0);
   const { data, error } = useFeatureReport<PulseReport>(path, refresh);
   const [busy, setBusy] = useState(false),
-    [failure, setFailure] = useState(''),
-    [saved, setSaved] = useState(false);
+    [failure, setFailure] = useState('');
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const element = event.currentTarget;
     setBusy(true);
     setFailure('');
-    setSaved(false);
     try {
       await apiClient(
         path,
@@ -54,7 +56,7 @@ export function PulseSettings({
         }),
       );
       element.reset();
-      setSaved(true);
+      toast.success(t('Changes saved.'));
       setRefresh((n) => n + 1);
     } catch (error) {
       setFailure(errorText(error));
@@ -98,7 +100,7 @@ export function PulseSettings({
         </label>
         {data?.monitor?.hasWebhook && (
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="clear" className="accent-primary" />
+            <Checkbox name="clear" />
             {t('Remove linked webhook')}
           </label>
         )}
@@ -107,16 +109,7 @@ export function PulseSettings({
             {t('Save monitor')}
           </Button>
         </div>
-        {failure && (
-          <p role="alert" className="text-sm text-danger">
-            {message(failure)}
-          </p>
-        )}
-        {saved && (
-          <p role="status" className="text-sm text-secondary-ink">
-            {t('Changes saved.')}
-          </p>
-        )}
+        {failure && <Alert className="text-sm text-danger">{message(failure)}</Alert>}
       </form>
     </ReportStatus>
   );
@@ -178,10 +171,10 @@ export function Pulse({ path, onSettings }: { path: string; onSettings: () => vo
             <h2 className="text-sm font-medium">{t('Recent checks')}</h2>
             <div className="mt-4 flex h-12 gap-0.5" aria-label={t('Recent checks')}>
               {[...data.checks].reverse().map((check) => (
-                <span
+                <HintText
                   key={check.checkedAt}
                   className={`min-w-0 flex-1 rounded-sm ${check.available ? 'bg-emerald-500/70' : 'bg-red-500/80'}`}
-                  title={`${new Date(check.checkedAt).toLocaleString(locale)} · ${check.statusCode ?? '—'} · ${check.latencyMs} ms`}
+                  content={`${new Date(check.checkedAt).toLocaleString(locale)} · ${check.statusCode ?? '—'} · ${check.latencyMs} ms`}
                 />
               ))}
             </div>

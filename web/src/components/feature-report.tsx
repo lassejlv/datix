@@ -1,3 +1,6 @@
+import { Spinner } from './ui/spinner';
+import { Alert } from './ui/alert';
+import { Select } from './ui/select';
 import { useEffect, useState, type ReactNode } from 'react';
 import { apiClient, errorText } from '../lib/client';
 import { useSitePreferences } from './site-preferences';
@@ -48,15 +51,11 @@ export function ReportStatus({
   children: ReactNode;
 }) {
   const { t, message } = useSitePreferences();
-  if (error)
-    return (
-      <p role="alert" className="py-8 text-sm text-danger">
-        {message(error)}
-      </p>
-    );
+  if (error) return <Alert className="py-8 text-sm text-danger">{message(error)}</Alert>;
   if (loading)
     return (
-      <p role="status" className="py-8 text-sm text-secondary-ink">
+      <p role="status" className="flex items-center gap-2 py-8 text-sm text-secondary-ink">
+        <Spinner />
         {t('Loading…')}
       </p>
     );
@@ -81,16 +80,16 @@ export function FeatureToolbar({
   const { t } = useSitePreferences();
   return (
     <div className="mb-5 flex items-center justify-end gap-2">
-      <select
+      <Select
         aria-label={t('Date range')}
         value={days}
-        onChange={(e) => setDays(e.target.value)}
+        onValueChange={(value) => setDays(value)}
         className="rounded-md border border-border bg-background px-3 py-2 text-sm"
       >
         <option value="1">{t('Today')}</option>
         <option value="7">{t('Last 7 days')}</option>
         <option value="30">{t('Last 30 days')}</option>
-      </select>
+      </Select>
       <Button variant="outline" size="sm" onClick={onRefresh}>
         {t('Refresh')}
       </Button>

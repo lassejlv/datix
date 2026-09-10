@@ -1,3 +1,7 @@
+import { Alert } from './ui/alert';
+import { Input } from './ui/input';
+import { Tabs } from './ui/tabs';
+import { toast } from './ui/toast';
 import { useSitePreferences } from './site-preferences';
 import { useCallback, useEffect, useState } from 'react';
 import { BillingActions } from './billing-actions';
@@ -92,43 +96,13 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
           {loading ? <Spinner /> : <RefreshCw />}
         </Button>
       </div>
-      <div
-        role="tablist"
-        aria-label={t('Usage')}
-        className="mb-8 flex gap-4 overflow-x-auto border-b border-border sm:gap-6"
-      >
-        {tabs.map((value, index) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            id={`usage-tab-${value}`}
-            aria-selected={tab === value}
-            aria-controls="usage-panel"
-            tabIndex={tab === value ? 0 : -1}
-            className="-mb-px shrink-0 border-b-2 border-transparent py-3 text-sm font-medium text-secondary-ink hover:text-foreground aria-selected:border-foreground aria-selected:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-            onClick={() => setTab(value)}
-            onKeyDown={(event) => {
-              const next =
-                event.key === 'ArrowRight'
-                  ? (index + 1) % tabs.length
-                  : event.key === 'ArrowLeft'
-                    ? (index + tabs.length - 1) % tabs.length
-                    : event.key === 'Home'
-                      ? 0
-                      : event.key === 'End'
-                        ? tabs.length - 1
-                        : -1;
-              if (next < 0) return;
-              event.preventDefault();
-              setTab(tabs[next]);
-              document.getElementById(`usage-tab-${tabs[next]}`)?.focus();
-            }}
-          >
-            {labels[value]}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        id="usage"
+        label={t('Usage')}
+        value={tab}
+        items={tabs.map((value) => ({ value, label: labels[value] }))}
+        onValueChange={setTab}
+      />
       <div
         id="usage-panel"
         role="tabpanel"
@@ -137,12 +111,12 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
         className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       >
         {error && (
-          <div role="alert" className="mt-5 text-sm text-danger">
+          <Alert className="mt-5">
             {messageText(error)}{' '}
             <button className="underline" onClick={refresh}>
               {t('Try again')}
             </button>
-          </div>
+          </Alert>
         )}
         {!data ? (
           <p className="py-12 text-sm text-secondary-ink">
@@ -377,6 +351,7 @@ function WebsiteBudget({
                 `/sites/${site.id}`,
                 write('PATCH', { creditBudget: value ? Number(value) : null }),
               );
+              toast.success(t('Website budget saved.'));
               setEditing(false);
               refresh();
             } catch (error) {
@@ -388,7 +363,7 @@ function WebsiteBudget({
         >
           <label className="flex flex-col gap-1.5" htmlFor={`budget-${site.id}`}>
             {t('Credits per allowance period')}
-            <input
+            <Input
               id={`budget-${site.id}`}
               name="budget"
               type="number"
@@ -397,7 +372,7 @@ function WebsiteBudget({
               step="0.01"
               defaultValue={site.creditBudget ?? ''}
               placeholder={t('No website budget')}
-              className="h-9 w-52 rounded-md border border-border bg-background px-3"
+              className="w-52"
               disabled={saving}
             />
           </label>
@@ -412,11 +387,7 @@ function WebsiteBudget({
               'This website pauses when its budget is used. Other websites keep collecting. Leave blank to remove the budget.',
             )}
           </p>
-          {error && (
-            <p role="alert" className="basis-full text-danger">
-              {messageText(error)}
-            </p>
-          )}
+          {error && <Alert className="basis-full text-danger">{messageText(error)}</Alert>}
         </form>
       )}
     </div>

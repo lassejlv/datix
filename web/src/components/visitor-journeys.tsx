@@ -1,3 +1,6 @@
+import { Alert } from './ui/alert';
+import { HintText } from './ui/tooltip';
+import { Select } from './ui/select';
 import { JourneyFlow } from './journey-flow';
 import { deviceName } from '../lib/i18n/display';
 import { Translated } from './translated';
@@ -64,16 +67,16 @@ export function VisitorJourneys({
           <h1 className="text-[22px] font-medium tracking-tight">{t('Visitors')}</h1>
         </div>
         <div className="flex items-center gap-2">
-          <select
+          <Select
             aria-label={t('Visitor date range')}
             value={days}
-            onChange={(e) => setDays(e.target.value)}
+            onValueChange={(value) => setDays(value)}
             className="h-10 sm:h-8 rounded-md border border-input bg-background px-2.5 text-sm focus-visible:outline-2 focus-visible:outline-ring"
           >
             <option value="1">{t('Today')}</option>
             <option value="7">{t('Last 7 days')}</option>
             <option value="30">{t('Last 30 days')}</option>
-          </select>
+          </Select>
           <Button
             aria-label={t('Refresh visits')}
             variant="outline"
@@ -186,21 +189,20 @@ function VisitExplorer({
     }
   }
   const recover = (
-    <div
-      role="alert"
-      className="mb-5 flex items-center justify-between gap-3 rounded-md bg-danger-wash p-4 text-sm text-danger"
-    >
-      <span>{messageText(error)}</span>
-      <Button
-        variant="outline"
-        onClick={() => {
-          if (report) void more();
-          else setRetry((value) => value + 1);
-        }}
-      >
-        {t('Try again')}
-      </Button>
-    </div>
+    <Alert className="mb-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span>{messageText(error)}</span>
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (report) void more();
+            else setRetry((value) => value + 1);
+          }}
+        >
+          {t('Try again')}
+        </Button>
+      </div>
+    </Alert>
   );
   if (!report)
     return error ? (
@@ -282,19 +284,21 @@ function VisitExplorer({
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <VisitorAvatar />
-                    <span
+                    <HintText
+                      tabIndex={-1}
                       className="truncate text-sm font-medium"
-                      title={t('Anonymous visitor {id}', { id: visit.visitorKey.slice(0, 8) })}
+                      content={t('Anonymous visitor {id}', { id: visit.visitorKey.slice(0, 8) })}
                     >
                       {visitorAlias(visit.visitorKey, locale).name}
-                    </span>
+                    </HintText>
                   </span>
-                  <span
+                  <HintText
+                    tabIndex={-1}
                     className="hidden truncate text-sm text-secondary-ink xl:block"
-                    title={visit.entryPath}
+                    content={visit.entryPath}
                   >
                     {visit.entryPath}
-                  </span>
+                  </HintText>
                   <span className="hidden text-sm text-secondary-ink tabular-nums xl:block">
                     {number(visit.pageviews)}
                   </span>
@@ -541,7 +545,7 @@ function JourneyTimeline({
         </p>
       )}
       {error && (
-        <div role="alert" className="mt-5 text-sm text-danger">
+        <Alert className="mt-5">
           {messageText(error)}
           <Button
             className="ml-3"
@@ -551,7 +555,7 @@ function JourneyTimeline({
           >
             {t('Try again')}
           </Button>
-        </div>
+        </Alert>
       )}
       {hasMore && (
         <Button className="mt-6" variant="outline" loading={busy} onClick={more}>

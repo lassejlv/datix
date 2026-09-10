@@ -1,19 +1,19 @@
 import { useSitePreferences } from '../site-preferences';
-import { Loader2Icon } from './icons';
 import type React from 'react';
 import { cn } from '@/lib/utils';
 
-export function Spinner({
-  className,
-  ...props
-}: React.ComponentProps<typeof Loader2Icon>): React.ReactElement {
+export function Spinner({ className, ...props }: React.ComponentProps<'span'>): React.ReactElement {
   const { t } = useSitePreferences();
   return (
-    <Loader2Icon
+    <span
       aria-label={t('Loading')}
-      className={cn('animate-spin', className)}
+      className={cn('kit-spinner', className)}
       role="status"
       {...props}
-    />
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+      </svg>
+    </span>
   );
 }
