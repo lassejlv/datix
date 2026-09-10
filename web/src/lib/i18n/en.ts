@@ -752,7 +752,6 @@ export const en = {
   'New to Datix?': 'New to Datix?',
   'No active plan': 'No active plan',
   'No activity in this period': 'No activity in this period',
-  'No trial or subscription starts at signup.': 'No trial or subscription starts at signup.',
   'No data in this period.': 'No data in this period.',
   'No environments found.': 'No environments found.',
   'No free trial.': 'No free trial.',
@@ -1001,8 +1000,6 @@ export const en = {
     'This export is already imported. Your totals have not changed.',
   'This history is already imported. Your reports will not be counted twice.':
     'This history is already imported. Your reports will not be counted twice.',
-  'This is a preview of the planned offer. Creating an account does not start a subscription or trial, and you won’t be charged.':
-    'This is a preview of the planned offer. Creating an account does not start a subscription or trial, and you won’t be charged.',
   'This is a product explanation, not a legal privacy policy.':
     'This is a product explanation, not a legal privacy policy.',
   'This page could not be found. Head back to the homepage.':

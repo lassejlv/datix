@@ -510,14 +510,6 @@
   font-size: 15px;
   font-weight: 500;
 }
-.auth-reassurance {
-  width: 100%;
-  padding-top: 16px;
-  color: var(--landing-secondary);
-  font-size: 14px;
-  line-height: 22px;
-  text-align: center;
-}
 .auth-switch {
   display: flex;
   flex-wrap: wrap;

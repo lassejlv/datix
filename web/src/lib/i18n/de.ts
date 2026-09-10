@@ -763,8 +763,6 @@ export const de = {
   'New to Datix?': 'Neu bei Datix?',
   'No active plan': 'Kein aktiver Tarif',
   'No activity in this period': 'Keine Aktivitäten in diesem Zeitraum',
-  'No trial or subscription starts at signup.':
-    'Bei der Registrierung beginnt weder eine Testphase noch ein Abonnement.',
   'No data in this period.': 'Keine Daten in diesem Zeitraum.',
   'No environments found.': 'Keine Umgebungen gefunden.',
   'No free trial.': 'Keine kostenlose Testphase.',
@@ -1020,8 +1018,6 @@ export const de = {
     'Dieser Export wurde bereits importiert. Deine Summen haben sich nicht geändert.',
   'This history is already imported. Your reports will not be counted twice.':
     'Dieser Verlauf wurde bereits importiert. Deine Berichte werden nicht doppelt gezählt.',
-  'This is a preview of the planned offer. Creating an account does not start a subscription or trial, and you won’t be charged.':
-    'Dies ist eine Vorschau des geplanten Angebots. Die Kontoerstellung startet weder ein Abonnement noch eine Testphase. Es entstehen keine Kosten.',
   'This is a product explanation, not a legal privacy policy.':
     'Dies ist eine Produkterklärung und keine rechtliche Datenschutzerklärung.',
   'This page could not be found. Head back to the homepage.':

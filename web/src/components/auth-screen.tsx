@@ -135,9 +135,6 @@ export function AuthScreen({
               <ArrowRight size={17} aria-hidden="true" />
             </button>
           </form>
-          {signup && (
-            <p className="auth-reassurance">{t('No trial or subscription starts at signup.')}</p>
-          )}
           <p className="auth-switch">
             {signup ? t('Already have an account?') : t('New to Datix?')}{' '}
             <button type="button" onClick={switchMode}>

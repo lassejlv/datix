@@ -759,8 +759,6 @@ export const da = {
   'New to Datix?': 'Ny hos Datix?',
   'No active plan': 'Ingen aktiv plan',
   'No activity in this period': 'Ingen aktivitet i denne periode',
-  'No trial or subscription starts at signup.':
-    'Der starter ingen prøveperiode eller et abonnement, når du opretter en konto.',
   'No data in this period.': 'Ingen data i denne periode.',
   'No environments found.': 'Ingen miljøer fundet.',
   'No free trial.': 'Ingen gratis prøveperiode.',
@@ -1013,8 +1011,6 @@ export const da = {
     'Denne eksport er allerede importeret. Dine totaler er ikke ændret.',
   'This history is already imported. Your reports will not be counted twice.':
     'Denne historik er allerede importeret. Dine rapporter tælles ikke dobbelt.',
-  'This is a preview of the planned offer. Creating an account does not start a subscription or trial, and you won’t be charged.':
-    'Dette er en forhåndsvisning af det planlagte tilbud. Oprettelse af en konto starter hverken et abonnement eller en prøveperiode, og du bliver ikke opkrævet noget.',
   'This is a product explanation, not a legal privacy policy.':
     'Dette er en produktforklaring, ikke en juridisk privatlivspolitik.',
   'This page could not be found. Head back to the homepage.':
