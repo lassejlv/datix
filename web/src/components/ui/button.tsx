@@ -9,7 +9,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Hint } from '@/components/ui/tooltip';
 
 export const buttonVariants = cva(
-  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border text-sm font-medium outline-none transition-[background-color,color,border-color,opacity,box-shadow] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-36 data-loading:select-none data-loading:text-transparent [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border text-sm font-medium outline-none transition-[background-color,color,border-color,opacity,box-shadow,scale] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-36 disabled:data-loading:opacity-100 data-loading:select-none data-loading:text-transparent [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     defaultVariants: {
       size: 'default',
@@ -82,6 +82,7 @@ export function Button({
     ),
     className: cn(buttonVariants({ className, size, variant })),
     'aria-disabled': loading || undefined,
+    'aria-busy': loading || undefined,
     'data-loading': loading ? '' : undefined,
     'data-slot': 'button',
     disabled: isDisabled,

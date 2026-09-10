@@ -1,6 +1,6 @@
-import { Select } from './ui/select';
+import { useId } from 'react';
+import { SelectionIndicator } from './ui/selection-indicator';
 import { featureDefinitions, featureSettings } from '../lib/features';
-import type { Locale } from '../lib/i18n/preferences';
 import { useSitePreferences } from './site-preferences';
 import { AccountMenu } from './account-menu';
 import { Link } from '@tanstack/react-router';
@@ -64,7 +64,8 @@ export function WorkspaceSidebar({
   onSignOut: () => void;
   onAccountSettings: () => void;
 }) {
-  const { t, locale, setLocale } = useSitePreferences();
+  const { t } = useSitePreferences();
+  const indicatorId = useId();
   const { setOpenMobile } = useSidebar();
   const action = (callback: () => void) => {
     setOpenMobile(false);
@@ -110,7 +111,7 @@ export function WorkspaceSidebar({
             />
           )}
         </div>
-        <nav aria-label={t('Workspace pages')}>
+        <nav className="isolate" aria-label={t('Workspace pages')}>
           <SidebarMenu>
             {(
               [
@@ -142,7 +143,7 @@ export function WorkspaceSidebar({
               .map((item) => (
                 <SidebarMenuItem key={item.page}>
                   <SidebarMenuButton
-                    className="h-11 gap-3 px-3 text-secondary-ink md:h-8"
+                    className="relative h-11 overflow-visible gap-3 px-3 text-secondary-ink data-[active=true]:bg-transparent md:h-8"
                     isActive={panel === item.page && !!site && !!environment}
                     aria-current={panel === item.page && site && environment ? 'page' : undefined}
                     disabled={!site || !environment}
@@ -161,6 +162,9 @@ export function WorkspaceSidebar({
                       ) : undefined
                     }
                   >
+                    {panel === item.page && site && environment && (
+                      <SelectionIndicator id={indicatorId} className="kit-navigation-indicator" />
+                    )}
                     <item.icon />
                     <span>{t(item.label)}</span>
                   </SidebarMenuButton>
@@ -168,11 +172,14 @@ export function WorkspaceSidebar({
               ))}
             <SidebarMenuItem>
               <SidebarMenuButton
-                className="h-11 gap-3 px-3 text-secondary-ink md:h-8"
+                className="relative h-11 overflow-visible gap-3 px-3 text-secondary-ink data-[active=true]:bg-transparent md:h-8"
                 isActive={panel === 'usage'}
                 aria-current={panel === 'usage' ? 'page' : undefined}
                 render={<Link to="/usage" onClick={() => setOpenMobile(false)} />}
               >
+                {panel === 'usage' && (
+                  <SelectionIndicator id={indicatorId} className="kit-navigation-indicator" />
+                )}
                 <Activity />
                 <span>{t('Usage')}</span>
               </SidebarMenuButton>
@@ -181,20 +188,6 @@ export function WorkspaceSidebar({
         </nav>
       </SidebarContent>
       <SidebarFooter className="px-2 py-2">
-        <label className="mx-1 flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-secondary-ink hover:bg-accent focus-within:ring-2 focus-within:ring-ring">
-          <Globe2 size={16} aria-hidden="true" />
-          <span className="sr-only">{t('Language')}</span>
-          <Select
-            data-testid="dashboard-language"
-            className="min-w-0 flex-1 cursor-pointer bg-transparent py-2 text-inherit outline-none"
-            value={locale}
-            onValueChange={(value) => setLocale(value as Locale)}
-          >
-            <option value="en">English</option>
-            <option value="da">Dansk</option>
-            <option value="de">Deutsch</option>
-          </Select>
-        </label>
         <AccountMenu
           user={user}
           signingOut={signingOut}

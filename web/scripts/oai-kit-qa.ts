@@ -1,7 +1,7 @@
 // UI interaction acceptance using isolated browser fixtures. Never touches a database.
 process.chdir(new URL('../..', import.meta.url).pathname);
 import { chromium, expect, type Page, type BrowserContext } from '@playwright/test';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, rename } from 'node:fs/promises';
 
 const base = process.env.QA_BASE_URL ?? 'http://127.0.0.1:3000';
 if (!['localhost', '127.0.0.1'].includes(new URL(base).hostname))
@@ -56,7 +56,14 @@ async function fixtures(context: BrowserContext) {
       },
     ],
   };
-  const state = { failSave: false, signedIn: true, site, environment, user };
+  const state = {
+    failSave: false,
+    signedIn: true,
+    site,
+    environment,
+    user,
+    profileGate: undefined as Promise<void> | undefined,
+  };
   const session = {
     id: 'session-1',
     visitorKey: 'visitor-12345678',
@@ -106,6 +113,7 @@ async function fixtures(context: BrowserContext) {
     else if (path === '/billing') result = { hasCustomer: true };
     else if (path === '/billing/sync') result = { success: true };
     else if (path === '/auth/update-user') {
+      await state.profileGate;
       if (state.failSave) {
         status = 500;
         result = { error: { message: 'Something went wrong. Please try again.' } };
@@ -277,13 +285,185 @@ async function fixtures(context: BrowserContext) {
   return state;
 }
 
+async function sampleMotion(page: Page, selector: string, action: () => Promise<unknown>) {
+  const samples = page.evaluate(async (selector) => {
+    const frames: {
+      opacity: number;
+      x: number;
+      y: number;
+      transform: string;
+      translate: string;
+    }[] = [];
+    const start = performance.now();
+    await new Promise<void>((resolve) => {
+      function frame() {
+        const el = document.querySelector(selector);
+        if (el) {
+          const style = getComputedStyle(el);
+          const box = el.getBoundingClientRect();
+          frames.push({
+            opacity: Number(style.opacity),
+            x: box.x,
+            y: box.y,
+            transform: style.transform,
+            translate: style.translate,
+          });
+        }
+        if (performance.now() - start < 550) requestAnimationFrame(frame);
+        else resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+    return frames;
+  }, selector);
+  await action();
+  return samples;
+}
+
+async function verifyMotion(page: Page, theme: 'light' | 'dark') {
+  const path = `${base}/site/11111111-1111-4111-8111-111111111111/11111111-1111-4111-8111-111111111111`;
+  await page.goto(`${path}/overview`);
+  await expect(page.getByRole('navigation', { name: 'Workspace pages' })).toBeVisible();
+  await expect(page.getByTestId('dashboard-language')).toHaveCount(0);
+  const navigation = await sampleMotion(page, '.kit-navigation-indicator', () =>
+    page.getByRole('link', { name: 'Settings', exact: true }).click(),
+  );
+  expect(new Set(navigation.map((frame) => Math.round(frame.y))).size).toBeGreaterThan(3);
+  pass(
+    `${theme}: sidebar language control is removed and the active navigation highlight moves between pages`,
+  );
+
+  await page
+    .getByRole('textbox', { name: 'Website name', exact: true })
+    .fill('Unsaved motion check');
+  const tabs = await sampleMotion(page, '.kit-tab-indicator', () =>
+    page.getByRole('tab', { name: 'Tracking', exact: true }).click(),
+  );
+  expect(new Set(tabs.map((frame) => Math.round(frame.x))).size).toBeGreaterThan(3);
+  const panel = await sampleMotion(page, '#settings-panel', () =>
+    page.getByRole('tab', { name: 'Website', exact: true }).click(),
+  );
+  expect(panel.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
+  await expect(page.getByRole('textbox', { name: 'Website name', exact: true })).toHaveValue(
+    'Unsaved motion check',
+  );
+  pass(`${theme}: tab underline and panel content animate while unsaved form values are preserved`);
+
+  const dropdown = await sampleMotion(page, '[data-slot="combobox-popup"]', () =>
+    page.getByRole('combobox', { name: 'Selected website' }).click(),
+  );
+  expect(dropdown.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
+  expect(dropdown.some((frame) => frame.transform !== 'none')).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('listbox')).not.toBeVisible();
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  const dialog = await sampleMotion(page, '[data-slot="dialog-popup"]', () =>
+    page.getByRole('menuitem', { name: 'Account settings' }).click(),
+  );
+  expect(dialog.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
+  await expect(page.getByRole('combobox', { name: 'Language', exact: true })).toBeVisible();
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Motion check');
+  const notification = await sampleMotion(page, '.kit-toast', () =>
+    page.getByRole('button', { name: 'Save name', exact: true }).click(),
+  );
+  expect(notification.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
+  await page.getByRole('button', { name: 'Dismiss notification' }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Account menu' })).toBeFocused();
+  pass(
+    `${theme}: dropdowns, dialogs and toasts have real intermediate animation frames and restore focus`,
+  );
+
+  const collapse = await sampleMotion(page, '[data-slot="sidebar-container"]', () =>
+    page.getByRole('button', { name: 'Toggle navigation' }).click(),
+  );
+  expect(new Set(collapse.map((frame) => Math.round(frame.x))).size).toBeGreaterThan(3);
+  await page.getByRole('button', { name: 'Toggle navigation' }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobile = await sampleMotion(page, '[data-mobile="true"]', () =>
+    page.getByRole('button', { name: 'Toggle navigation' }).click(),
+  );
+  expect(new Set(mobile.map((frame) => Math.round(frame.x))).size).toBeGreaterThan(3);
+  await expect(page.getByTestId('dashboard-language')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Close navigation' }).click();
+  await expect(page.getByRole('dialog', { name: 'Navigation', exact: true })).not.toBeVisible();
+  pass(`${theme}: desktop collapse and mobile navigation slide smoothly`);
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.getByRole('combobox', { name: 'Selected website' }).click();
+  await expect(page.locator('[data-slot="combobox-popup"]')).toHaveCSS(
+    'transition-property',
+    'none',
+  );
+  await page.keyboard.press('Escape');
+  const reducedPanel = await sampleMotion(page, '#settings-panel', () =>
+    page.getByRole('tab', { name: 'Tracking', exact: true }).click(),
+  );
+  expect(reducedPanel.every((frame) => frame.opacity === 1 && frame.transform === 'none')).toBe(
+    true,
+  );
+  await capture(page, { path: `${dir}/${theme}-sidebar-without-language.png` });
+  pass(`${theme}: reduced motion removes popup and panel movement`);
+}
+
+async function verifyProfileLoading(
+  page: Page,
+  state: Awaited<ReturnType<typeof fixtures>>,
+  theme: 'light' | 'dark',
+) {
+  let release = () => {};
+  state.profileGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  try {
+    await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Sam from North Studio');
+    const save = page.getByRole('button', { name: 'Save name' });
+    const before = await save.boundingBox();
+    await save.click();
+    const busy = page.locator('button[data-loading]');
+    const spinner = busy.locator('[data-slot="button-loading-indicator"]');
+    await expect(busy).toBeDisabled();
+    await expect(busy).toHaveAttribute('aria-busy', 'true');
+    await expect(busy).toHaveCSS('opacity', '1');
+    await expect(spinner.locator('circle')).toHaveCSS(
+      'stroke',
+      theme === 'light' ? 'rgb(255, 255, 255)' : 'rgb(18, 18, 18)',
+    );
+    const after = await busy.boundingBox();
+    await expect(spinner).toBeVisible();
+    const indicator = await spinner.boundingBox();
+    expect(after!.width).toBe(before!.width);
+    expect(indicator!.width).toBe(16);
+    expect(
+      Math.abs(indicator!.x + indicator!.width / 2 - (after!.x + after!.width / 2)),
+    ).toBeLessThan(1);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect(spinner.locator('svg')).toHaveCSS('animation-name', 'kit-spinner-rotate');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(spinner.locator('svg')).toHaveCSS('animation-name', 'none');
+    await capture(page, { path: `${dir}/${theme}-button-loading.png` });
+  } finally {
+    release();
+    state.profileGate = undefined;
+  }
+  await expect(page.locator('.kit-toast')).toContainText('Name saved.');
+  await expect(page.locator('[data-slot="button-loading-indicator"]')).toHaveCount(0);
+  pass(
+    `${theme}: pending save shows an opaque centered spinner, preserves button width and respects reduced motion`,
+  );
+}
+
 try {
   for (const theme of ['light', 'dark'] as const) {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 1000 },
       colorScheme: theme,
       permissions: ['clipboard-read', 'clipboard-write'],
-      reducedMotion: 'reduce',
+      reducedMotion: process.argv.includes('--motion-only') ? 'no-preference' : 'reduce',
+      ...(process.argv.includes('--record')
+        ? { recordVideo: { dir, size: { width: 1440, height: 1000 } } }
+        : {}),
     });
     const state = await fixtures(context);
     const page = await context.newPage();
@@ -292,6 +472,29 @@ try {
       if (message.type() === 'error' && /Base UI|React|hydration|uncontrolled/.test(message.text()))
         errors.push(message.text());
     });
+    if (process.argv.includes('--motion-only')) {
+      try {
+        await verifyMotion(page, theme);
+      } catch (error) {
+        console.error(await page.locator('body').innerText());
+        await page.screenshot({ path: `${dir}/motion-failure.png` });
+        throw error;
+      }
+      const video = page.video();
+      await context.close();
+      if (video) await rename(await video.path(), `${dir}/${theme}-motion.webm`);
+      continue;
+    }
+    if (process.argv.includes('--loading-only')) {
+      await page.goto(
+        `${base}/site/11111111-1111-4111-8111-111111111111/11111111-1111-4111-8111-111111111111/settings`,
+      );
+      await page.getByRole('button', { name: 'Account menu' }).click();
+      await page.getByRole('menuitem', { name: 'Account settings' }).click();
+      await verifyProfileLoading(page, state, theme);
+      await context.close();
+      continue;
+    }
     for (const route of process.argv.includes('--interactions-only')
       ? []
       : [
@@ -434,8 +637,7 @@ try {
         .click();
       await page.getByRole('menuitem', { name: 'Account settings' }).click();
       await expect(page.getByRole('dialog')).toBeVisible();
-      await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Sam from North Studio');
-      await page.getByRole('button', { name: 'Save name' }).click();
+      await verifyProfileLoading(page, state, theme);
       await expect(page.locator('.kit-toast')).toContainText('Name saved.');
       await capture(page, { path: `${dir}/${theme}-account-dialog.png` });
       await page.getByRole('button', { name: 'Dismiss notification' }).click();
@@ -552,7 +754,12 @@ try {
   }
   expect(errors).toEqual([]);
   expect(unexpected).toEqual([]);
-  await writeFile(`${dir}/results.json`, JSON.stringify({ checks, errors, unexpected }, null, 2));
+  const report = process.argv.includes('--motion-only')
+    ? 'motion-results'
+    : process.argv.includes('--loading-only')
+      ? 'loading-results'
+      : 'results';
+  await writeFile(`${dir}/${report}.json`, JSON.stringify({ checks, errors, unexpected }, null, 2));
 } finally {
   await browser.close();
 }

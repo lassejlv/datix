@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useId, useRef } from 'react';
+import { SelectionIndicator } from './selection-indicator';
 
 export function Tabs<Value extends string>({
   id,
@@ -13,6 +14,7 @@ export function Tabs<Value extends string>({
   items: readonly { value: Value; label: string }[];
   onValueChange: (value: Value) => void;
 }) {
+  const indicatorId = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   return (
     <div role="tablist" aria-label={label} className="kit-tabs">
@@ -48,6 +50,9 @@ export function Tabs<Value extends string>({
           }}
         >
           {item.label}
+          {value === item.value && (
+            <SelectionIndicator id={indicatorId} className="kit-tab-indicator" />
+          )}
         </button>
       ))}
     </div>

@@ -176,20 +176,16 @@ export function ComboboxPopup({
         side={side}
         sideOffset={sideOffset}
       >
-        <span
+        <ComboboxPrimitive.Popup
           className={cn(
-            'relative flex max-h-full min-w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) rounded-xl bg-popover p-1.5 shadow-[var(--menu-shadow)] transition-[scale,opacity] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none',
+            'kit-popup flex max-h-[min(var(--available-height),23rem)] min-w-(--anchor-width) max-w-(--available-width) flex-col rounded-xl bg-popover p-1.5 text-foreground shadow-[var(--menu-shadow)] outline-none',
             className,
           )}
+          data-slot="combobox-popup"
+          {...props}
         >
-          <ComboboxPrimitive.Popup
-            className="flex max-h-[min(var(--available-height),23rem)] flex-1 flex-col text-foreground"
-            data-slot="combobox-popup"
-            {...props}
-          >
-            {children}
-          </ComboboxPrimitive.Popup>
-        </span>
+          {children}
+        </ComboboxPrimitive.Popup>
       </ComboboxPrimitive.Positioner>
     </ComboboxPrimitive.Portal>
   );

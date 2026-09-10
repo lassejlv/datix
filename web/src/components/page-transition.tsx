@@ -1,4 +1,4 @@
-import { useLayoutEffect, type ReactNode } from 'react';
+import { useLayoutEffect, type ComponentProps } from 'react';
 import { useAnimate } from 'motion/react-mini';
 
 /** Animate the new view without retaining old controls or remounting forms. */
@@ -6,11 +6,10 @@ export function PageTransition({
   view,
   children,
   className,
+  ...props
 }: {
   view: string;
-  children: ReactNode;
-  className?: string;
-}) {
+} & ComponentProps<'div'>) {
   const [scope, animate] = useAnimate<HTMLDivElement>();
 
   useLayoutEffect(() => {
@@ -20,7 +19,7 @@ export function PageTransition({
     const animation = animate(
       element,
       { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
-      { duration: 0.18, ease: [0.22, 1, 0.36, 1] },
+      { duration: 0.24, ease: [0.19, 1, 0.22, 1] },
     );
     const stop = () => {
       animation.stop();
@@ -38,7 +37,7 @@ export function PageTransition({
   }, [view, scope, animate]);
 
   return (
-    <div ref={scope} className={className} data-page-transition={view}>
+    <div {...props} ref={scope} className={className} data-page-transition={view}>
       {children}
     </div>
   );

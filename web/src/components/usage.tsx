@@ -1,3 +1,4 @@
+import { PageTransition } from './page-transition';
 import { Alert } from './ui/alert';
 import { Input } from './ui/input';
 import { Tabs } from './ui/tabs';
@@ -103,7 +104,8 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
         items={tabs.map((value) => ({ value, label: labels[value] }))}
         onValueChange={setTab}
       />
-      <div
+      <PageTransition
+        view={tab}
         id="usage-panel"
         role="tabpanel"
         aria-labelledby={`usage-tab-${tab}`}
@@ -308,7 +310,7 @@ export function Usage({ data, error, loading, refresh }: ReturnType<typeof useAc
             </div>
           </>
         )}
-      </div>
+      </PageTransition>
     </section>
   );
 }

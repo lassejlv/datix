@@ -11,6 +11,7 @@ type Props = Omit<
   value?: string | number;
   defaultValue?: string | number;
   onValueChange?: (value: string) => void;
+  popupClassName?: string;
   'data-testid'?: string;
 };
 
@@ -24,6 +25,7 @@ export function Select({
   disabled,
   required,
   className,
+  popupClassName,
   id,
   ...props
 }: Props) {
@@ -67,12 +69,16 @@ export function Select({
       </Primitive.Trigger>
       <Primitive.Portal>
         <Primitive.Positioner
-          sideOffset={6}
+          sideOffset={4}
+          align="start"
           alignItemWithTrigger={false}
           className="z-[70] max-w-[calc(100vw-24px)] outline-none"
         >
-          <Primitive.Popup className="kit-select-popup">
-            <Primitive.List className="max-h-[min(320px,var(--available-height))] overflow-y-auto p-1.5">
+          <Primitive.Popup className={cn('kit-select-popup', popupClassName)}>
+            <Primitive.List
+              data-slot="select-list"
+              className="max-h-[min(320px,var(--available-height))] overflow-y-auto p-1.5"
+            >
               {items.map((item) => (
                 <Primitive.Item
                   key={item.value}
@@ -80,12 +86,15 @@ export function Select({
                   disabled={item.disabled}
                   className="kit-select-option"
                 >
-                  <span className="flex w-4 shrink-0 items-center">
+                  <span
+                    data-slot="select-item-indicator"
+                    className="flex w-4 shrink-0 items-center"
+                  >
                     <Primitive.ItemIndicator>
                       <Check className="size-4" />
                     </Primitive.ItemIndicator>
                   </span>
-                  <Primitive.ItemText>{item.label}</Primitive.ItemText>
+                  <Primitive.ItemText className="min-w-0">{item.label}</Primitive.ItemText>
                 </Primitive.Item>
               ))}
             </Primitive.List>

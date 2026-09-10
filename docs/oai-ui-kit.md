@@ -14,7 +14,9 @@ The components under `web/src/components/ui/` cover buttons, inputs/textarea, se
 - Use `Hint` or `HintText` for contextual explanations. Icon buttons with an accessible label receive a tooltip automatically. The tooltip wrapper supplies the description relationship explicitly.
 - Use `Alert` for form/report errors that need to remain visible. Use `toast.success` only after the server or clipboard operation succeeds; use `toast.error` for transient failures such as blocked clipboard access.
 - `ToastProvider` lives under site preferences at the root. Notifications stack at the bottom right, remain dismissible over dialogs, and use localized labels. Success/info messages expire after five seconds and errors after eight seconds.
-- `Tabs` provides the shared compact underline navigation, keyboard movement, and scrolling into view on narrow screens.
+- `Tabs` provides compact underline navigation, keyboard movement, and scrolling into view on narrow screens. `SelectionIndicator` animates the underline and sidebar selection between their actual positions. `PageTransition` fades/slides newly selected content without remounting forms.
+- Menus and calendars ease in over 240 ms and exit over 140 ms; dialogs, sheets, and notifications use 240–280 ms movement with shorter exits. Popup motion belongs to the Base UI popup itself so its starting/ending states actually drive the transition. Buttons have a small press response, and checkbox/switch changes animate.
+- OS Reduced Motion disables movement. Language/theme selection remains in account settings; the sidebar footer contains the account menu only.
 
 The kit is applied across authentication, onboarding forms, the dashboard, account/website/environment settings, installation, imports, usage/billing, feature reports, and public pages. The English, Danish, and German catalogs contain the new feedback and calendar labels.
 
@@ -27,8 +29,12 @@ bun run --cwd web typecheck
 bun run --cwd web test
 bun run --cwd web build
 bun web/scripts/oai-kit-qa.ts
+bun web/scripts/oai-kit-qa.ts --loading-only
+bun web/scripts/oai-kit-qa.ts --motion-only --record
 ```
 
 The Playwright acceptance script only permits localhost and intercepts API requests with isolated fixtures. It exercises ten workspace routes in both themes, keyboard selects/calendar/tooltips, workspace search, successful and failed saves, tracking consent, account dialogs, toast dismissal, clipboard errors, budgets, mobile layouts at 320/390 px, public/auth pages, and persisted language/theme preferences. It fails on uncaught browser errors or unexpected API paths. Screenshots and the acceptance report are written to gitignored `web/artifacts/oai-kit/`.
+
+The loading check holds a save response open and verifies spinner color, opacity, centering, stable button width, and reduced motion in both themes. The motion check samples intermediate animation frames, verifies draft preservation and the sidebar footer, and can record WebM previews.
 
 These checks validate the real frontend with synthetic responses. They do not establish authenticated backend integration, Polar checkout, webhook delivery, or production deployment acceptance.

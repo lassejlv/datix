@@ -696,7 +696,8 @@ function Overview({
         <div className="flex shrink-0 items-center gap-2 max-md:self-stretch">
           <div className="flex min-w-0 max-md:flex-1">
             <Select
-              className="cursor-pointer appearance-none bg-transparent pr-2 text-[13px] text-foreground max-md:flex-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              className="kit-date-range max-md:flex-1"
+              popupClassName="kit-date-menu"
               aria-label={t('Date range')}
               value={days}
               onValueChange={(value) => setDays(value)}

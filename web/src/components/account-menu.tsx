@@ -45,7 +45,7 @@ export function AccountMenu({
           <Menu.Popup
             aria-label={t('Account')}
             finalFocus={() => !openingSettings.current}
-            className="w-60 max-w-[calc(100vw-24px)] origin-(--transform-origin) rounded-xl bg-popover p-2.5 text-foreground shadow-[var(--menu-shadow)] outline-none transition-[scale,opacity] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] data-starting-style:scale-98 data-starting-style:opacity-0 data-ending-style:scale-98 data-ending-style:opacity-0 motion-reduce:transition-none"
+            className="kit-popup w-60 max-w-[calc(100vw-24px)] rounded-xl bg-popover p-2.5 text-foreground shadow-[var(--menu-shadow)] outline-none"
           >
             <div className="px-1.5 pb-3">
               <p className="truncate text-sm font-medium">{user.name}</p>

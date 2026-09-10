@@ -31,7 +31,7 @@ export function SheetBackdrop({
   return (
     <SheetPrimitive.Backdrop
       className={cn(
-        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
+        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-200 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
         className,
       )}
       data-slot="sheet-backdrop"
@@ -89,15 +89,15 @@ export function SheetPopup({
       <SheetViewport side={side} variant={variant}>
         <SheetPrimitive.Popup
           className={cn(
-            'relative flex max-h-full min-h-0 w-full min-w-0 flex-col bg-popover text-popover-foreground shadow-[var(--menu-shadow)] transition-[opacity,translate] duration-150 motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)] will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0',
+            'relative flex max-h-full min-h-0 w-full min-w-0 flex-col bg-popover text-popover-foreground shadow-[var(--menu-shadow)] transition-[opacity,translate] duration-[280ms] data-ending-style:duration-200 motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)] will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0',
             side === 'bottom' &&
-              'row-start-2 border-t data-ending-style:translate-y-8 data-starting-style:translate-y-8',
+              'row-start-2 border-t data-ending-style:translate-y-full data-starting-style:translate-y-full',
             side === 'top' &&
-              'border-b data-ending-style:-translate-y-8 data-starting-style:-translate-y-8',
+              'border-b data-ending-style:-translate-y-full data-starting-style:-translate-y-full',
             side === 'left' &&
-              'w-[calc(100%-(--spacing(12)))] max-w-md border-e data-ending-style:-translate-x-8 data-starting-style:-translate-x-8',
+              'w-[calc(100%-(--spacing(12)))] max-w-md border-e data-ending-style:-translate-x-full data-starting-style:-translate-x-full',
             side === 'right' &&
-              'col-start-2 w-[calc(100%-(--spacing(12)))] max-w-md border-s data-ending-style:translate-x-8 data-starting-style:translate-x-8',
+              'col-start-2 w-[calc(100%-(--spacing(12)))] max-w-md border-s data-ending-style:translate-x-full data-starting-style:translate-x-full',
             variant === 'inset' &&
               'sm:rounded-xl sm:border sm:border-hover sm:**:data-[slot=sheet-footer]:rounded-b-[calc(var(--radius-xl)-1px)]',
             className,

@@ -1,3 +1,4 @@
+import { PageTransition } from './page-transition';
 import { Alert } from './ui/alert';
 import { Tabs } from './ui/tabs';
 import { toast } from './ui/toast';
@@ -496,7 +497,8 @@ export function SiteSettings({
         items={tabs.map((value) => ({ value, label: labels[value] }))}
         onValueChange={setTab}
       />
-      <div
+      <PageTransition
+        view={tab}
         id="settings-panel"
         role="tabpanel"
         aria-labelledby={`settings-tab-${tab}`}
@@ -581,7 +583,7 @@ export function SiteSettings({
             </Button>
           </section>
         </div>
-      </div>
+      </PageTransition>
       <Dialog
         open={deleting}
         onOpenChange={(value) => {
