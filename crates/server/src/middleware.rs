@@ -1,5 +1,6 @@
 use analytics_core::{Error, State, crypto};
 use analytics_services::auth::{self, Identity};
+use analytics_services::{billing, onboarding};
 use axum::{
     body::{Body, to_bytes},
     extract::{ConnectInfo, Request, State as AxumState},
@@ -61,6 +62,7 @@ pub fn normalized(state: &State, headers: &HeaderMap, peer: &str) -> (String, St
 }
 fn account_path(path: &str) -> bool {
     path == "/api/me"
+        || path == "/api/onboarding/complete"
         || path == "/api/usage"
         || path == "/api/billing"
         || path.starts_with("/api/billing/")
@@ -94,6 +96,15 @@ async fn authorize(
             state
                 .limit("api", &format!("user:{}", identity.user.id), 120)
                 .await?;
+            if path.starts_with("/api/sites/")
+                || (path == "/api/sites"
+                    && method == Method::GET
+                    && onboarding::completed(state, &identity.user.id).await?)
+            {
+                billing::require_subscription(state, &identity.user.id).await?;
+            }
+            // POST /api/sites permits exactly one onboarding website; the service
+            // checks this inside the same transaction as creation.
             context.identity = Some(identity);
         }
     }

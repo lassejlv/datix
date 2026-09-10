@@ -38,6 +38,16 @@ Signed webhooks deduplicate delivery IDs and update snapshots in one transaction
 
 Access requires an enabled catalog product, an active/trialing subscription, correct period/currency and the analytics, website and meter-credit grants. Canceled periods and expired trials stop granting access. Website capacity comes from the grant metadata; event capacity comes from the granted credit units. Polar's asynchronous consumed totals never reset the local ledger.
 
+### Workspace access after onboarding
+
+New accounts may add one website and copy its installation script before selecting a plan. `POST /api/onboarding/complete` saves completion in `account_onboarding`; it does not claim that the script has sent a pageview. Collection already requires a subscription, so checking the first pageview happens after activation. Upgrade 0012 marks existing accounts with websites as having completed onboarding.
+
+`GET /api/usage` returns `onboardingCompleted` together with the server-verified plan. Until a plan is valid, the app renders only initial setup or the plan selector, with billing management, subscription refresh and sign-out. It does not mount the workspace sidebar, reports, installation settings or other product routes. Deep links, cleared browser storage and checkout return parameters cannot bypass this gate. Verification errors fail closed; polling, focus and denied API requests refresh access.
+
+The API independently requires a current verified subscription for all `/api/sites/{site}/...` operations. Before onboarding completion, `/api/sites` permits listing and creating exactly one website; creation and completion use the same user-row lock. After completion, listing also requires a subscription. Billing, authentication and account recovery/deletion remain reachable. Denied workspace requests return `402 subscription_required`. Active trials and subscriptions canceled at the end of a still-valid period retain access. Running out of event credits pauses collection without revoking workspace access. Expired, past-due, canceled or unverified subscriptions do not grant access.
+
+`bun web/scripts/subscription-access-qa.ts` checks the gate with local browser fixtures. The local Polar QA below additionally exercises actual Rust routes, the isolated database, signed webhook activation and revocation.
+
 ## Usage delivery
 
 Admission and ingestion enforce account and optional website budgets transactionally. Event credit values are stored in hundredths so fractional usage stays exact. Deduplicated analytics writes and usage outbox rows commit together. Delivery sends `events` with `metadata.quantity`, `metadata.event_type`, the account external ID and the original timestamp; no visitor identity or page data is sent.
@@ -54,4 +64,4 @@ Browser smoke (after building the Rust server and frontend):
 bun --env-file=.env web/scripts/polar-qa.ts
 ```
 
-This starts a local API and mock checkout/portal, creates one disposable app user, verifies USD pricing in all three locales, the annual gate, browser checkout, signed trial activation and portal navigation, then removes its records. Screenshots are written to `web/artifacts/polar/`. Install Playwright Chromium first. It requires the explicitly isolated test branch and Redis on 6394.
+This starts a local API and mock checkout/portal, creates one disposable app user, verifies USD pricing in all three locales, the annual gate, onboarding, blocked report APIs, checkout return without a grant, signed trial activation, portal navigation and renewed blocking after revocation, then removes its records. Screenshots are written to `web/artifacts/polar/`. Install Playwright Chromium first. It requires the explicitly isolated test branch and Redis on 6394.

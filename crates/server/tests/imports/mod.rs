@@ -77,6 +77,7 @@ async fn reviewed(
 #[ignore = "requires isolated Neon and Redis"]
 async fn import_preview_commit_report_duplicate_and_removal_leave_tracking_unbilled() {
     fixture!(f, {
+        f.pro().await;
         let site = f.site().await;
         let endpoint = path(site, site);
         let csv = plausible(10, 35);
@@ -161,7 +162,9 @@ async fn import_preview_commit_report_duplicate_and_removal_leave_tracking_unbil
 #[ignore = "requires isolated Neon and Redis"]
 async fn imports_are_isolated_by_owner_environment_and_origin() {
     fixture!(f, {
+        f.pro().await;
         fixture!(other, {
+            other.pro().await;
             let site = f.site().await;
             let foreign = other.site().await;
             let endpoint = path(site, site);
@@ -236,6 +239,7 @@ async fn imports_are_isolated_by_owner_environment_and_origin() {
 #[ignore = "requires isolated Neon and Redis"]
 async fn imports_recheck_native_dates_timezone_boundaries_and_the_reviewed_file() {
     fixture!(f, {
+        f.pro().await;
         let site = f.site().await;
         let endpoint = path(site, site);
         let csv = plausible(10, 11);
@@ -300,6 +304,7 @@ async fn imports_recheck_native_dates_timezone_boundaries_and_the_reviewed_file(
 #[ignore = "requires isolated Neon and Redis"]
 async fn ga4_import_accepts_daily_total_users_and_serializes_concurrent_commits() {
     fixture!(f, {
+        f.pro().await;
         let site = f.site().await;
         let endpoint = path(site, site);
         let csv = format!(

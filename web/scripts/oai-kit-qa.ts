@@ -97,6 +97,7 @@ async function fixtures(context: BrowserContext) {
     } else if (path === '/sites' && method === 'GET') result = { sites: [site] };
     else if (path === '/usage')
       result = {
+        onboardingCompleted: true,
         plan: { name: 'Basic', trial: false, eventLimit: 100000, websiteLimit: 10 },
         period: { start: `${today}T00:00:00Z`, end: '2026-12-01T00:00:00Z' },
         events: { used: 24810, remaining: 75190 },

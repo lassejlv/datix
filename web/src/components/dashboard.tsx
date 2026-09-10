@@ -13,6 +13,7 @@ import { featureDefinitions, isFeaturePage } from '../lib/features';
 import { deviceName } from '../lib/i18n/display';
 import { useSitePreferences } from './site-preferences';
 import { AccountSettings } from './account-settings';
+import { AccountAccess } from './account-access';
 import { Usage, useAccountUsage } from './usage';
 import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
@@ -90,9 +91,13 @@ export function AnalyticsApp() {
       </main>
     );
   return user ? (
-    <SidebarProvider className="dashboard-workspace">
-      <Dashboard key={user.id} user={user} onSignedOut={signedOut} onUserUpdated={setUser} />
-    </SidebarProvider>
+    <AccountAccess key={user.id} user={user} onSignedOut={signedOut}>
+      {(usage) => (
+        <SidebarProvider className="dashboard-workspace">
+          <Dashboard user={user} onSignedOut={signedOut} onUserUpdated={setUser} usage={usage} />
+        </SidebarProvider>
+      )}
+    </AccountAccess>
   ) : (
     <AuthScreen
       initialSignup={pathname === '/signup'}
@@ -120,10 +125,12 @@ function Dashboard({
   user,
   onSignedOut,
   onUserUpdated,
+  usage,
 }: {
   user: User;
   onSignedOut: () => void;
   onUserUpdated: (user: User) => void;
+  usage: ReturnType<typeof useAccountUsage>;
 }) {
   const { message: messageText, t } = useSitePreferences();
   const navigate = useNavigate();
@@ -138,7 +145,6 @@ function Dashboard({
     [environmentIds, setEnvironmentIds] = useState<Record<string, string>>({});
   const selected = params.siteId ?? rememberedSite;
   const panel: Panel = isUsage ? 'usage' : isDashboardPage(params.page) ? params.page : 'overview';
-  const usage = useAccountUsage(`${panel}:${sites.length}`);
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [addOpen, setAddOpen] = useState(false),
@@ -293,7 +299,11 @@ function Dashboard({
     } catch {
       /* Optional resume preference. */
     }
-  }, [user.id, selected, environment?.id]);
+    if (!usage.data?.onboardingCompleted)
+      void apiClient('/onboarding/complete', write('POST', {}))
+        .then(usage.refresh)
+        .catch((error) => setError(errorText(error)));
+  }, [user.id, usage.data?.onboardingCompleted, usage.refresh, selected, environment?.id]);
   function accountDeleted() {
     try {
       const exact = [

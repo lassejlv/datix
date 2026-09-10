@@ -4,6 +4,7 @@ pub mod billing;
 pub mod collect;
 pub mod imports;
 pub mod ingest;
+pub mod onboarding;
 pub mod queue;
 pub mod reports;
 pub mod retention;

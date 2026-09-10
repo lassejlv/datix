@@ -247,6 +247,8 @@ mod overview;
 mod polar;
 #[path = "scaling/mod.rs"]
 mod scaling;
+#[path = "integration/subscription_access.rs"]
+mod subscription_access;
 
 #[tokio::test]
 #[ignore = "requires isolated Neon and Redis"]
@@ -289,6 +291,7 @@ async fn http_auth_ownership_methods_validation_and_environment_contracts() {
             403
         );
         let site = f.site().await;
+        f.pro().await;
         let (status, body, _) = f.request(&format!("/api/sites/{site}"), "GET", None).await;
         assert_eq!(status, 200);
         assert_eq!(body["site"]["environments"][0]["id"], site.to_string());

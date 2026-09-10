@@ -97,9 +97,19 @@ pub async fn create(state: &State, owner: &str, body: Value) -> Result<Value> {
         .await?;
     let (allowance, _) =
         super::billing::usage::account_allowance(&mut tx, owner, chrono::Utc::now()).await?;
+    if allowance.is_none() {
+        let completed: bool =
+            sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM account_onboarding WHERE owner_id=$1)")
+                .bind(owner)
+                .fetch_one(&mut *tx)
+                .await?;
+        if completed || total > 0 {
+            return Err(super::billing::subscription_required());
+        }
+    }
     if allowance
         .as_ref()
-        .map_or(total >= 10, |a| !a.permits_website(total))
+        .is_some_and(|a| !a.permits_website(total))
     {
         return Err(Error::new(
             409,

@@ -64,7 +64,16 @@ export async function apiClient<T>(path: string, init: RequestInit = {}): Promis
     headers: { 'Content-Type': 'application/json', ...init.headers },
   });
   if (response.status === 204) return undefined as T;
-  const data = (await response.json()) as { error?: { message?: string }; message?: string };
+  const data = (await response.json()) as {
+    error?: { code?: string; message?: string };
+    message?: string;
+  };
+  if (
+    response.status === 402 &&
+    data.error?.code === 'subscription_required' &&
+    typeof window !== 'undefined'
+  )
+    window.dispatchEvent(new Event('datix:subscription-required'));
   if (!response.ok)
     throw new ApiError(
       response.status,

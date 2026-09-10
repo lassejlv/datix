@@ -25,7 +25,7 @@ mod auth_routes;
 mod feature_routes;
 use auth_routes::authentication;
 mod account_routes;
-use account_routes::{billing_operation, billing_root, me, usage};
+use account_routes::{billing_operation, billing_root, complete_onboarding, me, usage};
 mod site_routes;
 use site_routes::{
     create_environment, create_site, delete_environment, delete_site, get_environment, get_site,
@@ -85,6 +85,7 @@ pub fn router(state: State, jobs_ready: Arc<AtomicBool>) -> Router {
         )
         .route("/api/auth/{*path}", any(authentication))
         .route("/api/me", get(me))
+        .route("/api/onboarding/complete", post(complete_onboarding))
         .route("/api/usage", get(usage))
         .route("/api/billing", any(billing_root))
         .route("/api/billing/{*path}", any(billing_operation))

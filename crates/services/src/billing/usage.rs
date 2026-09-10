@@ -20,11 +20,11 @@ pub struct Count {
     pub site_id: Uuid,
     pub units: i64,
 }
-pub async fn account_allowance(
+pub async fn active_allowance(
     conn: &mut PgConnection,
     owner: &str,
     now: DateTime<Utc>,
-) -> Result<(Option<Allowance>, Vec<Website>)> {
+) -> Result<Option<Allowance>> {
     let rows: Vec<Value> = sqlx::query_scalar(
         "SELECT subscriptions FROM billing_customers WHERE owner_id=$1 AND deleted=false AND provider='polar' AND organization_id=$2 AND updated_at>now()-interval '5 minutes'",
     )
@@ -36,8 +36,16 @@ pub async fn account_allowance(
         .into_iter()
         .flat_map(|row| serde_json::from_value::<Vec<Subscription>>(row).unwrap_or_default())
         .collect();
+    Ok(allowance::active(subscriptions, now))
+}
+pub async fn account_allowance(
+    conn: &mut PgConnection,
+    owner: &str,
+    now: DateTime<Utc>,
+) -> Result<(Option<Allowance>, Vec<Website>)> {
+    let allowance = active_allowance(conn, owner, now).await?;
     let sites=sqlx::query_as::<_,Website>("SELECT id,name,domain,credit_budget::text,EXISTS(SELECT 1 FROM environments WHERE site_id=sites.id AND enabled=true) AS enabled FROM sites WHERE owner_id=$1 ORDER BY created_at,id").bind(owner).fetch_all(conn).await?;
-    Ok((allowance::active(subscriptions, now), sites))
+    Ok((allowance, sites))
 }
 pub async fn period_usage(
     conn: &mut PgConnection,
@@ -58,6 +66,11 @@ pub async fn account_usage(state: &State, owner: &str) -> Result<Value> {
     usage(&mut conn, owner, Utc::now()).await
 }
 pub async fn usage(conn: &mut PgConnection, owner: &str, now: DateTime<Utc>) -> Result<Value> {
+    let onboarding_completed: bool =
+        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM account_onboarding WHERE owner_id=$1)")
+            .bind(owner)
+            .fetch_one(&mut *conn)
+            .await?;
     let (allowance, websites) = account_allowance(conn, owner, now).await?;
     let rows = if let Some(a) = &allowance {
         period_usage(conn, owner, a.period.start).await?
@@ -80,6 +93,6 @@ pub async fn usage(conn: &mut PgConnection, owner: &str, now: DateTime<Utc>) -> 
   json!({"id":s.id,"name":s.name,"domain":s.domain,"events":units as f64/100.0,"creditBudget":s.credit_budget.as_ref().and_then(|v|v.parse::<f64>().ok()),"paused":reason.is_some(),"pauseReason":reason})
  }).collect();
     Ok(
-        json!({"plan":allowance.as_ref().map(|a|json!({"name":a.subscription.entitlements.as_ref().map(|e| &e.name),"trial":a.trial,"eventLimit":a.event_limit.map(|v|v as f64/100.0),"websiteLimit":a.website_limit})),"period":allowance.as_ref().map(|a|&a.period),"events":{"used":used as f64/100.0,"remaining":remaining.map(|v| v as f64/100.0)},"paused":pause.is_some(),"pauseReason":pause,"websites":websites}),
+        json!({"onboardingCompleted":onboarding_completed,"plan":allowance.as_ref().map(|a|json!({"name":a.subscription.entitlements.as_ref().map(|e| &e.name),"trial":a.trial,"eventLimit":a.event_limit.map(|v|v as f64/100.0),"websiteLimit":a.website_limit})),"period":allowance.as_ref().map(|a|&a.period),"events":{"used":used as f64/100.0,"remaining":remaining.map(|v| v as f64/100.0)},"paused":pause.is_some(),"pauseReason":pause,"websites":websites}),
     )
 }

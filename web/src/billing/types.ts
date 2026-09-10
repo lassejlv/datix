@@ -27,6 +27,7 @@ export type UsagePauseReason =
   | 'website_budget'
   | 'disabled';
 export type AccountUsage = {
+  onboardingCompleted: boolean;
   protection?: {
     since: string;
     blocked: number;

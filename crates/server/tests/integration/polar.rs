@@ -553,7 +553,7 @@ async fn local_quota_remains_exact_across_async_provider_updates_and_plan_change
             .await
             .unwrap();
         assert_eq!(usage["plan"]["name"], "Pro");
-        assert_eq!(usage["events"]["remaining"], 999999.0);
+        assert_eq!(usage["events"]["remaining"], pro.events as f64 - 1.0);
         assert!(
             ingest::ingest(&f.state, &f.event(site), Utc::now())
                 .await

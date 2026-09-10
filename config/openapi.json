@@ -412,6 +412,10 @@
                           }
                         }
                       }
+                    },
+                    "onboardingCompleted": {
+                      "type": "boolean",
+                      "description": "Persisted completion of initial website setup. Does not itself grant subscription access."
                     }
                   }
                 }
@@ -791,6 +795,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -937,6 +944,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -1068,6 +1078,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -1224,6 +1237,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -1331,6 +1347,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -1466,6 +1485,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -1675,6 +1697,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -1815,6 +1840,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -2025,6 +2053,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -2132,6 +2163,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -2280,6 +2314,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -2451,6 +2488,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -2630,6 +2670,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -2837,6 +2880,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3071,6 +3117,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3431,6 +3480,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -3487,6 +3539,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3533,6 +3588,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -3576,6 +3634,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3622,6 +3683,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3668,6 +3732,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3714,6 +3781,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       },
@@ -3766,6 +3836,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3820,6 +3893,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -3998,6 +4074,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         },
         "parameters": [
@@ -4112,6 +4191,9 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         }
       }
@@ -4214,9 +4296,57 @@
                 }
               }
             }
+          },
+          "402": {
+            "description": "A current, verified subscription or trial is required (subscription_required). Initial onboarding permits listing websites and creating exactly one website before completion."
           }
         },
         "description": "Create a dated note or delete one belonging to this environment. Maximum 500 notes; dates must be within the last 730 days."
+      }
+    },
+    "/api/onboarding/complete": {
+      "post": {
+        "operationId": "completeOnboarding",
+        "summary": "Finish website setup before selecting a subscription",
+        "description": "Idempotently records onboarding completion after a website has been added. Does not activate a subscription. Requires the application Origin.",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "SecureSessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Onboarding completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "onboardingCompleted"
+                  ],
+                  "properties": {
+                    "onboardingCompleted": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Invalid application origin"
+          },
+          "409": {
+            "description": "Add a website first (website_required)"
+          }
+        }
       }
     }
   },

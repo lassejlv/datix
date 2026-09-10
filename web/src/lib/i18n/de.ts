@@ -1,5 +1,17 @@
 import type { Copy } from './en';
 export const de = {
+  'Checking your subscription…': 'Dein Abonnement wird geprüft…',
+  'Choose a plan to continue': 'Wähle einen Tarif, um fortzufahren',
+  'Choose a plan to continue.': 'Wähle einen Tarif, um fortzufahren.',
+  'An active subscription or trial is required to use your workspace.':
+    'Du benötigst ein aktives Abonnement oder eine aktive Testphase, um deinen Arbeitsbereich zu nutzen.',
+  'Install the script on {domain}, then choose your plan.':
+    'Installiere das Script auf {domain} und wähle anschließend deinen Tarif.',
+  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
+    'Das Tracking beginnt, sobald dein Abonnement oder deine Testphase aktiv ist. Danach kannst du die Installation prüfen.',
+  'Continue to plans': 'Weiter zu den Tarifen',
+  'Add your website before choosing a plan.':
+    'Füge deine Website hinzu, bevor du einen Tarif wählst.',
   'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
     'Stündliches Traffic-Diagramm. Verwende die linke und rechte Pfeiltaste, um jede Stunde anzusehen.',
   'Live data is temporarily unavailable.': 'Live-Daten sind vorübergehend nicht verfügbar.',

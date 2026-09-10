@@ -200,19 +200,50 @@ try {
   if (!signup.ok()) throw Error(`Signup ${signup.status()}`);
   owner = (await signup.json()).user.id;
   await page.goto(`${base}/usage`);
-  await page.getByRole('tab', { name: 'Billing', exact: true }).click();
+  await page.getByRole('button', { name: 'Add your first website' }).click();
+  await page.getByLabel('Website name', { exact: true }).fill('Polar QA website');
+  await page.getByLabel('Website domain').fill('polar-qa.example');
+  await page.getByRole('button', { name: 'Add website', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Connect your website' })).toBeVisible();
+  await page.getByRole('button', { name: 'Continue to plans' }).click();
+  await expect(page.locator('#plan-required-title')).toBeVisible();
+  const sites = await client.query('SELECT id FROM sites WHERE owner_id=$1', [owner]);
+  const siteId = sites.rows[0].id;
+  expect((await context.request.get(`${base}/api/sites/${siteId}/overview`)).status()).toBe(402);
+  await page.screenshot({ path: 'web/artifacts/polar/plan-required.png', fullPage: true });
+  await page.getByRole('button', { name: 'Choose plan', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Local Polar checkout' })).toBeVisible();
+  // A return URL is not proof of payment or a grant.
+  await page.goto(`${base}/usage?checkout_id=${checkout.id}`);
+  await expect(page.locator('#plan-required-title')).toBeVisible();
+  await expect(
+    page.getByText('Waiting for Polar to confirm your subscription.', { exact: false }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Choose plan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Local Polar checkout' })).toBeVisible();
   await page.getByRole('button', { name: 'Confirm test trial' }).click();
   await page.getByRole('tab', { name: 'Billing', exact: true }).click();
+  expect((await context.request.get(`${base}/api/sites/${siteId}/overview`)).status()).toBe(200);
   await expect(page.getByRole('button', { name: 'Manage billing', exact: true })).toBeVisible();
   await expect(page.locator('main')).toContainText('Basic');
   await page.screenshot({ path: 'web/artifacts/polar/active-trial.png', fullPage: true });
   await page.getByRole('button', { name: 'Manage billing', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Local Polar customer portal' })).toBeVisible();
+  active = false;
+  expect(
+    (
+      await context.request.post(`${base}/api/billing/sync`, {
+        headers: { Origin: base },
+        data: {},
+      })
+    ).ok(),
+  ).toBe(true);
+  await page.goto(`${base}/site/${siteId}/${siteId}/overview`);
+  await expect(page.locator('#plan-required-title')).toBeVisible();
+  expect((await context.request.get(`${base}/api/sites/${siteId}/overview`)).status()).toBe(402);
   if (errors.length) throw Error(errors.join('\n'));
   console.log(
-    'PASS: USD pricing en/da/de, annual gate, browser checkout, signed trial activation, portal; local mock only.',
+    'PASS: USD pricing en/da/de, onboarding and API gate, checkout return without grant, signed trial unlock, portal, revoked subscription re-lock; local mock only.',
   );
 } finally {
   await browser.close();

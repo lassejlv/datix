@@ -128,9 +128,11 @@ export function Installation({
   onDashboard,
   onUpdated,
   guided = false,
+  awaitingPlan = false,
   onConnected,
 }: {
   guided?: boolean;
+  awaitingPlan?: boolean;
   onConnected?: () => void;
   site: Site;
   environment: SiteEnvironment;
@@ -303,55 +305,59 @@ export function Installation({
           </p>
         )}
       </section>
-      <section className="mb-6">
-        <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3 md:flex md:items-center md:gap-4">
-          <span
-            className={`grid size-7 shrink-0 place-items-center rounded-md bg-accent text-[13px] ${receiving ? 'text-success' : ''}`}
-          >
-            {receiving ? <CircleCheck size={20} /> : '3'}
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
-              {receiving ? t('You\u2019re connected') : t('Check that it\u2019s working')}
-            </h2>
-            <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
-              {t('Visit your website in a browser, then check for your first pageview.')}
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 flex gap-3 max-md:flex-wrap md:ml-11">
-          {guided && (
-            <Button
-              variant="outline"
-              render={<a href={`https://${environment.domain}`} target="_blank" rel="noreferrer" />}
+      {!awaitingPlan && (
+        <section className="mb-6">
+          <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3 md:flex md:items-center md:gap-4">
+            <span
+              className={`grid size-7 shrink-0 place-items-center rounded-md bg-accent text-[13px] ${receiving ? 'text-success' : ''}`}
             >
-              {t('Open my website')}
-              <ArrowRight size={15} />
+              {receiving ? <CircleCheck size={20} /> : '3'}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[17px] leading-[1.4] font-medium tracking-[-0.025em]">
+                {receiving ? t('You\u2019re connected') : t('Check that it\u2019s working')}
+              </h2>
+              <p className="mt-1.5 text-sm leading-[1.6] text-secondary-ink wrap-anywhere">
+                {t('Visit your website in a browser, then check for your first pageview.')}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-3 max-md:flex-wrap md:ml-11">
+            {guided && (
+              <Button
+                variant="outline"
+                render={
+                  <a href={`https://${environment.domain}`} target="_blank" rel="noreferrer" />
+                }
+              >
+                {t('Open my website')}
+                <ArrowRight size={15} />
+              </Button>
+            )}
+            <Button onClick={check} variant={receiving ? 'outline' : 'default'} loading={busy}>
+              <RefreshCw size={15} />
+              {t('Check installation')}
             </Button>
+            {receiving && (
+              <Button onClick={onDashboard}>
+                {t('View dashboard')}
+                <ArrowRight size={15} />
+              </Button>
+            )}
+          </div>
+          {message && (
+            <p
+              className={`mt-4 text-sm leading-[1.6] ${receiving ? 'text-success' : 'text-secondary-ink'}`}
+              role="status"
+            >
+              {message}
+            </p>
           )}
-          <Button onClick={check} variant={receiving ? 'outline' : 'default'} loading={busy}>
-            <RefreshCw size={15} />
-            {t('Check installation')}
-          </Button>
-          {receiving && (
-            <Button onClick={onDashboard}>
-              {t('View dashboard')}
-              <ArrowRight size={15} />
-            </Button>
+          {error && (
+            <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
           )}
-        </div>
-        {message && (
-          <p
-            className={`mt-4 text-sm leading-[1.6] ${receiving ? 'text-success' : 'text-secondary-ink'}`}
-            role="status"
-          >
-            {message}
-          </p>
-        )}
-        {error && (
-          <Alert className="text-sm leading-normal text-danger">{messageText(error)}</Alert>
-        )}
-      </section>
+        </section>
+      )}
       {environment.trackingMode !== 'cookieless' && (
         <section className="mb-6 rounded-md border border-border bg-muted p-5">
           <h2 className="text-[17px] font-medium">
@@ -402,24 +408,26 @@ export function Installation({
           </a>
         </section>
       )}
-      <ExtrasContainer>
-        {guided && (
-          <summary className="mb-5 cursor-pointer text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
-            {t('Testing locally or tracking custom events?')}
-          </summary>
-        )}
-        <LocalhostSetting environment={environment} busy={busy} onChange={setLocalhost} />
-        <div className="pt-2">
-          <h3 className="text-[15px] font-medium tracking-[-0.025em]">
-            {t('Want to track a specific action?')}
-          </h3>
-          <p className="mt-1.5 text-sm leading-[1.8] text-secondary-ink wrap-anywhere">
-            Use{' '}
-            <code className="font-mono text-[0.9em]">window.simpleAnalytics.track('signup')</code>{' '}
-            after your script has loaded. Replace “signup” with a short name for the action.
-          </p>
-        </div>
-      </ExtrasContainer>
+      {!awaitingPlan && (
+        <ExtrasContainer>
+          {guided && (
+            <summary className="mb-5 cursor-pointer text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+              {t('Testing locally or tracking custom events?')}
+            </summary>
+          )}
+          <LocalhostSetting environment={environment} busy={busy} onChange={setLocalhost} />
+          <div className="pt-2">
+            <h3 className="text-[15px] font-medium tracking-[-0.025em]">
+              {t('Want to track a specific action?')}
+            </h3>
+            <p className="mt-1.5 text-sm leading-[1.8] text-secondary-ink wrap-anywhere">
+              Use{' '}
+              <code className="font-mono text-[0.9em]">window.simpleAnalytics.track('signup')</code>{' '}
+              after your script has loaded. Replace “signup” with a short name for the action.
+            </p>
+          </div>
+        </ExtrasContainer>
+      )}
     </div>
   );
 }

@@ -43,11 +43,24 @@ export function useAccountUsage(refreshKey: string) {
     const interval = window.setInterval(() => {
       if (document.visibilityState === 'visible') void update();
     }, 15000);
+    const focused = () => {
+      if (document.visibilityState === 'visible') void update();
+    };
+    const accessRevoked = () => {
+      setData(null);
+      refresh();
+    };
+    window.addEventListener('focus', focused);
+    document.addEventListener('visibilitychange', focused);
+    window.addEventListener('datix:subscription-required', accessRevoked);
     return () => {
       controller.abort();
       window.clearInterval(interval);
+      window.removeEventListener('focus', focused);
+      document.removeEventListener('visibilitychange', focused);
+      window.removeEventListener('datix:subscription-required', accessRevoked);
     };
-  }, [refreshKey, revision]);
+  }, [refreshKey, revision, refresh]);
   return { data, error, loading, refresh };
 }
 

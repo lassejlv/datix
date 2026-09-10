@@ -81,7 +81,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
             </label>
             <Select
               id="billing-volume"
-              className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+              className="h-9 max-w-full rounded-md border border-border bg-background px-3 text-sm"
               value={events}
               disabled={busy}
               onValueChange={(value) => setEvents(Number(value))}

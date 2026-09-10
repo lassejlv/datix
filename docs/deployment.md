@@ -84,7 +84,7 @@ Railway deployment `183d57ef-cc45-4b3b-a324-8c6cba59a946` was verified running R
 
 ## Polar cutover
 
-Apply all registered schema upgrades (currently through 0011) with the database owner role before deploying API and worker. Configure `POLAR_ACCESS_TOKEN` and `POLAR_WEBHOOK_SECRET`; see [Polar billing](polar.md) for scopes, the Datix organization and webhook registration. Startup only checks compatibility.
+Apply all registered schema upgrades (currently through 0012) with the database owner role before deploying API and worker. Configure `POLAR_ACCESS_TOKEN` and `POLAR_WEBHOOK_SECRET`; see [Polar billing](polar.md) for scopes, the Datix organization and webhook registration. Startup only checks compatibility.
 
 Upgrades 0009 and 0010 scope current billing records to the Datix organization and place its usage in `billing_organization_usage`. Historical usage and provider records remain intact; existing subscriptions and pending usage are not migrated or charged automatically. Coordinate the API and worker cutover to avoid running different billing providers for the same account. A rollback must explicitly restore the previous provider configuration and reconcile activity during the cutover; do not assume billing state transfers automatically.
 

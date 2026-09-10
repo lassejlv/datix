@@ -1628,6 +1628,24 @@
       "is_nullable": "NO",
       "column_default": "now()",
       "since_version": 11
+    },
+    {
+      "table_name": "account_onboarding",
+      "column_name": "owner_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null,
+      "since_version": 12
+    },
+    {
+      "table_name": "account_onboarding",
+      "column_name": "completed_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()",
+      "since_version": 12
     }
   ],
   "constraints": [

@@ -153,6 +153,7 @@ async fn api_worker_roles_metrics_cache_and_queue_backpressure_remain_isolated()
             1
         );
         let outsider = Fixture::new().await;
+        outsider.pro().await;
         let request = Request::builder()
             .uri(&route)
             .header("cookie", &outsider.cookie)

@@ -1,5 +1,16 @@
 import type { Copy } from './en';
 export const da = {
+  'Checking your subscription…': 'Tjekker dit abonnement…',
+  'Choose a plan to continue': 'Vælg en plan for at fortsætte',
+  'Choose a plan to continue.': 'Vælg en plan for at fortsætte.',
+  'An active subscription or trial is required to use your workspace.':
+    'Du skal have et aktivt abonnement eller en aktiv prøveperiode for at bruge dit arbejdsområde.',
+  'Install the script on {domain}, then choose your plan.':
+    'Installer scriptet på {domain}, og vælg derefter din plan.',
+  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
+    'Sporingen starter, når dit abonnement eller din prøveperiode er aktiv. Du kan tjekke installationen bagefter.',
+  'Continue to plans': 'Fortsæt til planer',
+  'Add your website before choosing a plan.': 'Tilføj dit website, før du vælger en plan.',
   'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
     'Trafikdiagram pr. time. Brug venstre og højre piletast til at undersøge hver time.',
   'Live data is temporarily unavailable.': 'Livedata er midlertidigt utilgængelige.',

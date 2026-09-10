@@ -1236,5 +1236,16 @@ export const en = {
   'Allowance renews on {date}. Upgrade to resume sooner.':
     'Allowance renews on {date}. Upgrade to resume sooner.',
   'Choose a plan to resume tracking.': 'Choose a plan to resume tracking.',
+  'Checking your subscription…': 'Checking your subscription…',
+  'Choose a plan to continue': 'Choose a plan to continue',
+  'Choose a plan to continue.': 'Choose a plan to continue.',
+  'An active subscription or trial is required to use your workspace.':
+    'An active subscription or trial is required to use your workspace.',
+  'Install the script on {domain}, then choose your plan.':
+    'Install the script on {domain}, then choose your plan.',
+  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
+    'Tracking starts when your subscription or trial is active. You can check the installation afterward.',
+  'Continue to plans': 'Continue to plans',
+  'Add your website before choosing a plan.': 'Add your website before choosing a plan.',
 } as const;
 export type Copy = keyof typeof en;

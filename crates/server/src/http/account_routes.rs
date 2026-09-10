@@ -6,6 +6,13 @@ pub(super) async fn me(Extension(context): Extension<Context>) -> Result<Json<Va
         json!({"user":{"id":user.id,"name":user.name,"email":user.email}}),
     ))
 }
+pub(super) async fn complete_onboarding(
+    state: AppState<State>,
+    context: Extension<Context>,
+) -> Result<Json<Value>> {
+    analytics_services::onboarding::complete(&state.0, &owner(&context.0)?.id).await?;
+    Ok(Json(json!({"onboardingCompleted":true})))
+}
 pub(super) async fn usage(
     AppState(state): AppState<State>,
     Extension(context): Extension<Context>,
