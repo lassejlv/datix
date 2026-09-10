@@ -236,7 +236,7 @@ export function Installation({
         </label>
       )}
       <section className="mb-6">
-        <div className="flex items-center gap-3 max-md:flex-wrap md:gap-4">
+        <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3 md:flex md:items-center md:gap-4">
           <span className="grid size-7 shrink-0 place-items-center rounded-md bg-accent text-[13px]">
             1
           </span>
@@ -251,7 +251,7 @@ export function Installation({
               })}
             </p>
           </div>
-          <div className="flex gap-2 max-md:ml-10">
+          <div className="col-start-2 flex min-w-0 flex-wrap gap-2 md:shrink-0">
             <Button
               variant="outline"
               disabled={!origin}
@@ -276,7 +276,7 @@ export function Installation({
         </pre>
       </section>
       <section className="mb-6">
-        <div className="flex items-center gap-3 max-md:flex-wrap md:gap-4">
+        <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3 md:flex md:items-center md:gap-4">
           <span className="grid size-7 shrink-0 place-items-center rounded-md bg-accent text-[13px]">
             2
           </span>
@@ -304,7 +304,7 @@ export function Installation({
         )}
       </section>
       <section className="mb-6">
-        <div className="flex items-center gap-3 max-md:flex-wrap md:gap-4">
+        <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-3 md:flex md:items-center md:gap-4">
           <span
             className={`grid size-7 shrink-0 place-items-center rounded-md bg-accent text-[13px] ${receiving ? 'text-success' : ''}`}
           >
