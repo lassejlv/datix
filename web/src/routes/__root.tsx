@@ -17,6 +17,13 @@ export const Route = createRootRoute({
           'Understand your visitors, spot what works, and get back to building. Simple website analytics with cookieless tracking by default.',
       },
     ],
+    scripts: [
+      {
+        src: 'https://usedatix.com/tracker.js',
+        'data-site': 'c8a91742-a3bb-4b25-aefc-500041feafb3',
+        defer: true,
+      }
+    ],
   }),
   notFoundComponent: NotFound,
   component: RootDocument,

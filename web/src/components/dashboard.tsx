@@ -19,7 +19,7 @@ import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { isDashboardPage, siteRoute, type DashboardPage } from '../lib/dashboard-route';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, Code2, ExternalLink, RefreshCw } from './ui/icons';
+import { ArrowRight, Code2, ExternalLink, Lock, RefreshCw } from './ui/icons';
 import { Button } from './ui/button';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from './ui/sidebar';
@@ -488,18 +488,34 @@ function Dashboard({
                 onConnected={completeSetup}
               />
             ) : panel === 'imports' ? (
-              <AnalyticsImports
-                key={environment.id}
-                site={site}
-                environment={environment}
-                onViewReport={(from, to) => {
-                  void navigate({
-                    to: siteRoute,
-                    params: { siteId: site.id, environmentId: environment.id, page: 'overview' },
-                    search: { from, to },
-                  });
-                }}
-              />
+              <div className="relative min-h-[420px]">
+                <div className="pointer-events-none blur-sm select-none" aria-hidden="true" inert>
+                  <AnalyticsImports
+                    key={environment.id}
+                    site={site}
+                    environment={environment}
+                    onViewReport={(from, to) => {
+                      void navigate({
+                        to: siteRoute,
+                        params: {
+                          siteId: site.id,
+                          environmentId: environment.id,
+                          page: 'overview',
+                        },
+                        search: { from, to },
+                      });
+                    }}
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+                  <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card px-8 py-6 text-center shadow-lg">
+                    <span className="flex size-12 items-center justify-center rounded-full bg-muted text-secondary-ink">
+                      <Lock size={22} />
+                    </span>
+                    <p className="text-xl font-medium">{t('Coming soon')}</p>
+                  </div>
+                </div>
+              </div>
             ) : panel === 'settings' ? (
               <SiteSettings
                 key={environment.id}

@@ -273,6 +273,15 @@ export const Loader2Icon = iconComponent(
   true,
 );
 
+export const Lock = iconComponent(
+  <>
+    <rect x="4" y="10" width="16" height="10" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+  </>,
+  '0 0 24 24',
+  true,
+);
+
 export const LogOut = iconComponent(
   <>
     <path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4m6-16 5 5-5 5m-7-5h12" />
