@@ -30,6 +30,7 @@
     "motion": "^13.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3",
     "web-vitals": "^6.2.1"

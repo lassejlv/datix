@@ -829,7 +829,7 @@ try {
         };
       });
       await page.getByRole('button', { name: 'Copied', exact: true }).click();
-      await expect(page.locator('.kit-toast[data-kind=error]')).toContainText(
+      await expect(page.locator('.kit-toast[data-type=error]')).toContainText(
         'Copy is unavailable',
       );
       await capture(page, { path: `${dir}/${theme}-clipboard-error.png` });
