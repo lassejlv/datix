@@ -67,14 +67,14 @@ try {
   });
   expect(created.status(), await created.text()).toBe(201);
   const site = (await created.json()).site.id;
-  const route = `${base}/site/${site}/${site}/imports`;
+  const route = `${base}/site/${site}/${site}/settings?tab=imports`;
   const page = await context.newPage();
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(route);
   await expect(page.getByRole('heading', { name: 'Import analytics', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Imports', exact: true })).toHaveAttribute(
-    'aria-current',
-    'page',
+  await expect(page.getByRole('tab', { name: 'Imports', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
   );
   await page.screenshot({ path: `${output}/desktop-upload.png`, fullPage: true });
   await page.getByLabel('Analytics export file').setInputFiles(`${output}/plausible-export.zip`);
@@ -121,7 +121,8 @@ try {
   await page.reload();
   await expect(page.getByRole('button', { name: /Pageviews/ })).toContainText('55');
   checks.push('Overview, all five breakdowns, custom events, deep link and reload');
-  await page.getByRole('link', { name: 'Imports', exact: true }).click();
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+  await page.getByRole('tab', { name: 'Imports', exact: true }).click();
   await page.getByLabel('Analytics export file').setInputFiles(`${output}/plausible-export.zip`);
   await page.getByRole('button', { name: 'Review import', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'already imported' })).toBeVisible();

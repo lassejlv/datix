@@ -52,14 +52,12 @@ try {
   await menu.click();
   await page.screenshot({ path: `${dir}/menu.png`, fullPage: true });
   await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: 'Account settings' });
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByLabel('Email', { exact: true })).toHaveAttribute('readonly', '');
-  await dialog.getByLabel('Name', { exact: true }).fill('Updated Account');
-  await dialog.getByRole('button', { name: 'Save name' }).click();
-  await expect(dialog.getByText('Name saved.', { exact: true })).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(menu).toBeFocused();
+  await expect(page).toHaveURL(`${base}/account`);
+  await expect(page.getByRole('heading', { name: 'Account settings', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toHaveAttribute('readonly', '');
+  await page.getByLabel('Name', { exact: true }).fill('Updated Account');
+  await page.getByRole('button', { name: 'Save name' }).click();
+  await expect(page.getByText('Name saved.', { exact: true })).toBeVisible();
   await expect(menu).toContainText('Updated Account');
   await page.reload();
   await expect(menu).toContainText('Updated Account');
@@ -72,21 +70,23 @@ try {
   pass(
     'Account menu keyboard focus, profile persistence, read-only email, authentication and origin checks',
   );
+  await page.goto(`${base}/dashboard`);
   await menu.click();
   await page.getByRole('menuitem', { name: 'Account settings' }).click();
-  await dialog.locator('summary').filter({ hasText: 'Change password' }).click();
-  await dialog.getByLabel('Current password', { exact: true }).fill('incorrect-password');
-  await dialog.getByLabel('New password', { exact: true }).fill(newPassword);
-  await dialog.getByLabel('Confirm new password', { exact: true }).fill(`${newPassword}x`);
-  await dialog.getByRole('button', { name: 'Update password' }).click();
-  await expect(dialog.getByRole('alert')).toContainText('do not match');
-  await dialog.getByLabel('Confirm new password', { exact: true }).fill(newPassword);
-  await dialog.getByRole('button', { name: 'Update password' }).click();
-  await expect(dialog.getByRole('alert')).not.toContainText('do not match');
-  await expect(dialog.getByRole('alert')).toBeVisible();
-  await dialog.getByLabel('Current password', { exact: true }).fill(password);
-  await dialog.getByRole('button', { name: 'Update password' }).click();
-  await expect(dialog.getByText('Password changed. Other sessions are signed out.')).toBeVisible();
+  await expect(page).toHaveURL(`${base}/account`);
+  await page.locator('summary').filter({ hasText: 'Change password' }).click();
+  await page.getByLabel('Current password', { exact: true }).fill('incorrect-password');
+  await page.getByLabel('New password', { exact: true }).fill(newPassword);
+  await page.getByLabel('Confirm new password', { exact: true }).fill(`${newPassword}x`);
+  await page.getByRole('button', { name: 'Update password' }).click();
+  await expect(page.getByRole('alert')).toContainText('do not match');
+  await page.getByLabel('Confirm new password', { exact: true }).fill(newPassword);
+  await page.getByRole('button', { name: 'Update password' }).click();
+  await expect(page.getByRole('alert')).not.toContainText('do not match');
+  await expect(page.getByRole('alert')).toBeVisible();
+  await page.getByLabel('Current password', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Update password' }).click();
+  await expect(page.getByText('Password changed. Other sessions are signed out.')).toBeVisible();
   expect((await other.request.get(`${base}/api/me`)).status()).toBe(401);
   expect((await context.request.get(`${base}/api/me`)).status()).toBe(200);
   expect((await post(fresh, '/auth/sign-in/email', { email, password })).status()).toBe(401);
@@ -97,27 +97,26 @@ try {
   pass(
     'Password mismatch and wrong-current-password rejection, successful change, old password invalidated and other sessions revoked',
   );
-  await page.keyboard.press('Escape');
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${base}/account`);
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await menu.click();
   await page.getByRole('menuitem', { name: 'Account settings' }).click();
-  await expect(page.getByRole('dialog')).toHaveCount(1);
-  await expect(dialog).toBeVisible();
-  await dialog.locator('summary').filter({ hasText: 'Change password' }).click();
+  await expect(page).toHaveURL(`${base}/account`);
+  await expect(page.getByRole('heading', { name: 'Account settings', exact: true })).toBeVisible();
+  await page.locator('summary').filter({ hasText: 'Change password' }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: `${dir}/mobile.png`, fullPage: true });
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.screenshot({ path: `${dir}/mobile-dark.png`, fullPage: true });
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'Toggle navigation' })).toBeFocused();
+  await page.goto(`${base}/dashboard`);
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await menu.click();
   await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Welcome back.', exact: true })).toBeVisible();
   expect((await context.request.get(`${base}/api/me`)).status()).toBe(401);
   expect(errors).toEqual([]);
-  pass('Mobile dropdown to settings, focus restoration, dark layout and account-menu sign-out');
+  pass('Mobile navigation to account page, dark layout and account-menu sign-out');
   await writeFile(
     `${dir}/verification.json`,
     JSON.stringify({ base, checks, errors, verifiedAt: new Date().toISOString() }, null, 2),

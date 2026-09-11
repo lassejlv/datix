@@ -1,3 +1,5 @@
+// 'imports' is a legacy alias: the dashboard renders settings and replaces the
+// URL with /settings?tab=imports. Imports live as a settings tab, not a page.
 export const dashboardPages = [
   'setup',
   'overview',

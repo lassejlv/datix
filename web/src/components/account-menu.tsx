@@ -1,5 +1,4 @@
 import { useSitePreferences } from './site-preferences';
-import { useRef } from 'react';
 import { Menu } from '@base-ui/react/menu';
 import { ChevronDown, LogOut, Settings2, Monitor, Sun, Moon } from './ui/icons';
 import type { Theme } from '../lib/i18n/preferences';
@@ -17,15 +16,10 @@ export function AccountMenu({
   onSignOut: () => void;
 }) {
   const { t, theme, setTheme } = useSitePreferences();
-  const openingSettings = useRef(false);
   const itemClass =
     'flex h-8 cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none data-highlighted:bg-pressed data-disabled:opacity-40';
   return (
-    <Menu.Root
-      onOpenChange={(open) => {
-        if (open) openingSettings.current = false;
-      }}
-    >
+    <Menu.Root>
       <Menu.Trigger
         aria-label={t('Account menu')}
         data-testid="account-menu"
@@ -44,7 +38,6 @@ export function AccountMenu({
         <Menu.Positioner side="top" align="start" sideOffset={6} className="z-50">
           <Menu.Popup
             aria-label={t('Account')}
-            finalFocus={() => !openingSettings.current}
             className="kit-popup w-60 max-w-[calc(100vw-24px)] rounded-xl bg-popover p-2.5 text-foreground shadow-[var(--menu-shadow)] outline-none"
           >
             <div className="px-1.5 pb-3">
@@ -77,13 +70,7 @@ export function AccountMenu({
               ))}
             </Menu.RadioGroup>
             <Menu.Separator className="my-2 h-px bg-line" />
-            <Menu.Item
-              className={itemClass}
-              onClick={() => {
-                openingSettings.current = true;
-                onSettings();
-              }}
-            >
+            <Menu.Item className={itemClass} onClick={onSettings}>
               <Settings2 className="size-4" />
               {t('Account settings')}
             </Menu.Item>

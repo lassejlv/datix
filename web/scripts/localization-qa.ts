@@ -134,7 +134,10 @@ try {
     await page
       .getByRole('combobox', { name: translate(current, 'Language'), exact: true })
       .selectOption(locale);
-    await expect(page.getByRole('dialog')).toContainText(t('Manage your profile and password.'));
+    await expect(page).toHaveURL(`${base}/account`);
+    await expect(
+      page.getByRole('heading', { name: t('Account settings'), exact: true }),
+    ).toBeVisible();
     await page.getByRole('textbox', { name: t('Name'), exact: true }).fill('Unsaved name');
     await page.getByRole('combobox', { name: t('Language'), exact: true }).selectOption(current);
     await expect(
@@ -144,10 +147,9 @@ try {
       .getByRole('combobox', { name: translate(current, 'Language'), exact: true })
       .selectOption(locale);
     await audit(page, locale);
-    await page.keyboard.press('Escape');
-    await expect(page.getByTestId('account-menu')).toBeFocused();
     current = locale;
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await page.goto(route('overview'));
     await expect(page).toHaveTitle(`${t('Overview')} | Datix`);
     await expect(
       page.getByRole('button', { name: new RegExp(t('Pageviews')) }).first(),
@@ -207,7 +209,7 @@ try {
     await audit(page, locale);
     await page.screenshot({ path: `${output}/${locale}-usage.png`, fullPage: true });
 
-    await page.goto(route('imports'));
+    await page.goto(`${route('settings')}?tab=imports`);
     const date = new Date(
       Date.now() - (10 + (locale === 'en' ? 0 : locale === 'da' ? 1 : 2)) * 86400000,
     )
@@ -293,7 +295,7 @@ try {
     ).toBeVisible();
     await audit(page, locale);
     checks.push(
-      `${locale}: account language/focus, overview numbers/countries, visits, install, consent settings, deletion dialog, usage, real import/removal, mobile and 404`,
+      `${locale}: account language, overview numbers/countries, visits, install, consent settings, deletion dialog, usage, real import/removal, mobile and 404`,
     );
     console.log(`PASS ${locale}`);
   }

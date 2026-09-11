@@ -11,7 +11,6 @@ import {
   BarChart3,
   Footprints,
   Code2,
-  FileText,
   Settings2,
   Warning,
   PulseIcon,
@@ -39,6 +38,7 @@ export function WorkspaceSidebar({
   site,
   environment,
   panel,
+  isAccount,
   user,
   signingOut,
   showSetup,
@@ -53,6 +53,7 @@ export function WorkspaceSidebar({
   site?: Site;
   environment?: SiteEnvironment;
   panel: DashboardPage;
+  isAccount: boolean;
   user: User;
   signingOut: boolean;
   showSetup: boolean;
@@ -134,7 +135,6 @@ export function WorkspaceSidebar({
                               : Gauge,
                   })),
                 { page: 'installation', label: 'Install', icon: Code2 },
-                { page: 'imports', label: 'Imports', icon: FileText },
                 { page: 'settings', label: 'Settings', icon: Settings2 },
               ] as const
             )
@@ -143,8 +143,10 @@ export function WorkspaceSidebar({
                 <SidebarMenuItem key={item.page}>
                   <SidebarMenuButton
                     className="relative h-11 overflow-visible gap-3 px-3 text-secondary-ink data-[active=true]:bg-transparent md:h-8"
-                    isActive={panel === item.page && !!site && !!environment}
-                    aria-current={panel === item.page && site && environment ? 'page' : undefined}
+                    isActive={!isAccount && panel === item.page && !!site && !!environment}
+                    aria-current={
+                      !isAccount && panel === item.page && site && environment ? 'page' : undefined
+                    }
                     disabled={!site || !environment}
                     render={
                       site && environment ? (
@@ -161,7 +163,7 @@ export function WorkspaceSidebar({
                       ) : undefined
                     }
                   >
-                    {panel === item.page && site && environment && (
+                    {!isAccount && panel === item.page && site && environment && (
                       <SelectionIndicator id={indicatorId} className="kit-navigation-indicator" />
                     )}
                     <item.icon />

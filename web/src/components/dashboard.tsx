@@ -12,14 +12,14 @@ import { FeaturePageView } from './feature-pages';
 import { featureDefinitions, isFeaturePage } from '../lib/features';
 import { deviceName } from '../lib/i18n/display';
 import { useSitePreferences } from './site-preferences';
-import { AccountSettings } from './account-settings';
+import { AccountPage } from './account-settings';
 import { AccountAccess } from './account-access';
 import { useAccountUsage } from './usage';
 import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { isDashboardPage, siteRoute, type DashboardPage } from '../lib/dashboard-route';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, Code2, ExternalLink, Lock, RefreshCw } from './ui/icons';
+import { ArrowRight, Code2, ExternalLink, RefreshCw } from './ui/icons';
 import { Button } from './ui/button';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from './ui/sidebar';
@@ -32,7 +32,6 @@ import { WelcomeOnboarding, SetupOnboarding } from './onboarding';
 import { VisitorJourneys } from './visitor-journeys';
 import { AddSiteDialog, Installation, SiteSettings } from './site-panels';
 import { AddEnvironmentDialog } from './environment-panels';
-import { AnalyticsImports } from './analytics-imports';
 import { breakdownName, providerName } from '../lib/imports';
 import {
   ApiError,
@@ -139,16 +138,18 @@ function Dashboard({
   const settingsTab = useLocation({
     select: (location) => (location.search as { tab?: string }).tab,
   });
+  const isAccount = useLocation({ select: (location) => location.pathname === '/account' });
   const { setOpenMobile } = useSidebar();
   const [sites, setSites] = useState<Site[]>([]),
     [rememberedSite, setRememberedSite] = useState(''),
     [environmentIds, setEnvironmentIds] = useState<Record<string, string>>({});
   const selected = params.siteId ?? rememberedSite;
   const panel: Panel = isDashboardPage(params.page) ? params.page : 'overview';
+  // Legacy /imports URLs carry no ?tab= but must open the imports tab.
+  const settingsTabOrLegacy = panel === 'imports' ? 'imports' : settingsTab;
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [addOpen, setAddOpen] = useState(false),
-    [accountOpen, setAccountOpen] = useState(false),
     [addEnvironmentOpen, setAddEnvironmentOpen] = useState(false),
     [signingOut, setSigningOut] = useState(false);
   const site = sites.find((value) => value.id === selected);
@@ -255,7 +256,7 @@ function Dashboard({
     setEnvironmentIds((current) =>
       current[selected] === environment.id ? current : { ...current, [selected]: environment.id },
     );
-    if (!params.siteId || !params.environmentId || !params.page) {
+    if (!isAccount && (!params.siteId || !params.environmentId || !params.page)) {
       void navigate({
         to: siteRoute,
         params: {
@@ -283,7 +284,18 @@ function Dashboard({
     params.environmentId,
     params.page,
     navigate,
+    isAccount,
   ]);
+  useEffect(() => {
+    if (site && environment && panel === 'imports') {
+      void navigate({
+        to: siteRoute,
+        params: { siteId: site.id, environmentId: environment.id, page: 'settings' },
+        search: { tab: 'imports' },
+        replace: true,
+      });
+    }
+  }, [site, environment, panel, navigate]);
   function show(next: DashboardPage) {
     if (site && environment) go(site.id, environment.id, next);
   }
@@ -316,7 +328,6 @@ function Dashboard({
     } catch {
       /* Browser preferences are optional. */
     }
-    setAccountOpen(false);
     void navigate({ to: '/signin', replace: true });
     onSignedOut();
   }
@@ -340,18 +351,12 @@ function Dashboard({
       >
         {t('Skip to content')}
       </a>
-      <AccountSettings
-        open={accountOpen}
-        onOpenChange={setAccountOpen}
-        user={user}
-        onUpdated={onUserUpdated}
-        onDeleted={accountDeleted}
-      />
       <WorkspaceSidebar
         sites={sites}
         site={site}
         environment={environment}
-        panel={panel}
+        panel={panel === 'imports' ? 'settings' : panel}
+        isAccount={isAccount}
         user={user}
         signingOut={signingOut}
         showSetup={!!environment && setupStatus[environment.id] === false}
@@ -362,7 +367,7 @@ function Dashboard({
         onAddSite={() => setAddOpen(true)}
         onAddEnvironment={() => setAddEnvironmentOpen(true)}
         onSignOut={signout}
-        onAccountSettings={() => setAccountOpen(true)}
+        onAccountSettings={() => void navigate({ to: '/account' })}
       />
       <SidebarInset className="min-h-dvh min-w-0 md:min-h-[calc(100dvh-1rem)]">
         <header className="flex h-12 shrink-0 items-center gap-3 border-b border-border px-4 md:px-6">
@@ -377,16 +382,16 @@ function Dashboard({
               /
             </span>
             <span className="shrink-0 font-medium">
-              {!site || panel === 'setup'
-                ? t('Setup')
-                : isFeaturePage(panel)
-                  ? t(featureDefinitions.find((feature) => feature.page === panel)!.label)
-                  : panel === 'settings'
-                    ? t('Settings')
-                    : panel === 'installation'
-                      ? t('Install')
-                      : panel === 'imports'
-                        ? t('Imports')
+              {isAccount
+                ? t('Account settings')
+                : !site || panel === 'setup'
+                  ? t('Setup')
+                  : isFeaturePage(panel)
+                    ? t(featureDefinitions.find((feature) => feature.page === panel)!.label)
+                    : panel === 'settings' || panel === 'imports'
+                      ? t('Settings')
+                      : panel === 'installation'
+                        ? t('Install')
                         : panel === 'visitors'
                           ? t('Visitors')
                           : t('Overview')}
@@ -434,13 +439,19 @@ function Dashboard({
             </div>
           )}
           <PageTransition
-            view={loading ? 'loading' : `${environment?.id || selected || 'empty'}:${panel}`}
+            view={
+              loading
+                ? 'loading'
+                : `${environment?.id || selected || 'empty'}:${panel}${isAccount ? ':account' : ''}`
+            }
           >
             {loading ? (
               <div className="flex items-center gap-3 py-20 text-secondary-ink">
                 <Spinner className="size-5" />
                 <span>{t('Loading your workspace…')}</span>
               </div>
+            ) : isAccount ? (
+              <AccountPage user={user} onUpdated={onUserUpdated} onDeleted={accountDeleted} />
             ) : params.siteId && (!site || !environment) ? (
               <div className="max-w-[440px] py-10">
                 <h1 className="text-2xl font-medium">{t('Website or environment unavailable')}</h1>
@@ -487,42 +498,24 @@ function Dashboard({
                 onUpdated={environmentUpdated}
                 onConnected={completeSetup}
               />
-            ) : panel === 'imports' ? (
-              <div className="relative min-h-[420px]">
-                <div className="pointer-events-none blur-sm select-none" aria-hidden="true" inert>
-                  <AnalyticsImports
-                    key={environment.id}
-                    site={site}
-                    environment={environment}
-                    onViewReport={(from, to) => {
-                      void navigate({
-                        to: siteRoute,
-                        params: {
-                          siteId: site.id,
-                          environmentId: environment.id,
-                          page: 'overview',
-                        },
-                        search: { from, to },
-                      });
-                    }}
-                  />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-background/50">
-                  <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card px-8 py-6 text-center shadow-lg">
-                    <span className="flex size-12 items-center justify-center rounded-full bg-muted text-secondary-ink">
-                      <Lock size={22} />
-                    </span>
-                    <p className="text-xl font-medium">{t('Coming soon')}</p>
-                  </div>
-                </div>
-              </div>
-            ) : panel === 'settings' ? (
+            ) : panel === 'settings' || panel === 'imports' ? (
               <SiteSettings
-                key={environment.id}
+                key={`${environment.id}:${settingsTabOrLegacy ?? ''}`}
                 site={site}
                 environment={environment}
                 usage={usage}
-                initialTab={settingsTab}
+                initialTab={settingsTabOrLegacy}
+                onViewReport={(from, to) => {
+                  void navigate({
+                    to: siteRoute,
+                    params: {
+                      siteId: site.id,
+                      environmentId: environment.id,
+                      page: 'overview',
+                    },
+                    search: { from, to },
+                  });
+                }}
                 onEnvironmentUpdated={environmentUpdated}
                 onEnvironmentDeleted={() => {
                   setSites((items) =>
@@ -1004,8 +997,8 @@ function Overview({
           )}
           <Link
             to={siteRoute}
-            params={{ siteId: site.id, environmentId: environment.id, page: 'imports' }}
-            search={{}}
+            params={{ siteId: site.id, environmentId: environment.id, page: 'settings' }}
+            search={{ tab: 'imports' }}
             className="mt-2 inline-block underline underline-offset-4"
           >
             {t('Manage imports')}

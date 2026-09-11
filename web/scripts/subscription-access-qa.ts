@@ -159,7 +159,14 @@ try {
   expect(state.workspaceRequests).toEqual([]);
   console.log('PASS first website → install → plans without requiring a billable pageview');
 
-  for (const route of ['overview', 'settings', 'installation', 'visitors', 'imports', 'setup']) {
+  for (const route of [
+    'overview',
+    'settings',
+    'settings?tab=imports',
+    'installation',
+    'visitors',
+    'setup',
+  ]) {
     await page.goto(`${base}/site/${siteId}/${siteId}/${route}`);
     await expect(page.locator('#plan-required-title')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Toggle navigation', exact: true })).toHaveCount(

@@ -5,40 +5,25 @@ import { useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type User } from '../lib/client';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Dialog, DialogPopup, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 
-export function AccountSettings({
-  open,
-  onOpenChange,
+export function AccountPage({
   user,
   onUpdated,
   onDeleted,
 }: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   user: User;
   onUpdated: (user: User) => void;
   onDeleted: () => void;
 }) {
   const { t } = useSitePreferences();
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup
-        className="max-w-[440px]"
-        finalFocus={() => {
-          const account = document.querySelector<HTMLElement>('[data-testid="account-menu"]');
-          return account?.getClientRects().length
-            ? account
-            : document.querySelector<HTMLElement>('[data-testid="navigation-toggle"]');
-        }}
-      >
-        <DialogHeader>
-          <DialogTitle>{t('Account settings')}</DialogTitle>
-          <DialogDescription>{t('Manage your profile and password.')}</DialogDescription>
-        </DialogHeader>
-        {open && <AccountForm user={user} onUpdated={onUpdated} onDeleted={onDeleted} />}
-      </DialogPopup>
-    </Dialog>
+    <div className="max-w-[600px]">
+      <h1 className="text-2xl font-medium">{t('Account settings')}</h1>
+      <p className="mt-2 text-sm text-secondary-ink">{t('Manage your profile and password.')}</p>
+      <div className="mt-6">
+        <AccountForm user={user} onUpdated={onUpdated} onDeleted={onDeleted} />
+      </div>
+    </div>
   );
 }
 
@@ -121,7 +106,7 @@ function AccountForm({
   }
   const fieldClass = 'flex flex-col gap-1.5 text-sm';
   return (
-    <div className="min-h-0 overflow-y-auto px-6 pb-6">
+    <div>
       <section
         className="mb-5 border-b border-border pb-5"
         aria-label={t('Language and appearance')}

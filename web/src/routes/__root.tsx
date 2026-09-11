@@ -82,6 +82,7 @@ function DocumentMetadata() {
       privacy: 'Privacy policy',
       usage: 'Usage',
       dashboard: 'Your workspace',
+      account: 'Account settings',
       overview: 'Overview',
       visitors: 'Visitors',
       installation: 'Install',

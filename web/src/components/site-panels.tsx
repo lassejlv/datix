@@ -6,7 +6,8 @@ import { FeatureSettings } from './feature-settings';
 import { useSitePreferences } from './site-preferences';
 import { agentInstallationInstructions } from '../lib/agent-installation';
 import { useEffect, useState, type FormEvent } from 'react';
-import { Check, Copy, ArrowRight, CircleCheck, RefreshCw, Trash2 } from './ui/icons';
+import { Check, Copy, ArrowRight, CircleCheck, Lock, RefreshCw, Trash2 } from './ui/icons';
+import { AnalyticsImports } from './analytics-imports';
 import { Button } from './ui/button';
 import { Input, Textarea } from './ui/input';
 import {
@@ -437,7 +438,14 @@ export function Installation({
   );
 }
 
-type SettingsTab = 'website' | 'environment' | 'tracking' | 'features' | 'usage' | 'billing';
+type SettingsTab =
+  | 'website'
+  | 'environment'
+  | 'tracking'
+  | 'imports'
+  | 'features'
+  | 'usage'
+  | 'billing';
 
 function AccountUsageSection({
   usage,
@@ -477,6 +485,7 @@ export function SiteSettings({
   onEnvironmentDeleted,
   onUpdated,
   onDeleted,
+  onViewReport,
 }: {
   site: Site;
   environment: SiteEnvironment;
@@ -486,12 +495,14 @@ export function SiteSettings({
   onEnvironmentDeleted: () => void;
   onUpdated: (site: Site) => void;
   onDeleted: () => void;
+  onViewReport: (from: string, to: string) => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
   const tabs: readonly SettingsTab[] = [
     'website',
     'environment',
     'tracking',
+    'imports',
     'features',
     'usage',
     'billing',
@@ -503,6 +514,7 @@ export function SiteSettings({
     website: t('Website'),
     environment: t('Environment'),
     tracking: t('Tracking'),
+    imports: t('Imports'),
     features: t('Features'),
     usage: t('Usage'),
     billing: t('Billing'),
@@ -570,6 +582,26 @@ export function SiteSettings({
             environment={environment}
             onUpdated={onEnvironmentUpdated}
           />
+        )}
+        {tab === 'imports' && (
+          <div className="relative min-h-[420px]">
+            <div className="pointer-events-none blur-sm select-none" aria-hidden="true" inert>
+              <AnalyticsImports
+                key={environment.id}
+                site={site}
+                environment={environment}
+                onViewReport={onViewReport}
+              />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card px-8 py-6 text-center shadow-lg">
+                <span className="flex size-12 items-center justify-center rounded-full bg-muted text-secondary-ink">
+                  <Lock size={22} />
+                </span>
+                <p className="text-xl font-medium">{t('Coming soon')}</p>
+              </div>
+            </div>
+          </div>
         )}
         {tab === 'usage' && (
           <AccountUsageSection usage={usage}>

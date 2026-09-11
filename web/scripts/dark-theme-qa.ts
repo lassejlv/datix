@@ -109,10 +109,9 @@ try {
   }
   await page.getByTestId('account-menu').click();
   await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
-  await expect
-    .poll(() => page.getByRole('dialog').evaluate((el) => getComputedStyle(el).opacity))
-    .toBe('1');
-  await page.screenshot({ path: `web/artifacts/dark-theme/${phase}/dialog.png`, fullPage: true });
+  await expect(page).toHaveURL(`${base}/account`);
+  await expect(page.getByRole('heading', { name: 'Account settings', exact: true })).toBeVisible();
+  await page.screenshot({ path: `web/artifacts/dark-theme/${phase}/account.png`, fullPage: true });
   const theme = page.getByRole('combobox', { name: 'Theme', exact: true });
   await theme.selectOption('system');
   await page.emulateMedia({ colorScheme: 'dark' });
@@ -134,10 +133,9 @@ try {
     )
     .toBe('#fff');
   await page.screenshot({
-    path: `web/artifacts/dark-theme/${phase}/light-dialog.png`,
+    path: `web/artifacts/dark-theme/${phase}/light-account.png`,
     fullPage: true,
   });
-  await page.keyboard.press('Escape');
   await page.goto(`${base}/`);
   await context.addCookies([{ name: 'ab-theme', value: 'dark', url: base }]);
   await page.reload();

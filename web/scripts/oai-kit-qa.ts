@@ -457,21 +457,18 @@ async function verifyMotion(page: Page, theme: 'light' | 'dark') {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('listbox')).not.toBeVisible();
   await page.getByRole('button', { name: 'Account menu' }).click();
-  const dialog = await sampleMotion(page, '[data-slot="dialog-popup"]', () =>
-    page.getByRole('menuitem', { name: 'Account settings' }).click(),
-  );
-  expect(dialog.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
+  await page.getByRole('menuitem', { name: 'Account settings' }).click();
+  await expect(page).toHaveURL(`${base}/account`);
   await expect(page.getByRole('combobox', { name: 'Language', exact: true })).toBeVisible();
+  await page.goto(`${path}/settings`);
   await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Motion check');
   const notification = await sampleMotion(page, '.kit-toast', () =>
     page.getByRole('button', { name: 'Save name', exact: true }).click(),
   );
   expect(notification.some((frame) => frame.opacity > 0 && frame.opacity < 1)).toBe(true);
   await page.getByRole('button', { name: 'Dismiss notification' }).click();
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'Account menu' })).toBeFocused();
   pass(
-    `${theme}: dropdowns, dialogs and toasts have real intermediate animation frames and restore focus`,
+    `${theme}: dropdowns and toasts have real intermediate animation frames; account settings is a dedicated page`,
   );
 
   const collapse = await sampleMotion(page, '[data-slot="sidebar-container"]', () =>
@@ -811,16 +808,15 @@ try {
         .getByRole('menuitemradio', { name: theme === 'light' ? 'Light' : 'Dark', exact: true })
         .click();
       await page.getByRole('menuitem', { name: 'Account settings' }).click();
-      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect(page).toHaveURL(`${base}/account`);
+      await expect(
+        page.getByRole('heading', { name: 'Account settings', exact: true }),
+      ).toBeVisible();
       await verifyProfileLoading(page, state, theme);
       await expect(page.locator('.kit-toast')).toContainText('Name saved.');
-      await capture(page, { path: `${dir}/${theme}-account-dialog.png` });
+      await capture(page, { path: `${dir}/${theme}-account-page.png` });
       await page.getByRole('button', { name: 'Dismiss notification' }).click();
-      await page.keyboard.press('Escape');
-      await expect(page.getByRole('button', { name: 'Account menu' })).toBeFocused();
-      pass(
-        `${theme}: account theme controls, saved profile toast, modal dismissal and focus return`,
-      );
+      pass(`${theme}: account theme controls and saved profile toast on the account page`);
 
       await page.goto(`${path}/installation`);
       await page.getByRole('button', { name: 'Copy script', exact: true }).click();
