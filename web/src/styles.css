@@ -501,12 +501,16 @@ li.kit-toast:focus-visible {
   width: 20px;
   height: 20px;
   border-radius: 4px;
-  color: var(--secondary-ink);
+  /* Sonner injects high-specificity dark-theme [data-close-button] paint
+     rules at runtime; !important is required to keep the kit look. */
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--secondary-ink) !important;
   cursor: pointer;
 }
 .kit-toast-close:hover {
-  background: var(--hover);
-  color: var(--foreground);
+  background: var(--hover) !important;
+  color: var(--foreground) !important;
 }
 .kit-toast-close:focus-visible {
   outline: 2px solid var(--focus);
