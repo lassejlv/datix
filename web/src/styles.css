@@ -489,6 +489,9 @@
 li.kit-toast:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+  /* Sonner's unscoped [data-sonner-toast]:focus-visible box-shadow would
+     stack with the kit outline; restate the kit resting shadow instead. */
+  box-shadow: 0 8px 28px #0003;
 }
 .kit-toast-close {
   display: grid;

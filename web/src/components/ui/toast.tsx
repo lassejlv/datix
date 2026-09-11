@@ -5,7 +5,16 @@ import { useSitePreferences } from '../site-preferences';
 
 export const toast = {
   success: (title: string) => sonnerToast.success(title),
-  error: (title: string) => sonnerToast.error(title, { duration: 8000 }),
+  error: (title: string) => {
+    // Sonner has no priority API: visibility is purely positional
+    // (index + 1 <= visibleToasts), so a later burst of toasts could bury
+    // this 8s error behind data-visible="false". Clear the stack first so
+    // the error always lands front/visible (restores old priority-high
+    // behavior). Fresh auto id: a fixed id would merge into / race the
+    // just-dismissed entry instead of prepending.
+    sonnerToast.dismiss();
+    return sonnerToast.error(title, { duration: 8000 });
+  },
   info: (title: string) => sonnerToast.info(title),
 };
 
