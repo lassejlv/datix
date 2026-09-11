@@ -14,7 +14,7 @@ import { deviceName } from '../lib/i18n/display';
 import { useSitePreferences } from './site-preferences';
 import { AccountSettings } from './account-settings';
 import { AccountAccess } from './account-access';
-import { Usage, useAccountUsage } from './usage';
+import { useAccountUsage } from './usage';
 import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { isDashboardPage, siteRoute, type DashboardPage } from '../lib/dashboard-route';
@@ -46,14 +46,12 @@ import {
   type User,
 } from '../lib/client';
 
-type Panel = DashboardPage | 'usage';
+type Panel = DashboardPage;
 export function AnalyticsApp() {
   const { message: messageText, t } = useSitePreferences();
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = useNavigate();
-  const returnPath = useRef(
-    pathname.startsWith('/site/') || pathname === '/usage' ? pathname : null,
-  );
+  const returnPath = useRef(pathname.startsWith('/site/') ? pathname : null);
   if (pathname.startsWith('/site/')) returnPath.current = pathname;
   const [user, setUser] = useState<User | null | undefined>(undefined),
     [error, setError] = useState(''),
@@ -108,7 +106,7 @@ export function AnalyticsApp() {
         setUser(user);
         try {
           if (sessionStorage.getItem('ab-checkout-events')) {
-            void navigate({ to: '/usage', replace: true });
+            void navigate({ to: '/dashboard', replace: true });
             return;
           }
         } catch {
@@ -135,16 +133,18 @@ function Dashboard({
   const { message: messageText, t } = useSitePreferences();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
-  const isUsage = useLocation({ select: (location) => location.pathname === '/usage' });
   const reportRange = useLocation({
     select: (location) => location.search as { from?: string; to?: string },
+  });
+  const settingsTab = useLocation({
+    select: (location) => (location.search as { tab?: string }).tab,
   });
   const { setOpenMobile } = useSidebar();
   const [sites, setSites] = useState<Site[]>([]),
     [rememberedSite, setRememberedSite] = useState(''),
     [environmentIds, setEnvironmentIds] = useState<Record<string, string>>({});
   const selected = params.siteId ?? rememberedSite;
-  const panel: Panel = isUsage ? 'usage' : isDashboardPage(params.page) ? params.page : 'overview';
+  const panel: Panel = isDashboardPage(params.page) ? params.page : 'overview';
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [addOpen, setAddOpen] = useState(false),
@@ -255,7 +255,7 @@ function Dashboard({
     setEnvironmentIds((current) =>
       current[selected] === environment.id ? current : { ...current, [selected]: environment.id },
     );
-    if (!isUsage && (!params.siteId || !params.environmentId || !params.page)) {
+    if (!params.siteId || !params.environmentId || !params.page) {
       void navigate({
         to: siteRoute,
         params: {
@@ -283,7 +283,6 @@ function Dashboard({
     params.environmentId,
     params.page,
     navigate,
-    isUsage,
   ]);
   function show(next: DashboardPage) {
     if (site && environment) go(site.id, environment.id, next);
@@ -358,7 +357,7 @@ function Dashboard({
         showSetup={!!environment && setupStatus[environment.id] === false}
         onSiteChange={(id) => go(id, environmentIds[id] ?? id, 'overview')}
         onEnvironmentChange={(id) => {
-          if (site) go(site.id, id, panel === 'usage' ? 'overview' : panel);
+          if (site) go(site.id, id, panel);
         }}
         onAddSite={() => setAddOpen(true)}
         onAddEnvironment={() => setAddEnvironmentOpen(true)}
@@ -373,28 +372,24 @@ function Dashboard({
             data-testid="navigation-toggle"
           />
           <div className="flex min-w-0 items-center gap-2 text-sm">
-            <span className="truncate text-secondary-ink">
-              {isUsage ? t('Account') : (site?.name ?? t('Your workspace'))}
-            </span>
+            <span className="truncate text-secondary-ink">{site?.name ?? t('Your workspace')}</span>
             <span aria-hidden="true" className="text-muted-foreground">
               /
             </span>
             <span className="shrink-0 font-medium">
-              {isUsage
-                ? t('Usage')
-                : !site || panel === 'setup'
-                  ? t('Setup')
-                  : isFeaturePage(panel)
-                    ? t(featureDefinitions.find((feature) => feature.page === panel)!.label)
-                    : panel === 'settings'
-                      ? t('Settings')
-                      : panel === 'installation'
-                        ? t('Install')
-                        : panel === 'imports'
-                          ? t('Imports')
-                          : panel === 'visitors'
-                            ? t('Visitors')
-                            : t('Overview')}
+              {!site || panel === 'setup'
+                ? t('Setup')
+                : isFeaturePage(panel)
+                  ? t(featureDefinitions.find((feature) => feature.page === panel)!.label)
+                  : panel === 'settings'
+                    ? t('Settings')
+                    : panel === 'installation'
+                      ? t('Install')
+                      : panel === 'imports'
+                        ? t('Imports')
+                        : panel === 'visitors'
+                          ? t('Visitors')
+                          : t('Overview')}
             </span>
           </div>
         </header>
@@ -413,7 +408,7 @@ function Dashboard({
               </div>
             </Alert>
           )}
-          {!isUsage && (usage.data?.paused || websiteUsage?.pauseReason === 'website_budget') && (
+          {(usage.data?.paused || websiteUsage?.pauseReason === 'website_budget') && (
             <div
               className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-md border border-border px-4 py-3 text-sm"
               role="status"
@@ -426,9 +421,16 @@ function Dashboard({
                     ? t('Event limit reached')
                     : t('An active plan is required')}
               </span>
-              <Link to="/usage" className="underline underline-offset-4">
-                {t('View usage')}
-              </Link>
+              {site && environment && (
+                <Link
+                  to={siteRoute}
+                  params={{ siteId: site.id, environmentId: environment.id, page: 'settings' }}
+                  search={{ tab: 'usage' }}
+                  className="underline underline-offset-4"
+                >
+                  {t('View usage')}
+                </Link>
+              )}
             </div>
           )}
           <PageTransition
@@ -439,8 +441,6 @@ function Dashboard({
                 <Spinner className="size-5" />
                 <span>{t('Loading your workspace…')}</span>
               </div>
-            ) : isUsage ? (
-              <Usage {...usage} />
             ) : params.siteId && (!site || !environment) ? (
               <div className="max-w-[440px] py-10">
                 <h1 className="text-2xl font-medium">{t('Website or environment unavailable')}</h1>
@@ -521,6 +521,8 @@ function Dashboard({
                 key={environment.id}
                 site={site}
                 environment={environment}
+                usage={usage}
+                initialTab={settingsTab}
                 onEnvironmentUpdated={environmentUpdated}
                 onEnvironmentDeleted={() => {
                   setSites((items) =>

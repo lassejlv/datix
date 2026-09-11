@@ -22,7 +22,7 @@ export const Route = createRootRoute({
         src: 'https://usedatix.com/tracker.js',
         'data-site': 'c8a91742-a3bb-4b25-aefc-500041feafb3',
         defer: true,
-      }
+      },
     ],
   }),
   notFoundComponent: NotFound,

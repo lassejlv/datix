@@ -20,6 +20,11 @@ import {
 } from './ui/dialog';
 import { apiClient, errorText, write, type Site, type SiteEnvironment } from '../lib/client';
 import { EnvironmentSettings, LocalhostSetting } from './environment-panels';
+import { Link } from '@tanstack/react-router';
+import { BillingActions } from './billing-actions';
+import { EventCredits, PlanHeading, WebsitesUsage, type useAccountUsage } from './usage';
+import type { AccountUsage } from '../billing/types';
+import type { ReactNode } from 'react';
 
 export function AddSiteDialog({
   open,
@@ -432,9 +437,42 @@ export function Installation({
   );
 }
 
+type SettingsTab = 'website' | 'environment' | 'tracking' | 'features' | 'usage' | 'billing';
+
+function AccountUsageSection({
+  usage,
+  children,
+}: {
+  usage: ReturnType<typeof useAccountUsage>;
+  children: (data: AccountUsage) => ReactNode;
+}) {
+  const { message: messageText, t } = useSitePreferences();
+  return (
+    <>
+      {usage.error && (
+        <Alert className="mb-5">
+          {messageText(usage.error)}{' '}
+          <button className="underline" onClick={usage.refresh}>
+            {t('Try again')}
+          </button>
+        </Alert>
+      )}
+      {!usage.data ? (
+        <p className="py-12 text-sm text-secondary-ink">
+          {usage.loading ? t('Loading usage…') : t('Usage is unavailable.')}
+        </p>
+      ) : (
+        children(usage.data)
+      )}
+    </>
+  );
+}
+
 export function SiteSettings({
   site,
   environment,
+  usage,
+  initialTab,
   onEnvironmentUpdated,
   onEnvironmentDeleted,
   onUpdated,
@@ -442,19 +480,32 @@ export function SiteSettings({
 }: {
   site: Site;
   environment: SiteEnvironment;
+  usage: ReturnType<typeof useAccountUsage>;
+  initialTab?: string;
   onEnvironmentUpdated: (environment: SiteEnvironment) => void;
   onEnvironmentDeleted: () => void;
   onUpdated: (site: Site) => void;
   onDeleted: () => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
-  const [tab, setTab] = useState<'website' | 'environment' | 'tracking' | 'features'>('website');
-  const tabs = ['website', 'environment', 'tracking', 'features'] as const;
-  const labels = {
+  const tabs: readonly SettingsTab[] = [
+    'website',
+    'environment',
+    'tracking',
+    'features',
+    'usage',
+    'billing',
+  ];
+  const [tab, setTab] = useState<SettingsTab>(
+    tabs.includes(initialTab as SettingsTab) ? (initialTab as SettingsTab) : 'website',
+  );
+  const labels: Record<SettingsTab, string> = {
     website: t('Website'),
     environment: t('Environment'),
     tracking: t('Tracking'),
     features: t('Features'),
+    usage: t('Usage'),
+    billing: t('Billing'),
   };
   const [name, setName] = useState(site.name);
   const [busy, setBusy] = useState(false),
@@ -520,7 +571,44 @@ export function SiteSettings({
             onUpdated={onEnvironmentUpdated}
           />
         )}
-        <div hidden={tab === 'website' || tab === 'features'}>
+        {tab === 'usage' && (
+          <AccountUsageSection usage={usage}>
+            {(data) => (
+              <>
+                <PlanHeading
+                  data={data}
+                  action={
+                    <Button variant="outline" onClick={() => setTab('billing')}>
+                      {t('Billing')}
+                    </Button>
+                  }
+                />
+                <EventCredits data={data} />
+                <div className="mt-10">
+                  <WebsitesUsage data={data} refresh={usage.refresh} />
+                </div>
+              </>
+            )}
+          </AccountUsageSection>
+        )}
+        {tab === 'billing' && (
+          <AccountUsageSection usage={usage}>
+            {(data) => (
+              <>
+                <PlanHeading
+                  data={data}
+                  action={
+                    <Link to="/pricing" className="text-sm underline underline-offset-4">
+                      {t('View plans')}
+                    </Link>
+                  }
+                />
+                <BillingActions active={Boolean(data.plan)} refresh={usage.refresh} />
+              </>
+            )}
+          </AccountUsageSection>
+        )}
+        <div hidden={tab !== 'environment' && tab !== 'tracking'}>
           <EnvironmentSettings
             key={environment.id}
             section={tab === 'tracking' ? 'tracking' : 'environment'}

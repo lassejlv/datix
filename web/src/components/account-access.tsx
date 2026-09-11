@@ -79,11 +79,6 @@ export function AccountAccess({
 
 function PlanRequired({ refresh }: { refresh: () => void }) {
   const { t } = useSitePreferences();
-  const pathname = useLocation({ select: (location) => location.pathname });
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (pathname !== '/usage') void navigate({ to: '/usage', replace: true });
-  }, [navigate, pathname]);
   return (
     <section aria-labelledby="plan-required-title">
       <h1 id="plan-required-title" className="text-[22px] font-medium tracking-tight">

@@ -37,14 +37,12 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     } catch {
       /* Checkout selection is optional when storage is blocked. */
     }
+    // The account usage hook syncs ?checkout_id= returns; this only keeps the waiting note.
     if (new URLSearchParams(location.search).has('checkout_id')) {
       // oxlint-disable-next-line react/set-state-in-effect -- browser URL is an external source
       setReturned(true);
-      void apiClient('/billing/sync', { method: 'POST', body: '{}' })
-        .then(refresh)
-        .catch((e) => setError(errorText(e)));
     }
-  }, [refresh]);
+  }, []);
   const act = async (path: string) => {
     setBusy(true);
     setError('');

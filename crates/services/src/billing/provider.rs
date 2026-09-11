@@ -282,7 +282,7 @@ pub async fn refresh_due(state: &State) -> Result<()> {
 async fn portal(state: &State, customer: Uuid) -> Result<Value> {
     let response = required(request(state, Method::POST, "/v1/customer-sessions/", Some(json!({
         "customer_id":customer,
-        "return_url":format!("{}/usage", state.config.app_url.as_str().trim_end_matches('/')),
+        "return_url":format!("{}/dashboard", state.config.app_url.as_str().trim_end_matches('/')),
     }))).await?)?;
     if uuid(&response["customer_id"]) != Some(customer) {
         return Err(Error::unavailable());
@@ -454,7 +454,7 @@ pub async fn handle(
     let response = required(request(state, Method::POST, "/v1/checkouts/", Some(json!({
         "products":[plan.product_id], "customer_id":customer_id, "external_customer_id":owner.id,
         "currency":CATALOG.currency, "locale":plan.locale, "allow_trial":plan.allow_trial,
-        "success_url":format!("{app}/usage?checkout_id={{CHECKOUT_ID}}"), "return_url":format!("{app}/usage"),
+        "success_url":format!("{app}/dashboard?checkout_id={{CHECKOUT_ID}}"), "return_url":format!("{app}/dashboard"),
     }))).await?)?;
     if !checkout_matches(&response, &plan, customer_id) {
         return Err(Error::unavailable());

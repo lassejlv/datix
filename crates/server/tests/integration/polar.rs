@@ -196,7 +196,7 @@ async fn checkout_is_usd_only_reuses_open_sessions_and_blocks_annual_drafts() {
             assert_eq!(body["allow_trial"], true);
             assert_eq!(
                 body["success_url"],
-                "http://localhost:3057/usage?checkout_id={CHECKOUT_ID}"
+                "http://localhost:3057/dashboard?checkout_id={CHECKOUT_ID}"
             );
         }
         // A paid, expired or changed session is never reused, even inside the local cache TTL.

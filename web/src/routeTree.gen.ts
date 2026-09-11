@@ -17,7 +17,6 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppSigninRouteImport } from './routes/_app.signin'
 import { Route as AppSignupRouteImport } from './routes/_app.signup'
-import { Route as AppUsageRouteImport } from './routes/_app.usage'
 import { Route as AppSiteSiteIdRouteImport } from './routes/_app.site.$siteId'
 import { Route as AppSiteSiteIdEnvironmentIdRouteImport } from './routes/_app.site.$siteId.$environmentId'
 import { Route as AppSiteSiteIdEnvironmentIdPageRouteImport } from './routes/_app.site.$siteId.$environmentId.$page'
@@ -61,11 +60,6 @@ const AppSignupRoute = AppSignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => AppRoute,
 } as any)
-const AppUsageRoute = AppUsageRouteImport.update({
-  id: '/usage',
-  path: '/usage',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppSiteSiteIdRoute = AppSiteSiteIdRouteImport.update({
   id: '/site/$siteId',
   path: '/site/$siteId',
@@ -92,7 +86,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/signin': typeof AppSigninRoute
   '/signup': typeof AppSignupRoute
-  '/usage': typeof AppUsageRoute
   '/site/$siteId': typeof AppSiteSiteIdRouteWithChildren
   '/site/$siteId/$environmentId': typeof AppSiteSiteIdEnvironmentIdRouteWithChildren
   '/site/$siteId/$environmentId/$page': typeof AppSiteSiteIdEnvironmentIdPageRoute
@@ -105,7 +98,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/signin': typeof AppSigninRoute
   '/signup': typeof AppSignupRoute
-  '/usage': typeof AppUsageRoute
   '/site/$siteId': typeof AppSiteSiteIdRouteWithChildren
   '/site/$siteId/$environmentId': typeof AppSiteSiteIdEnvironmentIdRouteWithChildren
   '/site/$siteId/$environmentId/$page': typeof AppSiteSiteIdEnvironmentIdPageRoute
@@ -120,7 +112,6 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/signin': typeof AppSigninRoute
   '/_app/signup': typeof AppSignupRoute
-  '/_app/usage': typeof AppUsageRoute
   '/_app/site/$siteId': typeof AppSiteSiteIdRouteWithChildren
   '/_app/site/$siteId/$environmentId': typeof AppSiteSiteIdEnvironmentIdRouteWithChildren
   '/_app/site/$siteId/$environmentId/$page': typeof AppSiteSiteIdEnvironmentIdPageRoute
@@ -135,7 +126,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/signin'
     | '/signup'
-    | '/usage'
     | '/site/$siteId'
     | '/site/$siteId/$environmentId'
     | '/site/$siteId/$environmentId/$page'
@@ -148,7 +138,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/signin'
     | '/signup'
-    | '/usage'
     | '/site/$siteId'
     | '/site/$siteId/$environmentId'
     | '/site/$siteId/$environmentId/$page'
@@ -162,7 +151,6 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/signin'
     | '/_app/signup'
-    | '/_app/usage'
     | '/_app/site/$siteId'
     | '/_app/site/$siteId/$environmentId'
     | '/_app/site/$siteId/$environmentId/$page'
@@ -234,13 +222,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSignupRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/usage': {
-      id: '/_app/usage'
-      path: '/usage'
-      fullPath: '/usage'
-      preLoaderRoute: typeof AppUsageRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/site/$siteId': {
       id: '/_app/site/$siteId'
       path: '/site/$siteId'
@@ -295,7 +276,6 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppSigninRoute: typeof AppSigninRoute
   AppSignupRoute: typeof AppSignupRoute
-  AppUsageRoute: typeof AppUsageRoute
   AppSiteSiteIdRoute: typeof AppSiteSiteIdRouteWithChildren
 }
 
@@ -303,7 +283,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppSigninRoute: AppSigninRoute,
   AppSignupRoute: AppSignupRoute,
-  AppUsageRoute: AppUsageRoute,
   AppSiteSiteIdRoute: AppSiteSiteIdRouteWithChildren,
 }
 

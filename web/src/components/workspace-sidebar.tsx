@@ -13,7 +13,6 @@ import {
   Code2,
   FileText,
   Settings2,
-  Activity,
   Warning,
   PulseIcon,
   Gauge,
@@ -53,7 +52,7 @@ export function WorkspaceSidebar({
   sites: Site[];
   site?: Site;
   environment?: SiteEnvironment;
-  panel: DashboardPage | 'usage';
+  panel: DashboardPage;
   user: User;
   signingOut: boolean;
   showSetup: boolean;
@@ -170,20 +169,6 @@ export function WorkspaceSidebar({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className="relative h-11 overflow-visible gap-3 px-3 text-secondary-ink data-[active=true]:bg-transparent md:h-8"
-                isActive={panel === 'usage'}
-                aria-current={panel === 'usage' ? 'page' : undefined}
-                render={<Link to="/usage" onClick={() => setOpenMobile(false)} />}
-              >
-                {panel === 'usage' && (
-                  <SelectionIndicator id={indicatorId} className="kit-navigation-indicator" />
-                )}
-                <Activity />
-                <span>{t('Usage')}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </nav>
       </SidebarContent>

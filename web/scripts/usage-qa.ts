@@ -34,8 +34,8 @@ let ownerId: string | undefined;
 let fixture: ReturnType<typeof Bun.serve> | undefined;
 const readUsage = async () => (await context.request.get(`${base}/api/usage`)).json();
 const refresh = async () => {
-  await page.getByRole('button', { name: 'Refresh usage' }).click();
-  await expect(page.getByRole('button', { name: 'Refresh usage' })).toBeEnabled();
+  await page.reload();
+  await expect(page.getByRole('progressbar')).toBeVisible();
 };
 try {
   await client.connect();
@@ -47,12 +47,6 @@ try {
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Add your first website' })).toBeVisible();
   ownerId = ((await (await context.request.get(`${base}/api/me`)).json()) as any).user.id;
-  await page.getByRole('link', { name: 'Usage', exact: true }).click();
-  await expect(page).toHaveURL(`${base}/usage`);
-  await expect(page.getByRole('heading', { name: 'Usage', exact: true })).toBeVisible();
-  await expect(page.getByText('No active plan', { exact: true })).toBeVisible();
-  await expect(page.getByText('Tracking paused', { exact: true })).toBeVisible();
-  await page.screenshot({ path: `${dir}/no-plan.png`, fullPage: true });
   const response = await context.request.post(`${base}/api/sites`, {
     headers: { origin: base },
     data: { name: 'Example website', domain: 'usage-qa.example.com' },
@@ -65,15 +59,17 @@ try {
   );
   expect(setting.status()).toBe(200);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Usage', exact: true })).toBeVisible();
-  await expect(page.getByText('Paused · Pro required', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Connect your website' })).toBeVisible();
+  await page.getByRole('button', { name: 'Continue to plans' }).click();
+  await expect(page.locator('#plan-required-title')).toBeVisible();
+  await page.screenshot({ path: `${dir}/no-plan.png`, fullPage: true });
   await seedPro(client, ownerId!);
   const period = (await readUsage()).period;
   await client.query(
     'insert into billing_organization_usage (owner_id,site_id,period_start,period_end,events,organization_id) values ($1,$2,$3,$4,70020,$5)',
     [ownerId, siteId, period.start, period.end, catalog.organizationId],
   );
-  await refresh();
+  await page.goto(`${base}/site/${siteId}/${siteId}/settings?tab=usage`);
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '70020');
   await expect(page.getByText('Collecting', { exact: true })).toBeVisible();
   for (const [theme, width] of [

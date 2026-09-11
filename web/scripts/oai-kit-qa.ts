@@ -841,8 +841,7 @@ try {
         `${theme}: clipboard success is verified and denied clipboard access produces an error toast`,
       );
 
-      await page.goto(`${base}/usage`);
-      await page.getByRole('tab', { name: 'Websites', exact: true }).click();
+      await page.goto(`${path}/settings?tab=usage`);
       await page.getByRole('button', { name: 'Set a website budget' }).click();
       await page.getByLabel('Credits per allowance period').fill('50000');
       await page.getByRole('button', { name: 'Save budget' }).click();

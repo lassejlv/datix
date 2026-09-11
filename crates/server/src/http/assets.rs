@@ -45,7 +45,7 @@ pub(super) async fn fallback(AppState(state): AppState<State>, request: Request)
     {
         return StatusCode::NOT_FOUND.into_response();
     }
-    let known = ["", "/pricing", "/signin", "/signup", "/dashboard", "/usage"]
+    let known = ["", "/pricing", "/signin", "/signup", "/dashboard"]
         .contains(&path.trim_end_matches('/'))
         || regex::Regex::new(r"^/site/[^/]+(?:/[^/]+(?:/[^/]+)?)?/?$")
             .unwrap()

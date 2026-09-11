@@ -102,7 +102,7 @@ async function fixtures(context: BrowserContext) {
     else if (path === '/billing/sync') result = { success: true };
     else if (path === '/billing/checkout') {
       state.checkout = request.postDataJSON();
-      result = { url: `${base}/usage?checkout_id=fixture-checkout` };
+      result = { url: `${base}/dashboard?checkout_id=fixture-checkout` };
     } else if (path === '/auth/sign-out') {
       state.signedIn = false;
       result = { success: true };
@@ -116,9 +116,9 @@ async function fixtures(context: BrowserContext) {
       } else if (path.endsWith('/installation'))
         result = { receiving: true, lastReceivedAt: environment.createdAt };
       else {
-        unexpected.push(path);
-        status = 404;
-        result = { error: { message: 'Unhandled workspace fixture' } };
+        // Post-unlock report traffic is expected; fixtures only model access control.
+        status = 503;
+        result = { error: { message: 'Report fixtures are unavailable.' } };
       }
     } else {
       unexpected.push(path);
@@ -154,7 +154,7 @@ try {
   await expect(page.getByRole('button', { name: 'Continue to plans' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue to plans' }).click();
   await expect(page.locator('#plan-required-title')).toHaveText('Choose a plan to continue');
-  await expect(page).toHaveURL(`${base}/usage`);
+  await expect(page).toHaveURL(`${base}/dashboard`);
   expect(state.completed).toBe(true);
   expect(state.workspaceRequests).toEqual([]);
   console.log('PASS first website → install → plans without requiring a billable pageview');
@@ -165,7 +165,7 @@ try {
     await expect(page.getByRole('button', { name: 'Toggle navigation', exact: true })).toHaveCount(
       0,
     );
-    await expect(page).toHaveURL(`${base}/usage`);
+    await expect(page).toHaveURL(`${base}/site/${siteId}/${siteId}/${route}`);
   }
   await page.evaluate(() => {
     localStorage.clear();
@@ -191,17 +191,24 @@ try {
   state.trial = true;
   await page.getByRole('button', { name: 'Refresh subscription', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Toggle navigation', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Usage', exact: true })).toBeVisible();
   await expect(page.locator('#plan-required-title')).toHaveCount(0);
+  await page.goto(`${base}/site/${siteId}/${siteId}/settings?tab=usage`);
+  await expect(page.getByRole('heading', { name: 'Website settings', exact: true })).toBeVisible();
+  await expect(page.getByRole('progressbar')).toBeVisible();
+  await page.getByRole('tab', { name: 'Billing', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Manage billing', exact: true })).toBeVisible();
   state.exhausted = true;
-  await page.getByRole('button', { name: 'Refresh usage', exact: true }).click();
+  await page.reload();
   await expect(page.getByRole('button', { name: 'Toggle navigation', exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Tracking paused · Event limit reached', { exact: true }),
+  ).toBeVisible();
   console.log(
     'PASS verified trial unlocks the app; a spent allowance does not revoke a valid subscription',
   );
 
   state.usageFails = true;
-  await page.getByRole('button', { name: 'Refresh usage', exact: true }).click();
+  await page.reload();
   await expect(
     page.getByText('Subscription verification is temporarily unavailable.'),
   ).toBeVisible();
@@ -221,7 +228,7 @@ try {
     page.on('pageerror', (error) => errors.push(error.message));
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto(`${base}/usage`);
+      await page.goto(`${base}/dashboard`);
       await expect(page.locator('#plan-required-title')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
         true,

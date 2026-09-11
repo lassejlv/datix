@@ -70,7 +70,7 @@ const mock = Bun.serve({
         body,
       });
       if (!response.ok) return new Response(`Webhook failed ${response.status}`, { status: 500 });
-      return Response.redirect(`${base}/usage?checkout_id=${checkout.id}`, 303);
+      return Response.redirect(`${base}/dashboard?checkout_id=${checkout.id}`, 303);
     }
     if (
       request.headers.get('authorization') !== 'Bearer polar-local-qa' ||
@@ -199,7 +199,7 @@ try {
   });
   if (!signup.ok()) throw Error(`Signup ${signup.status()}`);
   owner = (await signup.json()).user.id;
-  await page.goto(`${base}/usage`);
+  await page.goto(`${base}/dashboard`);
   await page.getByRole('button', { name: 'Add your first website' }).click();
   await page.getByLabel('Website name', { exact: true }).fill('Polar QA website');
   await page.getByLabel('Website domain').fill('polar-qa.example');
@@ -214,7 +214,7 @@ try {
   await page.getByRole('button', { name: 'Choose plan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Local Polar checkout' })).toBeVisible();
   // A return URL is not proof of payment or a grant.
-  await page.goto(`${base}/usage?checkout_id=${checkout.id}`);
+  await page.goto(`${base}/dashboard?checkout_id=${checkout.id}`);
   await expect(page.locator('#plan-required-title')).toBeVisible();
   await expect(
     page.getByText('Waiting for Polar to confirm your subscription.', { exact: false }),
@@ -222,6 +222,8 @@ try {
   await page.getByRole('button', { name: 'Choose plan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Local Polar checkout' })).toBeVisible();
   await page.getByRole('button', { name: 'Confirm test trial' }).click();
+  await page.getByRole('link', { name: 'Settings', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Website settings' })).toBeVisible();
   await page.getByRole('tab', { name: 'Billing', exact: true }).click();
   expect((await context.request.get(`${base}/api/sites/${siteId}/overview`)).status()).toBe(200);
   await expect(page.getByRole('button', { name: 'Manage billing', exact: true })).toBeVisible();

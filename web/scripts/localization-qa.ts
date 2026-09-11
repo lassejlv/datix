@@ -198,8 +198,10 @@ try {
     await audit(page, locale);
     await page.keyboard.press('Escape');
 
-    await page.goto(`${base}/usage`);
-    await expect(page.getByRole('heading', { name: t('Usage'), exact: true })).toBeVisible();
+    await page.goto(`${route('settings')}?tab=usage`);
+    await expect(
+      page.getByRole('heading', { name: t('Website settings'), exact: true }),
+    ).toBeVisible();
     await expect(page.getByText(t('Event credits'), { exact: true })).toBeVisible();
     await page.getByRole('button', { name: t('Set a website budget'), exact: true }).click();
     await audit(page, locale);
