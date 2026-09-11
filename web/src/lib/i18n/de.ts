@@ -59,15 +59,6 @@ export const de = {
   'Website budget saved.': 'Website-Budget gespeichert.',
   'Subscription refreshed.': 'Abonnement aktualisiert.',
   'Dismiss notification': 'Benachrichtigung schließen',
-  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
-    'Ein Seitenaufruf in der Produktion zählt als 1 Ereignis zu deinem Kontingent. Klicks und andere Ereignisse zählen als 0,5.',
-  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
-    'Auf localhost zählen Seitenaufrufe als 0,3 Ereignisse und andere Ereignisse als 0,15 zu deinem Kontingent. Die Interaktionszeit ist kostenlos.',
-  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
-    'Ja. Jeder Tarif umfasst bis zu 10 Websites. Dein monatliches Ereigniskontingent wird zwischen ihnen geteilt. Schätze daher deinen gesamten Traffic bei der Tarifwahl.',
-  'Does testing use my event allowance?': 'Verbrauchen Tests mein Ereigniskontingent?',
-  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
-    'Seitenaufrufe auf localhost zählen als 0,3 Ereignisse und andere Ereignisse als 0,15 zu deinem Kontingent. Getrennte Umgebungen halten Testaktivität aus deinen Produktionsberichten heraus.',
   Menu: 'Menü',
   'Terms of service': 'Nutzungsbedingungen',
   Terms: 'Nutzungsbedingungen',
@@ -96,15 +87,17 @@ export const de = {
     'Probiere Änderungen in einer Testumgebung aus. Halte deine Produktionsberichte frei von Test-Traffic.',
   'Get started: add your website, paste one script, and check your first visit.':
     'So geht’s: Website hinzufügen, ein Skript einfügen und den ersten Besuch prüfen.',
-  'Three plans.': 'Drei Tarife.',
-  'All your analytics.': 'Deine gesamte Webanalyse.',
-  'Every plan includes every report. Start Basic with 14 days free.':
-    'Jeder Tarif enthält alle Berichte. Starte mit Basic und 14 kostenlosen Tagen.',
-  '14 days free': '14 Tage kostenlos',
+  'Simple, transparent pricing': 'Einfache, transparente Preise',
+  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
+    'Jeder Tarif enthält alle Berichte und alle Funktionen. Wähle den Tarif, der zu deinem Traffic passt.',
+  'For a personal site or a side project.': 'Für eine persönliche Website oder ein Nebenprojekt.',
+  'For a growing product with steady traffic.': 'Für ein wachsendes Produkt mit stetigem Traffic.',
+  'For high-traffic sites and agencies.': 'Für Websites mit viel Traffic und für Agenturen.',
+  '{count} credits per month': '{count} Credits pro Monat',
+  'Includes a 14-day free trial': 'Enthält eine 14-tägige kostenlose Testphase',
+  'Frequently asked questions': 'Häufig gestellte Fragen',
   'Most popular': 'Am beliebtesten',
-  'High volume': 'Viel Traffic',
   'Monthly credits': 'Monatliche Credits',
-  'Included in every plan': 'In jedem Tarif enthalten',
   'Date ranges': 'Zeiträume',
   'Referrers and countries': 'Verweisquellen und Länder',
   '{count} websites': '{count} Websites',
@@ -115,7 +108,6 @@ export const de = {
     'Basic deckt 15.000 Seitenaufrufe oder 12.000 Seitenaufrufe + 6.000 andere Ereignisse pro Monat ab.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'Auf localhost: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Aktive Zeit ist kostenlos.',
-  'Before you choose.': 'Bevor du dich entscheidest.',
   'Do I need Pro to get all the reports?': 'Brauche ich Pro für alle Berichte?',
   'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
     'Nein. Jeder Tarif enthält dieselben Berichte und Tracking-Funktionen. Wähle Basic, Pro oder Ultra nach deinem erwarteten Traffic.',

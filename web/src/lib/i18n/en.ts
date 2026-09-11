@@ -44,15 +44,6 @@ export const en = {
   'Website budget saved.': 'Website budget saved.',
   'Subscription refreshed.': 'Subscription refreshed.',
   'Dismiss notification': 'Dismiss notification',
-  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
-    'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.',
-  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
-    'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.',
-  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
-    'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.',
-  'Does testing use my event allowance?': 'Does testing use my event allowance?',
-  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
-    'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.',
   Menu: 'Menu',
   'Terms of service': 'Terms of service',
   Terms: 'Terms',
@@ -81,15 +72,17 @@ export const en = {
     'Explore changes in a test environment. Keep your production reports clean.',
   'Get started: add your website, paste one script, and check your first visit.':
     'Get started: add your website, paste one script, and check your first visit.',
-  'Three plans.': 'Three plans.',
-  'All your analytics.': 'All your analytics.',
-  'Every plan includes every report. Start Basic with 14 days free.':
-    'Every plan includes every report. Start Basic with 14 days free.',
-  '14 days free': '14 days free',
+  'Simple, transparent pricing': 'Simple, transparent pricing',
+  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
+    'Every plan includes every report and every feature. Pick the one that matches your traffic.',
+  'For a personal site or a side project.': 'For a personal site or a side project.',
+  'For a growing product with steady traffic.': 'For a growing product with steady traffic.',
+  'For high-traffic sites and agencies.': 'For high-traffic sites and agencies.',
+  '{count} credits per month': '{count} credits per month',
+  'Includes a 14-day free trial': 'Includes a 14-day free trial',
+  'Frequently asked questions': 'Frequently asked questions',
   'Most popular': 'Most popular',
-  'High volume': 'High volume',
   'Monthly credits': 'Monthly credits',
-  'Included in every plan': 'Included in every plan',
   'Date ranges': 'Date ranges',
   'Referrers and countries': 'Referrers and countries',
   '{count} websites': '{count} websites',
@@ -100,7 +93,6 @@ export const en = {
     'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
-  'Before you choose.': 'Before you choose.',
   'Do I need Pro to get all the reports?': 'Do I need Pro to get all the reports?',
   'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
     'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.',

@@ -57,15 +57,6 @@ export const da = {
   'Website budget saved.': 'Websitebudget gemt.',
   'Subscription refreshed.': 'Abonnement opdateret.',
   'Dismiss notification': 'Luk meddelelse',
-  'A production pageview counts as 1 event toward your allowance. Clicks and other events count as 0.5.':
-    'En sidevisning i produktion tæller som 1 hændelse i din kvote. Klik og andre hændelser tæller som 0,5.',
-  'On localhost, pageviews count as 0.3 events and other events as 0.15 toward your allowance. Engagement time is free.':
-    'På localhost tæller sidevisninger som 0,3 hændelser og andre hændelser som 0,15 i din kvote. Aktiv tid er gratis.',
-  'Yes. Every plan includes up to 10 websites. Your monthly event allowance is shared across them, so estimate your total traffic when choosing a plan.':
-    'Ja. Alle planer inkluderer op til 10 hjemmesider. Din månedlige hændelseskvote deles mellem dem, så beregn din samlede trafik, når du vælger en plan.',
-  'Does testing use my event allowance?': 'Bruger test min hændelseskvote?',
-  'Localhost pageviews count as 0.3 events and other events as 0.15 toward your allowance. Separate environments keep test activity out of your production reports.':
-    'Sidevisninger på localhost tæller som 0,3 hændelser og andre hændelser som 0,15 i din kvote. Separate miljøer holder testaktivitet ude af dine produktionsrapporter.',
   Menu: 'Menu',
   'Terms of service': 'Brugervilkår',
   Terms: 'Vilkår',
@@ -94,15 +85,17 @@ export const da = {
     'Afprøv ændringer i et testmiljø. Hold dine produktionsrapporter fri for testtrafik.',
   'Get started: add your website, paste one script, and check your first visit.':
     'Kom i gang: tilføj din hjemmeside, indsæt ét script, og se dit første besøg.',
-  'Three plans.': 'Tre planer.',
-  'All your analytics.': 'Al din webanalyse.',
-  'Every plan includes every report. Start Basic with 14 days free.':
-    'Alle planer inkluderer alle rapporter. Start med Basic gratis i 14 dage.',
-  '14 days free': '14 dage gratis',
+  'Simple, transparent pricing': 'Enkel og gennemskuelig prissætning',
+  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
+    'Alle planer inkluderer alle rapporter og alle funktioner. Vælg den, der passer til din trafik.',
+  'For a personal site or a side project.': 'Til en personlig hjemmeside eller et sideprojekt.',
+  'For a growing product with steady traffic.': 'Til et voksende produkt med stabil trafik.',
+  'For high-traffic sites and agencies.': 'Til hjemmesider med meget trafik og til bureauer.',
+  '{count} credits per month': '{count} credits om måneden',
+  'Includes a 14-day free trial': 'Inkluderer 14 dages gratis prøveperiode',
+  'Frequently asked questions': 'Ofte stillede spørgsmål',
   'Most popular': 'Mest populær',
-  'High volume': 'Meget trafik',
   'Monthly credits': 'Månedlige credits',
-  'Included in every plan': 'Inkluderet i alle planer',
   'Date ranges': 'Datointervaller',
   'Referrers and countries': 'Henvisninger og lande',
   '{count} websites': '{count} hjemmesider',
@@ -113,7 +106,6 @@ export const da = {
     'Basic dækker 15.000 sidevisninger eller 12.000 sidevisninger + 6.000 andre hændelser om måneden.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'På localhost: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Aktiv tid er gratis.',
-  'Before you choose.': 'Før du vælger.',
   'Do I need Pro to get all the reports?': 'Skal jeg have Pro for at få alle rapporter?',
   'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
     'Nej. Alle planer inkluderer de samme rapporter og sporingsfunktioner. Vælg Basic, Pro eller Ultra efter din forventede trafik.',
