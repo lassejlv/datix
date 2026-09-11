@@ -2,12 +2,24 @@ import { Alert } from './ui/alert';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { FooterPreferences, useSitePreferences } from './site-preferences';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from './ui/icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { GithubIcon, GoogleIcon } from '@hugeicons/core-free-icons';
 import { Brand } from './brand';
 import { PageTransition } from './page-transition';
 import { apiClient, errorText, write, type User } from '../lib/client';
 import '../landing.css';
+
+// Display names stay untranslated brand names. To add a provider, extend this
+// map with its icon and configure its credentials on the server.
+const oauthProviders = {
+  github: { label: 'GitHub', icon: GithubIcon },
+  google: { label: 'Google', icon: GoogleIcon },
+} as const;
+type OAuthProvider = keyof typeof oauthProviders;
+const isOAuthProvider = (value: unknown): value is OAuthProvider =>
+  typeof value === 'string' && value in oauthProviders;
 
 export function AuthScreen({
   onSignedIn,
@@ -23,6 +35,42 @@ export function AuthScreen({
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [oauth, setOauth] = useState<OAuthProvider[]>([]);
+  const [oauthBusy, setOauthBusy] = useState<OAuthProvider | null>(null);
+  const [oauthFailed] = useState(
+    () => new URLSearchParams(window.location.search).get('oauth') === 'failed',
+  );
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/preferences', { credentials: 'same-origin', signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((preferences: unknown) => {
+        const ids =
+          typeof preferences === 'object' && preferences !== null
+            ? (preferences as { oauth?: unknown }).oauth
+            : null;
+        if (Array.isArray(ids)) setOauth(ids.filter(isOAuthProvider));
+      })
+      .catch(() => {
+        /* Email sign-in stays available when provider discovery fails. */
+      });
+    return () => controller.abort();
+  }, []);
+  async function startOauth(provider: OAuthProvider) {
+    if (busy || oauthBusy) return;
+    setOauthBusy(provider);
+    setError('');
+    try {
+      const result = await apiClient<{ url: string }>(
+        '/auth/sign-in/social',
+        write('POST', { provider }),
+      );
+      window.location.assign(result.url);
+    } catch (error) {
+      setError(errorText(error));
+      setOauthBusy(null);
+    }
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -74,6 +122,35 @@ export function AuthScreen({
                 : t('Sign in to see how your website is doing.')}
             </p>
           </div>
+          {oauth.length > 0 && (
+            <>
+              <div className="auth-oauth">
+                {oauth.map((provider) => (
+                  <Button
+                    key={provider}
+                    type="button"
+                    variant="outline"
+                    className="auth-oauth-button"
+                    disabled={busy || oauthBusy !== null}
+                    loading={oauthBusy === provider}
+                    onClick={() => void startOauth(provider)}
+                  >
+                    <HugeiconsIcon
+                      icon={oauthProviders[provider].icon}
+                      size={18}
+                      aria-hidden="true"
+                    />
+                    {t('Continue with {provider}', {
+                      provider: oauthProviders[provider].label,
+                    })}
+                  </Button>
+                ))}
+              </div>
+              <div className="auth-divider" role="separator">
+                <span>{t('or')}</span>
+              </div>
+            </>
+          )}
           <form className="auth-form" onSubmit={submit}>
             {signup && (
               <label htmlFor="auth-name">
@@ -124,7 +201,13 @@ export function AuthScreen({
                 </Button>
               </div>
             </label>
-            {error && <Alert className="auth-error">{messageText(error)}</Alert>}
+            {error ? (
+              <Alert className="auth-error">{messageText(error)}</Alert>
+            ) : (
+              oauthFailed && (
+                <Alert className="auth-error">{t('OAuth sign-in failed. Please try again.')}</Alert>
+              )
+            )}
             <Button
               loading={busy}
               className="auth-submit"

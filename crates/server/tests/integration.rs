@@ -59,6 +59,7 @@ impl Fixture {
             app_origins: vec!["http://localhost:3057".into()],
             auth_secret: "integration-auth-secret-with-more-than-32-characters".into(),
             visitor_secret: format!("integration-visitor-{user}"),
+            oauth: vec![],
             origin_secret: Some("test-origin-verification-secret".into()),
             polar_token: None,
             polar_webhook_secret: None,
@@ -241,6 +242,8 @@ macro_rules! fixture {($name:ident,$body:block)=>{{let $name=Fixture::new().awai
 
 #[path = "imports/mod.rs"]
 mod imports;
+#[path = "integration/oauth.rs"]
+mod oauth;
 #[path = "integration/overview.rs"]
 mod overview;
 #[path = "integration/polar.rs"]

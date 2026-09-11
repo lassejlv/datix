@@ -20,12 +20,14 @@ pub struct Identity {
 pub struct Reply {
     pub body: Value,
     pub cookies: Vec<String>,
+    pub redirect: Option<String>,
 }
 impl Reply {
     fn json(body: Value) -> Self {
         Self {
             body,
             cookies: vec![],
+            redirect: None,
         }
     }
 }
@@ -115,7 +117,7 @@ fn clear_cookie(state: &State) -> String {
         }
     )
 }
-fn remember_cookie(state: &State, remember: bool) -> String {
+pub(crate) fn remember_cookie(state: &State, remember: bool) -> String {
     let name = cookie_name(state).replace("session_token", "dont_remember");
     let value = if remember {
         String::new()
@@ -189,7 +191,7 @@ fn user_json(user: &User) -> Value {
 fn session_json(s: &Session) -> Value {
     json!({"id":s.id,"token":s.token,"userId":s.user_id,"createdAt":s.created_at.and_utc(),"updatedAt":s.updated_at.and_utc(),"expiresAt":s.expires_at.and_utc(),"ipAddress":s.ip_address,"userAgent":s.user_agent})
 }
-async fn new_session(
+pub(crate) async fn new_session(
     conn: &mut PgConnection,
     user_id: &str,
     ip: &str,
@@ -208,6 +210,7 @@ pub async fn handle(
     headers: &HeaderMap,
     body: Value,
     ip: &str,
+    query: &str,
 ) -> Result<Reply> {
     if method == "POST" {
         if body.as_object().is_none() {
@@ -268,10 +271,22 @@ pub async fn handle(
         return Ok(Reply {
             body: json!({"user":user_json(&identity.user),"session":{"id":s.id,"token":s.token,"userId":s.user_id,"createdAt":s.created_at.and_utc(),"updatedAt":s.updated_at.and_utc(),"expiresAt":s.expires_at.and_utc(),"ipAddress":s.ip_address,"userAgent":s.user_agent}}),
             cookies,
+            redirect: None,
         });
+    }
+    if let Some(provider) = path.strip_prefix("callback/") {
+        if method != "GET" {
+            return Err(Error::new(405, "method_not_allowed", "Use GET."));
+        }
+        return super::oauth::callback(state, provider, query, headers, ip).await;
     }
     if method != "POST" {
         return Err(Error::new(405, "method_not_allowed", "Use POST."));
+    }
+    if path == "sign-in/social" {
+        let provider = body["provider"].as_str().unwrap_or("");
+        let url = super::oauth::begin(state, provider).await?;
+        return Ok(Reply::json(json!({"url":url,"redirect":true})));
     }
     if path == "sign-up/email" || path == "sign-in/email" {
         let signup = path == "sign-up/email";
@@ -356,6 +371,7 @@ pub async fn handle(
                 cookie(state, &session.token, remember),
                 remember_cookie(state, remember),
             ],
+            redirect: None,
         });
     }
     if path == "sign-out" {
@@ -368,6 +384,7 @@ pub async fn handle(
         return Ok(Reply {
             body: json!({"success":true}),
             cookies: vec![clear_cookie(state), remember_cookie(state, true)],
+            redirect: None,
         });
     }
     if ![
@@ -410,36 +427,21 @@ pub async fn handle(
             .await?;
         return Ok(Reply::json(json!({"status":true})));
     }
-    let current = password_input(
-        &body,
-        if path == "delete-user" {
-            "password"
-        } else {
-            "currentPassword"
-        },
-        false,
-    )?;
+    if path == "delete-user" {
+        return delete_user(state, &identity, &body).await;
+    }
+    let current = password_input(&body, "currentPassword", false)?;
     let mut tx = state.db.begin().await?;
     sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
         .bind(&identity.user.id)
         .fetch_optional(&mut *tx)
         .await?
         .ok_or_else(unauthorized)?;
-    let encoded=sqlx::query_scalar::<_,String>("SELECT password FROM account WHERE user_id=$1 AND provider_id='credential' AND password IS NOT NULL LIMIT 1 FOR UPDATE").bind(&identity.user.id).fetch_optional(&mut *tx).await?.ok_or_else(unauthorized)?;
+    let encoded = credential_hash(&mut tx, &identity.user.id)
+        .await?
+        .ok_or_else(|| Error::invalid("No password is set on this account."))?;
     if !verify_password(current, encoded).await? {
         return Err(Error::new(400, "INVALID_PASSWORD", "Invalid password."));
-    }
-    if path == "delete-user" {
-        // Provider synchronization and cancellation checks are performed by the HTTP handler before deletion.
-        sqlx::query("DELETE FROM \"user\" WHERE id=$1")
-            .bind(&identity.user.id)
-            .execute(&mut *tx)
-            .await?;
-        tx.commit().await?;
-        return Ok(Reply {
-            body: json!({"success":true,"message":"User deleted"}),
-            cookies: vec![clear_cookie(state), remember_cookie(state, true)],
-        });
     }
     let next = hash_password(password_input(&body, "newPassword", true)?).await?;
     sqlx::query("UPDATE account SET password=$1,updated_at=now() AT TIME ZONE 'UTC' WHERE user_id=$2 AND provider_id='credential'").bind(next).bind(&identity.user.id).execute(&mut *tx).await?;
@@ -458,5 +460,43 @@ pub async fn handle(
     Ok(Reply {
         body: json!({"token":token,"user":user_json(&identity.user)}),
         cookies,
+        redirect: None,
+    })
+}
+async fn credential_hash(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    user_id: &str,
+) -> Result<Option<String>> {
+    Ok(sqlx::query_scalar::<_, String>("SELECT password FROM account WHERE user_id=$1 AND provider_id='credential' AND password IS NOT NULL LIMIT 1 FOR UPDATE")
+        .bind(user_id)
+        .fetch_optional(&mut **tx)
+        .await?)
+}
+async fn delete_user(state: &State, identity: &Identity, body: &Value) -> Result<Reply> {
+    let mut tx = state.db.begin().await?;
+    sqlx::query("SELECT id FROM \"user\" WHERE id=$1 FOR UPDATE")
+        .bind(&identity.user.id)
+        .fetch_optional(&mut *tx)
+        .await?
+        .ok_or_else(unauthorized)?;
+    let encoded = credential_hash(&mut tx, &identity.user.id).await?;
+    // OAuth-only accounts have no password to re-enter; the session plus the
+    // billing deletability check in the HTTP handler still guard deletion.
+    if let Some(encoded) = encoded {
+        let current = password_input(body, "password", false)?;
+        if !verify_password(current, encoded).await? {
+            return Err(Error::new(400, "INVALID_PASSWORD", "Invalid password."));
+        }
+    }
+    // Provider synchronization and cancellation checks are performed by the HTTP handler before deletion.
+    sqlx::query("DELETE FROM \"user\" WHERE id=$1")
+        .bind(&identity.user.id)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(Reply {
+        body: json!({"success":true,"message":"User deleted"}),
+        cookies: vec![clear_cookie(state), remember_cookie(state, true)],
+        redirect: None,
     })
 }

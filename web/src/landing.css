@@ -461,6 +461,33 @@
   font-size: 16px;
   line-height: 26px;
 }
+.auth-oauth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.landing-page .auth-oauth-button {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 0 2px;
+  color: var(--landing-secondary);
+  font-size: 13px;
+  line-height: 20px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
 .auth-form {
   display: flex;
   flex-direction: column;

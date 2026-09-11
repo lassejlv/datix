@@ -529,6 +529,11 @@ export const de = {
   Countries: 'Länder',
   Country: 'Land',
   'Create account': 'Konto erstellen',
+  'Continue with {provider}': 'Weiter mit {provider}',
+  'OAuth sign-in failed. Please try again.':
+    'OAuth-Anmeldung fehlgeschlagen. Bitte versuche es erneut.',
+  'Leave blank if your account has no password.': 'Leer lassen, wenn dein Konto kein Passwort hat.',
+  or: 'oder',
   'Create an account': 'Konto erstellen',
   'Create an account to get started.': 'Erstelle ein Konto, um loszulegen.',
   'Create an account. Get to know your traffic.':

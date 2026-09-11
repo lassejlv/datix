@@ -2,7 +2,7 @@
 
 Base URL in development: `http://localhost:3000`. Application OpenAPI: `GET /api/openapi.json`.
 
-Axum serves the API and the static TanStack Router frontend from the same Rust process. `GET /api/preferences` returns `{ locale: 'en' | 'de' | 'da', theme: 'system' | 'light' | 'dark' }`; saved preference cookies override trusted country defaults. This endpoint is public and its response is not cached.
+Axum serves the API and the static TanStack Router frontend from the same Rust process. `GET /api/preferences` returns `{ locale: 'en' | 'de' | 'da', theme: 'system' | 'light' | 'dark', oauth: string[] }` where `oauth` lists enabled OAuth provider ids; saved preference cookies override trusted country defaults. This endpoint is public and its response is not cached.
 
 ## Authentication
 
@@ -14,7 +14,11 @@ Better Auth owns `/api/auth/*`. Email/password is enabled for the current develo
 | POST   | `/api/auth/sign-in/email` | `{ "email": "sam@example.com", "password": "a-long-unique-password" }`                |
 | GET    | `/api/auth/get-session`   | Session cookie                                                                        |
 | POST   | `/api/auth/sign-out`      | `{}` and session cookie                                                               |
+| POST   | `/api/auth/sign-in/social` | `{ "provider": "github" \| "google" }`; returns `{ "url", "redirect": true }`        |
+| GET    | `/api/auth/callback/:provider` | Provider redirect target; 303 to `/dashboard` or `/signin?oauth=failed`          |
 | GET    | `/api/me`                 | Session cookie; returns minimal user details                                          |
+
+OAuth accounts link to an existing user by verified email and are stored as `account` rows with `provider_id` `github`/`google`, reusing the Better Auth account shape. OAuth sign-ups mark the email verified. Accounts without a password skip password re-entry on deletion and get a clear error on password change.
 
 Preserve `Set-Cookie` responses and send the cookie on account/reporting requests. HTTPS deployments use secure cookies. All POST/PATCH/DELETE account requests require `Origin` equal to `APP_URL` or, when set, `APP_LEGACY_URL`. The dashboard shares those origins; other cross-origin dashboard clients are not enabled. Sign-out invalidates the server-side session immediately. Database authorization reads use the direct Neon connection without proxy caching.
 

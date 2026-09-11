@@ -238,7 +238,11 @@ async fn polar_webhook(AppState(state): AppState<State>, request: Request) -> Re
         billing::webhook::receive(&state, &headers, &body).await?,
     ))
 }
-async fn preferences(Extension(context): Extension<Context>, request: Request) -> Json<Value> {
+async fn preferences(
+    AppState(state): AppState<State>,
+    Extension(context): Extension<Context>,
+    request: Request,
+) -> Json<Value> {
     let raw = request
         .headers()
         .get("cookie")
@@ -257,7 +261,7 @@ async fn preferences(Extension(context): Extension<Context>, request: Request) -
         },
     };
     let theme = cookies.get("ab-theme").copied().unwrap_or("system");
-    Json(json!({"locale":locale,"theme":theme}))
+    Json(json!({"locale":locale,"theme":theme,"oauth":analytics_services::oauth::enabled(&state)}))
 }
 async fn tracker_config(
     AppState(state): AppState<State>,

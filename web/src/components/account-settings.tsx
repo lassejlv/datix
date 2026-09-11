@@ -102,7 +102,7 @@ function AccountForm({
   }
   async function deleteAccount(event: FormEvent) {
     event.preventDefault();
-    if (busy || !deletePassword) return;
+    if (busy) return;
     setBusy('delete');
     setDeleteError('');
     try {
@@ -236,19 +236,21 @@ function AccountForm({
             <Input
               type="password"
               autoComplete="current-password"
-              required
               maxLength={128}
               value={deletePassword}
               disabled={!!busy}
               onChange={(event) => setDeletePassword(event.target.value)}
             />
+            <span className="text-[13px] leading-normal font-normal text-muted-foreground">
+              {t('Leave blank if your account has no password.')}
+            </span>
           </label>
           <Button
             type="submit"
             variant="destructive"
             className="self-start"
             loading={busy === 'delete'}
-            disabled={!!busy || !deletePassword}
+            disabled={!!busy}
           >
             {t('Permanently delete account')}
           </Button>

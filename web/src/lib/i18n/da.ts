@@ -527,6 +527,11 @@ export const da = {
   Countries: 'Lande',
   Country: 'Land',
   'Create account': 'Opret konto',
+  'Continue with {provider}': 'Fortsæt med {provider}',
+  'OAuth sign-in failed. Please try again.': 'OAuth-login mislykkedes. Prøv igen.',
+  'Leave blank if your account has no password.':
+    'Lad stå tomt, hvis din konto ikke har en adgangskode.',
+  or: 'eller',
   'Create an account': 'Opret en konto',
   'Create an account to get started.': 'Opret en konto for at komme i gang.',
   'Create an account. Get to know your traffic.': 'Opret en konto. Lær din trafik at kende.',

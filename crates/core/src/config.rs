@@ -126,12 +126,44 @@ impl Runtime {
         Ok(r)
     }
 }
+/// OAuth client credentials for one provider. A provider is enabled only when both
+/// values are present; to add a provider, extend OAUTH_PROVIDERS here and map the
+/// same id to endpoints and a profile parser in analytics_services::oauth.
+#[derive(Clone)]
+pub struct OAuthClient {
+    pub provider: String,
+    pub client_id: String,
+    pub client_secret: String,
+}
+const OAUTH_PROVIDERS: [(&str, &str, &str); 2] = [
+    ("github", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET"),
+    ("google", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"),
+];
+fn oauth_clients() -> Vec<OAuthClient> {
+    OAUTH_PROVIDERS
+        .iter()
+        .filter_map(|(provider, id_key, secret_key)| {
+            let client_id = std::env::var(id_key)
+                .ok()
+                .filter(|v| !v.trim().is_empty())?;
+            let client_secret = std::env::var(secret_key)
+                .ok()
+                .filter(|v| !v.trim().is_empty())?;
+            Some(OAuthClient {
+                provider: provider.to_string(),
+                client_id,
+                client_secret,
+            })
+        })
+        .collect()
+}
 #[derive(Clone)]
 pub struct Config {
     pub app_url: url::Url,
     pub app_origins: Vec<String>,
     pub auth_secret: String,
     pub visitor_secret: String,
+    pub oauth: Vec<OAuthClient>,
     pub origin_secret: Option<String>,
     pub polar_token: Option<String>,
     pub polar_url: String,
@@ -176,6 +208,7 @@ impl Config {
             app_origins,
             auth_secret: required("BETTER_AUTH_SECRET")?,
             visitor_secret: required("VISITOR_HASH_SECRET")?,
+            oauth: oauth_clients(),
             origin_secret,
             polar_token: std::env::var("POLAR_ACCESS_TOKEN")
                 .ok()
