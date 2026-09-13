@@ -79,10 +79,31 @@ test('diagnostics remove URL secrets and email addresses', () => {
 });
 
 test('webhooks authenticate exact bytes and reject stale or forged signatures', () => {
-  const secret = Buffer.alloc(32, 7),
-    body = '{"type":"customer.state_changed"}',
-    timestamp = String(Math.floor(Date.now() / 1000)),
-    id = 'event-123';
+  const secret = 'whsec_test-polar-secret-kept-as-plain-text';
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const id = 'event-123';
+
+  const body = JSON.stringify({
+    type: 'customer.deleted',
+    timestamp: new Date().toISOString(),
+    data: {
+      id: '11111111-1111-4111-8111-111111111111',
+      created_at: new Date().toISOString(),
+      modified_at: null,
+      metadata: {},
+      external_id: 'datix-user',
+      email: 'fixture@example.test',
+      email_verified: true,
+      type: 'individual',
+      name: 'Fixture',
+      billing_name: null,
+      billing_address: null,
+      tax_id: null,
+      organization_id: '22222222-2222-4222-8222-222222222222',
+      deleted_at: new Date().toISOString(),
+      avatar_url: null,
+    },
+  });
 
   const signature = createHmac('sha256', secret)
     .update(`${id}.${timestamp}.${body}`)
@@ -94,8 +115,11 @@ test('webhooks authenticate exact bytes and reject stale or forged signatures', 
     'webhook-signature': 'v1,' + signature,
   });
 
-  expect(verifyWebhook(headers, body, 'whsec_' + secret.toString('base64'))).toBe(id);
-  expect(() => verifyWebhook(headers, body + ' ', secret.toString('base64'))).toThrow();
+  const event = verifyWebhook(headers, body, secret);
+  expect(event.type).toBe('customer.deleted');
+  expect(event.timestamp).toBeInstanceOf(Date);
+  expect(() => verifyWebhook(headers, body + ' ', secret)).toThrow();
+  expect(() => verifyWebhook(headers, body, 'different-secret')).toThrow();
   headers.set('webhook-timestamp', '1');
-  expect(() => verifyWebhook(headers, body, secret.toString('base64'))).toThrow();
+  expect(() => verifyWebhook(headers, body, secret)).toThrow();
 });

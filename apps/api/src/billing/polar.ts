@@ -1,71 +1,34 @@
 import { Effect, Schema, Clock } from 'effect';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
+import type { Customer } from '@polar-sh/sdk/models/components/customer';
+import type { PresentmentCurrency } from '@polar-sh/sdk/models/components/presentmentcurrency';
+import type { CustomerState } from '@polar-sh/sdk/models/components/customerstate';
+import { polarClient, optionalResource, unconfigured } from './client';
 import { Infrastructure, type Resources } from '../platform/resources';
 import { attempt, ApiError, invalid, unavailable, attemptSync } from '../shared/errors';
-import { decode, Id } from '../shared/validation';
+import { decode } from '../shared/validation';
 import { usage } from './service';
 import catalog from './catalog';
 
-const unconfigured = () =>
-  new ApiError({
-    status: 503,
-    code: 'billing_unconfigured',
-    message: 'Billing is temporarily unavailable.',
-  });
-
-const JsonObject = Schema.Record(Schema.String, Schema.Unknown);
-
-const Subscription = Schema.Struct({
-  id: Id,
-  product_id: Id,
-  currency: Schema.String,
-  recurring_interval: Schema.String,
-  status: Schema.String,
-  current_period_start: Schema.String,
-  current_period_end: Schema.String,
-  trial_end: Schema.NullOr(Schema.String),
-  ends_at: Schema.NullOr(Schema.String),
-  cancel_at_period_end: Schema.Boolean,
-});
-
-const Customer = Schema.Struct({
-  id: Id,
-  external_id: Schema.String,
-  organization_id: Id,
-  deleted_at: Schema.optional(Schema.NullOr(Schema.String)),
-  active_subscriptions: Schema.optional(Schema.Array(Subscription)),
-  granted_benefits: Schema.optional(
-    Schema.Array(
-      Schema.Struct({
-        benefit_id: Id,
-        benefit_type: Schema.String,
-        benefit_metadata: Schema.optional(JsonObject),
-        properties: Schema.optional(JsonObject),
-      }),
-    ),
-  ),
-});
-
-function verifyCustomer(value: unknown, owner: string) {
-  const c = Schema.decodeUnknownSync(Customer)(value);
-  if (c.external_id !== owner || c.organization_id !== catalog.organizationId)
+function verifyCustomer<T extends Customer | CustomerState>(customer: T, owner: string): T {
+  if (customer.externalId !== owner || customer.organizationId !== catalog.organizationId)
     throw new ApiError({
       status: 502,
       code: 'invalid_billing_customer',
       message: 'Billing customer could not be verified.',
     });
 
-  return c;
+  return customer;
 }
 
-function subscriptions(customer: typeof Customer.Type) {
-  if (customer.deleted_at) return [];
-  if (!customer.active_subscriptions || !customer.granted_benefits) throw unavailable();
+function subscriptions(customer: CustomerState) {
+  if (customer.deletedAt) return [];
+  if (!customer.activeSubscriptions || !customer.grantedBenefits) throw unavailable();
 
   const grant = (id: string, type: string) =>
-    customer.granted_benefits!.find((g) => g.benefit_id === id && g.benefit_type === type);
+    customer.grantedBenefits!.find((g) => g.benefitId === id && g.benefitType === type);
 
-  const websites = grant(catalog.websitesBenefitId, 'custom')?.benefit_metadata?.included;
+  const websites = grant(catalog.websitesBenefitId, 'custom')?.benefitMetadata?.included;
   if (
     !grant(catalog.analyticsBenefitId, 'custom') ||
     typeof websites !== 'number' ||
@@ -74,17 +37,21 @@ function subscriptions(customer: typeof Customer.Type) {
   )
     return [];
 
-  return customer.active_subscriptions.flatMap((row) => {
-    const plan = catalog.plans.find((p) => p.productId === row.product_id);
+  return customer.activeSubscriptions.flatMap((row) => {
+    const plan = catalog.plans.find((p) => p.productId === row.productId);
     if (
       !plan ||
       !plan.checkoutEnabled ||
       row.currency !== catalog.currency ||
-      row.recurring_interval !== plan.interval ||
+      row.recurringInterval !== plan.interval ||
       !['active', 'trialing'].includes(row.status)
     )
       return [];
-    const properties = grant(plan.eventsBenefitId, 'meter_credit')?.properties;
+
+    const properties = grant(plan.eventsBenefitId, 'meter_credit')?.properties as
+      | Record<string, unknown>
+      | undefined;
+
     if (!properties) return [];
 
     const count =
@@ -95,27 +62,27 @@ function subscriptions(customer: typeof Customer.Type) {
           : null;
 
     const limit = typeof count === 'number' ? count * 100 : 0,
-      start = Date.parse(row.current_period_start),
-      end = Date.parse(row.current_period_end);
+      start = row.currentPeriodStart.getTime(),
+      end = row.currentPeriodEnd.getTime();
 
     if (
       !Number.isSafeInteger(limit) ||
       limit <= 0 ||
       !(Date.now() >= start && Date.now() < end) ||
-      (row.status === 'trialing' && !row.trial_end)
+      (row.status === 'trialing' && !row.trialEnd)
     )
       return [];
 
     return [
       {
         id: row.id,
-        productId: row.product_id,
+        productId: row.productId,
         status: row.status,
-        currentPeriodStart: row.current_period_start,
-        currentPeriodEnd: row.current_period_end,
-        trialEnd: row.trial_end,
-        endsAt: row.ends_at,
-        cancelAtPeriodEnd: row.cancel_at_period_end,
+        currentPeriodStart: row.currentPeriodStart.toISOString(),
+        currentPeriodEnd: row.currentPeriodEnd.toISOString(),
+        trialEnd: row.trialEnd?.toISOString() ?? null,
+        endsAt: row.endsAt?.toISOString() ?? null,
+        cancelAtPeriodEnd: row.cancelAtPeriodEnd,
         entitlements: {
           name: plan.name,
           eventLimit: limit,
@@ -124,49 +91,22 @@ function subscriptions(customer: typeof Customer.Type) {
           remaining: limit,
           localBaseline: 0,
           pending: 0,
-          periodStart: row.current_period_start,
-          periodEnd: row.current_period_end,
+          periodStart: row.currentPeriodStart.toISOString(),
+          periodEnd: row.currentPeriodEnd.toISOString(),
         },
       },
     ];
   });
 }
 
-async function request(method: string, path: string, body?: unknown) {
-  if (process.env.EXTERNAL_EFFECTS !== 'enabled' || !process.env.POLAR_ACCESS_TOKEN)
-    throw unconfigured();
-  const base = process.env.POLAR_API_URL ?? 'https://api.polar.sh';
-  if (
-    !['https://api.polar.sh', 'https://sandbox-api.polar.sh'].includes(base) ||
-    (base === 'https://sandbox-api.polar.sh') !== !!process.env.POLAR_SANDBOX_IDS
-  )
-    throw unconfigured();
-
-  const response = await fetch(base + path, {
-    method,
-    headers: {
-      authorization: `Bearer ${process.env.POLAR_ACCESS_TOKEN}`,
-      'Polar-Version': catalog.apiVersion,
-      'content-type': 'application/json',
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
-  });
-
-  if (response.status === 404) return null;
-  if (!response.ok) throw unavailable();
-
-  return Schema.decodeUnknownSync(JsonObject)(await response.json());
-}
-
 async function save(
   db: Bun.SQL | Bun.TransactionSQL,
   owner: string,
-  customer: typeof Customer.Type | null,
+  customer: CustomerState | null,
   at: string,
 ) {
   const subs = customer ? subscriptions(customer) : [],
-    deleted = !customer || !!customer.deleted_at;
+    deleted = !customer || !!customer.deletedAt;
 
   const rows =
     await db`INSERT INTO billing_customers(customer_id,owner_id,subscriptions,deleted,occurred_at,updated_at,provider,organization_id,sync_attempted_at) VALUES(${`polar:${catalog.organizationId}:${owner}`},${owner},${JSON.stringify(subs)}::text::jsonb,${deleted},${at},now(),'polar',${catalog.organizationId}::uuid,now()) ON CONFLICT(customer_id) DO UPDATE SET subscriptions=excluded.subscriptions,deleted=excluded.deleted,occurred_at=excluded.occurred_at,updated_at=excluded.updated_at,sync_attempted_at=excluded.sync_attempted_at WHERE billing_customers.provider='polar' AND billing_customers.organization_id=excluded.organization_id AND billing_customers.owner_id=excluded.owner_id AND billing_customers.occurred_at<excluded.occurred_at RETURNING customer_id`;
@@ -179,57 +119,50 @@ async function sync(r: Resources, owner: string) {
     await tx`SELECT id FROM "user" WHERE id=${owner} FOR UPDATE`;
 
     const at = new Date().toISOString(),
-      value = await request('GET', `/v1/customers/external/${encodeURIComponent(owner)}/state`),
+      value = await optionalResource(
+        polarClient().customers.getStateExternal({ externalId: owner }),
+      ),
       customer = value ? verifyCustomer(value, owner) : null;
 
     await save(tx, owner, customer, at);
 
-    return customer?.deleted_at ? null : customer;
+    return customer?.deletedAt ? null : customer;
   });
 }
 
 async function portal(r: Resources, customer: string) {
-  const response = await request('POST', '/v1/customer-sessions/', {
-    customer_id: customer,
-    return_url: r.config.appUrl + '/dashboard',
+  const response = await polarClient().customerSessions.create({
+    customerId: customer,
+    returnUrl: r.config.appUrl + '/dashboard',
   });
 
-  if (response?.customer_id !== customer || typeof response.customer_portal_url !== 'string')
+  if (response?.customerId !== customer || typeof response.customerPortalUrl !== 'string')
     throw unavailable();
 
-  return { url: response.customer_portal_url };
+  return { url: response.customerPortalUrl };
 }
 
 async function hasSubscription(customer: string, includeCanceling: boolean) {
   for (let page = 1; page <= 100; page++) {
-    const response = await request(
-      'GET',
-      `/v1/subscriptions/?customer_id=${customer}&organization_id=${catalog.organizationId}&limit=100&page=${page}`,
-    );
+    const response = await polarClient().subscriptions.list({
+      customerId: customer,
+      organizationId: catalog.organizationId,
+      limit: 100,
+      page,
+    });
 
-    const result = Schema.decodeUnknownSync(
-      Schema.Struct({
-        items: Schema.Array(
-          Schema.Struct({
-            customer_id: Id,
-            status: Schema.String,
-            cancel_at_period_end: Schema.Boolean,
-          }),
-        ),
-        pagination: Schema.Struct({ max_page: Schema.Number.check(Schema.isInt()) }),
-      }),
-    )(response);
+    const result = response.result;
 
     for (const row of result.items) {
-      if (row.customer_id !== customer) throw unavailable();
+      if (row.customerId !== customer) throw unavailable();
       if (
         !['canceled', 'unpaid', 'incomplete_expired'].includes(row.status) &&
-        (includeCanceling || !row.cancel_at_period_end)
+        (includeCanceling || !row.cancelAtPeriodEnd)
       )
         return true;
     }
 
-    if (page >= result.pagination.max_page) return false;
+    if (page >= result.pagination.maxPage) return false;
   }
 
   throw unavailable();
@@ -297,7 +230,7 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
         code: 'plan_unavailable',
         message: 'Yearly billing is not available yet. Choose a monthly plan.',
       });
-    let customer = await sync(r, owner);
+    let customer: Customer | CustomerState | null = await sync(r, owner);
     if (customer && (await hasSubscription(customer.id, true))) return portal(r, customer.id);
 
     return r.primary.begin(async (tx) => {
@@ -309,13 +242,16 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
         await tx`SELECT checkout_id FROM billing_checkouts WHERE owner_id=${owner} AND provider='polar' AND organization_id=${catalog.organizationId}::uuid AND plan_id=${plan.productId} AND checkout_options=${JSON.stringify(options)}::text::jsonb AND created_at>now()-interval '10 minutes'`;
 
       if (cached && customer) {
-        const checkout = await request('GET', `/v1/checkouts/${cached.checkout_id}`);
+        const checkout = await optionalResource(
+          polarClient().checkouts.get({ id: cached.checkout_id }),
+        );
+
         if (
           checkout &&
           ['open', 'confirmed'].includes(String(checkout.status)) &&
-          Date.parse(String(checkout.expires_at)) > Date.now() &&
-          checkout.product_id === plan.productId &&
-          checkout.customer_id === customer.id &&
+          checkout.expiresAt.getTime() > Date.now() &&
+          checkout.productId === plan.productId &&
+          checkout.customerId === customer.id &&
           checkout.currency === catalog.currency &&
           typeof checkout.url === 'string'
         )
@@ -324,8 +260,10 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
 
       if (!customer)
         customer = verifyCustomer(
-          await request('POST', '/v1/customers/', {
-            external_id: owner,
+          await polarClient().customers.create({
+            type: 'individual',
+            externalId: owner,
+            organizationId: catalog.organizationId,
             email: user.email,
             name: user.name,
             locale: options.locale,
@@ -333,21 +271,21 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
           owner,
         );
 
-      const checkout = await request('POST', '/v1/checkouts/', {
+      const checkout = await polarClient().checkouts.create({
         products: [plan.productId],
-        customer_id: customer.id,
-        external_customer_id: owner,
-        currency: catalog.currency,
+        customerId: customer.id,
+        externalCustomerId: owner,
+        currency: catalog.currency as PresentmentCurrency,
         locale: options.locale,
-        allow_trial: plan.trialDays > 0,
-        success_url: r.config.appUrl + '/dashboard?checkout_id={CHECKOUT_ID}',
-        return_url: r.config.appUrl + '/dashboard',
+        allowTrial: plan.trialDays > 0,
+        successUrl: r.config.appUrl + '/dashboard?checkout_id={CHECKOUT_ID}',
+        returnUrl: r.config.appUrl + '/dashboard',
       });
 
       if (
         !checkout ||
-        checkout.product_id !== plan.productId ||
-        checkout.customer_id !== customer.id ||
+        checkout.productId !== plan.productId ||
+        checkout.customerId !== customer.id ||
         checkout.currency !== catalog.currency ||
         typeof checkout.url !== 'string' ||
         typeof checkout.id !== 'string'
@@ -361,61 +299,42 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
 });
 
 export function verifyWebhook(headers: Headers, body: string, secret: string) {
-  const id = headers.get('webhook-id') ?? '',
-    timestamp = headers.get('webhook-timestamp') ?? '',
-    key = Buffer.from(secret.replace(/^whsec_/, ''), 'base64');
-
-  if (key.length < 32) throw unconfigured();
-  const expected = createHmac('sha256', key).update(`${id}.${timestamp}.${body}`).digest();
-  if (
-    !id ||
-    id.length > 200 ||
-    !/^\d+$/.test(timestamp) ||
-    Math.abs(Date.now() / 1000 - Number(timestamp)) > 300 ||
-    !(headers.get('webhook-signature') ?? '').split(/\s+/).some((sig) => {
-      if (!sig.startsWith('v1,')) return false;
-      const received = Buffer.from(sig.slice(3), 'base64');
-
-      return received.length === expected.length && timingSafeEqual(received, expected);
-    })
-  )
-    throw new ApiError({
-      status: 400,
-      code: 'invalid_webhook_signature',
-      message: 'Invalid webhook signature.',
-    });
-
-  return id;
+  try {
+    return validateEvent(body, Object.fromEntries(headers.entries()), secret);
+  } catch (error) {
+    if (error instanceof WebhookVerificationError)
+      throw new ApiError({
+        status: 400,
+        code: 'invalid_webhook_signature',
+        message: 'Invalid webhook signature.',
+      });
+    throw invalid('Invalid webhook payload.');
+  }
 }
 
 export const webhook = Effect.fn('webhook')(function* (headers: Headers, body: string) {
   const r = yield* Infrastructure;
   const secret = process.env.POLAR_WEBHOOK_SECRET;
   if (!secret || process.env.EXTERNAL_EFFECTS !== 'enabled') return yield* unconfigured();
-  const id = yield* attemptSync(() => verifyWebhook(headers, body, secret));
+  const value = yield* attemptSync(() => verifyWebhook(headers, body, secret));
+  const id = headers.get('webhook-id')!;
 
-  const value = yield* attemptSync(() =>
-    Schema.decodeUnknownSync(
-      Schema.Struct({ type: Schema.String, timestamp: Schema.String, data: JsonObject }),
-    )(JSON.parse(body)),
-  );
-
-  if (!['customer.state_changed', 'customer.deleted'].includes(value.type))
+  if (value.type !== 'customer.state_changed' && value.type !== 'customer.deleted')
     return { received: true, handled: false };
   if (
-    !Number.isFinite(Date.parse(value.timestamp)) ||
-    Date.parse(value.timestamp) > (yield* Clock.currentTimeMillis) + 300000
+    !Number.isFinite(value.timestamp.getTime()) ||
+    value.timestamp.getTime() > (yield* Clock.currentTimeMillis) + 300000
   )
     return yield* invalid('Invalid webhook event timestamp.');
-  if (typeof value.data.external_id !== 'string') return { received: true, handled: false };
+  if (typeof value.data.externalId !== 'string') return { received: true, handled: false };
 
-  const owner = value.data.external_id,
-    customer = yield* attemptSync(() => verifyCustomer(value.data, owner));
+  const owner = value.data.externalId;
+  yield* attemptSync(() => verifyCustomer(value.data, owner));
 
   return yield* attempt(() =>
     r.primary.begin(async (tx) => {
       const rows =
-        await tx`INSERT INTO billing_webhook_events(id,type,occurred_at) VALUES(${`polar:${catalog.organizationId}:${id}`},${value.type},${value.timestamp}) ON CONFLICT DO NOTHING RETURNING id`;
+        await tx`INSERT INTO billing_webhook_events(id,type,occurred_at) VALUES(${`polar:${catalog.organizationId}:${id}`},${value.type},${value.timestamp.toISOString()}) ON CONFLICT DO NOTHING RETURNING id`;
 
       if (!rows.length) return { received: true, duplicate: true };
       const user = await tx`SELECT id FROM "user" WHERE id=${owner} FOR UPDATE`;
@@ -426,8 +345,8 @@ export const webhook = Effect.fn('webhook')(function* (headers: Headers, body: s
         updated: await save(
           tx,
           owner,
-          value.type === 'customer.deleted' ? null : customer,
-          value.timestamp,
+          value.type === 'customer.deleted' ? null : verifyCustomer(value.data, owner),
+          value.timestamp.toISOString(),
         ),
       };
     }),
@@ -505,16 +424,19 @@ export const drainBilling = Effect.fn('drainBilling')(function* () {
             if (!Number.isFinite(quantity) || quantity <= 0) throw unavailable();
 
             return {
-              external_id: `datix-usage-${row.id}`,
+              externalId: `datix-usage-${row.id}`,
               name: catalog.meter.eventName,
-              external_customer_id: owner,
-              timestamp: row.occurred_at.toISOString(),
+              externalCustomerId: owner,
+              timestamp: row.occurred_at,
               metadata: { [catalog.meter.quantityProperty]: quantity, event_type: row.event_type },
             };
           },
         );
 
-        const result = await request('POST', '/v1/events/ingest', { events }).catch(() => null);
+        const result = await polarClient()
+          .events.ingest({ events })
+          .catch(() => null);
+
         if (acknowledged(result, batch.length))
           await tx`DELETE FROM billing_outbox WHERE owner_id=${owner} AND lease_id=${lease}::uuid AND provider='polar' AND organization_id=${catalog.organizationId}::uuid`;
         else

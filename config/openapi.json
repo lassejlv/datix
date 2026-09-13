@@ -3818,7 +3818,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates.",
         "responses": {
           "200": {
             "description": "Feature report",
@@ -3919,7 +3919,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates.",
         "responses": {
           "200": {
             "description": "Feature report",
@@ -4012,7 +4012,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates. See docs/features.md.",
+        "description": "Environment-scoped report. Goals/errors/vitals accept UTC from/to dates.",
         "responses": {
           "200": {
             "description": "Feature report",
@@ -4247,7 +4247,7 @@
             "SecureSessionCookie": []
           }
         ],
-        "description": "Combined traffic reports, equal-length previous period, retained-event cross-filters, goals and persistent annotations. See docs/features.md.",
+        "description": "Combined traffic reports, equal-length previous period, retained-event cross-filters, goals and persistent annotations.",
         "responses": {
           "200": {
             "description": "Feature report",
