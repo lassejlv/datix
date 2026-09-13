@@ -10,8 +10,10 @@ export type JourneyStop = {
 /** Preserve arrival order and repeat visits; a changed action path is context, not a pageview. */
 export function journeyStops(events: Activity[]): JourneyStop[] {
   const stops: JourneyStop[] = [];
+
   for (const event of events) {
     let stop = stops.at(-1);
+
     if (event.kind === 'pageview' || !stop || stop.path !== event.path) {
       stop = {
         id: event.id,
@@ -21,7 +23,9 @@ export function journeyStops(events: Activity[]): JourneyStop[] {
       };
       stops.push(stop);
     }
+
     if (event.kind !== 'pageview') stop.actions.push(event);
   }
+
   return stops;
 }

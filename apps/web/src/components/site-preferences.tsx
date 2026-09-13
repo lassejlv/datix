@@ -8,6 +8,7 @@ import {
   type Copy,
   type Parameters,
 } from '../lib/i18n/translations';
+
 const Context = createContext({
   locale: 'en' as Locale,
   theme: 'system' as Theme,
@@ -15,6 +16,7 @@ const Context = createContext({
   setLocale: (_locale: Locale) => {},
   setTheme: (_theme: Theme) => {},
 });
+
 export function SitePreferences({
   initial,
   children,
@@ -24,15 +26,18 @@ export function SitePreferences({
 }) {
   const [locale, setLocale] = useState(initial.locale);
   const [theme, setTheme] = useState(initial.theme);
+
   const [systemDark, setSystemDark] = useState(
     () => matchMedia('(prefers-color-scheme: dark)').matches,
   );
+
   const dark = theme === 'dark' || (theme === 'system' && systemDark);
   useEffect(() => {
     const media = matchMedia('(prefers-color-scheme: dark)');
     const sync = () => setSystemDark(media.matches);
     sync();
     media.addEventListener('change', sync);
+
     return () => media.removeEventListener('change', sync);
   }, []);
   useEffect(() => {
@@ -44,9 +49,11 @@ export function SitePreferences({
         (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches),
     );
   }, [locale, theme, dark]);
+
   const save = (name: string, value: string) => {
     document.cookie = `${name}=${value}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
   };
+
   return (
     <Context.Provider
       value={{
@@ -67,11 +74,14 @@ export function SitePreferences({
     </Context.Provider>
   );
 }
+
 export function useSitePreferences() {
   const context = useContext(Context);
+
   const formatting = useMemo(() => {
     const language = formatLocale[context.locale];
     const formatter = new Intl.NumberFormat(language);
+
     return {
       t: (text: Copy, values?: Parameters) => translate(context.locale, text, values),
       message: (text: string) => translateMessage(context.locale, text),
@@ -92,6 +102,7 @@ export function useSitePreferences() {
       ) => new Date(value).toLocaleString(language, { ...options, timeZone: 'UTC' }),
     };
   }, [context.locale]);
+
   return {
     ...context,
     ...formatting,
@@ -103,6 +114,7 @@ export function useSitePreferences() {
           : 'not all',
   };
 }
+
 // The flag repeats the language name beside it, so it stays out of the accessibility tree.
 function Flag({ emoji }: { emoji: string }) {
   return (
@@ -111,10 +123,12 @@ function Flag({ emoji }: { emoji: string }) {
     </span>
   );
 }
+
 export function FooterPreferences() {
   const { locale, theme, setLocale, setTheme, t } = useSitePreferences();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
   return (
     <div className="footer-preferences">
       <label>

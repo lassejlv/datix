@@ -66,6 +66,7 @@ export const SidebarContext: React.Context<SidebarContextProps | null> =
 
 export function useSidebar(): SidebarContextProps {
   const context = React.useContext(SidebarContext);
+
   if (!context) {
     throw new Error('useSidebar must be used within a SidebarProvider.');
   }
@@ -93,9 +94,11 @@ export function SidebarProvider({
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen);
   const open = openProp ?? _open;
+
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === 'function' ? value(open) : value;
+
       if (setOpenProp) {
         setOpenProp(openState);
       } else {
@@ -120,6 +123,7 @@ export function SidebarProvider({
     };
 
     window.addEventListener('keydown', handleKeyDown);
+
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleSidebar]);
 

@@ -13,7 +13,7 @@
     "test": "bun test apps/api/tests",
     "check": "vp check && bun run typecheck && bun run test",
     "lint": "vp lint",
-    "format": "vp fmt",
+    "format": "bun run fmt",
     "db:generate": "bun run --cwd packages/database generate",
     "db:migrate": "bun scripts/migrate.ts",
     "start": "bun apps/api/src/main.ts",
@@ -21,11 +21,12 @@
     "test:integration": "bun --env-file=.env --env-file=.env.test scripts/integration.ts",
     "db:runtime": "bun scripts/runtime-role.ts",
     "lint:fix": "vp lint --fix",
-    "fmt": "vp fmt",
-    "fmt:check": "vp fmt --check",
-    "format:check": "vp fmt --check"
+    "fmt": "vp lint --quiet --fix -A all -D spacing/padding-line-between-statements && vp fmt",
+    "fmt:check": "vp lint --quiet -A all -D spacing/padding-line-between-statements && vp fmt --check",
+    "format:check": "bun run fmt:check"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@types/bun": "^1.4.1",
     "effect": "4.0.0-rc.115",
     "typescript": "^7.0.2",

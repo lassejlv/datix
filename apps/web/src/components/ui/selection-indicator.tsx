@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 /** A shared background/underline that follows the current selection. */
 export function SelectionIndicator({ id, className }: { id: string; className: string }) {
   const reduceMotion = useReducedMotion();
+
   return (
     <motion.span
       aria-hidden="true"

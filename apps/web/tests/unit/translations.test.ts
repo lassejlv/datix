@@ -8,16 +8,19 @@ import { visitorAlias, activityTitle, type Activity } from '../../src/lib/visito
 
 const placeholders = (text: string) =>
   [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
+
 describe('complete language catalogs', () => {
   for (const [locale, catalog] of Object.entries({ da, de })) {
     test(`${locale} covers the English catalog and preserves every named value`, () => {
       expect(Object.keys(catalog).sort()).toEqual(Object.keys(en).sort());
+
       for (const key of Object.keys(en) as Copy[]) {
         expect(catalog[key].trim().length, key).toBeGreaterThan(0);
         expect(placeholders(catalog[key]), key).toEqual(placeholders(en[key]));
       }
     });
   }
+
   test('sentences can reorder values without interpreting user input as markup', () => {
     expect(translate('de', 'Import {count} days', { count: 2 })).toBe('2 Tage importieren');
     expect(translate('da', 'Import {count} day', { count: 1 })).toBe('Importér 1 dag');
@@ -35,8 +38,10 @@ describe('complete language catalogs', () => {
     expect(translateMessage('da', 'Ignored unsupported file: unexpected.$&.csv.')).toBe(
       'Ikke-understøttet fil ignoreret: unexpected.$&.csv.',
     );
+
     const cutoff =
       'Live analytics starts on 2026-09-08 UTC. Export source days that end before that boundary; the source timezone may require excluding the preceding calendar day.';
+
     expect(translateMessage('de', cutoff)).toContain('beginnt am 2026-09-08 UTC');
     expect(
       translateMessage('da', '2 days imported from Plausible. Your history is ready in Overview.'),
@@ -50,8 +55,10 @@ describe('complete language catalogs', () => {
     expect(countryName('DE', 'da')).toBe('Tyskland');
     expect(countryName('DE', 'de')).toBe('Deutschland');
     expect(countryName('XX', 'da')).toBeUndefined();
+
     for (const key of ['a'.repeat(64), 'b'.repeat(64), 'visitor-123']) {
       const english = visitorAlias(key, 'en');
+
       for (const locale of ['da', 'de'] as const) {
         const translated = visitorAlias(key, locale);
         expect(translated.animal).toBe(english.animal);
@@ -59,6 +66,7 @@ describe('complete language catalogs', () => {
         expect(translated.name).not.toBe(english.name);
       }
     }
+
     expect(activityTitle({ kind: 'scroll', details: { scrollDepth: 75 } } as Activity, 'de')).toBe(
       'Bis 75% gescrollt',
     );

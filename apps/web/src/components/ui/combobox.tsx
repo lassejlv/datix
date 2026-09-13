@@ -25,6 +25,7 @@ export function Combobox<Value, Multiple extends boolean | undefined = false>(
   props: ComboboxPrimitive.Root.Props<Value, Multiple>,
 ): React.ReactElement {
   const chipsRef = React.useRef<Element | null>(null);
+
   return (
     <ComboboxContext.Provider value={{ chipsRef, multiple: !!props.multiple }}>
       <ComboboxPrimitive.Root {...props} />
@@ -372,6 +373,7 @@ export function ComboboxChip({
 
 export function ComboboxChipRemove(props: ComboboxPrimitive.ChipRemove.Props): React.ReactElement {
   const { t } = useSitePreferences();
+
   return (
     <ComboboxPrimitive.ChipRemove
       aria-label={t('Remove')}

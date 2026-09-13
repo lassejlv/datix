@@ -9,6 +9,7 @@ export function Alert({
   ...props
 }: ComponentProps<'div'> & { variant?: 'error' | 'warning' | 'info' }) {
   const Icon = variant === 'info' ? Info : Warning;
+
   return (
     <div
       role={variant === 'error' ? 'alert' : 'status'}

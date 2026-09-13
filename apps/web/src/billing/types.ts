@@ -26,6 +26,7 @@ export type UsagePauseReason =
   | 'website_limit'
   | 'website_budget'
   | 'disabled';
+
 export type AccountUsage = {
   onboardingCompleted: boolean;
   protection?: {

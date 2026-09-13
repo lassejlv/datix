@@ -40,14 +40,17 @@ export function PricingSection() {
   const [yearly, setYearly] = useState(false);
   const interval = yearly ? 'year' : 'month';
   const amount = (plan: Plan) => billingPrice(plan, locale, yearly);
+
   const checkout = async (plan: Plan) => {
     setBusy(plan.id);
     setError('');
+
     try {
       const result = await apiClient<{ url: string }>('/billing/checkout', {
         method: 'POST',
         body: JSON.stringify({ events: plan.events, interval, locale }),
       });
+
       window.location.assign(result.url);
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) {
@@ -57,13 +60,17 @@ export function PricingSection() {
         } catch {
           /* Optional selection. */
         }
+
         window.location.assign('/signup');
+
         return;
       }
+
       setError(errorText(e));
       setBusy('');
     }
   };
+
   return (
     <section id="pricing" className="landing-pricing" aria-labelledby="pricing-title">
       <header className="pricing-heading">
@@ -92,6 +99,7 @@ export function PricingSection() {
             const available = billingAvailable(plan, yearly);
             const popular = plan.id === 'pro';
             const description = billingPlanDescriptions[plan.id];
+
             return (
               <article
                 key={plan.id}

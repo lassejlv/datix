@@ -16,6 +16,7 @@ import { ChevronDown } from './ui/icons';
 import type { Copy } from '../lib/i18n/translations';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+
 export function FeaturePageView({
   page,
   siteId,
@@ -31,6 +32,7 @@ export function FeaturePageView({
   const feature = featureDefinitions.find((f) => f.page === page)!;
   const enabled = featureSettings(environment.featureSettings)[feature.key];
   const path = `/sites/${siteId}/environments/${environment.id}/features/${page}`;
+
   return (
     <div>
       <header className="mb-6">
@@ -54,6 +56,7 @@ export function FeaturePageView({
     </div>
   );
 }
+
 type Goal = {
   id: string;
   name: string;
@@ -62,23 +65,28 @@ type Goal = {
   conversions: number;
   visitors: number;
 };
+
 function Goals({ path }: { path: string }) {
   const { t, locale, message } = useSitePreferences();
+
   const [days, setDays] = useState('7'),
     [refresh, setRefresh] = useState(0),
     [busy, setBusy] = useState(false),
     [failure, setFailure] = useState(''),
     [type, setType] = useState('event');
+
   const { data, error } = useFeatureReport<{ goals: Goal[]; visitors: number }>(
     path + rangeQuery(days),
     refresh,
   );
+
   async function create(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const fields = new FormData(form);
     setBusy(true);
     setFailure('');
+
     try {
       await apiClient(
         path,
@@ -97,9 +105,11 @@ function Goals({ path }: { path: string }) {
       setBusy(false);
     }
   }
+
   async function remove(goal: Goal) {
     setBusy(true);
     setFailure('');
+
     try {
       await apiClient(`${path}/${goal.id}`, { method: 'DELETE' });
       toast.success(t('Goal deleted.'));
@@ -110,6 +120,7 @@ function Goals({ path }: { path: string }) {
       setBusy(false);
     }
   }
+
   return (
     <>
       <FeatureToolbar days={days} setDays={setDays} onRefresh={() => setRefresh((n) => n + 1)} />
@@ -201,6 +212,7 @@ function Goals({ path }: { path: string }) {
     </>
   );
 }
+
 type ErrorItem = {
   fingerprint: string;
   message: string;
@@ -231,6 +243,7 @@ const deviceLabels: Record<string, Copy> = {
 function VitalMeter({ value, good, poor }: { value: number; good: number; poor: number }) {
   const max = poor * 1.5;
   const at = (point: number) => Math.min(point / max, 1) * 100;
+
   return (
     <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
       <span className="absolute inset-y-0 left-0 bg-success/40" style={{ width: `${at(good)}%` }} />
@@ -249,17 +262,21 @@ function VitalMeter({ value, good, poor }: { value: number; good: number; poor: 
 
 function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
   const { t, locale, message } = useSitePreferences();
+
   const [days, setDays] = useState('7'),
     [refresh, setRefresh] = useState(0),
     [failure, setFailure] = useState(''),
     [busy, setBusy] = useState(false);
+
   const { data, error } = useFeatureReport<{ items: ErrorItem[] | VitalItem[] }>(
     path + rangeQuery(days),
     refresh,
   );
+
   async function resolve(fingerprint: string) {
     setBusy(true);
     setFailure('');
+
     try {
       await apiClient(path, write('POST', { fingerprint }));
       toast.success(t('Error resolved.'));
@@ -270,6 +287,7 @@ function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
       setBusy(false);
     }
   }
+
   return (
     <>
       <FeatureToolbar days={days} setDays={setDays} onRefresh={() => setRefresh((n) => n + 1)} />
@@ -338,6 +356,7 @@ function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
             {(['LCP', 'INP', 'CLS'] as const).map((name) => {
               const spec = VITALS[name];
               const rows = (data.items as VitalItem[]).filter((row) => row.name === name);
+
               return (
                 <section key={name} className="min-w-0">
                   <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">

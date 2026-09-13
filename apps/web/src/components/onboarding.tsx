@@ -29,6 +29,7 @@ export function BeerBuddy({
 
 export function WelcomeOnboarding({ onAdd }: { name: string; onAdd: () => void }) {
   const { t } = useSitePreferences();
+
   return (
     <div className="max-w-[560px]">
       <h1 className="text-[22px] leading-[1.25] font-medium tracking-[-0.025em]">
@@ -102,6 +103,7 @@ export function SetupOnboarding({
       .finally(() => {
         if (!controller.signal.aborted) setChecking(false);
       });
+
     return () => controller.abort();
   }, [site.id, environment.id, retry]);
   useEffect(() => {
@@ -110,6 +112,7 @@ export function SetupOnboarding({
       if (interacted.current) successHeading.current?.focus();
     }
   }, [connected, onComplete]);
+
   return (
     <div className="max-w-[640px]">
       {checking ? (

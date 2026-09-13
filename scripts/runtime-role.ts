@@ -9,6 +9,7 @@ const { values } = parseArgs({
   options: { apply: { type: 'boolean' }, 'expect-host': { type: 'string' } },
   strict: true,
 });
+
 const url = new URL(process.env.DATABASE_URL_UNPOOLED ?? '');
 if (url.hostname.includes('-pooler.') || url.hostname !== values['expect-host'])
   throw new Error('Pass the independently reviewed direct endpoint with --expect-host');
@@ -19,6 +20,7 @@ if (
   throw new Error('TLS required');
 const db = new SQL(url.toString(), { max: 1, prepare: false });
 const quote = (value: string) => `"${value.replaceAll('"', '""')}"`;
+
 try {
   await checkMigrations(db);
   const [identity] = await db`SELECT current_database() AS database,current_user AS role`;
@@ -28,6 +30,7 @@ try {
   )
     throw new Error('Database identity mismatch');
   const existing = await db`SELECT rolname FROM pg_roles WHERE rolname='datix_runtime'`;
+
   if (!values.apply) {
     console.log(
       JSON.stringify({
@@ -46,22 +49,27 @@ try {
         await tx.unsafe(
           `CREATE ROLE datix_runtime LOGIN PASSWORD '${password}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS`,
         );
+
       const [role] =
         await tx`SELECT rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls AS privileged FROM pg_roles WHERE rolname='datix_runtime'`;
+
       const memberships =
         await tx`SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.member WHERE r.rolname='datix_runtime'`;
+
       if (role.privileged || memberships.length)
         throw new Error('Existing runtime role must be unprivileged and have no role memberships');
       await tx.unsafe(`GRANT CONNECT ON DATABASE ${quote(identity.database)} TO datix_runtime`);
       await tx`REVOKE CREATE ON SCHEMA public FROM PUBLIC,datix_runtime`;
       await tx`GRANT USAGE ON SCHEMA public TO datix_runtime`;
       await tx`REVOKE ALL ON ALL TABLES IN SCHEMA public FROM datix_runtime`;
+
       const tables = [
         ...primaryTables.map(([name]) => name),
         ...analyticsTables.map(([name]) => name),
         'ingestion_receipts',
         'analytics_deletions',
       ];
+
       await tx.unsafe(
         `GRANT SELECT,INSERT,UPDATE,DELETE ON ${tables.map((t) => `public.${quote(t)}`).join(',')} TO datix_runtime`,
       );
@@ -74,6 +82,7 @@ try {
       await tx`ALTER ROLE datix_runtime SET lock_timeout='3s'`;
       await tx`ALTER ROLE datix_runtime SET idle_in_transaction_session_timeout='30s'`;
     });
+
     if (!existing.length) {
       const runtime = new URL(url);
       runtime.username = 'datix_runtime';
@@ -88,6 +97,7 @@ try {
       );
       console.log('Created runtime role; connection saved to ignored .local/runtime.env');
     }
+
     console.log(
       JSON.stringify({
         host: url.hostname,

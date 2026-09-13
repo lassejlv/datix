@@ -1,14 +1,18 @@
 import { Schema } from 'effect';
 import { invalid } from './errors';
+
 export const Id = Schema.String.check(
   Schema.isPattern(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
 );
+
 export const Name = Schema.String.check(
   Schema.isMinLength(1),
   Schema.isMaxLength(80),
   Schema.isPattern(/\S/),
 );
+
 export const Domain = Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(253));
+
 export function decode<S extends Schema.Top & { readonly DecodingServices: never }>(
   schema: S,
   input: unknown,
@@ -19,7 +23,9 @@ export function decode<S extends Schema.Top & { readonly DecodingServices: never
     throw invalid();
   }
 }
+
 export const id = (input: unknown) => decode(Id, input);
+
 export function domain(input: string) {
   const host = input.trim().toLowerCase().replace(/\.$/, '');
   if (
@@ -30,9 +36,12 @@ export function domain(input: string) {
     host.includes('..')
   )
     throw invalid('Use a hostname without a protocol or path.');
+
   return host;
 }
+
 export const CreateSite = Schema.Struct({ name: Name, domain: Domain });
+
 export const UpdateSite = Schema.Struct({
   name: Schema.optional(Name),
   enabled: Schema.optional(Schema.Boolean),
@@ -41,6 +50,7 @@ export const UpdateSite = Schema.Struct({
     Schema.NullOr(Schema.Number.check(Schema.isBetween({ minimum: 0.15, maximum: 1e9 }))),
   ),
 });
+
 const Tracking = Schema.Struct(
   Object.fromEntries(
     [
@@ -61,6 +71,7 @@ const Tracking = Schema.Struct(
     ].map((key) => [key, Schema.optional(Schema.Boolean)]),
   ),
 );
+
 export const EnvironmentInput = Schema.Struct({
   name: Schema.optional(Name),
   domain: Schema.optional(Domain),

@@ -6,8 +6,10 @@ import { useSitePreferences } from '../site-preferences';
 
 const dayMs = 86_400_000;
 const iso = (date: Date) => date.toISOString().slice(0, 10);
+
 const parse = (value: string) => {
   const date = new Date(`${value}T00:00:00Z`);
+
   return Number.isFinite(date.getTime()) ? date : new Date();
 };
 
@@ -33,11 +35,13 @@ export function DatePicker({
   const moveFocus = useRef(false);
   const first = parse(`${month}-01`);
   const start = first.getTime() - first.getUTCDay() * dayMs;
+
   const heading = first.toLocaleDateString(locale, {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
   });
+
   const enabled = (date: string) => (!min || date >= min) && (!max || date <= max);
   const clamp = (date: string) => (min && date < min ? min : max && date > max ? max : date);
   useLayoutEffect(() => {
@@ -46,16 +50,20 @@ export function DatePicker({
       moveFocus.current = false;
     }
   }, [focused, month]);
+
   function monthDate(delta: number) {
     return iso(new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + delta, 1)));
   }
+
   function navigateMonth(delta: number) {
     const next = monthDate(delta);
     setMonth(next.slice(0, 7));
     setFocused(clamp(next));
   }
+
   function keyboard(event: KeyboardEvent<HTMLButtonElement>, date: string) {
     const current = parse(date);
+
     const delta =
       event.key === 'ArrowLeft'
         ? -1
@@ -70,13 +78,16 @@ export function DatePicker({
                 : event.key === 'End'
                   ? 6 - current.getUTCDay()
                   : null;
+
     let next: string;
     if (delta !== null) next = iso(new Date(current.getTime() + delta * dayMs));
     else if (event.key === 'PageUp' || event.key === 'PageDown') {
       const offset = event.key === 'PageUp' ? -1 : 1;
+
       const lastDay = new Date(
         Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + offset + 1, 0),
       ).getUTCDate();
+
       next = iso(
         new Date(
           Date.UTC(
@@ -93,6 +104,7 @@ export function DatePicker({
     setFocused(next);
     setMonth(next.slice(0, 7));
   }
+
   return (
     <Popover.Root
       open={open}
@@ -102,6 +114,7 @@ export function DatePicker({
           setMonth(date.slice(0, 7));
           setFocused(date);
         }
+
         setOpen(next);
       }}
     >
@@ -169,6 +182,7 @@ export function DatePicker({
                       const date = new Date(start + (week * 7 + weekday) * dayMs);
                       const key = iso(date);
                       const outside = key.slice(0, 7) !== month;
+
                       return (
                         <td key={key} aria-selected={key === value} className="p-0">
                           <button

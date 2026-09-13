@@ -16,6 +16,7 @@ export type TrackingSettings = Record<
   | 'coordinates',
   boolean
 >;
+
 export type ActivityDetails = {
   clientTime?: number;
   sequence?: number;
@@ -31,6 +32,7 @@ export type ActivityDetails = {
   screenHeight: number;
   language: string;
 };
+
 export type Entitlements = {
   name: string;
   eventLimit: number | null;
@@ -42,6 +44,7 @@ export type Entitlements = {
   periodStart: string;
   periodEnd: string;
 };
+
 export type BillingSubscription = {
   entitlements?: Entitlements;
   id: string;
@@ -60,6 +63,7 @@ export type Baseline = {
   eventsPerVisitor: number;
   customShare: number;
 };
+
 export type SourceActivity = {
   minute: number;
   minuteEvents: number;
@@ -71,5 +75,7 @@ export type SourceActivity = {
   signature: string;
   repeats: number;
 };
+
 export type TrafficWindow = { start: number; events: number; custom: number };
+
 export type AbuseReason = 'source_limit' | 'repeated_activity' | 'unusual_activity';

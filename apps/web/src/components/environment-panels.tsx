@@ -22,6 +22,7 @@ import { apiClient, errorText, write, type Site, type SiteEnvironment } from '..
 
 function hostname(value: string) {
   let domain = value.trim();
+
   if (domain.includes('://')) {
     try {
       domain = new URL(domain).hostname;
@@ -29,6 +30,7 @@ function hostname(value: string) {
       /* API validation provides the error. */
     }
   }
+
   return domain.replace(/\/$/, '');
 }
 
@@ -66,16 +68,20 @@ export function AddEnvironmentDialog({
   onCreated: (environment: SiteEnvironment) => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
+
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
+
   useEffect(() => {
     if (!open) setError('');
   }, [open]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError('');
     const form = new FormData(event.currentTarget);
+
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${site.id}/environments`,
@@ -85,6 +91,7 @@ export function AddEnvironmentDialog({
           allowLocalhost: form.get('localhost') === 'on',
         }),
       );
+
       toast.success(t('Environment added.'));
       onCreated(result.environment);
       onOpenChange(false);
@@ -94,6 +101,7 @@ export function AddEnvironmentDialog({
       setBusy(false);
     }
   }
+
   return (
     <Dialog
       open={open}
@@ -181,6 +189,7 @@ export function LocalhostSetting({
   className?: string;
 }) {
   const { t } = useSitePreferences();
+
   return (
     <section className={cn(className)}>
       <label
@@ -221,21 +230,27 @@ export function EnvironmentSettings({
   onDeleted: () => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
+
   const [name, setName] = useState(environment.name),
     [domain, setDomain] = useState(environment.domain);
+
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [deleting, setDeleting] = useState(false),
     [confirm, setConfirm] = useState('');
+
   const isDefault = environment.id === site.id;
+
   async function update(value: Partial<SiteEnvironment>) {
     setBusy(true);
     setError('');
+
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${site.id}/environments/${environment.id}`,
         write('PATCH', value),
       );
+
       onUpdated(result.environment);
       setName(result.environment.name);
       setDomain(result.environment.domain);
@@ -246,9 +261,11 @@ export function EnvironmentSettings({
       setBusy(false);
     }
   }
+
   async function remove() {
     setBusy(true);
     setError('');
+
     try {
       await apiClient(`/sites/${site.id}/environments/${environment.id}`, {
         method: 'DELETE',
@@ -262,6 +279,7 @@ export function EnvironmentSettings({
       setBusy(false);
     }
   }
+
   return (
     <div className="mb-10">
       <div hidden={section !== 'tracking'}>
@@ -288,6 +306,7 @@ export function EnvironmentSettings({
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {Object.entries(trackingSettingLabels).map(([key, label]) => {
               const setting = key as keyof typeof trackingSettingLabels;
+
               return (
                 <label key={key} className="flex items-center gap-3 text-sm">
                   <Checkbox
@@ -481,13 +500,16 @@ export function TrackingModeSetting({
   onChange: (mode: SiteEnvironment['trackingMode']) => void;
 }) {
   const { t } = useSitePreferences();
+
   const [mode, setMode] = useState<SiteEnvironment['trackingMode']>(
       environment.trackingMode === 'local' ? 'cookieless' : environment.trackingMode,
     ),
     [acknowledged, setAcknowledged] = useState(false);
+
   useEffect(() => {
     setMode(environment.trackingMode === 'local' ? 'cookieless' : environment.trackingMode);
   }, [environment.trackingMode]);
+
   return (
     <section className="mb-9 max-w-[640px]">
       <h2 className="text-[17px] font-medium">{t('Tracking mode')}</h2>

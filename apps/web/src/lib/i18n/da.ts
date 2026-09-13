@@ -1,4 +1,5 @@
 import type { Copy } from './en';
+
 export const da = {
   'Checking your subscription…': 'Tjekker dit abonnement…',
   'Choose a plan to continue': 'Vælg en plan for at fortsætte',

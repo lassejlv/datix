@@ -17,6 +17,17 @@ export default defineConfig({
   envDir: false,
   lint: {
     plugins: ['typescript', 'unicorn', 'oxc'],
+    jsPlugins: [{ name: 'spacing', specifier: '@stylistic/eslint-plugin' }],
+    rules: {
+      'spacing/padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: '*', next: ['export', 'function', 'block-like', 'return'] },
+        { blankLine: 'always', prev: ['import', 'export', 'function', 'block-like'], next: '*' },
+        { blankLine: 'always', prev: '*', next: ['multiline-const', 'multiline-let'] },
+        { blankLine: 'always', prev: ['multiline-const', 'multiline-let'], next: '*' },
+        { blankLine: 'any', prev: 'import', next: 'import' },
+      ],
+    },
     categories: { correctness: 'error' },
     ignorePatterns,
     overrides: [

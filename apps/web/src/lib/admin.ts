@@ -2,6 +2,7 @@ import type { Copy } from './i18n/translations';
 
 /** Mirrors the status filter accepted by /api/admin/users and /api/admin/sites. */
 export type AdminStatusFilter = 'all' | 'active' | 'suspended';
+
 export const adminStatusFilters: readonly AdminStatusFilter[] = ['all', 'active', 'suspended'];
 
 export type AdminUser = {
@@ -77,7 +78,9 @@ export type AdminStatus = {
 };
 
 export type AdminUserDetail = { user: AdminUser; sites: AdminSite[]; subscriptions: unknown[] };
+
 export type AdminSiteDetail = { site: AdminSite; environments: AdminEnvironment[] };
+
 export type AdminList<Key extends string, Row> = Record<Key, Row[]> & { nextCursor: string | null };
 
 export type AdminListQuery = {
@@ -99,6 +102,7 @@ export function adminListPath(resource: 'users' | 'sites', query: AdminListQuery
   if (query.cursor) params.set('cursor', query.cursor);
   if (query.limit) params.set('limit', String(query.limit));
   const suffix = params.toString();
+
   return suffix ? `/admin/${resource}?${suffix}` : `/admin/${resource}`;
 }
 
@@ -116,6 +120,7 @@ export function adminAuditPath(query: AdminAuditQuery = {}): string {
   if (query.cursor) params.set('cursor', query.cursor);
   if (query.limit) params.set('limit', String(query.limit));
   const suffix = params.toString();
+
   return suffix ? `/admin/audit?${suffix}` : '/admin/audit';
 }
 
@@ -136,11 +141,13 @@ export function auditActionCopy(action: string): Copy | null {
 /** Sessions are only revoked when an account is suspended, so zero is not worth reporting. */
 export function revokedSessions(entry: AdminAuditEntry): number {
   const value = entry.metadata?.sessionsRevoked;
+
   return typeof value === 'number' && value > 0 ? value : 0;
 }
 
 /** A website stops collecting when either the website itself or its owner is suspended. */
 export function suspensionSource(site: AdminSite): 'site' | 'owner' | null {
   if (site.suspended) return 'site';
+
   return site.ownerSuspended ? 'owner' : null;
 }

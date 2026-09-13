@@ -1,10 +1,12 @@
 import { Schema } from 'effect';
+
 const Environment = Schema.Struct({
   APP_URL: Schema.NonEmptyString,
   DATABASE_URL: Schema.String.check(Schema.isMinLength(1)),
   REDIS_URL: Schema.String.check(Schema.isMinLength(1)),
   BETTER_AUTH_SECRET: Schema.String.check(Schema.isMinLength(32)),
 });
+
 export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   const value = Schema.decodeUnknownSync(Environment)(env);
   const appUrl = new URL(value.APP_URL);
@@ -26,6 +28,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
     throw new Error('Invalid BILLING_STATE_MODE');
   if (env.EXTERNAL_EFFECTS === 'enabled' && env.BILLING_STATE_MODE === 'snapshot')
     throw new Error('Snapshot copies cannot send external effects');
+
   const integer = (key: string, fallback: number, max: number) =>
     Schema.decodeUnknownSync(
       Schema.Number.check(
@@ -34,6 +37,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
         Schema.isLessThanOrEqualTo(max),
       ),
     )(Number(env[key] ?? fallback));
+
   return {
     ...value,
     appUrl: appUrl.origin,
@@ -55,4 +59,5 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
     ),
   };
 }
+
 export type Config = ReturnType<typeof readConfig>;

@@ -22,6 +22,7 @@ export function LandingLayout({
 }) {
   const { t } = useSitePreferences();
   const [dialog, setDialog] = useState<'privacy' | null>(null);
+
   return (
     <div className="landing-page">
       <a className="landing-skip" href="#main-content">
@@ -159,17 +160,22 @@ function MobileNavigation({ pricing }: { pricing: boolean }) {
         menu.current.open = false;
       }
     };
+
     const desktop = matchMedia('(min-width: 768px)');
+
     const closeOnDesktop = () => {
       if (desktop.matches && menu.current) menu.current.open = false;
     };
+
     document.addEventListener('pointerdown', closeOutside);
     desktop.addEventListener('change', closeOnDesktop);
+
     return () => {
       document.removeEventListener('pointerdown', closeOutside);
       desktop.removeEventListener('change', closeOnDesktop);
     };
   }, []);
+
   return (
     <details
       ref={menu}

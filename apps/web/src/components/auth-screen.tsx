@@ -17,7 +17,9 @@ const oauthProviders = {
   github: { label: 'GitHub', icon: GithubIcon },
   google: { label: 'Google', icon: GoogleIcon },
 } as const;
+
 type OAuthProvider = keyof typeof oauthProviders;
+
 const isOAuthProvider = (value: unknown): value is OAuthProvider =>
   typeof value === 'string' && value in oauthProviders;
 
@@ -37,9 +39,11 @@ export function AuthScreen({
   const [error, setError] = useState('');
   const [oauth, setOauth] = useState<OAuthProvider[]>([]);
   const [oauthBusy, setOauthBusy] = useState<OAuthProvider | null>(null);
+
   const [oauthFailed] = useState(
     () => new URLSearchParams(window.location.search).get('oauth') === 'failed',
   );
+
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/preferences', { credentials: 'same-origin', signal: controller.signal })
@@ -49,33 +53,40 @@ export function AuthScreen({
           typeof preferences === 'object' && preferences !== null
             ? (preferences as { oauth?: unknown }).oauth
             : null;
+
         if (Array.isArray(ids)) setOauth(ids.filter(isOAuthProvider));
       })
       .catch(() => {
         /* Email sign-in stays available when provider discovery fails. */
       });
+
     return () => controller.abort();
   }, []);
+
   async function startOauth(provider: OAuthProvider) {
     if (busy || oauthBusy) return;
     setOauthBusy(provider);
     setError('');
+
     try {
       const result = await apiClient<{ url: string }>(
         '/auth/sign-in/social',
         write('POST', { provider }),
       );
+
       window.location.assign(result.url);
     } catch (error) {
       setError(errorText(error));
       setOauthBusy(null);
     }
   }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError('');
     const form = new FormData(event.currentTarget);
+
     try {
       await apiClient(
         `/auth/${signup ? 'sign-up' : 'sign-in'}/email`,
@@ -93,11 +104,13 @@ export function AuthScreen({
       setBusy(false);
     }
   }
+
   const switchMode = () => {
     onModeChange?.(!signup);
     setError('');
     setVisible(false);
   };
+
   return (
     <div className="landing-page auth-page">
       <a className="landing-skip" href="#main-content">

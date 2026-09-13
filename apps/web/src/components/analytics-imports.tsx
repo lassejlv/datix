@@ -38,8 +38,10 @@ export function AnalyticsImports({
   onViewReport: (from: string, to: string) => void;
 }) {
   const { number, message: messageText, t, locale, dateLabel } = useSitePreferences();
+
   const fullDate = (day: string) =>
     dateLabel(day, { day: 'numeric', month: 'short', year: 'numeric' });
+
   const endpoint = `/sites/${site.id}/environments/${environment.id}/imports`;
   const [provider, setProvider] = useState<ImportProvider>('plausible');
   const [timeZone, setTimeZone] = useState('UTC');
@@ -70,6 +72,7 @@ export function AnalyticsImports({
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
+
     return () => controller.abort();
   }, [endpoint, revision]);
   useEffect(() => () => request.current?.abort(), []);
@@ -81,30 +84,38 @@ export function AnalyticsImports({
     setPreview(null);
     setError('');
   }
+
   function selectFile(selected: File | undefined) {
     resetPreview();
     setFile(null);
     if (!selected) return;
+
     if (!selected.size || selected.size > MAX_UPLOAD) {
       setError(
         'Choose a non-empty export up to 10 MB. Export a shorter date range for larger files.',
       );
+
       return;
     }
+
     if (!(provider === 'plausible' ? /\.(csv|zip)$/i : /\.csv$/i).test(selected.name)) {
       setError(
         provider === 'plausible'
           ? 'Choose a Plausible full-export ZIP or visitors CSV.'
           : 'Choose a Google Analytics CSV export.',
       );
+
       return;
     }
+
     setFile(selected);
   }
+
   function reloadHistory() {
     setLoading(true);
     setRevision((value) => value + 1);
   }
+
   async function readExport(event: FormEvent) {
     event.preventDefault();
     if (!file) return;
@@ -112,6 +123,7 @@ export function AnalyticsImports({
     setError('');
     const controller = new AbortController();
     request.current = controller;
+
     try {
       const query = new URLSearchParams({
         provider,
@@ -119,12 +131,14 @@ export function AnalyticsImports({
         filename: file.name,
         webOnly: String(webOnly),
       });
+
       const result = await apiClient<ImportSummary>(`${endpoint}/preview?${query}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/octet-stream' },
         body: file,
         signal: controller.signal,
       });
+
       setPreview(result);
     } catch (error) {
       if (!controller.signal.aborted) setError(errorText(error));
@@ -132,12 +146,14 @@ export function AnalyticsImports({
       if (!controller.signal.aborted) setBusy(null);
     }
   }
+
   async function commit() {
     if (!file || !preview) return;
     setBusy('import');
     setError('');
     const controller = new AbortController();
     request.current = controller;
+
     try {
       const query = new URLSearchParams({
         provider,
@@ -146,6 +162,7 @@ export function AnalyticsImports({
         webOnly: String(webOnly),
         fingerprint: preview.fingerprint,
       });
+
       const result = await apiClient<{ import: ImportSummary; duplicate: boolean }>(
         `${endpoint}?${query}`,
         {
@@ -155,6 +172,7 @@ export function AnalyticsImports({
           signal: controller.signal,
         },
       );
+
       toast.success(
         result.duplicate
           ? t('This export is already imported. Your totals have not changed.')
@@ -176,10 +194,12 @@ export function AnalyticsImports({
       if (!controller.signal.aborted) setBusy(null);
     }
   }
+
   async function remove() {
     if (!removing?.id) return;
     setBusy('remove');
     setError('');
+
     try {
       await apiClient(`${endpoint}/${removing.id}`, { method: 'DELETE' });
       setRemoving(null);
@@ -191,6 +211,7 @@ export function AnalyticsImports({
       setBusy(null);
     }
   }
+
   return (
     <div className="max-w-[760px]">
       <header className="mb-7">
@@ -390,10 +411,13 @@ export function AnalyticsImports({
             onDrop={(event) => {
               event.preventDefault();
               if (busy) return;
+
               if (event.dataTransfer.files.length !== 1) {
                 setError('Upload one export at a time.');
+
                 return;
               }
+
               selectFile(event.dataTransfer.files[0]);
             }}
           >
@@ -541,6 +565,7 @@ export function AnalyticsImports({
                       const earliest = new Date(Date.parse(item.to) - 365 * 86400000)
                         .toISOString()
                         .slice(0, 10);
+
                       onViewReport(item.from < earliest ? earliest : item.from, item.to);
                     }}
                   >

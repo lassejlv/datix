@@ -13,6 +13,7 @@ import {
   billingPrice,
   billingAvailable,
 } from '../lib/billing-plans';
+
 export const billingVolumes = billingPlans;
 
 type Plan = (typeof billingPlans)[number];
@@ -29,6 +30,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     void apiClient<{ hasCustomer: boolean }>('/billing')
       .then((r) => setHasCustomer(r.hasCustomer))
       .catch(() => {});
+
     try {
       const pending = Number(sessionStorage.getItem('ab-checkout-events'));
       if (
@@ -42,20 +44,24 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
     } catch {
       /* Checkout selection is optional when storage is blocked. */
     }
+
     // The account usage hook syncs ?checkout_id= returns; this only keeps the waiting note.
     if (new URLSearchParams(location.search).has('checkout_id')) {
       // oxlint-disable-next-line react/set-state-in-effect -- browser URL is an external source
       setReturned(true);
     }
   }, []);
+
   const checkout = async (plan: Plan) => {
     setBusy(plan.id);
     setError('');
+
     try {
       const result = await apiClient<{ url?: string }>('/billing/checkout', {
         method: 'POST',
         body: JSON.stringify({ events: plan.events, interval, locale }),
       });
+
       if (result.url) window.location.assign(result.url);
       else {
         toast.success(t('Subscription refreshed.'));
@@ -67,14 +73,17 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       setBusy('');
     }
   };
+
   const portal = async (path: string) => {
     setBusy(path);
     setError('');
+
     try {
       const result = await apiClient<{ url?: string }>(path, {
         method: 'POST',
         body: '{}',
       });
+
       if (result.url) window.location.assign(result.url);
       else {
         toast.success(t('Subscription refreshed.'));
@@ -86,6 +95,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
       setBusy('');
     }
   };
+
   return (
     <div className="mt-5 space-y-4">
       {returned && !active && (
@@ -132,6 +142,7 @@ export function BillingActions({ active, refresh }: { active: boolean; refresh: 
               const available = billingAvailable(plan, yearly);
               const popular = plan.id === 'pro';
               const description = billingPlanDescriptions[plan.id];
+
               return (
                 <article
                   key={plan.id}

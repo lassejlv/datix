@@ -19,6 +19,7 @@ import { sql } from 'drizzle-orm';
 import type { BillingSubscription } from './json-types';
 import type { Baseline, SourceActivity, TrafficWindow, AbuseReason } from './json-types';
 import { user } from './auth-schema';
+
 export * from './auth-schema';
 
 export const billingCheckouts = pgTable('billing_checkouts', {
@@ -227,6 +228,7 @@ export const accountOnboarding = pgTable('account_onboarding', {
     .references(() => user.id, { onDelete: 'cascade' }),
   completedAt: timestamp('completed_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
 export const userSuspensions = pgTable('user_suspensions', {
   userId: text('user_id')
     .primaryKey()
@@ -235,6 +237,7 @@ export const userSuspensions = pgTable('user_suspensions', {
   suspendedAt: timestamp('suspended_at', { withTimezone: true }).notNull().defaultNow(),
   suspendedBy: text('suspended_by').notNull(),
 });
+
 export const siteSuspensions = pgTable('site_suspensions', {
   siteId: uuid('site_id')
     .primaryKey()
@@ -243,6 +246,7 @@ export const siteSuspensions = pgTable('site_suspensions', {
   suspendedAt: timestamp('suspended_at', { withTimezone: true }).notNull().defaultNow(),
   suspendedBy: text('suspended_by').notNull(),
 });
+
 export const adminAuditLog = pgTable(
   'admin_audit_log',
   {
@@ -257,6 +261,7 @@ export const adminAuditLog = pgTable(
   },
   (t) => [index('admin_audit_target_idx').on(t.targetType, t.targetId, t.id)],
 );
+
 export const conversionGoals = pgTable(
   'conversion_goals',
   {
@@ -271,6 +276,7 @@ export const conversionGoals = pgTable(
   },
   (t) => [uniqueIndex('conversion_goals_match_idx').on(t.environmentId, t.matchType, t.matchValue)],
 );
+
 export const overviewAnnotations = pgTable(
   'overview_annotations',
   {
@@ -284,6 +290,7 @@ export const overviewAnnotations = pgTable(
   },
   (t) => [index('overview_annotations_environment_day_idx').on(t.environmentId, t.day)],
 );
+
 export const errorResolutions = pgTable(
   'error_resolutions',
   {

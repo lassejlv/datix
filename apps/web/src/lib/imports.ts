@@ -1,5 +1,7 @@
 import { translate, type Translate } from './i18n/translations';
+
 export type ImportProvider = 'plausible' | 'ga4';
+
 export type ImportSummary = {
   id?: string;
   createdAt?: string;
@@ -20,6 +22,7 @@ export type ImportSummary = {
   warnings: string[];
   duplicate: boolean;
 };
+
 export type ImportedReportSources = {
   sources: Pick<
     ImportSummary,
@@ -40,8 +43,10 @@ export type ImportedReportSources = {
   breakdowns: string[];
   calendarDayWarning: boolean;
 };
+
 export const providerName = (provider: ImportProvider) =>
   provider === 'plausible' ? 'Plausible' : 'Google Analytics 4';
+
 export function breakdownName(dimension: string, t: Translate = (text) => translate('en', text)) {
   const labels = {
     path: 'Pages',
@@ -50,6 +55,8 @@ export function breakdownName(dimension: string, t: Translate = (text) => transl
     device: 'Devices',
     event: 'Custom events',
   } as const;
+
   const key = labels[dimension as keyof typeof labels];
+
   return key ? t(key) : dimension;
 }

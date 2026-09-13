@@ -3,6 +3,7 @@ import type { ReactNode, SVGProps } from 'react';
 // Original OpenAI Platform SVG paths from design-fun/public/assets/icons.json.
 // Companion icons share the kit's 24 px grid and 1.8 px strokes.
 type IconProps = SVGProps<SVGSVGElement> & { size?: number | string };
+
 function iconComponent(children: ReactNode, viewBox = '0 0 24 24', outline = false) {
   return function Icon({ size = 24, ...props }: IconProps) {
     return (

@@ -18,6 +18,7 @@ type Particle = {
 
 function cssColor(name: string, fallback: string) {
   const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
   return value || fallback;
 }
 
@@ -31,6 +32,7 @@ function burst(
 ) {
   const particles: Particle[] = [];
   const now = performance.now();
+
   for (let i = 0; i < 70; i++) {
     const angle = -Math.PI / 2 + drift * 0.5 + (Math.random() - 0.5) * 1.15;
     const speed = 8 + Math.random() * 12;
@@ -49,6 +51,7 @@ function burst(
       ttl: 1700 + Math.random() * 900,
     });
   }
+
   return particles;
 }
 
@@ -59,31 +62,41 @@ function fireConfetti() {
     'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:80';
   document.body.appendChild(canvas);
   const context = canvas.getContext('2d');
+
   if (!context) {
     canvas.remove();
+
     return () => {};
   }
+
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
   const resize = () => {
     canvas.width = Math.floor(window.innerWidth * dpr);
     canvas.height = Math.floor(window.innerHeight * dpr);
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
+
   resize();
+
   const colors = [
     cssColor('--foreground', '#181818'),
     cssColor('--success', '#2f6b3a'),
     cssColor('--new', '#924ff7'),
     cssColor('--chart-ink', '#181818'),
   ];
+
   let particles = [
     ...burst(window.innerWidth, window.innerHeight, colors, 0.16, 0.2, 1),
     ...burst(window.innerWidth, window.innerHeight, colors, 0.84, 0.2, -1),
   ];
+
   const second = window.setTimeout(() => {
     particles = particles.concat(burst(window.innerWidth, window.innerHeight, colors, 0.5, 0.1, 0));
   }, 160);
+
   let frame = 0;
+
   const draw = (now: number) => {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
     particles = particles.filter((particle) => {
@@ -102,13 +115,16 @@ function fireConfetti() {
       context.fillStyle = particle.color;
       context.fillRect(-particle.width / 2, -particle.height / 2, particle.width, particle.height);
       context.restore();
+
       return true;
     });
     if (particles.length) frame = requestAnimationFrame(draw);
     else canvas.remove();
   };
+
   frame = requestAnimationFrame(draw);
   window.addEventListener('resize', resize);
+
   return () => {
     window.clearTimeout(second);
     cancelAnimationFrame(frame);
@@ -123,13 +139,16 @@ export function CheckoutConfetti({ active }: { active: boolean }) {
     const checkoutId = new URLSearchParams(location.search).get('checkout_id');
     if (!checkoutId) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     try {
       if (sessionStorage.getItem(STORAGE_KEY) === checkoutId) return;
       sessionStorage.setItem(STORAGE_KEY, checkoutId);
     } catch {
       /* Celebrate once per visit when storage is blocked. */
     }
+
     return fireConfetti();
   }, [active]);
+
   return null;
 }

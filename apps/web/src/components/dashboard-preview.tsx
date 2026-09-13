@@ -2,6 +2,7 @@ import { useSitePreferences } from './site-preferences';
 
 export function DashboardPreview() {
   const { t } = useSitePreferences();
+
   return (
     <section className="landing-product" aria-label={t('Explore dashboard')}>
       <div className="landing-preview-window" id="dashboard-preview">

@@ -25,6 +25,7 @@ export const disclosureSummary =
   'flex w-fit cursor-pointer list-none items-center gap-1.5 rounded-sm hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&::-webkit-details-marker]:hidden';
 
 export type Annotation = { id: string; day: string; label: string };
+
 export type OverviewReport = Reports & {
   window?: { from: string; to: string; interval: 'hour' };
   previous: Pick<Reports, 'overview' | 'timeseries'> | null;
@@ -49,14 +50,17 @@ export function LiveVisitors({
   onExpired: () => void;
 }) {
   const { t, number } = useSitePreferences();
+
   const [live, setLive] = useState<{
     active: number;
     recent: { path: string; country: string; at: string }[];
   } | null>(null);
+
   const active = live?.active ?? null;
   useEffect(() => {
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
+
     const load = async () => {
       try {
         const result = await apiClient<{
@@ -65,6 +69,7 @@ export function LiveVisitors({
         }>(`/sites/${siteId}/environments/${environmentId}/features/live`, {
           signal: controller.signal,
         });
+
         if (!controller.signal.aborted) setLive(result);
       } catch (error) {
         if (!controller.signal.aborted) {
@@ -75,12 +80,15 @@ export function LiveVisitors({
         if (!controller.signal.aborted) timer = setTimeout(load, 30_000);
       }
     };
+
     void load();
+
     return () => {
       controller.abort();
       clearTimeout(timer);
     };
   }, [siteId, environmentId, onExpired]);
+
   return (
     <Dialog>
       <DialogTrigger
@@ -142,6 +150,7 @@ export function OverviewGoal({
 }) {
   const { t, number } = useSitePreferences();
   const storageKey = `datix-primary-goal:${environmentId}`;
+
   const [selected, setSelected] = useState(() => {
     try {
       return localStorage.getItem(storageKey) ?? '';
@@ -149,7 +158,9 @@ export function OverviewGoal({
       return '';
     }
   });
+
   const goal = report.goals.goals.find((g) => g.id === selected) ?? report.goals.goals[0];
+
   return (
     <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
       {goal ? (
@@ -159,6 +170,7 @@ export function OverviewGoal({
             value={goal.id}
             onValueChange={(id) => {
               setSelected(id);
+
               try {
                 localStorage.setItem(storageKey, id);
               } catch {
@@ -220,9 +232,11 @@ export function OverviewAnnotations({
   const [label, setLabel] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
   async function save(body: object) {
     setBusy(true);
     setError('');
+
     try {
       await apiClient(
         `/sites/${siteId}/environments/${environmentId}/features/annotations`,
@@ -237,6 +251,7 @@ export function OverviewAnnotations({
       setBusy(false);
     }
   }
+
   return (
     <details className="group">
       <summary className={disclosureSummary}>

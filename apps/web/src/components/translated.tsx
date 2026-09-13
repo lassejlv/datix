@@ -5,6 +5,7 @@ import { useSitePreferences } from './site-preferences';
 /** Named React slots let each language place emphasis and code in its own word order. */
 export function Translated({ text, values }: { text: Copy; values: Record<string, ReactNode> }) {
   const { t } = useSitePreferences();
+
   return t(text)
     .split(/(\{\w+\})/g)
     .map((part, index) => (

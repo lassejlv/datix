@@ -26,11 +26,13 @@ import { sessions } from '../analytics/sessions';
 import { report } from '../analytics/reports';
 import { hash } from '../analytics/tracking';
 import { collect, trackerConfig } from '../analytics/ingestion';
+
 export async function createApp(
   runtime: ManagedRuntime.ManagedRuntime<Infrastructure | Auth, ApiError>,
 ) {
   const r = await runtime.runPromise(Infrastructure);
   const auth = await runtime.runPromise(Auth);
+
   const run = <A>(effect: Effect.Effect<A, ApiError, Infrastructure | Auth>) =>
     runtime.runPromise(effect);
 
@@ -44,15 +46,18 @@ export async function createApp(
       country: string;
     };
   }>();
+
   app.use(secureHeaders({ crossOriginResourcePolicy: 'cross-origin' }));
   app.use('*', async (c, next) => {
     const expected = process.env.CLOUDFLARE_ORIGIN_SECRET;
     const supplied = c.req.header('x-analytics-origin-key');
+
     const trusted =
       !!expected &&
       !!supplied &&
       Buffer.byteLength(expected) === Buffer.byteLength(supplied) &&
       timingSafeEqual(Buffer.from(expected), Buffer.from(supplied));
+
     c.set(
       'ip',
       trusted
@@ -87,18 +92,22 @@ export async function createApp(
   app.use('/api/*', async (c, next) => {
     c.header('cache-control', 'no-store');
     c.header('x-request-id', crypto.randomUUID());
+
     const publicTracker = ['/api/collect', '/api/telemetry', '/api/tracker-config'].includes(
       c.req.path,
     );
+
     if (publicTracker) {
       c.header('access-control-allow-origin', '*');
       c.header('access-control-allow-methods', 'GET, POST, OPTIONS');
       c.header('access-control-allow-headers', 'Content-Type');
       if (c.req.method === 'OPTIONS') return c.body(null, 204);
     }
+
     if (c.req.method === 'HEAD')
       return c.json({ error: { code: 'method_not_allowed', message: 'Use GET.' } }, 405);
     const account = /^\/api\/(auth|sites|me|usage|billing|admin|onboarding)(\/|$)/.test(c.req.path);
+
     if (account) {
       const config = r.config;
       if (!['GET', 'HEAD'].includes(c.req.method) && c.req.header('origin') !== config.appUrl)
@@ -107,9 +116,11 @@ export async function createApp(
           code: 'invalid_origin',
           message: 'Use the application origin for account mutations.',
         });
+
       if (!c.req.path.startsWith('/api/auth/')) {
         const user = await run(identity(c.req.raw.headers));
         c.set('owner', user.id);
+
         const count = Number(
           await r.redis.send('EVAL', [
             "local n=redis.call('INCR',KEYS[1]);if n==1 then redis.call('EXPIRE',KEYS[1],60) end;return n",
@@ -117,6 +128,7 @@ export async function createApp(
             `${r.config.queuePrefix}:account:${hash(r.config.BETTER_AUTH_SECRET, user.id)}`,
           ]),
         );
+
         if (count > 600)
           throw new ApiError({
             status: 429,
@@ -124,13 +136,16 @@ export async function createApp(
             message: 'Too many requests. Try again in a minute.',
           });
         if (c.req.path.startsWith('/api/sites/')) await run(requireSubscription(user.id));
+
         if (c.req.path === '/api/sites' && c.req.method === 'GET') {
           const completed =
             await r.primary`SELECT 1 FROM account_onboarding WHERE owner_id=${user.id}`;
+
           if (completed.length) await run(requireSubscription(user.id));
         }
       }
     }
+
     await next();
   });
   app.onError((error, c) => {
@@ -142,9 +157,12 @@ export async function createApp(
             code: 'unavailable',
             message: 'Service temporarily unavailable.',
           });
+
     if (!(error instanceof ApiError)) console.error('Request failed', error.name);
+
     return c.json({ error: { code: e.code, message: e.message } }, e.status as 400);
   });
+
   const jsonBody = async (request: Request) => {
     if (
       !['application/json', 'text/plain'].includes(
@@ -152,12 +170,14 @@ export async function createApp(
       )
     )
       throw invalid('Send JSON with application/json or text/plain.');
+
     try {
       return await request.json();
     } catch {
       throw invalid('Request body must be valid JSON.');
     }
   };
+
   app.get('/api/health', (c) => c.json({ status: 'ok', service: 'analytics', version: 1 }));
   app.get('/health/ready', async (c) => c.json(await run(readiness())));
   app.get(
@@ -170,6 +190,7 @@ export async function createApp(
   app.get('/internal/metrics', async (c) => {
     const expected = process.env.METRICS_TOKEN,
       supplied = c.req.header('authorization');
+
     if (
       !expected ||
       !supplied ||
@@ -179,6 +200,7 @@ export async function createApp(
       return c.notFound();
     const counts = await r.queue.getJobCounts('active', 'waiting', 'failed', 'delayed');
     c.header('content-type', 'text/plain; version=0.0.4');
+
     return c.body(
       Object.entries(counts)
         .map(([state, count]) => `datix_queue_jobs{state="${state}"} ${count}`)
@@ -189,7 +211,9 @@ export async function createApp(
     const cookies = Object.fromEntries(
       (c.req.header('cookie') ?? '').split(';').map((s) => s.trim().split('=')),
     );
+
     const country = c.get('country');
+
     return c.json({
       locale: ['en', 'da', 'de'].includes(cookies['ab-language'] ?? '')
         ? cookies['ab-language']
@@ -203,6 +227,7 @@ export async function createApp(
         : 'system',
       oauth: ['github', 'google'].filter((provider) => {
         const prefix = provider.toUpperCase();
+
         return process.env[`${prefix}_CLIENT_ID`] && process.env[`${prefix}_CLIENT_SECRET`];
       }),
     });
@@ -211,13 +236,15 @@ export async function createApp(
     const headers = new Headers(c.req.raw.headers);
     headers.set('x-datix-client-ip', c.get('ip'));
     const request = new Request(c.req.raw, { headers });
+
     return auth.handler(request);
   });
   app.get('/api/me', async (c) => c.json({ user: await run(identity(c.req.raw.headers)) }));
   app.get('/api/usage', async (c) => c.json(await run(usage(c.get('owner')))));
   app.post('/api/onboarding/complete', async (c) => {
-    await run(requireSubscription(c.get('owner')));
+    // Finishing setup opens plan selection; it does not grant subscription access.
     await r.primary`INSERT INTO account_onboarding(owner_id) VALUES(${c.get('owner')}) ON CONFLICT DO NOTHING`;
+
     return c.json({ onboardingCompleted: true });
   });
   app.get('/api/sites', async (c) => c.json({ sites: await run(listSites(c.get('owner'))) }));
@@ -234,6 +261,7 @@ export async function createApp(
   );
   app.delete('/api/sites/:site', async (c) => {
     await run(deleteSite(c.get('owner'), c.req.param('site')));
+
     return c.body(null, 204);
   });
   app.get('/api/sites/:site/environments', async (c) =>
@@ -277,6 +305,7 @@ export async function createApp(
   );
   app.delete('/api/sites/:site/environments/:environment', async (c) => {
     await run(deleteEnvironment(c.get('owner'), c.req.param('site'), c.req.param('environment')));
+
     return c.body(null, 204);
   });
   for (const kind of ['overview', 'timeseries', 'breakdown', 'installation'])
@@ -299,6 +328,7 @@ export async function createApp(
   app.post('/api/collect', async (c) => {
     const ip = c.get('ip');
     const country = c.get('country');
+
     return c.json(
       await run(collect(await jsonBody(c.req.raw), c.req.raw.headers, ip, country)),
       202,
@@ -409,6 +439,7 @@ export async function createApp(
         c.req.raw,
       ),
     );
+
     return c.json(result, result.duplicate ? 200 : 201);
   });
   app.delete('/api/sites/:site/environments/:environment/imports/:id', async (c) => {
@@ -423,6 +454,7 @@ export async function createApp(
         c.req.param('id'),
       ),
     );
+
     return c.body(null, 204);
   });
   app.on(['GET', 'POST'], '/api/billing', async (c) =>
@@ -446,5 +478,6 @@ export async function createApp(
   app.all('/api/*', (c) => c.json({ error: { code: 'not_found', message: 'Not found.' } }, 404));
   app.use('*', serveStatic({ root: 'apps/web/dist/client' }));
   app.get('*', serveStatic({ path: 'apps/web/dist/client/index.html' }));
+
   return app;
 }

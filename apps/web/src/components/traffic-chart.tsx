@@ -33,8 +33,10 @@ export function TrafficChart({
 }) {
   const { dateLabel, dateTime, number, t, dark } = useSitePreferences();
   const hourly = !!data[0]?.at;
+
   const rows = useMemo(() => {
     const label = (point: Point) => (point.at ? dateTime(point.at) : dateLabel(point.day));
+
     return data.map((point, index) => ({
       ...point,
       previous: previous?.[index]?.[metric] ?? 0,
@@ -44,8 +46,10 @@ export function TrafficChart({
         : dateLabel(point.day),
     }));
   }, [data, dateLabel, dateTime, previous, metric]);
+
   const config = useMemo(() => {
     const ink = metricInk(metric, dark);
+
     return {
       [metric]: {
         label: t(metricLabels[metric]),
@@ -55,6 +59,7 @@ export function TrafficChart({
       ...(previous ? { previous: { label: t('Previous period'), color: 'grey' as const } } : {}),
     };
   }, [metric, dark, t, previous]);
+
   const allZero =
     data.every((point) => point[metric] === 0) &&
     !previous?.some((point) => point[metric] > 0) &&
@@ -107,12 +112,14 @@ function AnnotationMarkers({ annotations }: { annotations: Annotation[] }) {
   const ctx = useChart();
   const { dateLabel } = useSitePreferences();
   if (!ctx.ready) return null;
+
   return (
     <g>
       {annotations.map((note) => {
         const index = ctx.data.findIndex((point) => point.day === note.day);
         if (index < 0) return null;
         const x = ctx.xCenter(index);
+
         return (
           <g key={note.id} className="stroke-muted-foreground" data-testid="annotation-marker">
             <title>

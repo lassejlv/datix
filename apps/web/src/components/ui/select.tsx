@@ -41,6 +41,7 @@ export function Select({
       });
     }
   });
+
   return (
     <Primitive.Root
       items={items}

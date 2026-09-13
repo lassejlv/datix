@@ -65,10 +65,12 @@ export function WorkspaceSidebar({
   const { t } = useSitePreferences();
   const indicatorId = useId();
   const { setOpenMobile } = useSidebar();
+
   const action = (callback: () => void) => {
     setOpenMobile(false);
     callback();
   };
+
   return (
     <Sidebar variant="inset" aria-label={t('Main navigation')} className="border-sidebar-border">
       <SidebarHeader className="gap-0 px-5 pt-4 pb-3">

@@ -36,6 +36,7 @@ function RootDocument() {
     // Static metadata covers the HTML shell; the router owns it once the app has mounted.
     document.querySelectorAll('[data-router-head]').forEach((element) => element.remove());
   }, []);
+
   return (
     <>
       <HeadContent />
@@ -53,6 +54,7 @@ function RootDocument() {
 
 function NotFound() {
   const { t } = useSitePreferences();
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 px-6 text-center">
       <p className="text-lg font-medium">Datix</p>
@@ -75,6 +77,7 @@ function DocumentMetadata() {
   const { pathname } = useLocation();
   useEffect(() => {
     const page = pathname.split('/').filter(Boolean).at(-1);
+
     const titles = {
       signin: 'Sign in',
       signup: 'Create account',
@@ -91,6 +94,7 @@ function DocumentMetadata() {
       setup: 'Setup',
       settings: 'Settings',
     } as const;
+
     const key = titles[page as keyof typeof titles];
     document.title = key ? `${t(key)} | Datix` : `Datix | ${t('Website analytics')}`;
     const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
@@ -99,5 +103,6 @@ function DocumentMetadata() {
         'Understand your visitors, spot what works, and get back to building. Simple website analytics with cookieless tracking by default.',
       );
   }, [pathname, t]);
+
   return null;
 }

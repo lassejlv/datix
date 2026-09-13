@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 export function Spinner({ className, ...props }: React.ComponentProps<'span'>): React.ReactElement {
   const { t } = useSitePreferences();
+
   return (
     <span
       aria-label={t('Loading')}

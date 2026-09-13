@@ -63,6 +63,7 @@ function makeAuth(r: Infrastructure['Service']) {
           before: async (session) => {
             const blocked =
               await r.primary`SELECT 1 FROM user_suspensions WHERE user_id=${session.userId}`;
+
             if (blocked.length) throw new APIError('FORBIDDEN', { message: 'Account suspended.' });
           },
         },
@@ -70,6 +71,7 @@ function makeAuth(r: Infrastructure['Service']) {
     },
   });
 }
+
 export class Auth extends Context.Service<Auth, ReturnType<typeof makeAuth>>()('@datix/api/Auth') {
   static readonly layer = Layer.effect(
     Auth,
@@ -78,6 +80,7 @@ export class Auth extends Context.Service<Auth, ReturnType<typeof makeAuth>>()('
     }),
   );
 }
+
 export const identity = Effect.fn('identity')(function* (headers: Headers) {
   const auth = yield* Auth;
   const r = yield* Infrastructure;
@@ -88,15 +91,18 @@ export const identity = Effect.fn('identity')(function* (headers: Headers) {
       code: 'unauthorized',
       message: 'Sign in to continue.',
     });
+
   const blocked = yield* attempt(
     () => r.primary`SELECT 1 FROM user_suspensions WHERE user_id=${session.user.id}`,
   );
+
   if (blocked.length)
     return yield* new ApiError({
       status: 403,
       code: 'account_suspended',
       message: 'Account suspended.',
     });
+
   return {
     id: session.user.id,
     name: session.user.name,

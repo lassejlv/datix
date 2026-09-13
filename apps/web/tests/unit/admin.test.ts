@@ -12,6 +12,7 @@ import { en } from '../../src/lib/i18n/en';
 
 const site = (overrides: Partial<AdminSite>): AdminSite =>
   ({ suspended: false, ownerSuspended: false, ...overrides }) as AdminSite;
+
 const entry = (metadata: AdminAuditEntry['metadata']): AdminAuditEntry =>
   ({ metadata }) as AdminAuditEntry;
 

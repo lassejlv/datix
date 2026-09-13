@@ -18,9 +18,13 @@ export const featureDefinitions = [
     description: 'Measure loading speed, responsiveness, and visual stability.',
   },
 ] as const;
+
 export type FeatureKey = (typeof featureDefinitions)[number]['key'];
+
 export type FeaturePage = (typeof featureDefinitions)[number]['page'];
+
 export type FeatureSettings = Record<FeatureKey, boolean>;
+
 export function featureSettings(raw?: Partial<FeatureSettings>): FeatureSettings {
   return {
     goals: raw?.goals ?? false,
@@ -28,6 +32,7 @@ export function featureSettings(raw?: Partial<FeatureSettings>): FeatureSettings
     webVitals: raw?.webVitals ?? true,
   };
 }
+
 export function isFeaturePage(page: string): page is FeaturePage {
   return featureDefinitions.some((feature) => feature.page === page);
 }

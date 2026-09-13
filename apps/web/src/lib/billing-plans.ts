@@ -8,6 +8,7 @@ export const billingPlans = catalog.plans
     const annual = catalog.plans.find(
       (candidate) => candidate.events === plan.events && candidate.interval === 'year',
     )!;
+
     return {
       id: plan.id,
       name: plan.name,
@@ -27,8 +28,10 @@ export const billingPlanDescriptions: Record<string, Copy> = {
 };
 
 export const billingCurrency = () => catalog.currency;
+
 export const billingAvailable = (plan: (typeof billingPlans)[number], yearly = false) =>
   yearly ? plan.yearlyAvailable : plan.monthlyAvailable;
+
 export function billingPrice(plan: (typeof billingPlans)[number], locale: string, yearly = false) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',

@@ -16,6 +16,7 @@ const TooltipContext = createContext<{ id: string; open: boolean } | null>(null)
 export function Tooltip({ onOpenChange, ...props }: TooltipPrimitive.Root.Props): ReactElement {
   const id = useId();
   const [open, setOpen] = useState(props.defaultOpen ?? false);
+
   return (
     <TooltipContext.Provider value={{ id, open: props.open ?? open }}>
       <TooltipPrimitive.Root
@@ -31,6 +32,7 @@ export function Tooltip({ onOpenChange, ...props }: TooltipPrimitive.Root.Props)
 
 export function TooltipTrigger(props: TooltipPrimitive.Trigger.Props): React.ReactElement {
   const context = useContext(TooltipContext);
+
   return (
     <TooltipPrimitive.Trigger
       data-slot="tooltip-trigger"
@@ -61,6 +63,7 @@ export function TooltipPopup({
   portalProps?: TooltipPrimitive.Portal.Props;
 }): React.ReactElement {
   const context = useContext(TooltipContext);
+
   return (
     <TooltipPrimitive.Portal {...portalProps}>
       <TooltipPrimitive.Positioner

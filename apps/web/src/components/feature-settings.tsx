@@ -19,14 +19,17 @@ export function FeatureSettings({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const settings = featureSettings(environment.featureSettings);
+
   async function toggle(key: FeatureKey) {
     setBusy(true);
     setError('');
+
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${siteId}/environments/${environment.id}`,
         write('PATCH', { featureSettings: { ...settings, [key]: !settings[key] } }),
       );
+
       onUpdated(result.environment);
       toast.success(t('Changes saved.'));
     } catch (error) {
@@ -35,6 +38,7 @@ export function FeatureSettings({
       setBusy(false);
     }
   }
+
   return (
     <section>
       <h2 className="text-[17px] font-medium">{t('Features')}</h2>

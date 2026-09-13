@@ -8,6 +8,7 @@ const result = await Bun.build({
   format: 'iife',
   minify: true,
 });
+
 if (!result.success) throw new AggregateError(result.logs, 'Tracker minification failed');
 const sourceBytes = Bun.file('./public/tracker.js').size;
 const outputBytes = Bun.file('./dist/client/tracker.js').size;

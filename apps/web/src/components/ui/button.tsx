@@ -67,6 +67,7 @@ export function Button({
   ...props
 }: ButtonProps): React.ReactElement {
   const isDisabled: boolean = Boolean(loading || disabledProp);
+
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] = render
     ? undefined
     : 'button';
@@ -94,6 +95,8 @@ export function Button({
     props: mergeProps<'button'>(defaultProps, props),
     render,
   });
+
   const hint = tooltip ?? title ?? (size?.startsWith('icon') ? props['aria-label'] : undefined);
+
   return hint && !isDisabled ? <Hint content={hint}>{element}</Hint> : element;
 }

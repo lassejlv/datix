@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import { journeyStops } from '../../src/lib/journey-flow';
 import type { Activity } from '../../src/lib/visitor-journey';
+
 const event = (id: string, kind: string, path: string) => ({ id, kind, path }) as Activity;
 
 test('journeys keep repeat navigation and actions in their observed order', () => {
@@ -12,6 +13,7 @@ test('journeys keep repeat navigation and actions in their observed order', () =
     event('5', 'pageview', '/'),
     event('6', 'pageview', '/'),
   ];
+
   const stops = journeyStops(events);
   expect(stops.map((stop) => stop.path)).toEqual(['/', '/docs', '/', '/']);
   expect(
@@ -28,6 +30,7 @@ test('actions without a preceding pageview add context without inventing navigat
     event('2', 'scroll', '/help'),
     event('3', 'pageview', '/help'),
   ]);
+
   expect(stops.map((stop) => stop.page?.id ?? null)).toEqual([null, null, '3']);
   expect(stops[0]!.actions[0]!.id).toBe('1');
   expect(stops[1]!.actions[0]!.id).toBe('2');

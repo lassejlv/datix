@@ -2,6 +2,7 @@ import { Schema } from 'effect';
 import { createHmac } from 'node:crypto';
 import { decode, Id } from '../shared/validation';
 import { invalid } from '../shared/errors';
+
 export const trackingKeys = [
   'pageview',
   'custom',
@@ -18,16 +19,19 @@ export const trackingKeys = [
   'language',
   'coordinates',
 ] as const;
+
 export function settings(raw: Record<string, boolean> = {}) {
   return Object.fromEntries(
     trackingKeys.map((key) => [key, raw[key] ?? !['click', 'download', 'scroll'].includes(key)]),
   );
 }
+
 const integer = (max: number) =>
   Schema.Number.check(Schema.isInt()).check(
     Schema.isGreaterThanOrEqualTo(0),
     Schema.isLessThanOrEqualTo(max),
   );
+
 const Details = Schema.Struct({
   clientTime: Schema.optional(integer(8640000000000000)),
   sequence: Schema.optional(integer(2147483647)),
@@ -45,6 +49,7 @@ const Details = Schema.Struct({
   screenHeight: integer(20000),
   language: Schema.String.check(Schema.isMaxLength(35), Schema.isPattern(/^[a-zA-Z0-9-]*$/)),
 });
+
 const Kind = Schema.Literals([
   'pageview',
   'custom',
@@ -55,7 +60,9 @@ const Kind = Schema.Literals([
   'scroll',
   'engagement',
 ]);
+
 const Activity = Schema.Struct({ kind: Kind, details: Details });
+
 const Session = Schema.Struct({
   kind: Kind,
   details: Details,
@@ -64,6 +71,7 @@ const Session = Schema.Struct({
   consent: Schema.optional(Schema.Boolean),
   storage: Schema.optional(Schema.Literals(['cookie', 'local'])),
 });
+
 export const Input = Schema.Struct({
   siteId: Id,
   environmentId: Schema.optional(Id),
@@ -75,8 +83,10 @@ export const Input = Schema.Struct({
   session: Schema.optional(Session),
   activity: Schema.optional(Activity),
 });
+
 export const hash = (secret: string, value: unknown) =>
   createHmac('sha256', secret).update(JSON.stringify(value)).digest('hex');
+
 export function normalize(
   body: unknown,
   origin: string,
@@ -112,17 +122,22 @@ export function normalize(
       (input.session.storage ?? 'cookie') !== (env.tracking_mode === 'local' ? 'local' : 'cookie'))
   )
     throw invalid("Use the current environment script for this environment's tracking mode.");
+
   const environment = input.environmentId ?? input.siteId,
     day = now.toISOString().slice(0, 10);
+
   const visitor = hash(
     secret,
     input.session ? [environment, day, input.session.visitorId] : [environment, day, ip, ua],
   );
+
   const raw = input.session ?? input.activity;
   let activity;
+
   if (raw) {
     if ((input.type === 'pageview') !== (raw.kind === 'pageview'))
       throw invalid('Activity kind does not match the event.');
+
     const details = {
       ...raw.details,
       clientTime:
@@ -131,6 +146,7 @@ export function normalize(
           : now.getTime(),
       activeSeconds: raw.kind === 'engagement' ? (raw.details.activeSeconds ?? 0) : 0,
     };
+
     if (details.destination) {
       const target = new URL(details.destination);
       if (!['http:', 'https:'].includes(target.protocol) || target.username || target.password)
@@ -139,6 +155,7 @@ export function normalize(
       target.hash = '';
       details.destination = target.toString();
     }
+
     activity = {
       sessionKey: input.session
         ? hash(secret, [environment, input.session.visitorId, input.session.sessionId])
@@ -168,11 +185,14 @@ export function normalize(
       details,
     };
   }
+
   let referrer = '';
+
   try {
     const ref = new URL(input.referrer ?? '');
     if (['http:', 'https:'].includes(ref.protocol)) referrer = ref.hostname;
   } catch {}
+
   return applyPolicy(
     {
       version: activity ? 3 : 2,
@@ -198,7 +218,9 @@ export function normalize(
     env.tracking_settings,
   );
 }
+
 export type Event = NonNullable<ReturnType<typeof normalize>>;
+
 type Envelope = {
   version: number;
   siteId: string;
@@ -223,33 +245,43 @@ type Envelope = {
     details: typeof Details.Type;
   };
 };
+
 export function applyPolicy(input: Envelope, raw: Record<string, boolean>): Envelope | null {
   const policy = settings(raw),
     event = structuredClone(input);
+
   if (!policy[event.activity?.kind ?? (event.type === 'pageview' ? 'pageview' : 'custom')])
     return null;
   if (!policy.referrer) event.referrer = '';
   if (!policy.country) event.country = '';
   if (!policy.device) event.device = '';
+
   if (event.activity) {
     const a = event.activity;
     const d = { ...a.details };
+
     if (!policy.device) {
       a.browser = '';
       a.os = '';
     }
+
     if (!policy.dimensions) {
       d.viewportWidth = d.viewportHeight = d.screenWidth = d.screenHeight = 0;
     }
+
     if (!policy.language) d.language = '';
+
     if (!policy.coordinates) {
       delete d.x;
       delete d.y;
     }
+
     a.details = d;
   }
+
   return event;
 }
+
 export function units(event: Event) {
   return event.activity?.kind === 'engagement'
     ? 0

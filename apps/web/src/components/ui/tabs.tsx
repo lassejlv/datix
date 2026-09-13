@@ -16,6 +16,7 @@ export function Tabs<Value extends string>({
 }) {
   const indicatorId = useId();
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+
   return (
     <div role="tablist" aria-label={label} className="kit-tabs">
       {items.map((item, index) => (
@@ -42,6 +43,7 @@ export function Tabs<Value extends string>({
                     : event.key === 'End'
                       ? items.length - 1
                       : -1;
+
             if (next < 0) return;
             event.preventDefault();
             onValueChange(items[next].value);

@@ -11,8 +11,10 @@
     "dev:frontend": "bun scripts/build-vitals.ts && vp dev",
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",
-    "format": "vp fmt",
-    "format:check": "vp fmt --check"
+    "format": "bun run fmt",
+    "format:check": "bun run fmt:check",
+    "fmt": "vp lint --quiet --fix -A all -D spacing/padding-line-between-statements && vp fmt",
+    "fmt:check": "vp lint --quiet -A all -D spacing/padding-line-between-statements && vp fmt --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

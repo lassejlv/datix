@@ -1,4 +1,5 @@
 import type { Copy } from './en';
+
 export const de = {
   'Checking your subscription…': 'Dein Abonnement wird geprüft…',
   'Choose a plan to continue': 'Wähle einen Tarif, um fortzufahren',

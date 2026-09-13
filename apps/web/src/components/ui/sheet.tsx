@@ -83,6 +83,7 @@ export function SheetPopup({
   portalProps?: SheetPrimitive.Portal.Props;
 }): React.ReactElement {
   const { t } = useSitePreferences();
+
   return (
     <SheetPortal {...portalProps}>
       <SheetBackdrop />

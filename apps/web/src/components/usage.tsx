@@ -16,12 +16,15 @@ export function useAccountUsage(refreshKey: string) {
   useEffect(() => {
     const controller = new AbortController();
     let pending = false;
+
     const update = async () => {
       if (pending || controller.signal.aborted) return;
       pending = true;
       setLoading(true);
+
       try {
         const result = await apiClient<AccountUsage>('/usage', { signal: controller.signal });
+
         if (!controller.signal.aborted) {
           setData(result);
           setError('');
@@ -33,20 +36,26 @@ export function useAccountUsage(refreshKey: string) {
         if (!controller.signal.aborted) setLoading(false);
       }
     };
+
     void update();
+
     const interval = window.setInterval(() => {
       if (document.visibilityState === 'visible') void update();
     }, 15000);
+
     const focused = () => {
       if (document.visibilityState === 'visible') void update();
     };
+
     const accessRevoked = () => {
       setData(null);
       refresh();
     };
+
     window.addEventListener('focus', focused);
     document.addEventListener('visibilitychange', focused);
     window.addEventListener('datix:subscription-required', accessRevoked);
+
     return () => {
       controller.abort();
       window.clearInterval(interval);
@@ -66,6 +75,7 @@ export function useAccountUsage(refreshKey: string) {
         /* Usage polling picks up the allowance when the sync lands late. */
       });
   }, [refreshKey, refresh]);
+
   return { data, error, loading, refresh };
 }
 
@@ -84,8 +94,10 @@ const reasonLabel = (reason: UsagePauseReason | null) =>
 
 export function PlanHeading({ data, action }: { data: AccountUsage; action?: ReactNode }) {
   const { dateTime, t } = useSitePreferences();
+
   const date = (value: string) =>
     dateTime(value, { month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -109,8 +121,10 @@ export function PlanHeading({ data, action }: { data: AccountUsage; action?: Rea
 
 export function EventCredits({ data }: { data: AccountUsage }) {
   const { dateTime, number, t } = useSitePreferences();
+
   const date = (value: string) =>
     dateTime(value, { month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
     <>
       {data.paused && (
@@ -178,6 +192,7 @@ export function EventCredits({ data }: { data: AccountUsage }) {
 
 export function WebsitesUsage({ data, refresh }: { data: AccountUsage; refresh: () => void }) {
   const { number, t } = useSitePreferences();
+
   return (
     <section aria-labelledby="usage-websites-title">
       <div className="flex items-baseline justify-between gap-3">
@@ -234,6 +249,7 @@ function WebsiteBudget({
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
   return (
     <div className="basis-full text-sm">
       {!editing ? (
@@ -256,6 +272,7 @@ function WebsiteBudget({
             const value = String(new FormData(event.currentTarget).get('budget') ?? '').trim();
             setSaving(true);
             setError('');
+
             try {
               await apiClient(
                 `/sites/${site.id}`,

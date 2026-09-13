@@ -38,13 +38,13 @@ bun run test:integration
 bun run build
 ```
 
-Formatting and linting are configured centrally in `vite.config.ts`. Generated assets, build output, and applied database migrations are excluded. Existing React effect, ref, purity, and dependency findings in frontend components remain warnings; other correctness findings fail the check. TypeScript uses the existing per-package checks.
+Formatting and linting are configured centrally in `vite.config.ts`. `bun run fmt` first applies the Stylistic blank-line rule through Vite+ lint, then runs Vite+ formatting. This adds spacing after imports, around functions and multiline declarations, and before control flow and returns. `bun run fmt:check` and `bun run check` enforce that spacing. Use the Bun scripts for the complete formatting workflow; bare `vp fmt` preserves blank lines but does not insert them. Generated assets, build output, and applied database migrations are excluded. Existing React effect, ref, purity, and dependency findings in frontend components remain warnings; other correctness findings fail the check. TypeScript uses the existing per-package checks.
 
 The integration suite requires the isolated database settings described in `.env.test.example`. The API build is `apps/api/dist/main.js`; the frontend build is `apps/web/dist/client`.
 
 ## Infrastructure and migration
 
-The new Neon project is **datix-timescale** (`rapid-flower-57581427`), in `aws-eu-central-1`, with PostgreSQL **18.6** and TimescaleDB **2.24.0**. Its default `development` branch contains the schema and no customer data. Separate branches hold synthetic API and copy-rehearsal fixtures.
+The new Neon project is **datix-timescale** (`rapid-flower-57581427`), in `aws-eu-central-1`, with PostgreSQL **18.6** and TimescaleDB **2.24.0**. Its default branch is `production`. The disposable `api-tests` and `migration-rehearsal` branches were deleted after verification; create a fresh isolated branch and update the test environment before running live integration tests or copy rehearsals again.
 
 Neon exposes the Apache-licensed Timescale feature set. This implementation uses hypertables, indexes and `drop_chunks`; it does not require compression or continuous aggregates. See [Neon's Timescale documentation](https://neon.com/docs/extensions/timescaledb).
 

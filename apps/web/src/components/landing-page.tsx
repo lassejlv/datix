@@ -42,6 +42,7 @@ const questions = [
 export function LandingPage() {
   const { t } = useSitePreferences();
   const [dialog, setDialog] = useState<'demo' | null>(null);
+
   return (
     <LandingLayout home>
       <main id="main-content" tabIndex={-1}>

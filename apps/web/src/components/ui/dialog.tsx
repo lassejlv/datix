@@ -72,6 +72,7 @@ export function DialogPopup({
   portalProps?: DialogPrimitive.Portal.Props;
 }): React.ReactElement {
   const { t } = useSitePreferences();
+
   return (
     <DialogPortal {...portalProps}>
       <DialogBackdrop />

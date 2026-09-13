@@ -1287,4 +1287,5 @@ export const en = {
   "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.":
     "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.",
 } as const;
+
 export type Copy = keyof typeof en;

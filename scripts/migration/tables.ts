@@ -24,6 +24,7 @@ export const primaryTables = [
   ['site_suspensions', ['site_id']],
   ['admin_audit_log', ['id']],
 ] as const;
+
 export const analyticsTables = [
   ['events', ['site_id', 'id', 'day']],
   ['activity_events', ['environment_id', 'id', 'received_at']],
@@ -35,4 +36,5 @@ export const analyticsTables = [
   ['imported_daily_stats', ['environment_id', 'day']],
   ['imported_breakdowns', ['environment_id', 'day', 'dimension', 'value']],
 ] as const;
+
 export const targetTables = { primary: primaryTables, analytics: analyticsTables };

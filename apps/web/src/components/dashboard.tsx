@@ -48,19 +48,23 @@ import {
 } from '../lib/client';
 
 type Panel = DashboardPage;
+
 // Only administrators ever load this surface, so it stays out of the workspace bundle.
 const AdminPanel = lazy(() =>
   import('./admin-panel').then((module) => ({ default: module.AdminPanel })),
 );
+
 export function AnalyticsApp() {
   const { message: messageText, t } = useSitePreferences();
   const pathname = useLocation({ select: (location) => location.pathname });
   const navigate = useNavigate();
   const returnPath = useRef(pathname.startsWith('/site/') ? pathname : null);
   if (pathname.startsWith('/site/')) returnPath.current = pathname;
+
   const [user, setUser] = useState<User | null | undefined>(undefined),
     [error, setError] = useState(''),
     [reload, setReload] = useState(0);
+
   useEffect(() => {
     const controller = new AbortController();
     setError('');
@@ -71,12 +75,15 @@ export function AnalyticsApp() {
         if (error instanceof ApiError && error.status === 401) setUser(null);
         else setError(errorText(error));
       });
+
     return () => controller.abort();
   }, [reload]);
+
   const signedOut = useCallback(() => {
     returnPath.current = null;
     setUser(null);
   }, []);
+
   if (error)
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-5 text-secondary-ink">
@@ -108,6 +115,7 @@ export function AnalyticsApp() {
         <AdminPanel user={user} onExit={() => void navigate({ to: '/dashboard' })} />
       </Suspense>
     );
+
   return user ? (
     <AccountAccess key={user.id} user={user} onSignedOut={signedOut}>
       {(usage) => (
@@ -124,14 +132,17 @@ export function AnalyticsApp() {
       }}
       onSignedIn={(user) => {
         setUser(user);
+
         try {
           if (sessionStorage.getItem('ab-checkout-events')) {
             void navigate({ to: '/dashboard', replace: true });
+
             return;
           }
         } catch {
           /* Optional checkout selection. */
         }
+
         if (returnPath.current && !pathname.startsWith('/site/'))
           void navigate({ to: returnPath.current, replace: true });
       }}
@@ -153,31 +164,40 @@ function Dashboard({
   const { message: messageText, t } = useSitePreferences();
   const navigate = useNavigate();
   const params = useParams({ strict: false });
+
   const reportRange = useLocation({
     select: (location) => location.search as { from?: string; to?: string },
   });
+
   const settingsTab = useLocation({
     select: (location) => (location.search as { tab?: string }).tab,
   });
+
   const isAccount = useLocation({ select: (location) => location.pathname === '/account' });
   const { setOpenMobile } = useSidebar();
+
   const [sites, setSites] = useState<Site[]>([]),
     [rememberedSite, setRememberedSite] = useState(''),
     [environmentIds, setEnvironmentIds] = useState<Record<string, string>>({});
+
   const selected = params.siteId ?? rememberedSite;
   const panel: Panel = isDashboardPage(params.page) ? params.page : 'overview';
   // Legacy /imports URLs carry no ?tab= but must open the imports tab.
   const settingsTabOrLegacy = panel === 'imports' ? 'imports' : settingsTab;
+
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [addOpen, setAddOpen] = useState(false),
     [addEnvironmentOpen, setAddEnvironmentOpen] = useState(false),
     [signingOut, setSigningOut] = useState(false);
+
   const site = sites.find((value) => value.id === selected);
   const websiteUsage = usage.data?.websites.find((value) => value.id === selected);
+
   const environment = site?.environments.find(
     (value) => value.id === (params.environmentId ?? environmentIds[site.id] ?? site.id),
   );
+
   const [setupStatus, setSetupStatus] = useState<Record<string, boolean>>({});
   useEffect(() => {
     if (!site || !environment) return;
@@ -197,12 +217,15 @@ function Dashboard({
       .catch(() => {
         /* Keep the last known setup status if the check fails. */
       });
+
     return () => controller.abort();
   }, [site?.id, environment?.id, panel]);
+
   function go(siteId: string, environmentId: string, page: DashboardPage, replace = false) {
     setOpenMobile(false);
     void navigate({ to: siteRoute, params: { siteId, environmentId, page }, replace });
   }
+
   function environmentUpdated(updated: SiteEnvironment) {
     setSites((items) =>
       items.map((value) =>
@@ -223,13 +246,16 @@ function Dashboard({
       ),
     );
   }
+
   const loadSites = useCallback(async () => {
     setLoading(true);
     setError('');
+
     try {
       const result = await apiClient<{ sites: Site[] }>('/sites');
       setSites(result.sites);
       let remembered: string | null = null;
+
       try {
         remembered =
           localStorage.getItem(`analytics-beer:site:${user.id}`) ??
@@ -237,6 +263,7 @@ function Dashboard({
       } catch {
         /* Optional preference. */
       }
+
       setRememberedSite(
         result.sites.find((site) => site.id === remembered)?.id ?? result.sites[0]?.id ?? '',
       );
@@ -244,11 +271,13 @@ function Dashboard({
         Object.fromEntries(
           result.sites.map((site) => {
             let id: string | null = null;
+
             try {
               id = localStorage.getItem(`analytics-beer:environment:${user.id}:${site.id}`);
             } catch {
               /* Optional preference. */
             }
+
             return [
               site.id,
               site.environments.some((environment) => environment.id === id) ? id! : site.id,
@@ -263,20 +292,24 @@ function Dashboard({
       setLoading(false);
     }
   }, [onSignedOut, user.id]);
+
   useEffect(() => {
     void loadSites();
   }, [loadSites]);
   useEffect(() => {
     if (!selected || !environment) return;
+
     try {
       localStorage.setItem(`analytics-beer:site:${user.id}`, selected);
       localStorage.setItem(`analytics-beer:environment:${user.id}:${selected}`, environment.id);
     } catch {
       /* Storage may be unavailable in private browsing. */
     }
+
     setEnvironmentIds((current) =>
       current[selected] === environment.id ? current : { ...current, [selected]: environment.id },
     );
+
     if (!isAccount && (!params.siteId || !params.environmentId || !params.page)) {
       void navigate({
         to: siteRoute,
@@ -317,25 +350,30 @@ function Dashboard({
       });
     }
   }, [site, environment, panel, navigate]);
+
   function show(next: DashboardPage) {
     if (site && environment) go(site.id, environment.id, next);
   }
+
   const completeSetup = useCallback(() => {
     if (environment)
       setSetupStatus((current) =>
         current[environment.id] === true ? current : { ...current, [environment.id]: true },
       );
+
     try {
       if (localStorage.getItem(`analytics-beer:setup:${user.id}`) === selected)
         localStorage.removeItem(`analytics-beer:setup:${user.id}`);
     } catch {
       /* Optional resume preference. */
     }
+
     if (!usage.data?.onboardingCompleted)
       void apiClient('/onboarding/complete', write('POST', {}))
         .then(usage.refresh)
         .catch((error) => setError(errorText(error)));
   }, [user.id, usage.data?.onboardingCompleted, usage.refresh, selected, environment?.id]);
+
   function accountDeleted() {
     try {
       const exact = [
@@ -343,17 +381,21 @@ function Dashboard({
         `folks:site:${user.id}`,
         `analytics-beer:setup:${user.id}`,
       ];
+
       for (const key of Object.keys(localStorage))
         if (exact.includes(key) || key.startsWith(`analytics-beer:environment:${user.id}:`))
           localStorage.removeItem(key);
     } catch {
       /* Browser preferences are optional. */
     }
+
     void navigate({ to: '/signin', replace: true });
     onSignedOut();
   }
+
   async function signout() {
     setSigningOut(true);
+
     try {
       await apiClient('/auth/sign-out', write('POST', {}));
       void navigate({ to: '/signin', replace: true });
@@ -364,6 +406,7 @@ function Dashboard({
       setSigningOut(false);
     }
   }
+
   return (
     <>
       <a
@@ -540,6 +583,7 @@ function Dashboard({
                 onDeleted={() => {
                   setSites((items) => items.filter((value) => value.id !== site.id));
                   const remaining = sites.find((value) => value.id !== site.id);
+
                   if (remaining)
                     go(
                       remaining.id,
@@ -577,6 +621,7 @@ function Dashboard({
             } catch {
               /* Setup remains accessible from navigation. */
             }
+
             go(site.id, site.id, 'setup');
           } else go(site.id, site.id, 'installation');
         }}
@@ -620,38 +665,47 @@ function Overview({
   initialRange?: { from?: string; to?: string };
 }) {
   const { message: messageText, number, dateLabel, dateTime, t, dark } = useSitePreferences();
+
   const [days, setDays] = useState(initialRange?.from && initialRange?.to ? 'custom' : '30'),
     [metric, setMetric] = useState<Metric>('pageviews'),
     [reports, setReports] = useState<OverviewReport | null>(null),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(true),
     [reload, setReload] = useState(0);
+
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [compare, setCompare] = useState(true);
   const filterQuery = new URLSearchParams(filters).toString();
   const today = new Date().toISOString().slice(0, 10);
+
   const [customFrom, setCustomFrom] = useState(initialRange?.from ?? today),
     [customTo, setCustomTo] = useState(initialRange?.to ?? today);
+
   const from =
     days === 'custom'
       ? customFrom
       : new Date(Date.parse(today) - (days === '24h' ? 1 : Number(days) - 1) * 86400000)
           .toISOString()
           .slice(0, 10);
+
   const to = days === 'custom' ? customTo : today;
+
   const rangeValid =
     !!from &&
     !!to &&
     from <= to &&
     to <= today &&
     (Date.parse(to) - Date.parse(from)) / 86400000 < 366;
+
   useEffect(() => {
     if (!rangeValid) {
       setReports(null);
       setError('Choose a range of up to 366 days, ending no later than today.');
       setLoading(false);
+
       return;
     }
+
     const controller = new AbortController();
     setLoading(true);
     setError('');
@@ -670,8 +724,10 @@ function Overview({
       .finally(() => {
         if (!controller.signal.aborted) setLoading(false);
       });
+
     return () => controller.abort();
   }, [site.id, environment.id, from, to, reload, rangeValid, onExpired, filterQuery, days]);
+
   const metrics = [
     { key: 'pageviews', name: 'Pageviews', caption: 'Every page opened' },
     {
@@ -685,6 +741,7 @@ function Overview({
       caption: 'Clicks and actions',
     },
   ] as const;
+
   return (
     <div>
       <div className="mb-6 flex flex-col items-stretch gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
@@ -827,6 +884,7 @@ function Overview({
                 setFilters((current) => {
                   const next = { ...current };
                   delete next[key];
+
                   return next;
                 })
               }
@@ -859,6 +917,7 @@ function Overview({
         <div className="grid grid-cols-3 gap-2 md:gap-3">
           {metrics.map((item) => {
             const selected = metric === item.key;
+
             return (
               <Hint key={item.key} content={t(item.caption)}>
                 <button
@@ -1084,6 +1143,7 @@ const cardTitleClass = 'text-[15px] leading-[1.4] font-medium tracking-[-0.02em]
 /** Row width as a share of the largest count, so every list is read at a glance. */
 function share(count: number, rows: { count: number }[]) {
   const max = Math.max(...rows.map((row) => row.count), 0);
+
   return max > 0 ? Math.max((count / max) * 100, 2) : 0;
 }
 
@@ -1118,6 +1178,7 @@ function MetricDelta({ current, previous }: { current: number; previous: number 
       </span>
     );
   const change = Math.round((current / previous - 1) * 1000) / 10;
+
   return (
     <span
       className={`block text-[11px] tabular-nums md:text-xs ${change > 0 ? 'text-success' : change < 0 ? 'text-danger' : 'text-secondary-ink'}`}
@@ -1146,6 +1207,7 @@ function BreakdownCard({
   onSelect?: (value: string) => void;
 }) {
   const { locale, number, t } = useSitePreferences();
+
   return (
     <section className={cardClass}>
       <h2 className={cardTitleClass}>{title}</h2>
@@ -1179,6 +1241,7 @@ function BreakdownCard({
               : countries
                 ? t('Unknown')
                 : t('Direct / none');
+
             return (
               <MeterRow
                 key={item.value}

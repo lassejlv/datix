@@ -2,10 +2,12 @@ import { defaultTrackingSettings } from '../../src/lib/tracking-settings';
 import { expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
+
 const source = readFileSync(
   process.env.TRACKER_TEST_FILE ?? new URL('../../public/tracker.js', import.meta.url),
   'utf8',
 );
+
 function tracker({
   env = 'environment',
   shared = new Map<string, { value: string; expires: number }>(),
@@ -32,10 +34,13 @@ function tracker({
     timers: Function[] = [],
     intervals: Function[] = [],
     writes: string[] = [];
+
   let reads = 0,
     storageReads = 0;
+
   const listeners: Record<string, Function> = {};
   const window: any = unset ? {} : { analyticsBeerConsent: saved };
+
   const document: any = {
     currentScript: {
       src: 'https://analytics.example/tracker.js',
@@ -53,9 +58,11 @@ function tracker({
     visibilityState: 'visible',
     addEventListener() {},
   };
+
   Object.defineProperty(document, 'cookie', {
     get() {
       reads++;
+
       return [...shared]
         .filter(([, c]) => c.expires > now)
         .map(([k, c]) => `${k}=${c.value}`)
@@ -95,6 +102,7 @@ function tracker({
       getItem: (key: string) => {
         storageReads++;
         if (blocked) throw Error('blocked');
+
         return local.get(key) ?? null;
       },
       setItem: (key: string, value: string) => {
@@ -116,9 +124,11 @@ function tracker({
           json: async () => ({ enabled: true, settings: defaultTrackingSettings }),
         };
       requests.push(JSON.parse(options.body));
+
       return { status, json: async () => ({ accepted: true }) };
     },
   });
+
   return {
     window,
     requests,
@@ -136,6 +146,7 @@ function tracker({
     intervals,
   };
 }
+
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 test('session mode tracks without consent wiring, because the site gates the snippet itself', async () => {
   const t = tracker({ unset: true });

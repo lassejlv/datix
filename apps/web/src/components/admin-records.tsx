@@ -41,23 +41,28 @@ function useDirectory<Row>(
 ) {
   const path = adminListPath(resource, { search, status, limit: PAGE_SIZE });
   const page = useAdminResource<Record<string, Row[]> & { nextCursor: string | null }>(path);
+
   const [appended, setAppended] = useState<{
     key: string;
     rows: Row[];
     cursor: string | null;
   } | null>(null);
+
   const [loadingMore, setLoadingMore] = useState(false);
   // Appended pages belong to one request; a new filter or reload discards them by key.
   const active = appended?.key === page.key ? appended : null;
   const rows = [...((page.data?.[key] as Row[] | undefined) ?? []), ...(active?.rows ?? [])];
   const cursor = active ? active.cursor : (page.data?.nextCursor ?? null);
+
   async function loadMore() {
     if (!cursor || loadingMore) return;
     setLoadingMore(true);
+
     try {
       const next = await apiClient<Record<string, Row[]> & { nextCursor: string | null }>(
         adminListPath(resource, { search, status, cursor, limit: PAGE_SIZE }),
       );
+
       setAppended({
         key: page.key,
         rows: [...(active?.rows ?? []), ...((next[key] as Row[] | undefined) ?? [])],
@@ -69,6 +74,7 @@ function useDirectory<Row>(
       setLoadingMore(false);
     }
   }
+
   return { ...page, rows, cursor, loadingMore, loadMore };
 }
 
@@ -89,6 +95,7 @@ function DirectoryToolbar({
 }) {
   const { t } = useSitePreferences();
   const names = { all: t('All'), active: t('Active'), suspended: t('Suspended') } as const;
+
   return (
     <div className="mb-4 flex flex-wrap items-center gap-3">
       <div className="relative min-w-[220px] flex-1">
@@ -212,6 +219,7 @@ function SuspensionNotice({
 }) {
   const { dateTime, t } = useSitePreferences();
   if (!reason) return null;
+
   return (
     <Alert variant="warning" className="mb-5 text-sm">
       <p className="font-medium">{t('Suspended')}</p>
@@ -250,6 +258,7 @@ function SuspensionDialog({
   onSubmit: (reason: string) => void;
 }) {
   const { message: messageText, t } = useSitePreferences();
+
   return (
     <Dialog
       open={open}
@@ -321,20 +330,24 @@ function useSuspension<Detail>(path: string, onUpdated: (detail: Detail) => void
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [reason, setReason] = useState('');
+
   // Opening clears the previous attempt here rather than from an effect on `open`.
   function start() {
     setReason('');
     setError('');
     setOpen(true);
   }
+
   async function submit(suspended: boolean, reason: string) {
     setBusy(true);
     setError('');
+
     try {
       const detail = await apiClient<Detail>(
         path,
         write('PATCH', suspended ? { suspended: true, reason } : { suspended: false }),
       );
+
       onUpdated(detail);
       setOpen(false);
     } catch (cause) {
@@ -343,6 +356,7 @@ function useSuspension<Detail>(path: string, onUpdated: (detail: Detail) => void
       setBusy(false);
     }
   }
+
   return { open, setOpen, start, busy, error, reason, setReason, submit };
 }
 
@@ -355,6 +369,7 @@ export function AdminUsers() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     timer.current = setTimeout(() => setSearch(input), 300);
+
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
@@ -370,6 +385,7 @@ export function AdminUsers() {
         }}
       />
     );
+
   return (
     <>
       <DirectoryToolbar
@@ -424,11 +440,14 @@ export function AdminUsers() {
 function AdminUserDetailView({ id, onBack }: { id: string; onBack: () => void }) {
   const { dateTime, number, t } = useSitePreferences();
   const detail = useAdminResource<AdminUserDetail>(`/admin/users/${id}`);
+
   const suspension = useSuspension<AdminUserDetail>(`/admin/users/${id}`, (updated) => {
     detail.setData(updated);
     toast.success(updated.user.suspended ? t('Account suspended.') : t('Account restored.'));
   });
+
   const user = detail.data?.user;
+
   return (
     <>
       <DetailHeader
@@ -521,6 +540,7 @@ export function AdminSites() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     timer.current = setTimeout(() => setSearch(input), 300);
+
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
@@ -536,6 +556,7 @@ export function AdminSites() {
         }}
       />
     );
+
   return (
     <>
       <DirectoryToolbar
@@ -560,6 +581,7 @@ export function AdminSites() {
           >
             {directory.rows.map((row) => {
               const source = suspensionSource(row);
+
               return (
                 <RecordRow
                   key={row.id}
@@ -594,11 +616,14 @@ export function AdminSites() {
 function AdminSiteDetailView({ id, onBack }: { id: string; onBack: () => void }) {
   const { dateTime, number, t } = useSitePreferences();
   const detail = useAdminResource<AdminSiteDetail>(`/admin/sites/${id}`);
+
   const suspension = useSuspension<AdminSiteDetail>(`/admin/sites/${id}`, (updated) => {
     detail.setData(updated);
     toast.success(updated.site.suspended ? t('Website suspended.') : t('Website restored.'));
   });
+
   const site = detail.data?.site;
+
   return (
     <>
       <DetailHeader

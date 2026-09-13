@@ -22,16 +22,19 @@ test('Plausible ZIP preserves counts and removes sensitive path query strings', 
     'imported_visitors.csv': strToU8(daily),
     'imported_pages.csv': strToU8('date,page,pageviews\n2026-09-01,/hello?secret=private,4\n'),
   });
+
   const value = parse('plausible', 'export.zip', data);
   expect(value.days[0]).toEqual({ day: '2026-09-01', pageviews: 4, visitors: 3, custom: 0 });
   expect(value.breakdowns[0]?.value).toBe('/hello');
   const corrupt = data.slice();
   const view = new DataView(corrupt.buffer);
+
   for (let i = 0; i < corrupt.length - 4; i++)
     if (view.getUint32(i, true) === 0x02014b50) {
       corrupt[i + 16] ^= 1;
       break;
     }
+
   expect(() => parse('plausible', 'export.zip', corrupt)).toThrow();
   expect(() =>
     parse('plausible', 'export.zip', zipSync({ '../imported_visitors.csv': strToU8(daily) })),
@@ -69,6 +72,7 @@ test('diagnostics remove URL secrets and email addresses', () => {
     'Failure at https://example.com/a?token=secret#fragment for person@example.com',
     500,
   );
+
   expect(value).not.toContain('token');
   expect(value).not.toContain('person@example.com');
   expect(value).toContain('https://example.com/a');
@@ -79,14 +83,17 @@ test('webhooks authenticate exact bytes and reject stale or forged signatures', 
     body = '{"type":"customer.state_changed"}',
     timestamp = String(Math.floor(Date.now() / 1000)),
     id = 'event-123';
+
   const signature = createHmac('sha256', secret)
     .update(`${id}.${timestamp}.${body}`)
     .digest('base64');
+
   const headers = new Headers({
     'webhook-id': id,
     'webhook-timestamp': timestamp,
     'webhook-signature': 'v1,' + signature,
   });
+
   expect(verifyWebhook(headers, body, 'whsec_' + secret.toString('base64'))).toBe(id);
   expect(() => verifyWebhook(headers, body + ' ', secret.toString('base64'))).toThrow();
   headers.set('webhook-timestamp', '1');

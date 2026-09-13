@@ -1,15 +1,18 @@
 import { useSitePreferences } from '../components/site-preferences';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
+
 const AnalyticsApp = lazy(() =>
   import('../components/dashboard').then((module) => ({ default: module.AnalyticsApp })),
 );
+
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
 });
 
 function AppLayout() {
   const { t } = useSitePreferences();
+
   return (
     <>
       <Suspense

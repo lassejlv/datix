@@ -12,6 +12,7 @@ describe('Polar pricing', () => {
     expect(billingCurrency()).toBe('usd');
     expect(billingPlans.map((p) => p.price)).toEqual([9, 49, 149]);
     expect(billingPlans.map((p) => p.yearlyPrice)).toEqual([90, 490, 1490]);
+
     for (const locale of ['en', 'da', 'de']) {
       for (const plan of billingPlans) {
         expect(billingPrice(plan, locale)).toContain('$');
@@ -22,6 +23,7 @@ describe('Polar pricing', () => {
   });
   test('monthly plans are selectable while annual draft prices remain previews', () => {
     expect(billingPlans.map((p) => p.events)).toEqual([15000, 500000, 5000000]);
+
     for (const plan of billingPlans) {
       expect(billingAvailable(plan)).toBe(true);
       expect(billingAvailable(plan, true)).toBe(false);

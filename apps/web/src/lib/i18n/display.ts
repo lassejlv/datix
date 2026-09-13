@@ -1,4 +1,5 @@
 import type { Translate } from './translations';
+
 export function deviceName(value: string, t: Translate): string {
   const labels = {
     desktop: 'Desktop',
@@ -6,5 +7,6 @@ export function deviceName(value: string, t: Translate): string {
     tablet: 'Tablet',
     unknown: 'Unknown device',
   } as const;
+
   return t(labels[value.toLowerCase() as keyof typeof labels] ?? 'Unknown device');
 }

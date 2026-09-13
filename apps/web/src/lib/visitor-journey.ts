@@ -1,6 +1,7 @@
 import { translate, type Copy } from './i18n/translations';
 import type { Locale } from './i18n/preferences';
 import type { ActivityDetails } from './session-tracking';
+
 export type Visit = {
   id: string;
   visitorKey: string;
@@ -15,6 +16,7 @@ export type Visit = {
   country: string;
   device: string;
 };
+
 export type Activity = {
   id: string;
   receivedAt: string;
@@ -29,6 +31,7 @@ export type Activity = {
   referrer: string;
   details: ActivityDetails;
 };
+
 export type VisitReport = {
   summary: {
     sessions: number;
@@ -41,12 +44,15 @@ export type VisitReport = {
   nextOffset: number;
   nextCursor?: string | null;
 };
+
 const animals = ['Robin', 'Rabbit', 'Cat', 'Fish', 'Squirrel', 'Turtle'] as const;
 const moods = ['Curious', 'Sunny', 'Gentle', 'Bright', 'Cosy', 'Little'] as const;
+
 export function visitorAlias(key: string, locale: Locale = 'en') {
   let hash = 0;
   for (const char of key) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0;
   const animal = animals[hash % animals.length]!;
+
   return {
     animal,
     name: translate(
@@ -55,10 +61,12 @@ export function visitorAlias(key: string, locale: Locale = 'en') {
     ),
   };
 }
+
 export const activeDuration = (seconds: number) =>
   seconds >= 60
     ? `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`
     : `${Math.floor(seconds)}s`;
+
 export const visitDate = (value: string) =>
   new Date(value).toLocaleString('en-GB', {
     month: 'short',
@@ -67,6 +75,7 @@ export const visitDate = (value: string) =>
     minute: '2-digit',
     timeZone: 'UTC',
   });
+
 export function activityTitle(event: Activity, locale: Locale = 'en') {
   switch (event.kind) {
     case 'pageview':

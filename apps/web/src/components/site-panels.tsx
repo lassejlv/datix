@@ -38,28 +38,35 @@ export function AddSiteDialog({
   onCreated: (site: Site) => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
+
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
+
   useEffect(() => {
     if (!open) setError('');
   }, [open]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError('');
     const form = new FormData(event.currentTarget);
     let domain = String(form.get('domain')).trim();
+
     try {
       if (domain.includes('://')) domain = new URL(domain).hostname;
     } catch {
       /* API validates invalid hostnames. */
     }
+
     domain = domain.replace(/\/$/, '');
+
     try {
       const result = await apiClient<{ site: Site }>(
         '/sites',
         write('POST', { name: form.get('name'), domain }),
       );
+
       toast.success(t('Website added.'));
       onCreated(result.site);
       onOpenChange(false);
@@ -69,6 +76,7 @@ export function AddSiteDialog({
       setBusy(false);
     }
   }
+
   return (
     <Dialog
       open={open}
@@ -147,6 +155,7 @@ export function Installation({
   onUpdated: (environment: SiteEnvironment) => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
+
   const [origin, setOrigin] = useState(''),
     [copied, setCopied] = useState(false),
     [agentCopied, setAgentCopied] = useState(false),
@@ -155,17 +164,21 @@ export function Installation({
     [message, setMessage] = useState(''),
     [receiving, setReceiving] = useState(false),
     [error, setError] = useState('');
+
   useEffect(() => setOrigin(location.origin), []);
   const code = `<script defer src="${origin}/tracker.js" data-site="${site.id}"${environment.id === site.id ? '' : ` data-environment="${environment.id}"`}${environment.trackingMode !== 'cookieless' ? ` data-mode="${environment.trackingMode}"` : ''}></script>`;
+
   async function check() {
     setBusy(true);
     setMessage('');
     setError('');
+
     try {
       const status = await apiClient<{
         receiving: boolean;
         lastReceivedAt: string | null;
       }>(`/sites/${site.id}/installation?environment=${environment.id}`);
+
       setReceiving(status.receiving);
       if (status.receiving) onConnected?.();
       setMessage(
@@ -179,15 +192,18 @@ export function Installation({
       setBusy(false);
     }
   }
+
   async function setLocalhost(allowLocalhost: boolean) {
     setBusy(true);
     setError('');
     setMessage('');
+
     try {
       const result = await apiClient<{ environment: SiteEnvironment }>(
         `/sites/${site.id}/environments/${environment.id}`,
         write('PATCH', { allowLocalhost }),
       );
+
       onUpdated(result.environment);
     } catch (error) {
       setError(errorText(error));
@@ -195,6 +211,7 @@ export function Installation({
       setBusy(false);
     }
   }
+
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
@@ -205,7 +222,9 @@ export function Installation({
       toast.error(t('Copy is unavailable in this browser. Select and copy the code below.'));
     }
   }
+
   const agentInstructions = agentInstallationInstructions(code, environment);
+
   async function copyAgent() {
     try {
       await navigator.clipboard.writeText(agentInstructions);
@@ -217,8 +236,10 @@ export function Installation({
       setAgentFallback(true);
     }
   }
+
   const ExtrasContainer = guided ? 'details' : 'div';
   const local = !!origin && new URL(origin).hostname === 'localhost';
+
   return (
     <div className={guided ? 'w-full' : 'max-w-[640px]'}>
       {!guided && (
@@ -443,6 +464,7 @@ function AccountUsageSection({
   children: (data: AccountUsage) => ReactNode;
 }) {
   const { message: messageText, t } = useSitePreferences();
+
   return (
     <>
       {usage.error && (
@@ -486,6 +508,7 @@ export function SiteSettings({
   onViewReport: (from: string, to: string) => void;
 }) {
   const { t, message: messageText } = useSitePreferences();
+
   const tabs: readonly SettingsTab[] = [
     'website',
     'environment',
@@ -495,9 +518,11 @@ export function SiteSettings({
     'usage',
     'billing',
   ];
+
   const [tab, setTab] = useState<SettingsTab>(
     tabs.includes(initialTab as SettingsTab) ? (initialTab as SettingsTab) : 'website',
   );
+
   const labels: Record<SettingsTab, string> = {
     website: t('Website'),
     environment: t('Environment'),
@@ -507,14 +532,18 @@ export function SiteSettings({
     usage: t('Usage'),
     billing: t('Billing'),
   };
+
   const [name, setName] = useState(site.name);
+
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [deleting, setDeleting] = useState(false),
     [confirm, setConfirm] = useState('');
+
   async function update(value: Partial<Site>) {
     setBusy(true);
     setError('');
+
     try {
       const result = await apiClient<{ site: Site }>(`/sites/${site.id}`, write('PATCH', value));
       onUpdated(result.site);
@@ -525,9 +554,11 @@ export function SiteSettings({
       setBusy(false);
     }
   }
+
   async function remove() {
     setBusy(true);
     setError('');
+
     try {
       await apiClient(`/sites/${site.id}`, { method: 'DELETE' });
       setDeleting(false);
@@ -539,6 +570,7 @@ export function SiteSettings({
       setBusy(false);
     }
   }
+
   return (
     <div className="max-w-[600px]">
       <div className="mb-6">

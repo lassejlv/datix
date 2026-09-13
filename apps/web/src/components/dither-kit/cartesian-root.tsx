@@ -57,6 +57,7 @@ export type CartesianChartProps<TData extends Row> = {
 /** Which render layer a composed part targets — defaults to the front SVG. */
 function layerOf(node: ReactNode): 'back' | 'dom' | 'svg' {
   if (!isValidElement(node) || typeof node.type === 'string') return 'svg';
+
   return (node.type as { chartLayer?: 'back' | 'dom' }).chartLayer ?? 'svg';
 }
 
@@ -151,6 +152,7 @@ export function CartesianRoot<TData extends Row>({
                   if (!data.length) return;
                   const current = ctx.hoverIndex;
                   let index: number;
+
                   switch (event.key) {
                     case 'ArrowLeft':
                       index = current == null ? data.length - 1 : Math.max(0, current - 1);
@@ -168,10 +170,12 @@ export function CartesianRoot<TData extends Row>({
                       event.preventDefault();
                       ctx.setHoverIndex(null);
                       onHoverChange?.(null);
+
                       return;
                     default:
                       return;
                   }
+
                   event.preventDefault();
                   ctx.setHoverIndex(index);
                   ctx.setCursorX(margins.left + ctx.xCenter(index));

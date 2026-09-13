@@ -32,6 +32,7 @@ export function AccountAccess({
   async function signout() {
     setSigningOut(true);
     setError('');
+
     try {
       await apiClient('/auth/sign-out', write('POST', {}));
       onSignedOut();
@@ -91,6 +92,7 @@ export function AccountAccess({
 
 function PlanRequired({ refresh }: { refresh: () => void }) {
   const { t } = useSitePreferences();
+
   return (
     <section aria-labelledby="plan-required-title">
       <h1 id="plan-required-title" className="text-[22px] font-medium tracking-tight">
@@ -122,13 +124,16 @@ function AccountOnboarding({ user, onCompleted }: { user: User; onCompleted: () 
       .catch((error) => {
         if (!controller.signal.aborted) setError(errorText(error));
       });
+
     return () => controller.abort();
   }, [revision]);
   const site = sites?.[0];
   const environment = site?.environments.find((environment) => environment.id === site.id);
+
   async function complete() {
     setBusy(true);
     setError('');
+
     try {
       await apiClient('/onboarding/complete', write('POST', {}));
       onCompleted();
@@ -138,6 +143,7 @@ function AccountOnboarding({ user, onCompleted }: { user: User; onCompleted: () 
       setBusy(false);
     }
   }
+
   return (
     <>
       {error && (

@@ -45,12 +45,14 @@ export function AdminPanel({ user, onExit }: { user: User; onExit: () => void })
         </Button>
       </main>
     );
+
   const items = [
     { value: 'overview', label: t('Overview') },
     { value: 'users', label: t('Accounts') },
     { value: 'sites', label: t('Websites') },
     { value: 'audit', label: t('Audit log') },
   ] as const;
+
   return (
     <div className="min-h-dvh bg-background text-foreground">
       <header className="border-b border-border">
@@ -120,6 +122,7 @@ function AdminOverview() {
   const { number, t } = useSitePreferences();
   const status = useAdminResource<AdminStatus>('/admin/status');
   const data = status.data;
+
   return (
     <AdminState error={status.error} loading={status.loading && !data} onRetry={status.reload}>
       {data && (
@@ -215,26 +218,32 @@ function AdminOverview() {
 
 function AdminAudit() {
   const { dateTime, number, t } = useSitePreferences();
+
   const first = useAdminResource<{ entries: AdminAuditEntry[]; nextCursor: number | null }>(
     adminAuditPath({ limit: PAGE_SIZE }),
   );
+
   const [appended, setAppended] = useState<{
     key: string;
     entries: AdminAuditEntry[];
     cursor: number | null;
   } | null>(null);
+
   const [loadingMore, setLoadingMore] = useState(false);
   // A reload restarts the log, so previously appended pages are dropped with it.
   const active = appended?.key === first.key ? appended : null;
   const entries = [...(first.data?.entries ?? []), ...(active?.entries ?? [])];
   const cursor = active ? active.cursor : (first.data?.nextCursor ?? null);
+
   async function loadMore() {
     if (cursor === null || loadingMore) return;
     setLoadingMore(true);
+
     try {
       const next = await apiClient<{ entries: AdminAuditEntry[]; nextCursor: number | null }>(
         adminAuditPath({ cursor: String(cursor), limit: PAGE_SIZE }),
       );
+
       setAppended({
         key: first.key,
         entries: [...(active?.entries ?? []), ...next.entries],
@@ -246,6 +255,7 @@ function AdminAudit() {
       setLoadingMore(false);
     }
   }
+
   return (
     <AdminState error={first.error} loading={first.loading} onRetry={first.reload}>
       {entries.length === 0 ? (
@@ -255,6 +265,7 @@ function AdminAudit() {
           {entries.map((entry) => {
             const copy = auditActionCopy(entry.action);
             const revoked = revokedSessions(entry);
+
             return (
               <li key={entry.id} className="px-4 py-3.5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">

@@ -8,8 +8,10 @@ export class ApiError extends Schema.TaggedError<ApiError>()('ApiError', {
 
 export const invalid = (message = 'Invalid request.') =>
   new ApiError({ status: 400, code: 'invalid_request', message });
+
 export const unavailable = () =>
   new ApiError({ status: 503, code: 'unavailable', message: 'Service temporarily unavailable.' });
+
 export const attempt = <A>(run: () => PromiseLike<A>) =>
   Effect.tryPromise({
     try: run,
@@ -20,6 +22,7 @@ export const attempt = <A>(run: () => PromiseLike<A>) =>
         name: failure?.name,
         code: failure?.code,
       });
+
       return unavailable();
     },
   });

@@ -16,6 +16,7 @@ export function AccountPage({
   onDeleted: () => void;
 }) {
   const { t } = useSitePreferences();
+
   return (
     <div className="max-w-[600px]">
       <h1 className="text-2xl font-medium">{t('Account settings')}</h1>
@@ -46,11 +47,13 @@ function AccountForm({
   const [passwordError, setPasswordError] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
+
   async function saveProfile(event: FormEvent) {
     event.preventDefault();
     if (busy || !name.trim()) return;
     setBusy('profile');
     setProfileError('');
+
     try {
       await apiClient('/auth/update-user', write('POST', { name: name.trim() }));
       onUpdated({ ...user, name: name.trim() });
@@ -61,15 +64,20 @@ function AccountForm({
       setBusy(null);
     }
   }
+
   async function savePassword(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
     setPasswordError('');
+
     if (newPassword !== confirmation) {
       setPasswordError('The new passwords do not match.');
+
       return;
     }
+
     setBusy('password');
+
     try {
       await apiClient(
         '/auth/change-password',
@@ -85,16 +93,19 @@ function AccountForm({
       setBusy(null);
     }
   }
+
   async function deleteAccount(event: FormEvent) {
     event.preventDefault();
     if (busy) return;
     setBusy('delete');
     setDeleteError('');
+
     try {
       const result = await apiClient<{ success: boolean }>(
         '/auth/delete-user',
         write('POST', { password: deletePassword }),
       );
+
       if (!result.success) throw new Error('Account deletion could not be completed.');
       toast.success(t('Account deleted.'));
       onDeleted();
@@ -104,7 +115,9 @@ function AccountForm({
       setBusy(null);
     }
   }
+
   const fieldClass = 'flex flex-col gap-1.5 text-sm';
+
   return (
     <div>
       <section

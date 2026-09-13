@@ -32,12 +32,16 @@ export function JourneyFlow({ events, hasMore }: { events: Activity[]; hasMore: 
   const stops = journeyStops(events);
   const pages = events.filter((event) => event.kind === 'pageview').length;
   const selected = events.find((event) => event.id === selectedId);
+
   function node(event: Activity, first = false) {
     const Icon = icons[event.kind as keyof typeof icons] ?? Sparkles;
     const passive = event.kind === 'scroll' || event.kind === 'engagement';
+
     const tone =
       event.kind === 'pageview' ? (first ? 'entry' : 'page') : passive ? 'passive' : 'action';
+
     const label = event.kind === 'pageview' ? event.path : activityTitle(event, locale);
+
     return (
       <Hint content={`${label} · ${new Date(event.occurredAt).toISOString().slice(11, 19)} UTC`}>
         <button
@@ -54,8 +58,10 @@ export function JourneyFlow({ events, hasMore }: { events: Activity[]; hasMore: 
       </Hint>
     );
   }
+
   function detail(event: Activity) {
     if (selected?.id !== event.id) return null;
+
     return (
       <div id={`journey-event-${event.id}`} className="journey-detail">
         <p className="font-medium text-foreground">{activityTitle(event, locale)}</p>
@@ -81,6 +87,7 @@ export function JourneyFlow({ events, hasMore }: { events: Activity[]; hasMore: 
       </div>
     );
   }
+
   return (
     <div className="journey-flow">
       <dl className="journey-summary">

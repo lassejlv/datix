@@ -11,6 +11,7 @@ import { attempt, unavailable } from '../shared/errors';
 export function createResources(config: Config = readConfig()) {
   const databaseUrl = new URL(config.DATABASE_URL);
   databaseUrl.searchParams.set('options', '-c timezone=UTC');
+
   const sql = new SQL(databaseUrl.toString(), {
     max: config.maxConnections,
     prepare: false,
@@ -20,8 +21,10 @@ export function createResources(config: Config = readConfig()) {
       application_name: 'datix',
     },
   });
+
   const redis = redisConnection(config.REDIS_URL);
   const queueConnection = createBunRedisClient(new RedisClient(config.REDIS_URL));
+
   const queue = new Queue('ingestion', {
     connection: queueConnection,
     prefix: config.queuePrefix,
@@ -32,7 +35,9 @@ export function createResources(config: Config = readConfig()) {
       removeOnFail: 5000,
     },
   });
+
   queue.on('error', () => console.error('Queue connection error'));
+
   const storage = process.env.S3_BUCKET
     ? new S3Client({
         bucket: process.env.S3_BUCKET,
@@ -42,6 +47,7 @@ export function createResources(config: Config = readConfig()) {
         region: process.env.S3_REGION,
       })
     : undefined;
+
   return {
     config,
     sql,
@@ -59,7 +65,9 @@ export function createResources(config: Config = readConfig()) {
     },
   };
 }
+
 export type Resources = ReturnType<typeof createResources>;
+
 export class Infrastructure extends Context.Service<Infrastructure, Resources>()(
   '@datix/api/platform/Infrastructure',
 ) {
@@ -69,14 +77,17 @@ export class Infrastructure extends Context.Service<Infrastructure, Resources>()
       const r = yield* Effect.acquireRelease(Effect.sync(createResources), (r) =>
         Effect.promise(() => r.close()),
       );
+
       yield* attempt(() => checkSchema(r));
       yield* attempt(() =>
         Promise.all([r.sql`SELECT 1`, r.redis.send('PING', []), r.queue.waitUntilReady()]),
       );
+
       return r;
     }),
   );
 }
+
 export const readiness = Effect.fn('readiness')(function* () {
   const r = yield* Infrastructure;
   if (r.workerHealthy && !r.workerHealthy()) return yield* unavailable();
@@ -88,5 +99,6 @@ export const readiness = Effect.fn('readiness')(function* () {
     ],
     { concurrency: 'unbounded' },
   );
+
   return { status: 'ok', runtime: 'bun', service: 'app', role: r.config.role };
 });

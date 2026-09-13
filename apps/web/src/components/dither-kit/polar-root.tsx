@@ -23,6 +23,7 @@ const DEFAULT_POLAR_MARGINS: Margins = {
 
 function layerOf(node: ReactNode): 'back' | 'dom' | 'svg' {
   if (!isValidElement(node) || typeof node.type === 'string') return 'svg';
+
   return (node.type as { chartLayer?: 'back' | 'dom' }).chartLayer ?? 'svg';
 }
 
@@ -109,6 +110,7 @@ export function PolarRoot<TData extends Row>({
     const dy = clientY - rect.top - margins.top - ctx.center.y;
     const angle = Math.atan2(dy, dx);
     const r = Math.hypot(dx, dy);
+
     if (chartType === 'pie' && ctx.pie) {
       const inside = r <= ctx.outerRadius && r >= ctx.innerRadius;
       const i = inside ? sliceAtAngle(ctx.pie, angle) : -1;
@@ -116,6 +118,7 @@ export function PolarRoot<TData extends Row>({
     } else if (ctx.radar) {
       ctx.setHoverIndex(axisAtAngle(ctx.radar.axes, angle));
     }
+
     ctx.setCursor(clientX - rect.left, clientY - rect.top);
   };
 

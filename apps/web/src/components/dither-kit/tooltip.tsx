@@ -29,8 +29,10 @@ export function Tooltip({
 }) {
   const chart = useCommonChart();
   const [bounds, setBounds] = useState({ width: 0, container: 0 });
+
   const measureTooltip = useCallback((node: HTMLDivElement | null) => {
     if (!node) return;
+
     const measure = () => {
       const width = node.offsetWidth;
       const container = node.parentElement?.clientWidth ?? 0;
@@ -40,26 +42,32 @@ export function Tooltip({
           : { width, container },
       );
     };
+
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     if (node.parentElement) observer.observe(node.parentElement);
     measure();
+
     return () => observer.disconnect();
   }, []);
+
   const left = bounds.container
     ? Math.max(
         bounds.width / 2 + 4,
         Math.min(bounds.container - bounds.width / 2 - 4, chart.tooltipLeft),
       )
     : chart.tooltipLeft;
+
   const show = chart.ready && chart.hoverIndex != null;
 
   // Retain the last hovered index so the card keeps its content while fading
   // out — adjust-state-during-render (no refs in render).
   const [lastIndex, setLastIndex] = useState(0);
+
   if (chart.hoverIndex != null && chart.hoverIndex !== lastIndex) {
     setLastIndex(chart.hoverIndex);
   }
+
   const index = chart.hoverIndex ?? lastIndex;
 
   const heading = chart.heading(index, labelKey);

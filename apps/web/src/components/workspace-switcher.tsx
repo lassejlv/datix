@@ -45,6 +45,7 @@ export function WorkspaceSwitcher({
 }) {
   const { t } = useSitePreferences();
   const [open, setOpen] = useState(false);
+
   const groups: Group[] = sites.map((site) => ({
     siteId: site.id,
     name: site.name,
@@ -58,14 +59,17 @@ export function WorkspaceSwitcher({
       environmentName: environment.name,
     })),
   }));
+
   const selected =
     groups
       .flatMap((group) => group.items)
       .find((item) => item.siteId === siteId && item.environmentId === environmentId) ?? null;
+
   const close = (add: () => void) => {
     setOpen(false);
     add();
   };
+
   return (
     <Combobox
       items={groups}

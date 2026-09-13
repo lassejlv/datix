@@ -2,6 +2,7 @@ import { Effect, Clock } from 'effect';
 import { removeArchive, removeEnvironmentArchives } from '../platform/storage';
 import { Infrastructure } from '../platform/resources';
 import { attempt } from '../shared/errors';
+
 const analyticsTables = [
   ['imported_breakdowns', 'environment_id', 'day < current_date-729'],
   [
@@ -21,6 +22,7 @@ const analyticsTables = [
   ['daily_visitors', 'site_id', 'day < current_date-729'],
   ['daily_stats', 'site_id', 'day < current_date-729'],
 ] as const;
+
 const primaryTables = [
   ['error_resolutions', "resolved_at < now()-interval '30 days'"],
   ['ingestion_receipts', "state<>'pending' AND created_at < now()-interval '731 days'"],
@@ -30,30 +32,39 @@ const primaryTables = [
   ['abuse_sources', "updated_at < now()-interval '2 days'"],
   ['abuse_daily', 'day < current_date-90'],
 ] as const;
+
 /** Commits each bounded analytics deletion; a failure leaves the primary tombstone retryable. */
 export const cleanDeletedEnvironments = Effect.fn('cleanDeletedEnvironments')(function* () {
   const r = yield* Infrastructure;
   const deadline = (yield* Clock.currentTimeMillis) + 8000;
+
   const rows = yield* attempt(
     () => r.primary`SELECT environment_id FROM analytics_deletions ORDER BY created_at LIMIT 16`,
   );
+
   for (const row of rows) {
     if ((yield* Clock.currentTimeMillis) > deadline) return;
     yield* attempt(() =>
       r.primary.begin(async (tx) => {
         const present =
           await tx`SELECT environment_id FROM analytics_deletions WHERE environment_id=${row.environment_id}::uuid FOR UPDATE SKIP LOCKED`;
+
         if (!present.length) return;
+
         for (const [table, column] of analyticsTables) {
           if (Date.now() > deadline) return;
+
           const deleted = await tx.unsafe(
             `DELETE FROM ${table} WHERE (tableoid,ctid) IN(SELECT tableoid,ctid FROM ${table} WHERE ${column}=$1 LIMIT 5000) RETURNING 1`,
             [row.environment_id],
           );
+
           if (deleted.length === 5000) return;
         }
+
         const receipts =
           await tx`DELETE FROM ingestion_receipts WHERE ctid IN(SELECT ctid FROM ingestion_receipts WHERE environment_id=${row.environment_id}::uuid LIMIT 5000) RETURNING 1`;
+
         if (receipts.length === 5000) return;
         await removeEnvironmentArchives(r, row.environment_id);
         await tx`DELETE FROM analytics_deletions WHERE environment_id=${row.environment_id}::uuid`;
@@ -61,13 +72,16 @@ export const cleanDeletedEnvironments = Effect.fn('cleanDeletedEnvironments')(fu
     );
   }
 });
+
 export const retain = Effect.fn('retain')(function* () {
   const r = yield* Infrastructure;
+
   // Archives expire when their first day leaves retention, including mixed-age imports.
   const expired = yield* attempt(
     () =>
       r.analytics`SELECT id,environment_id FROM analytics_imports WHERE (summary->>'from')::date<current_date-729 AND NOT coalesce((summary->>'archiveDeleted')::boolean,false) ORDER BY created_at LIMIT 50`,
   );
+
   for (const row of expired) {
     yield* attempt(() => removeArchive(r, row.environment_id, row.id));
     yield* attempt(
@@ -75,6 +89,7 @@ export const retain = Effect.fn('retain')(function* () {
         r.analytics`UPDATE analytics_imports SET summary=summary||'{"archiveDeleted":true}'::jsonb WHERE id=${row.id}::uuid`,
     );
   }
+
   yield* attempt(() => r.sql`SELECT public.datix_retention()`);
   for (const [table, , predicate] of analyticsTables.filter(([name]) =>
     ['analytics_imports', 'imported_daily_stats', 'imported_breakdowns'].includes(name),

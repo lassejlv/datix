@@ -7,5 +7,6 @@ export function createRuntime() {
   const application = Layer.merge(Auth.layer, WorkersLive).pipe(
     Layer.provideMerge(Infrastructure.layer),
   );
+
   return ManagedRuntime.make(application);
 }

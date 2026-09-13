@@ -13,6 +13,7 @@ export const toast = {
     // behavior). Fresh auto id: a fixed id would merge into / race the
     // just-dismissed entry instead of prepending.
     sonnerToast.dismiss();
+
     return sonnerToast.error(title, { duration: 8000 });
   },
   info: (title: string) => sonnerToast.info(title),
@@ -31,6 +32,7 @@ function ToastBadge({ children }: { children: ReactNode }) {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const { t, theme } = useSitePreferences();
+
   return (
     <>
       {children}

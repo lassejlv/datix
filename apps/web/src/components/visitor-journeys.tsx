@@ -43,6 +43,7 @@ function VisitorAvatar({ large = false }: { large?: boolean }) {
     </span>
   );
 }
+
 export function VisitorJourneys({
   siteId,
   environment,
@@ -53,13 +54,17 @@ export function VisitorJourneys({
   onInstall: () => void;
 }) {
   const { locale, t } = useSitePreferences();
+
   const [days, setDays] = useState('7'),
     [reload, setReload] = useState(0),
     [visitor, setVisitor] = useState<string | null>(null);
+
   const today = new Date().toISOString().slice(0, 10);
+
   const from = new Date(Date.parse(today) - (Number(days) - 1) * 86400000)
     .toISOString()
     .slice(0, 10);
+
   return (
     <div>
       <header className="mb-5 flex flex-wrap items-start justify-between gap-5">
@@ -123,6 +128,7 @@ export function VisitorJourneys({
     </div>
   );
 }
+
 function VisitExplorer({
   siteId,
   environment,
@@ -141,11 +147,13 @@ function VisitExplorer({
   onVisitorChange: (key: string) => void;
 }) {
   const { message: messageText, number, locale, dateTime, t } = useSitePreferences();
+
   const [report, setReport] = useState<VisitReport | null>(null),
     [selected, setSelected] = useState<Visit | null>(null),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [retry, setRetry] = useState(0);
+
   const requests = useRef<AbortController | null>(null);
   const query = `environment=${environment.id}&from=${from}&to=${to}${visitor ? `&visitor=${visitor}` : ''}`;
   const previousVisit = useRef<string | null>(null);
@@ -165,18 +173,22 @@ function VisitExplorer({
       .catch((e) => {
         if (!controller.signal.aborted) setError(errorText(e));
       });
+
     return () => controller.abort();
   }, [siteId, query, retry]);
+
   async function more() {
     if (!report || busy) return;
     setBusy(true);
     setError('');
     const signal = requests.current?.signal;
+
     try {
       const next = await apiClient<VisitReport>(
         `/sites/${siteId}/sessions?${query}&${report.nextCursor ? `cursor=${encodeURIComponent(report.nextCursor)}` : `offset=${report.nextOffset}`}`,
         { signal },
       );
+
       if (!signal?.aborted)
         setReport((current) => ({
           ...next,
@@ -188,6 +200,7 @@ function VisitExplorer({
       if (!signal?.aborted) setBusy(false);
     }
   }
+
   const recover = (
     <Alert className="mb-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -204,6 +217,7 @@ function VisitExplorer({
       </div>
     </Alert>
   );
+
   if (!report)
     return error ? (
       recover
@@ -214,6 +228,7 @@ function VisitExplorer({
         ))}
       </div>
     );
+
   return (
     <>
       {!selected && (
@@ -340,6 +355,7 @@ function VisitExplorer({
     </>
   );
 }
+
 const eventIcons = {
   pageview: FileText,
   click: MousePointer2,
@@ -350,6 +366,7 @@ const eventIcons = {
   custom: Sparkles,
   engagement: Clock3,
 };
+
 function JourneyTimeline({
   visit,
   siteId,
@@ -364,6 +381,7 @@ function JourneyTimeline({
   onVisitorHistory?: () => void;
 }) {
   const { locale, dateTime, message: messageText, t } = useSitePreferences();
+
   const [events, setEvents] = useState<Activity[]>([]),
     [hasMore, setHasMore] = useState(false),
     [offset, setOffset] = useState(0),
@@ -371,6 +389,7 @@ function JourneyTimeline({
     [busy, setBusy] = useState(true),
     [error, setError] = useState(''),
     [retry, setRetry] = useState(0);
+
   const controller = useRef<AbortController | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
@@ -400,12 +419,15 @@ function JourneyTimeline({
       .finally(() => {
         if (!request.signal.aborted) setBusy(false);
       });
+
     return () => request.abort();
   }, [siteId, query, visit.id, retry]);
+
   async function more() {
     setBusy(true);
     setError('');
     const signal = controller.current?.signal;
+
     try {
       const result = await apiClient<{
         events: Activity[];
@@ -416,6 +438,7 @@ function JourneyTimeline({
         `/sites/${siteId}/sessions?${query}&session=${visit.id}&${cursor ? `cursor=${encodeURIComponent(cursor)}` : `offset=${offset}`}`,
         { signal },
       );
+
       if (!signal?.aborted) {
         setEvents((current) => [...current, ...result.events]);
         setHasMore(result.hasMore);
@@ -428,8 +451,10 @@ function JourneyTimeline({
       if (!signal?.aborted) setBusy(false);
     }
   }
+
   const [view, setView] = useState<'journey' | 'timeline'>('journey');
   const first = events[0];
+
   return (
     <section aria-label={t('Session timeline')} className="min-w-0 max-w-[800px]">
       <Button className="mb-5" variant="ghost" size="sm" onClick={onClose}>
@@ -506,6 +531,7 @@ function JourneyTimeline({
         <ol aria-label={t('Activity events')} className="mt-6 border-t border-border pt-3">
           {events.map((event) => {
             const Icon = eventIcons[event.kind as keyof typeof eventIcons] ?? Sparkles;
+
             return (
               <li key={event.id} className="relative flex gap-3 py-2.5">
                 <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center text-secondary-ink">

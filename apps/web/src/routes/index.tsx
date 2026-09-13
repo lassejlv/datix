@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { LandingPage } from '../components/landing-page';
 import { isDashboardPage, siteRoute } from '../lib/dashboard-route';
 import { landingSearchSchema } from '../lib/search-params';
+
 export const Route = createFileRoute('/')({
   validateSearch: landingSearchSchema,
   beforeLoad: ({ search }) => {

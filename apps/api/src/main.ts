@@ -3,10 +3,12 @@ import { Infrastructure } from './platform/resources';
 import { createRuntime } from './platform/runtime';
 
 const runtime = createRuntime();
+
 try {
   const resources = await runtime.runPromise(Infrastructure);
   const app = await createApp(runtime);
   let stopping = false;
+
   const server = Bun.serve({
     port: resources.config.port,
     hostname: '0.0.0.0',
@@ -20,9 +22,11 @@ try {
         )
       )
         return new Response(null, { status: 404 });
+
       return app.fetch(request, { ip: server.requestIP(request)?.address });
     },
   });
+
   async function shutdown() {
     if (stopping) return;
     stopping = true;
@@ -33,6 +37,7 @@ try {
     clearTimeout(timeout);
     process.exit(0);
   }
+
   process.once('SIGTERM', shutdown);
   process.once('SIGINT', shutdown);
   console.info(`Datix ${resources.config.role} listening on ${server.port}`);

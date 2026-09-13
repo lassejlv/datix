@@ -7,6 +7,7 @@ const tracker = readFileSync(
   process.env.TRACKER_TEST_FILE ?? new URL('../../public/tracker.js', import.meta.url),
   'utf8',
 );
+
 function run({
   features = { errors: false, webVitals: false },
   settings = defaultTrackingSettings,
@@ -37,17 +38,21 @@ function run({
   storageDisabled?: boolean;
 } = {}) {
   const listeners = new Map<string, (event: unknown) => void>();
+
   const logs: string[] = [],
     requests: string[] = [];
+
   const window = {} as {
     simpleAnalytics?: { track(name: string): void; consent(granted: boolean): void };
   };
+
   const location = {
     hostname,
     href: `http://${hostname}/test?secret=discard`,
     origin: `http://${hostname}`,
     pathname: '/test',
   };
+
   const history = {
     pushState(_state: unknown, _unused: string, path: string) {
       const url = new URL(path, location.href);
@@ -58,6 +63,7 @@ function run({
       this.pushState(_state, _unused, path);
     },
   };
+
   runInNewContext(tracker, {
     window,
     URL,
@@ -74,6 +80,7 @@ function run({
     sessionStorage: {
       getItem: (key: string) => {
         if (storageDisabled) throw new Error('blocked');
+
         return storage.get(key) ?? null;
       },
       setItem: (key: string, value: string) => {
@@ -107,9 +114,11 @@ function run({
       if (_endpoint.includes('/api/tracker-config'))
         return { status: configStatus, json: async () => ({ enabled: true, settings, features }) };
       requests.push(options.body);
+
       return { status, json: async () => ({ accepted: status === 202 }) };
     },
   });
+
   return {
     emit: (name: string, event: unknown) => listeners.get(name)?.(event),
     logs,
@@ -122,12 +131,16 @@ function run({
     navigate: (path: string) => history.pushState({}, '', path),
   };
 }
+
 const settle = () => new Promise((resolve) => setImmediate(resolve));
+
 async function readyRun(options?: Parameters<typeof run>[0]) {
   const result = run(options);
   await settle();
+
   return result;
 }
+
 test('tracker still respects Do Not Track even with GPC enabled', async () => {
   const result = run({ dnt: '1', gpc: true });
   await settle();
@@ -248,6 +261,7 @@ test('tracker blocks disabled activity, strips details, refreshes policy and fai
     dimensions: false,
     language: false,
   };
+
   const result = await readyRun({ settings });
   const page = JSON.parse(result.requests[0]!);
   expect(page.referrer).toBe('');
@@ -277,6 +291,7 @@ test('JavaScript error capture is opt-in, bounded, redacted and stops after cons
     lineno: 8,
     colno: 2,
   };
+
   const off = await readyRun();
   off.emit('error', event);
   await settle();
@@ -287,9 +302,11 @@ test('JavaScript error capture is opt-in, bounded, redacted and stops after cons
   on.emit('error', event);
   on.emit('error', event);
   await settle();
+
   const rows = on.requests
     .map((value) => JSON.parse(value))
     .filter((value) => value.kind === 'error');
+
   expect(rows).toHaveLength(1);
   expect(rows[0].payload.message).toBe('Failure for [redacted]');
   expect(JSON.stringify(rows)).not.toContain('token=secret');

@@ -23,5 +23,6 @@ export const metricInk = (metric: Metric, dark: boolean): MetricInk =>
 
 export function metricColor(metric: Metric, dark: boolean, alpha = 1): string {
   const [r, g, b] = metricInk(metric, dark);
+
   return alpha === 1 ? `rgb(${r} ${g} ${b})` : `rgb(${r} ${g} ${b} / ${alpha})`;
 }

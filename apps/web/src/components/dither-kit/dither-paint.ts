@@ -11,11 +11,15 @@ export const BAYER = [
 ].map((row) => row.map((v) => (v + 0.5) / 16));
 
 export const CELL = 2; // css px per dither cell — chunky enough to read pixelated
+
 export const MAX_COLS = 520;
+
 export const MAX_ROWS = 200;
+
 // Opacity of the top border outline (just under solid, so it reads as a soft
 // edge rather than a hard line). See the note on colour vs opacity below.
 export const BORDER_ALPHA = 0.72;
+
 // Opacity of a dither "off" cell relative to an "on" cell. The scatter modulates
 // between these two tiers of the *same* colour instead of leaving holes, so the
 // background never shows through as stark white on a light theme.
@@ -58,12 +62,16 @@ export function paintColumn(
   const t = Math.round(top);
   const f = Math.round(floor);
   const depth = f - t;
+
   if (depth <= 0) {
     octx.fillStyle = rgb(seed.fill, 1, BORDER_ALPHA * dim);
     octx.fillRect(x, t, 1, 1);
+
     return;
   }
+
   const bias = (variant === 'dotted' ? 0.12 : 0) + (stacked ? 0.2 : 0) - sparse;
+
   for (let y = t; y < f; y++) {
     // Inverted falloff: 0 at the top line, 1 at the floor — dense at the
     // bottom, thinning as it rises toward the outline.
@@ -81,11 +89,13 @@ export function paintColumn(
     octx.fillStyle = rgb(seed.fill, 1, alpha);
     octx.fillRect(x, y, 1, 1);
   }
+
   // Top border outline — the shape's edge now that the fill fades out here.
   // Kept just under full opacity, with a faint feather row beneath, so it reads
   // as a soft edge rather than a hard line floating over the fade.
   octx.fillStyle = rgb(seed.fill, 1, BORDER_ALPHA * dim);
   octx.fillRect(x, t, 1, 1);
+
   if (depth > 1) {
     octx.fillStyle = rgb(seed.fill, 1, BORDER_ALPHA * 0.5 * dim);
     octx.fillRect(x, t + 1, 1, 1);
@@ -96,6 +106,7 @@ export function paintColumn(
 export function resample(src: number[], cols: number): number[] {
   const out: number[] = [];
   const last = Math.max(src.length - 1, 1);
+
   for (let c = 0; c < cols; c++) {
     const t = (c / Math.max(cols - 1, 1)) * last;
     const i = Math.floor(t);
@@ -104,6 +115,7 @@ export function resample(src: number[], cols: number): number[] {
     const b = src[Math.min(i + 1, src.length - 1)] ?? a;
     out[c] = a + (b - a) * f;
   }
+
   return out;
 }
 
@@ -120,7 +132,9 @@ export function backingSize(width: number, height: number) {
 // hue blooms in its own colour instead of a grey wash. Lives on a second canvas
 // layered over the crisp one (which stays sharp/pixelated).
 export type BloomLevel = 'off' | 'low' | 'high' | 'aura';
+
 export type BloomBlend = 'plus-lighter' | 'screen' | 'lighten';
+
 export type BloomConfig = {
   blur: number; // px
   brightness: number; // 1 = none
@@ -130,6 +144,7 @@ export type BloomConfig = {
   saturate?: number;
   blend?: BloomBlend; // additive by default
 };
+
 /** A preset name, a full config, or "off". */
 export type BloomInput = BloomLevel | BloomConfig;
 
@@ -150,6 +165,7 @@ export type BloomStyle = {
 export function bloomLayerStyle(input: BloomInput, active: boolean): BloomStyle | null {
   if (!active || input === 'off') return null;
   const cfg = typeof input === 'string' ? PRESET[input] : input;
+
   return {
     filter: `blur(${cfg.blur}px) brightness(${cfg.brightness}) saturate(${cfg.saturate ?? 1})`,
     opacity: cfg.opacity,
@@ -160,7 +176,9 @@ export function bloomLayerStyle(input: BloomInput, active: boolean): BloomStyle 
 
 // Easing — gentle start + soft settle so entrances don't feel linear.
 export const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
 export const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
 export const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t);
 
 /** Whether the OS asks for reduced motion (snap + steady stars). */

@@ -4,7 +4,9 @@ import type { SQL } from 'bun';
 import { Infrastructure } from '../platform/resources';
 import { ApiError, attempt } from '../shared/errors';
 import catalog from './catalog';
+
 const Units = Schema.Number.check(Schema.isInt()).check(Schema.isGreaterThanOrEqualTo(0));
+
 const Entitlement = Schema.Struct({
   name: Schema.String.check(Schema.isMinLength(1)),
   eventLimit: Schema.NullOr(Units),
@@ -16,6 +18,7 @@ const Entitlement = Schema.Struct({
   periodStart: Schema.String,
   periodEnd: Schema.String,
 });
+
 const Subscription = Schema.Struct({
   status: Schema.String,
   currentPeriodEnd: Schema.String,
@@ -23,15 +26,18 @@ const Subscription = Schema.Struct({
   endsAt: Schema.optional(Schema.NullOr(Schema.String)),
   entitlements: Entitlement,
 });
+
 export const subscriptionRequired = () =>
   new ApiError({
     status: 402,
     code: 'subscription_required',
     message: 'An active subscription is required.',
   });
+
 export async function allowance(db: SQL | Bun.TransactionSQL, owner: string, now = Date.now()) {
   const rows =
     await db`SELECT subscriptions FROM billing_customers WHERE owner_id=${owner} AND deleted=false AND provider='polar' AND organization_id=${catalog.organizationId}::uuid AND (${process.env.EXTERNAL_EFFECTS !== 'enabled'} OR updated_at>now()-interval '5 minutes')`;
+
   const active = (
     rows as {
       subscriptions: unknown[];
@@ -42,12 +48,14 @@ export async function allowance(db: SQL | Bun.TransactionSQL, owner: string, now
       try {
         const s = Schema.decodeUnknownSync(Subscription)(raw);
         const e = s.entitlements;
+
         const end = Math.min(
           Date.parse(e.periodEnd),
           Date.parse(s.currentPeriodEnd),
           s.endsAt ? Date.parse(s.endsAt) : Infinity,
           s.status === 'trialing' && s.trialEnd ? Date.parse(s.trialEnd) : Infinity,
         );
+
         const start = Date.parse(e.periodStart);
         if (
           !['active', 'trialing'].includes(s.status) ||
@@ -55,6 +63,7 @@ export async function allowance(db: SQL | Bun.TransactionSQL, owner: string, now
           (e.remaining === null) !== (e.eventLimit === null)
         )
           return [];
+
         return [
           {
             ...e,
@@ -66,6 +75,7 @@ export async function allowance(db: SQL | Bun.TransactionSQL, owner: string, now
         return [];
       }
     });
+
   return (
     active.sort(
       (a, b) =>
@@ -74,21 +84,28 @@ export async function allowance(db: SQL | Bun.TransactionSQL, owner: string, now
     )[0] ?? null
   );
 }
+
 export const requireSubscription = Effect.fn('requireSubscription')(function* (owner: string) {
   const r = yield* Infrastructure;
   const active = yield* attempt(() => allowance(r.primary, owner));
   if (!active) return yield* subscriptionRequired();
+
   return active;
 });
+
 export const usage = Effect.fn('usage')(function* (owner: string) {
   const r = yield* Infrastructure;
+
   return yield* attempt(async () => {
     const active = await allowance(r.primary, owner);
+
     const sites =
       await r.primary`SELECT s.id,s.name,s.domain,s.credit_budget,EXISTS(SELECT 1 FROM environments e WHERE e.site_id=s.id AND e.enabled) AS enabled,EXISTS(SELECT 1 FROM site_suspensions ss WHERE ss.site_id=s.id) AS suspended FROM sites s WHERE owner_id=${owner} ORDER BY created_at,id`;
+
     const rows = active
       ? await r.primary`SELECT site_id,(events*100)::bigint AS units FROM billing_organization_usage WHERE owner_id=${owner} AND period_start=${active.period.start} AND organization_id=${catalog.organizationId}::uuid`
       : [];
+
     const local = rows.reduce(
       (
         n: number,
@@ -98,19 +115,24 @@ export const usage = Effect.fn('usage')(function* (owner: string) {
       ) => n + Number(row.units),
       0,
     );
+
     const reserved = active ? active.pending + Math.max(0, local - active.localBaseline) : 0;
+
     const remaining = active
       ? active.remaining === null
         ? null
         : Math.max(0, active.remaining - reserved)
       : 0;
+
     const reason = !active
       ? 'subscription_required'
       : remaining !== null && remaining < 15
         ? 'event_limit'
         : null;
+
     const [onboarding] =
       await r.primary`SELECT EXISTS(SELECT 1 FROM account_onboarding WHERE owner_id=${owner}) AS completed`;
+
     return {
       onboardingCompleted: onboarding.completed,
       protection: await protection(r.primary, owner),
@@ -132,6 +154,7 @@ export const usage = Effect.fn('usage')(function* (owner: string) {
       websites: sites.map((s: Record<string, unknown>, i: number) => {
         const units = Number(rows.find((x: { site_id: string }) => x.site_id === s.id)?.units ?? 0);
         const budget = s.credit_budget === null ? null : Number(s.credit_budget);
+
         const pause = s.suspended
           ? 'admin_suspended'
           : !s.enabled
@@ -142,6 +165,7 @@ export const usage = Effect.fn('usage')(function* (owner: string) {
                 : budget !== null && budget * 100 - units < 15
                   ? 'website_budget'
                   : null));
+
         return {
           id: s.id,
           name: s.name,

@@ -14,6 +14,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import type { ActivityDetails } from './json-types';
+
 // Retain the existing storage keys and column names: site_id now identifies an
 // environment. A site's default environment keeps the site's original ID, so
 // old snippets, raw events, visitor deduplication and summaries stay unchanged.
@@ -112,6 +113,7 @@ export const goalConversions = pgTable(
     index('goal_conversions_report_idx').on(t.environmentId, t.receivedAt),
   ],
 );
+
 export const diagnosticEvents = pgTable(
   'diagnostic_events',
   {
@@ -131,6 +133,7 @@ export const diagnosticEvents = pgTable(
     index('diagnostic_events_report_idx').on(t.environmentId, t.kind, t.receivedAt),
   ],
 );
+
 export const analyticsImports = pgTable(
   'analytics_imports',
   {
@@ -147,6 +150,7 @@ export const analyticsImports = pgTable(
     uniqueIndex('analytics_imports_fingerprint_idx').on(t.environmentId, t.fingerprint),
   ],
 );
+
 export const importedDailyStats = pgTable(
   'imported_daily_stats',
   {
@@ -163,6 +167,7 @@ export const importedDailyStats = pgTable(
   },
   (t) => [primaryKey({ columns: [t.environmentId, t.day] })],
 );
+
 export const importedBreakdowns = pgTable(
   'imported_breakdowns',
   {

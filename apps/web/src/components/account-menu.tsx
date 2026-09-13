@@ -18,8 +18,10 @@ export function AccountMenu({
   onSignOut: () => void;
 }) {
   const { t, theme, setTheme } = useSitePreferences();
+
   const itemClass =
     'flex h-8 cursor-pointer items-center gap-2 rounded-md px-2 text-sm outline-none data-highlighted:bg-pressed data-disabled:opacity-40';
+
   return (
     <Menu.Root>
       <Menu.Trigger

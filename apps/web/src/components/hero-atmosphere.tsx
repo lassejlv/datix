@@ -5,6 +5,7 @@ import { useEffect, type CSSProperties, type RefObject } from 'react';
 const particles = Array.from({ length: 48 }, (_, index) => {
   const side = index % 2;
   const seed = (index * 37 + 17) % 101;
+
   return {
     left: side ? 77 + seed * 0.21 : 2 + seed * 0.21,
     top: 4 + ((index * 29 + 11) % 89),
@@ -39,6 +40,7 @@ export function HeroAtmosphere({
       const active = enabled && visible && !document.hidden;
       const state = active ? 'active' : 'paused';
       if (hero.dataset.motion !== state) hero.dataset.motion = state;
+
       if (reduced.matches) {
         hero.style.setProperty('--hero-scroll', '0');
         hero.style.setProperty('--hero-pointer-x', '0px');
@@ -50,12 +52,15 @@ export function HeroAtmosphere({
         hero.style.setProperty('--hero-pointer-y', `${pointerY.toFixed(1)}px`);
       }
     };
+
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(render);
     };
+
     const scroll = () => {
       if (visible && !paused && !reduced.matches && !document.hidden) schedule();
     };
+
     const move = (event: PointerEvent) => {
       if (!finePointer.matches || reduced.matches || paused) return;
       const bounds = hero.getBoundingClientRect();
@@ -63,15 +68,18 @@ export function HeroAtmosphere({
       pointerY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 14;
       schedule();
     };
+
     const leave = () => {
       pointerX = 0;
       pointerY = 0;
       schedule();
     };
+
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       schedule();
     });
+
     observer.observe(hero);
     window.addEventListener('scroll', scroll, { passive: true });
     window.addEventListener('resize', schedule, { passive: true });
@@ -80,6 +88,7 @@ export function HeroAtmosphere({
     hero.addEventListener('pointermove', move, { passive: true });
     hero.addEventListener('pointerleave', leave);
     schedule();
+
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();

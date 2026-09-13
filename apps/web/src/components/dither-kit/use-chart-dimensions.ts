@@ -30,6 +30,7 @@ export function useChartDimensions<T extends HTMLElement>() {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     measure();
+
     return () => ro.disconnect();
   }, []);
 
