@@ -42,7 +42,9 @@ test('Polar SDK serializes usage IDs and dates, pins the API version, and reads 
     ),
   );
 
-  const result = await polarClient().events.ingest({
+  const result = await (
+    await polarClient()
+  ).events.ingest({
     events: [
       {
         externalId: 'datix-usage-stable-id',
@@ -77,24 +79,26 @@ test('only typed missing resources become null; provider failures are not retrie
     Response.json({ error: 'ResourceNotFound', detail: 'Missing' }, { status: 404 }),
   );
   expect(
-    await optionalResource(polarClient().customers.getStateExternal({ externalId: 'missing' })),
+    await optionalResource(
+      (await polarClient()).customers.getStateExternal({ externalId: 'missing' }),
+    ),
   ).toBeNull();
   fetchMock.mockResolvedValue(Response.json({ detail: 'Unavailable' }, { status: 503 }));
   await expect(
-    optionalResource(polarClient().customers.getStateExternal({ externalId: 'owner' })),
+    optionalResource((await polarClient()).customers.getStateExternal({ externalId: 'owner' })),
   ).rejects.toThrow();
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
-test('external effects and sandbox mapping gates are enforced before any Polar request', () => {
+test('external effects and sandbox mapping gates are enforced before any Polar request', async () => {
   configured();
   process.env.EXTERNAL_EFFECTS = 'disabled';
-  expect(() => polarClient()).toThrow();
+  await expect(polarClient()).rejects.toThrow();
   process.env.EXTERNAL_EFFECTS = 'enabled';
   process.env.POLAR_API_URL = 'https://sandbox-api.polar.sh';
-  expect(() => polarClient()).toThrow();
+  await expect(polarClient()).rejects.toThrow();
   process.env.POLAR_API_URL = 'https://untrusted.example';
-  expect(() => polarClient()).toThrow();
+  await expect(polarClient()).rejects.toThrow();
 });
 
 test('Polar SDK validates customer state and converts provider dates and names', async () => {
@@ -121,13 +125,13 @@ test('Polar SDK validates customer state and converts provider dates and names',
       active_meters: [],
     }),
   );
-  const state = await polarClient().customers.getStateExternal({ externalId: 'owner-id' });
+  const state = await (await polarClient()).customers.getStateExternal({ externalId: 'owner-id' });
   expect(state.externalId).toBe('owner-id');
   expect(state.organizationId).toBe(catalog.organizationId);
   expect(state.createdAt.toISOString()).toBe('2026-09-13T12:00:00.000Z');
   expect(state.activeSubscriptions).toEqual([]);
   fetchMock.mockResolvedValue(Response.json({ id: state.id }));
   await expect(
-    polarClient().customers.getStateExternal({ externalId: 'owner-id' }),
+    (await polarClient()).customers.getStateExternal({ externalId: 'owner-id' }),
   ).rejects.toThrow();
 });

@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 import { createHmac } from 'node:crypto';
 import { decode, Id } from '../shared/validation';
 import { invalid } from '../shared/errors';

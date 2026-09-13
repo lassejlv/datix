@@ -1,4 +1,6 @@
-import { Effect, Schema, Clock } from 'effect';
+import * as Clock from 'effect/Clock';
+import * as Effect from 'effect/Effect';
+import * as Schema from 'effect/Schema';
 import { Infrastructure } from '../platform/resources';
 import { attempt, invalid, ApiError, attemptSync } from '../shared/errors';
 import { decode, Id } from '../shared/validation';

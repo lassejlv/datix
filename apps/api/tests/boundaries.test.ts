@@ -1,8 +1,9 @@
 import { expect, test } from 'bun:test';
 import { zipSync, strToU8 } from 'fflate';
 import { csv, parse } from '../src/imports/parse';
+import { canonicalFingerprint } from '../src/imports/fingerprint';
 import { detect } from '../src/analytics/abuse';
-import { createHmac } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import { acknowledged, verifyWebhook } from '../src/billing/polar';
 import { sanitize } from '../src/analytics/diagnostics';
 
@@ -17,15 +18,44 @@ test('CSV handles quoting and rejects malformed records and impossible dates', (
     parse('plausible', 'imported_visitors.csv', strToU8(daily.replace('2026-09-01', '2026-02-30'))),
   ).toThrow();
 });
+test('import fingerprints preserve canonical JSON semantics without copying the payload', () => {
+  const value = {
+    z: [3, undefined, { b: 'two', a: 1 }],
+    a: { omitted: undefined, kept: true },
+  };
+
+  const canonical = (nested: unknown): unknown => {
+    if (Array.isArray(nested)) return nested.map(canonical);
+    if (nested && typeof nested === 'object')
+      return Object.fromEntries(
+        Object.entries(nested)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([key, entry]) => [key, canonical(entry)]),
+      );
+
+    return nested;
+  };
+
+  expect(canonicalFingerprint(value)).toBe(
+    createHash('sha256')
+      .update(JSON.stringify(canonical(value)))
+      .digest('hex'),
+  );
+});
 test('Plausible ZIP preserves counts and removes sensitive path query strings', () => {
   const data = zipSync({
     'imported_visitors.csv': strToU8(daily),
-    'imported_pages.csv': strToU8('date,page,pageviews\n2026-09-01,/hello?secret=private,4\n'),
+    'imported_pages.csv': strToU8(
+      'date,page,pageviews\n2026-09-01,/z?secret=private,2\n2026-09-01,/a,1\n2026-09-01,/z#fragment,2\n',
+    ),
   });
 
   const value = parse('plausible', 'export.zip', data);
   expect(value.days[0]).toEqual({ day: '2026-09-01', pageviews: 4, visitors: 3, custom: 0 });
-  expect(value.breakdowns[0]?.value).toBe('/hello');
+  expect(value.breakdowns).toEqual([
+    { day: '2026-09-01', dimension: 'path', value: '/a', count: 1 },
+    { day: '2026-09-01', dimension: 'path', value: '/z', count: 4 },
+  ]);
   const corrupt = data.slice();
   const view = new DataView(corrupt.buffer);
 
@@ -78,7 +108,7 @@ test('diagnostics remove URL secrets and email addresses', () => {
   expect(value).toContain('https://example.com/a');
 });
 
-test('webhooks authenticate exact bytes and reject stale or forged signatures', () => {
+test('webhooks authenticate exact bytes and reject stale or forged signatures', async () => {
   const secret = 'whsec_test-polar-secret-kept-as-plain-text';
   const timestamp = String(Math.floor(Date.now() / 1000));
   const id = 'event-123';
@@ -115,11 +145,11 @@ test('webhooks authenticate exact bytes and reject stale or forged signatures', 
     'webhook-signature': 'v1,' + signature,
   });
 
-  const event = verifyWebhook(headers, body, secret);
+  const event = await verifyWebhook(headers, body, secret);
   expect(event.type).toBe('customer.deleted');
   expect(event.timestamp).toBeInstanceOf(Date);
-  expect(() => verifyWebhook(headers, body + ' ', secret)).toThrow();
-  expect(() => verifyWebhook(headers, body, 'different-secret')).toThrow();
+  await expect(verifyWebhook(headers, body + ' ', secret)).rejects.toThrow();
+  await expect(verifyWebhook(headers, body, 'different-secret')).rejects.toThrow();
   headers.set('webhook-timestamp', '1');
-  expect(() => verifyWebhook(headers, body, secret)).toThrow();
+  await expect(verifyWebhook(headers, body, secret)).rejects.toThrow();
 });

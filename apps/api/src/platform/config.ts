@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 
 const Environment = Schema.Struct({
   APP_URL: Schema.NonEmptyString,

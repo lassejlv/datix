@@ -1,4 +1,5 @@
-import { Effect, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import * as Schema from 'effect/Schema';
 import { Infrastructure } from '../platform/resources';
 import { identity } from '../auth/service';
 import { attempt, ApiError, invalid } from '../shared/errors';

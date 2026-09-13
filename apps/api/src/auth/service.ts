@@ -1,9 +1,11 @@
 import { ensureDeletable } from '../billing/polar';
-import { betterAuth } from 'better-auth';
+import { betterAuth } from 'better-auth/minimal';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { APIError } from 'better-auth/api';
 import { hashPassword, verifyPassword } from 'better-auth/crypto';
-import { Context, Effect, Layer } from 'effect';
+import * as Context from 'effect/Context';
+import * as Effect from 'effect/Effect';
+import * as Layer from 'effect/Layer';
 import * as schema from '@datix/database/auth-schema';
 import { Infrastructure } from '../platform/resources';
 import { attempt, ApiError } from '../shared/errors';

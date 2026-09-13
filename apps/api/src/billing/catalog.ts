@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 import original from '../../../../config/polar-catalog.json';
 import { Id } from '../shared/validation';
 

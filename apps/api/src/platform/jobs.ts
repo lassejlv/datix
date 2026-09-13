@@ -1,4 +1,8 @@
-import { Clock, Effect, Layer, Schedule, Schema } from 'effect';
+import * as Clock from 'effect/Clock';
+import * as Effect from 'effect/Effect';
+import * as Layer from 'effect/Layer';
+import * as Schedule from 'effect/Schedule';
+import * as Schema from 'effect/Schema';
 import { Worker } from 'bullmq';
 import { Infrastructure } from './resources';
 import { attempt, invalid } from '../shared/errors';

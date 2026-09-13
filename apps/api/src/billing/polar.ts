@@ -1,5 +1,6 @@
-import { Effect, Schema, Clock } from 'effect';
-import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks';
+import * as Clock from 'effect/Clock';
+import * as Effect from 'effect/Effect';
+import * as Schema from 'effect/Schema';
 import type { Customer } from '@polar-sh/sdk/models/components/customer';
 import type { PresentmentCurrency } from '@polar-sh/sdk/models/components/presentmentcurrency';
 import type { CustomerState } from '@polar-sh/sdk/models/components/customerstate';
@@ -115,13 +116,21 @@ async function save(
 }
 
 async function sync(r: Resources, owner: string) {
+  const client = await polarClient();
+
+  return syncWithClient(r, owner, client);
+}
+
+async function syncWithClient(
+  r: Resources,
+  owner: string,
+  client: Awaited<ReturnType<typeof polarClient>>,
+) {
   return r.primary.begin(async (tx) => {
     await tx`SELECT id FROM "user" WHERE id=${owner} FOR UPDATE`;
 
     const at = new Date().toISOString(),
-      value = await optionalResource(
-        polarClient().customers.getStateExternal({ externalId: owner }),
-      ),
+      value = await optionalResource(client.customers.getStateExternal({ externalId: owner })),
       customer = value ? verifyCustomer(value, owner) : null;
 
     await save(tx, owner, customer, at);
@@ -130,8 +139,12 @@ async function sync(r: Resources, owner: string) {
   });
 }
 
-async function portal(r: Resources, customer: string) {
-  const response = await polarClient().customerSessions.create({
+async function portal(
+  r: Resources,
+  customer: string,
+  client: Awaited<ReturnType<typeof polarClient>>,
+) {
+  const response = await client.customerSessions.create({
     customerId: customer,
     returnUrl: r.config.appUrl + '/dashboard',
   });
@@ -142,9 +155,13 @@ async function portal(r: Resources, customer: string) {
   return { url: response.customerPortalUrl };
 }
 
-async function hasSubscription(customer: string, includeCanceling: boolean) {
+async function hasSubscription(
+  customer: string,
+  includeCanceling: boolean,
+  client: Awaited<ReturnType<typeof polarClient>>,
+) {
   for (let page = 1; page <= 100; page++) {
-    const response = await polarClient().subscriptions.list({
+    const response = await client.subscriptions.list({
       customerId: customer,
       organizationId: catalog.organizationId,
       limit: 100,
@@ -196,7 +213,8 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
 
   return yield* attempt(async () => {
     if (path === 'portal') {
-      const customer = await sync(r, owner);
+      const client = await polarClient();
+      const customer = await syncWithClient(r, owner, client);
       if (!customer)
         throw new ApiError({
           status: 404,
@@ -204,7 +222,7 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
           message: 'Start a plan before opening billing.',
         });
 
-      return portal(r, customer.id);
+      return portal(r, customer.id, client);
     }
 
     if (path !== 'checkout')
@@ -230,8 +248,10 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
         code: 'plan_unavailable',
         message: 'Yearly billing is not available yet. Choose a monthly plan.',
       });
-    let customer: Customer | CustomerState | null = await sync(r, owner);
-    if (customer && (await hasSubscription(customer.id, true))) return portal(r, customer.id);
+    const client = await polarClient();
+    let customer: Customer | CustomerState | null = await syncWithClient(r, owner, client);
+    if (customer && (await hasSubscription(customer.id, true, client)))
+      return portal(r, customer.id, client);
 
     return r.primary.begin(async (tx) => {
       const [user] = await tx`SELECT id,name,email FROM "user" WHERE id=${owner} FOR UPDATE`;
@@ -242,9 +262,7 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
         await tx`SELECT checkout_id FROM billing_checkouts WHERE owner_id=${owner} AND provider='polar' AND organization_id=${catalog.organizationId}::uuid AND plan_id=${plan.productId} AND checkout_options=${JSON.stringify(options)}::text::jsonb AND created_at>now()-interval '10 minutes'`;
 
       if (cached && customer) {
-        const checkout = await optionalResource(
-          polarClient().checkouts.get({ id: cached.checkout_id }),
-        );
+        const checkout = await optionalResource(client.checkouts.get({ id: cached.checkout_id }));
 
         if (
           checkout &&
@@ -260,7 +278,7 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
 
       if (!customer)
         customer = verifyCustomer(
-          await polarClient().customers.create({
+          await client.customers.create({
             type: 'individual',
             externalId: owner,
             organizationId: catalog.organizationId,
@@ -271,7 +289,7 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
           owner,
         );
 
-      const checkout = await polarClient().checkouts.create({
+      const checkout = await client.checkouts.create({
         products: [plan.productId],
         customerId: customer.id,
         externalCustomerId: owner,
@@ -298,7 +316,9 @@ export const billingOperation = Effect.fn('billingOperation')(function* (
   });
 });
 
-export function verifyWebhook(headers: Headers, body: string, secret: string) {
+export async function verifyWebhook(headers: Headers, body: string, secret: string) {
+  const { validateEvent, WebhookVerificationError } = await import('@polar-sh/sdk/webhooks');
+
   try {
     return validateEvent(body, Object.fromEntries(headers.entries()), secret);
   } catch (error) {
@@ -316,7 +336,7 @@ export const webhook = Effect.fn('webhook')(function* (headers: Headers, body: s
   const r = yield* Infrastructure;
   const secret = process.env.POLAR_WEBHOOK_SECRET;
   if (!secret || process.env.EXTERNAL_EFFECTS !== 'enabled') return yield* unconfigured();
-  const value = yield* attemptSync(() => verifyWebhook(headers, body, secret));
+  const value = yield* attempt(() => verifyWebhook(headers, body, secret));
   const id = headers.get('webhook-id')!;
 
   if (value.type !== 'customer.state_changed' && value.type !== 'customer.deleted')
@@ -363,8 +383,9 @@ export async function ensureDeletable(r: Resources, owner: string) {
     return;
   }
 
-  const customer = await sync(r, owner);
-  if (customer && (await hasSubscription(customer.id, false)))
+  const client = await polarClient();
+  const customer = await syncWithClient(r, owner, client);
+  if (customer && (await hasSubscription(customer.id, false, client)))
     throw new ApiError({
       status: 409,
       code: 'cancel_subscription_first',
@@ -407,6 +428,9 @@ export const drainBilling = Effect.fn('drainBilling')(function* () {
     }),
   );
 
+  if (!rows.length) return;
+  const client = yield* attempt(() => polarClient());
+
   for (const owner of new Set<string>(rows.map((row: { owner_id: string }) => row.owner_id))) {
     yield* attempt(() =>
       r.primary.begin(async (tx) => {
@@ -433,9 +457,7 @@ export const drainBilling = Effect.fn('drainBilling')(function* () {
           },
         );
 
-        const result = await polarClient()
-          .events.ingest({ events })
-          .catch(() => null);
+        const result = await client.events.ingest({ events }).catch(() => null);
 
         if (acknowledged(result, batch.length))
           await tx`DELETE FROM billing_outbox WHERE owner_id=${owner} AND lease_id=${lease}::uuid AND provider='polar' AND organization_id=${catalog.organizationId}::uuid`;
@@ -455,13 +477,17 @@ export const refreshBilling = Effect.fn('refreshBilling')(function* () {
       r.primary`SELECT owner_id FROM billing_customers WHERE provider='polar' AND organization_id=${catalog.organizationId}::uuid AND deleted=false AND (sync_attempted_at IS NULL OR sync_attempted_at<now()-interval '60 seconds') ORDER BY sync_attempted_at NULLS FIRST LIMIT 16`,
   );
 
+  let client: Awaited<ReturnType<typeof polarClient>> | undefined;
+
   for (const row of rows) {
     yield* attempt(
       () =>
         r.primary`UPDATE billing_customers SET sync_attempted_at=now() WHERE owner_id=${row.owner_id} AND provider='polar' AND organization_id=${catalog.organizationId}::uuid`,
     );
-    yield* attempt(() => sync(r, row.owner_id)).pipe(
-      Effect.catch(() => Effect.sync(() => console.error('Billing refresh failed'))),
-    );
+    yield* attempt(async () => {
+      client ??= await polarClient();
+
+      return syncWithClient(r, row.owner_id, client);
+    }).pipe(Effect.catch(() => Effect.sync(() => console.error('Billing refresh failed'))));
   }
 });

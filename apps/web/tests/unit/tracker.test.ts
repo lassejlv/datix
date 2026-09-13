@@ -22,6 +22,7 @@ function run({
   now = 1_000_000,
   status = 202,
   storageDisabled = false,
+  holdRequests = false,
 }: {
   features?: { errors: boolean; webVitals: boolean };
   settings?: typeof defaultTrackingSettings;
@@ -36,6 +37,7 @@ function run({
   now?: number;
   status?: number;
   storageDisabled?: boolean;
+  holdRequests?: boolean;
 } = {}) {
   const listeners = new Map<string, (event: unknown) => void>();
 
@@ -114,6 +116,7 @@ function run({
       if (_endpoint.includes('/api/tracker-config'))
         return { status: configStatus, json: async () => ({ enabled: true, settings, features }) };
       requests.push(options.body);
+      if (holdRequests) return new Promise(() => {});
 
       return { status, json: async () => ({ accepted: status === 202 }) };
     },
@@ -233,6 +236,13 @@ test('rejected collection clears its throttle so a corrected installation can re
   await settle();
   await settle();
   expect((await readyRun({ storage: rejected.storage })).requests).toHaveLength(1);
+});
+test('tracker bounds pending requests when collection stalls', async () => {
+  const result = await readyRun({ holdRequests: true });
+
+  for (let index = 0; index < 100; index++) result.window.simpleAnalytics!.track(`event-${index}`);
+  await settle();
+  expect(result.requests).toHaveLength(32);
 });
 
 test('environment payloads and throttling stay separate under the same site', async () => {

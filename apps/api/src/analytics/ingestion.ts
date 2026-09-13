@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import * as Effect from 'effect/Effect';
 import { guard } from './abuse';
 import { Infrastructure } from '../platform/resources';
 import { attempt, ApiError, attemptSync } from '../shared/errors';

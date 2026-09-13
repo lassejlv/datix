@@ -1,4 +1,6 @@
-import { Context, Effect, Layer } from 'effect';
+import * as Context from 'effect/Context';
+import * as Effect from 'effect/Effect';
+import * as Layer from 'effect/Layer';
 import { checkSchema } from './schema';
 import { RedisClient, SQL, S3Client } from 'bun';
 import { drizzle } from 'drizzle-orm/bun-sql';
@@ -71,21 +73,23 @@ export type Resources = ReturnType<typeof createResources>;
 export class Infrastructure extends Context.Service<Infrastructure, Resources>()(
   '@datix/api/platform/Infrastructure',
 ) {
-  static readonly layer = Layer.effect(
-    Infrastructure,
-    Effect.gen(function* () {
-      const r = yield* Effect.acquireRelease(Effect.sync(createResources), (r) =>
-        Effect.promise(() => r.close()),
-      );
+  static readonly layer = (config: Config = readConfig()) =>
+    Layer.effect(
+      Infrastructure,
+      Effect.gen(function* () {
+        const r = yield* Effect.acquireRelease(
+          Effect.sync(() => createResources(config)),
+          (r) => Effect.promise(() => r.close()),
+        );
 
-      yield* attempt(() => checkSchema(r));
-      yield* attempt(() =>
-        Promise.all([r.sql`SELECT 1`, r.redis.send('PING', []), r.queue.waitUntilReady()]),
-      );
+        yield* attempt(() => checkSchema(r));
+        yield* attempt(() =>
+          Promise.all([r.sql`SELECT 1`, r.redis.send('PING', []), r.queue.waitUntilReady()]),
+        );
 
-      return r;
-    }),
-  );
+        return r;
+      }),
+    );
 }
 
 export const readiness = Effect.fn('readiness')(function* () {

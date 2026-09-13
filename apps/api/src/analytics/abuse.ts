@@ -1,4 +1,4 @@
-import { Schema } from 'effect';
+import * as Schema from 'effect/Schema';
 import type { Resources } from '../platform/resources';
 import native from './sql/native.sql' with { type: 'text' };
 import { hash, type Event } from './tracking';

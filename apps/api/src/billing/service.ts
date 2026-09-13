@@ -1,4 +1,5 @@
-import { Effect, Schema } from 'effect';
+import * as Effect from 'effect/Effect';
+import * as Schema from 'effect/Schema';
 import { protection } from '../analytics/abuse';
 import type { SQL } from 'bun';
 import { Infrastructure } from '../platform/resources';

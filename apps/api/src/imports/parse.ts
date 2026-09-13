@@ -15,7 +15,11 @@ export type Breakdown = {
   count: number;
 };
 
-export function csv(text: string) {
+export function csv(text: string): string[][];
+
+export function csv(text: string, visit: (row: string[]) => void): void;
+
+export function csv(text: string, visit?: (row: string[]) => void) {
   const rows: string[][] = [];
 
   let row: string[] = [],
@@ -33,10 +37,18 @@ export function csv(text: string) {
 
   const finishRow = () => {
     finishField();
-    if (row.some((s) => s.trim())) rows.push(row);
+
+    if (row.some((s) => s.trim())) {
+      if (visit) visit(row);
+      else rows.push(row);
+      records++;
+    }
+
     row = [];
-    if (rows.length > 100001) throw invalid('An import may contain at most 100,000 CSV records.');
+    if (records > 100001) throw invalid('An import may contain at most 100,000 CSV records.');
   };
+
+  let records = 0;
 
   for (const char of text.replace(/^\uFEFF/, '')) {
     if (comment) {
@@ -86,7 +98,7 @@ export function csv(text: string) {
   if (state === 'quoted') throw invalid('The CSV contains malformed quotes.');
   if (row.length || field || state === 'closed') finishRow();
 
-  return rows;
+  if (!visit) return rows;
 }
 
 function number(value: string) {
@@ -143,8 +155,9 @@ export function parse(provider: string, filename: string, bytes: Uint8Array) {
   } else files = { [filename]: bytes };
 
   const days = new Map<string, Day>(),
-    breakdowns = new Map<string, Breakdown>(),
+    breakdowns = new Map<string, Map<string, Breakdown>>(),
     custom = new Map<string, number>(),
+    calendarDays = new Map<string, string>(),
     tables = new Set<string>(),
     warnings = new Set<string>();
 
@@ -156,71 +169,93 @@ export function parse(provider: string, filename: string, bytes: Uint8Array) {
       continue;
     }
 
-    const rows = csv(new TextDecoder('utf-8', { fatal: true }).decode(data));
-    records += Math.max(0, rows.length - 1);
-    if (records > 100000) throw invalid('An import may contain at most 100,000 CSV records.');
-    const header = rows.shift();
-    if (!header) throw invalid('The CSV is empty.');
+    let header: string[] | undefined,
+      columns: string[] = [],
+      match: RegExpExecArray | null,
+      table = '',
+      dimension: string[] | undefined,
+      di = -1,
+      ci = -1,
+      vi = -1,
+      li = -1,
+      ignored = false;
 
-    const normalized = header.map((s) =>
-      provider === 'ga4' ? s.toLowerCase().replace(/[\s_]/g, '') : s.trim(),
-    );
+    csv(new TextDecoder('utf-8', { fatal: true }).decode(data), (row) => {
+      if (!header) {
+        header = row;
 
-    if (new Set(normalized).size !== normalized.length || normalized.some((s) => !s))
-      throw invalid('CSV column names must be nonempty and unique.');
-    let columns = normalized;
-
-    if (provider === 'ga4') {
-      columns = normalized.map((s) => (s === 'screenpageviews' ? 'views' : s));
-      if (columns.some((s) => !['date', 'views', 'totalusers'].includes(s)) || columns.length !== 3)
-        throw invalid('The GA4 CSV must contain only Date, Views and Total users.');
-    }
-
-    const required = (key: string) => {
-      const index = columns.indexOf(key);
-      if (index < 0) throw invalid(`The CSV is missing its ${key} column.`);
-
-      return index;
-    };
-
-    const match =
-      /(?:^|\/)imported_(visitors|pages|sources|devices|locations|custom_events)(?:_(\d{8})_(\d{8}))?\.csv$/i.exec(
-        name,
-      );
-
-    if (provider === 'plausible' && !match) {
-      if (/(?:^|\/)(visitors|pages|sources|devices|locations)(?:_|\.)/i.test(name))
-        throw invalid(
-          'Upload imported_visitors.csv or the full Plausible export ZIP from site settings. Dashboard exports are not supported.',
+        const normalized = header.map((s) =>
+          provider === 'ga4' ? s.toLowerCase().replace(/[\s_]/g, '') : s.trim(),
         );
-      warnings.add(`Ignored unsupported file: ${name}.`);
-      continue;
-    }
 
-    const table = provider === 'ga4' ? 'visitors' : match![1]!;
-    if (tables.has(table)) throw invalid('Only one CSV per report is allowed.');
-    tables.add(table);
+        if (new Set(normalized).size !== normalized.length || normalized.some((s) => !s))
+          throw invalid('CSV column names must be nonempty and unique.');
+        columns =
+          provider === 'ga4'
+            ? normalized.map((s) => (s === 'screenpageviews' ? 'views' : s))
+            : normalized;
+        if (
+          provider === 'ga4' &&
+          (columns.some((s) => !['date', 'views', 'totalusers'].includes(s)) ||
+            columns.length !== 3)
+        )
+          throw invalid('The GA4 CSV must contain only Date, Views and Total users.');
 
-    const dimension = {
-      pages: ['path', 'page'],
-      sources: ['referrer', 'referrer'],
-      devices: ['device', 'device'],
-      locations: ['country', 'country'],
-      custom_events: ['event', 'name'],
-    }[table];
+        match =
+          /(?:^|\/)imported_(visitors|pages|sources|devices|locations|custom_events)(?:_(\d{8})_(\d{8}))?\.csv$/i.exec(
+            name,
+          );
 
-    const di = required('date'),
-      ci = required(
-        provider === 'ga4' ? 'views' : table === 'custom_events' ? 'events' : 'pageviews',
-      ),
-      vi = table === 'visitors' ? required(provider === 'ga4' ? 'totalusers' : 'visitors') : -1,
-      li = dimension ? required(dimension[1]!) : -1;
+        if (provider === 'plausible' && !match) {
+          if (/(?:^|\/)(visitors|pages|sources|devices|locations)(?:_|\.)/i.test(name))
+            throw invalid(
+              'Upload imported_visitors.csv or the full Plausible export ZIP from site settings. Dashboard exports are not supported.',
+            );
+          warnings.add(`Ignored unsupported file: ${name}.`);
+          ignored = true;
 
-    for (const row of rows) {
+          return;
+        }
+
+        table = provider === 'ga4' ? 'visitors' : match![1]!;
+        if (tables.has(table)) throw invalid('Only one CSV per report is allowed.');
+        tables.add(table);
+        dimension = {
+          pages: ['path', 'page'],
+          sources: ['referrer', 'referrer'],
+          devices: ['device', 'device'],
+          locations: ['country', 'country'],
+          custom_events: ['event', 'name'],
+        }[table];
+
+        const required = (key: string) => {
+          const index = columns.indexOf(key);
+          if (index < 0) throw invalid(`The CSV is missing its ${key} column.`);
+
+          return index;
+        };
+
+        di = required('date');
+        ci = required(
+          provider === 'ga4' ? 'views' : table === 'custom_events' ? 'events' : 'pageviews',
+        );
+        vi = table === 'visitors' ? required(provider === 'ga4' ? 'totalusers' : 'visitors') : -1;
+        li = dimension ? required(dimension[1]!) : -1;
+
+        return;
+      }
+
+      records++;
+      if (records > 100000) throw invalid('An import may contain at most 100,000 CSV records.');
+      if (ignored) return;
       if (row.length !== header.length)
         throw invalid('CSV rows must have the same number of columns as the header.');
-      if (provider === 'ga4' && /^(total|totals|grand total)$/i.test(row[di]!.trim())) continue;
-      const date = day(row[di]!, provider === 'ga4');
+      if (provider === 'ga4' && /^(total|totals|grand total)$/i.test(row[di]!.trim())) return;
+
+      const parsedDate = day(row[di]!, provider === 'ga4'),
+        date = calendarDays.get(parsedDate) ?? parsedDate;
+
+      calendarDays.set(date, date);
       if (match?.[2] && (date < day(match[2], true) || date > day(match[3]!, true)))
         throw invalid('A CSV date falls outside its filename range.');
 
@@ -246,19 +281,23 @@ export function parse(provider: string, filename: string, bytes: Uint8Array) {
         days.set(date, { day: date, pageviews: count, visitors: number(row[vi]!), custom: 0 });
       } else if (dimension) {
         const value = label(dimension[0]!, row[li]!),
-          key = JSON.stringify([date, dimension[0], value]),
-          existing = breakdowns.get(key);
+          key = `${date}\0${dimension[0]}`,
+          group = breakdowns.get(key) ?? new Map<string, Breakdown>(),
+          existing = group.get(value);
 
         const sum = (existing?.count ?? 0) + count;
         if (sum > 1e12) throw invalid('An imported daily count exceeds 1 trillion.');
-        breakdowns.set(key, { day: date, dimension: dimension[0]!, value, count: sum });
+        group.set(value, { day: date, dimension: dimension[0]!, value, count: sum });
+        breakdowns.set(key, group);
         if (table === 'custom_events') custom.set(date, (custom.get(date) ?? 0) + count);
       }
-    }
+    });
+    if (!header) throw invalid('The CSV is empty.');
   }
 
   if (!days.size || days.size > 730) throw invalid('Import 1–730 daily totals.');
-  for (const row of breakdowns.values())
+  const breakdownRows = [...breakdowns.values()].flatMap((group) => [...group.values()]);
+  for (const row of breakdownRows)
     if (!days.has(row.day)) throw invalid('A breakdown date has no daily total.');
 
   for (const row of days.values()) {
@@ -266,13 +305,20 @@ export function parse(provider: string, filename: string, bytes: Uint8Array) {
     if (row.custom > 1e12) throw invalid('An imported daily count exceeds 1 trillion.');
   }
 
+  const sortKeys = new WeakMap<Breakdown, string>();
+
+  const sortKey = (row: Breakdown) => {
+    const existing = sortKeys.get(row);
+    if (existing) return existing;
+    const value = JSON.stringify([row.day, row.dimension, row.value]);
+    sortKeys.set(row, value);
+
+    return value;
+  };
+
   return {
     days: [...days.values()].sort((a, b) => a.day.localeCompare(b.day)),
-    breakdowns: [...breakdowns.values()].sort((a, b) =>
-      JSON.stringify([a.day, a.dimension, a.value]).localeCompare(
-        JSON.stringify([b.day, b.dimension, b.value]),
-      ),
-    ),
+    breakdowns: breakdownRows.sort((a, b) => sortKey(a).localeCompare(sortKey(b))),
     warnings: [...warnings],
     files: Object.keys(files),
     metrics: [

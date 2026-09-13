@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import * as Effect from 'effect/Effect';
 import { and, eq, asc, inArray, sql } from 'drizzle-orm';
 import { sites, environments } from '@datix/database/primary-schema';
 import { Infrastructure } from '../platform/resources';

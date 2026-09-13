@@ -1,12 +1,19 @@
-import { createApp } from './http/app';
 import { Infrastructure } from './platform/resources';
 import { createRuntime } from './platform/runtime';
 
-const runtime = createRuntime();
+let dispose: (() => Promise<void>) | undefined;
 
 try {
+  const application = await createRuntime();
+  const { runtime } = application;
+  dispose = () => runtime.dispose();
   const resources = await runtime.runPromise(Infrastructure);
-  const app = await createApp(runtime);
+
+  const app =
+    application.role === 'worker'
+      ? await (await import('./http/worker-app')).createWorkerApp(application.runtime)
+      : await (await import('./http/app')).createApp(application.runtime);
+
   let stopping = false;
 
   const server = Bun.serve({
@@ -45,6 +52,6 @@ try {
   console.error(
     'Startup failed; check database migrations, runtime grants, and service configuration.',
   );
-  await runtime.dispose();
+  await dispose?.();
   process.exit(1);
 }

@@ -1,8 +1,18 @@
-import { Polar } from '@polar-sh/sdk';
-import { HTTPClient } from '@polar-sh/sdk/lib/http';
-import { ResourceNotFound } from '@polar-sh/sdk/models/errors/resourcenotfound';
 import { ApiError } from '../shared/errors';
 import catalog from './catalog';
+
+const importSdk = () =>
+  Promise.all([
+    import('@polar-sh/sdk/lib/http'),
+    import('@polar-sh/sdk/sdk/checkouts'),
+    import('@polar-sh/sdk/sdk/customers'),
+    import('@polar-sh/sdk/sdk/customersessions'),
+    import('@polar-sh/sdk/sdk/events'),
+    import('@polar-sh/sdk/sdk/subscriptions'),
+  ]);
+
+let sdk: ReturnType<typeof importSdk> | undefined;
+const loadSdk = () => (sdk ??= importSdk());
 
 export const unconfigured = () =>
   new ApiError({
@@ -11,7 +21,7 @@ export const unconfigured = () =>
     message: 'Billing is temporarily unavailable.',
   });
 
-export function polarClient() {
+export async function polarClient() {
   if (process.env.EXTERNAL_EFFECTS !== 'enabled' || !process.env.POLAR_ACCESS_TOKEN)
     throw unconfigured();
 
@@ -22,25 +32,53 @@ export function polarClient() {
   )
     throw unconfigured();
 
-  const httpClient = new HTTPClient();
+  const [http, checkouts, customers, customerSessions, events, subscriptions] = await loadSdk();
+
+  const httpClient = new http.HTTPClient();
   httpClient.addHook('beforeRequest', (request) => {
     request.headers.set('Polar-Version', catalog.apiVersion);
   });
 
-  return new Polar({
+  const options = {
     accessToken: process.env.POLAR_ACCESS_TOKEN,
-    server: base === 'https://sandbox-api.polar.sh' ? 'sandbox' : 'production',
+    server:
+      base === 'https://sandbox-api.polar.sh' ? ('sandbox' as const) : ('production' as const),
     timeoutMs: 10000,
     // Durable outbox retries own delivery; do not retry checkout creation implicitly.
-    retryConfig: { strategy: 'none' },
+    retryConfig: { strategy: 'none' as const },
     httpClient,
-  });
+  };
+
+  let checkoutsClient: InstanceType<typeof checkouts.Checkouts> | undefined,
+    customersClient: InstanceType<typeof customers.Customers> | undefined,
+    customerSessionsClient: InstanceType<typeof customerSessions.CustomerSessions> | undefined,
+    eventsClient: InstanceType<typeof events.Events> | undefined,
+    subscriptionsClient: InstanceType<typeof subscriptions.Subscriptions> | undefined;
+
+  return {
+    get checkouts() {
+      return (checkoutsClient ??= new checkouts.Checkouts(options));
+    },
+    get customers() {
+      return (customersClient ??= new customers.Customers(options));
+    },
+    get customerSessions() {
+      return (customerSessionsClient ??= new customerSessions.CustomerSessions(options));
+    },
+    get events() {
+      return (eventsClient ??= new events.Events(options));
+    },
+    get subscriptions() {
+      return (subscriptionsClient ??= new subscriptions.Subscriptions(options));
+    },
+  };
 }
 
 export async function optionalResource<T>(request: Promise<T>): Promise<T | null> {
   try {
     return await request;
   } catch (error) {
+    const { ResourceNotFound } = await import('@polar-sh/sdk/models/errors/resourcenotfound');
     if (error instanceof ResourceNotFound) return null;
     throw error;
   }

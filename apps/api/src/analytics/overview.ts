@@ -1,4 +1,5 @@
-import { Effect, Clock } from 'effect';
+import * as Clock from 'effect/Clock';
+import * as Effect from 'effect/Effect';
 import { Infrastructure } from '../platform/resources';
 import { attempt, invalid, attemptSync } from '../shared/errors';
 import { getEnvironment } from '../sites/service';

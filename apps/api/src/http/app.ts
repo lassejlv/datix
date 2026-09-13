@@ -1,4 +1,5 @@
-import { Effect, type ManagedRuntime } from 'effect';
+import * as Effect from 'effect/Effect';
+import type * as ManagedRuntime from 'effect/ManagedRuntime';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { bodyLimit } from 'hono/body-limit';

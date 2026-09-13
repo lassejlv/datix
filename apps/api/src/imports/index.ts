@@ -1,25 +1,13 @@
-import { Effect } from 'effect';
+import * as Effect from 'effect/Effect';
 import { archiveImport, removeArchive } from '../platform/storage';
-import { createHash } from 'node:crypto';
 import { Infrastructure } from '../platform/resources';
 import { attempt, invalid, ApiError } from '../shared/errors';
 import { getEnvironment } from '../sites/service';
 import { id } from '../shared/validation';
+import { canonicalFingerprint } from './fingerprint';
 import { parse } from './parse';
 
 const conflict = (code: string, message: string) => new ApiError({ status: 409, code, message });
-
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object')
-    return Object.fromEntries(
-      Object.entries(value)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, v]) => [key, canonical(v)]),
-    );
-
-  return value;
-}
 
 export const imports = Effect.fn('imports')(function* (
   owner: string,
@@ -137,19 +125,13 @@ export const imports = Effect.fn('imports')(function* (
     if (Object.values(totals).some((n) => !Number.isSafeInteger(n)))
       throw invalid('Imported totals exceed the supported count limit.');
 
-    const fingerprint = createHash('sha256')
-      .update(
-        JSON.stringify(
-          canonical({
-            provider,
-            timeZone: zone,
-            days,
-            breakdowns: data.breakdowns,
-            metrics: data.metrics,
-          }),
-        ),
-      )
-      .digest('hex');
+    const fingerprint = canonicalFingerprint({
+      provider,
+      timeZone: zone,
+      days,
+      breakdowns: data.breakdowns,
+      metrics: data.metrics,
+    });
 
     const summary = {
       fingerprint,

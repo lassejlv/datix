@@ -1,4 +1,5 @@
-import { Effect, Clock } from 'effect';
+import * as Clock from 'effect/Clock';
+import * as Effect from 'effect/Effect';
 import { removeArchive, removeEnvironmentArchives } from '../platform/storage';
 import { Infrastructure } from '../platform/resources';
 import { attempt } from '../shared/errors';

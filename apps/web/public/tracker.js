@@ -266,6 +266,7 @@
         navigator.doNotTrack === '1'
       )
         return;
+      if (pending.size >= 32) return;
       const settings = config.settings;
       details = { ...details };
 
@@ -415,6 +416,7 @@
         navigator.doNotTrack === '1'
       )
         return;
+      if (pending.size >= 32) return;
       let id = diagnosticIds.get(metricId);
 
       if (!id) {
