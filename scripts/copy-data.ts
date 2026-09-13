@@ -2,7 +2,7 @@ import { SQL } from 'bun';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
-import { checkMigrations } from '../packages/database/src/migrations';
+import { checkMigrations } from '../packages/db/src/migrations';
 import { primaryTables, analyticsTables } from './migration/tables';
 import { openTarget, identity, type Target } from './migration/target';
 

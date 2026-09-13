@@ -1,5 +1,5 @@
 import { SQL } from 'bun';
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 
 const root = 'http://localhost:3107',
   origin = root;
@@ -16,32 +16,42 @@ const db = new SQL(testUrl.toString(), { max: 2, prepare: false });
 const analytics = db;
 const email = `bun-migration-${randomUUID()}@example.test`;
 const otherEmail = `bun-migration-${randomUUID()}@example.test`;
+const verificationLinks = new Map<string, string>();
 
-const child = Bun.spawn(['bun', 'apps/api/src/main.ts'], {
-  stdout: 'inherit',
-  stderr: 'inherit',
-  env: {
-    ...process.env,
-    REDIS_URL: process.env.TEST_REDIS_URL ?? process.env.REDIS_URL,
-    DATABASE_URL: runtimeUrl.toString(),
-    APP_URL: origin,
-    PORT: '3107',
-    EXTERNAL_EFFECTS: 'disabled',
-    BILLING_STATE_MODE: 'snapshot',
-    NODE_ENV: 'test',
-    BETTER_AUTH_SECRET: 'isolated-integration-secret-32-characters',
-    GITHUB_CLIENT_ID: '',
-    GITHUB_CLIENT_SECRET: '',
-    GOOGLE_CLIENT_ID: '',
-    GOOGLE_CLIENT_SECRET: '',
-    POLAR_ACCESS_TOKEN: '',
-    POLAR_WEBHOOK_SECRET: '',
-    S3_BUCKET: '',
-    QUEUE_PREFIX: 'datix-it-' + randomUUID(),
-    SERVICE_ROLE: 'combined',
-    ADMIN_EMAILS: email,
+const child = Bun.spawn(
+  ['bun', '--preload', './scripts/integration-email.ts', 'apps/api/src/main.ts'],
+  {
+    ipc(message: unknown) {
+      const data = message as { email?: unknown; url?: unknown };
+
+      if (typeof data.email === 'string' && typeof data.url === 'string')
+        verificationLinks.set(data.email, data.url);
+    },
+    stdout: 'inherit',
+    stderr: 'inherit',
+    env: {
+      ...process.env,
+      REDIS_URL: process.env.TEST_REDIS_URL ?? process.env.REDIS_URL,
+      DATABASE_URL: runtimeUrl.toString(),
+      APP_URL: origin,
+      PORT: '3107',
+      EXTERNAL_EFFECTS: 'disabled',
+      BILLING_STATE_MODE: 'snapshot',
+      NODE_ENV: 'test',
+      BETTER_AUTH_SECRET: 'isolated-integration-secret-32-characters',
+      GITHUB_CLIENT_ID: '',
+      GITHUB_CLIENT_SECRET: '',
+      GOOGLE_CLIENT_ID: '',
+      GOOGLE_CLIENT_SECRET: '',
+      POLAR_ACCESS_TOKEN: '',
+      POLAR_WEBHOOK_SECRET: '',
+      S3_BUCKET: '',
+      QUEUE_PREFIX: 'datix-it-' + randomUUID(),
+      SERVICE_ROLE: 'combined',
+      ADMIN_EMAILS: email,
+    },
   },
-});
+);
 
 let cookie = '',
   owner = '',
@@ -64,6 +74,27 @@ async function request(path: string, method = 'GET', body?: unknown) {
   return { response, value };
 }
 
+async function verifyAccount(address: string) {
+  const link = verificationLinks.get(address);
+
+  if (!link) throw new Error('Verification email was not captured');
+
+  const url = new URL(link);
+
+  if (url.origin !== origin || url.pathname !== '/api/auth/verify-email')
+    throw new Error('Unexpected verification URL');
+
+  const response = await fetch(url, { headers: { origin, cookie }, redirect: 'manual' });
+
+  if (response.status !== 302 || response.headers.get('location') !== '/dashboard')
+    throw new Error('Email verification did not redirect to the app');
+
+  cookie = response.headers
+    .getSetCookie()
+    .map((s) => s.split(';')[0])
+    .join('; ');
+}
+
 try {
   for (let n = 0; n < 30; n++) {
     if (
@@ -79,6 +110,7 @@ try {
     name: 'Bun Migration Fixture',
     email,
     password: 'secure-isolated-fixture-password',
+    callbackURL: '/dashboard',
   });
 
   cookie = signup.response.headers
@@ -86,7 +118,52 @@ try {
     .map((s) => s.split(';')[0])
     .join('; ');
   owner = signup.value.user.id;
+  if (signup.value.token !== null || cookie) throw new Error('Unverified signup created a session');
+
+  const denied = await fetch(root + '/api/auth/sign-in/email', {
+    method: 'POST',
+    headers: { origin, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      password: 'secure-isolated-fixture-password',
+      callbackURL: '/dashboard',
+    }),
+  });
+
+  if (denied.status !== 403 || (await denied.json()).code !== 'EMAIL_NOT_VERIFIED')
+    throw new Error('Unverified password sign-in was allowed');
+
+  await request('/auth/send-verification-email', 'POST', { email, callbackURL: '/dashboard' });
+
+  const verification = new URL(verificationLinks.get(email)!);
+  const token = verification.searchParams.get('token')!;
+  const [header, encoded] = token.split('.');
+
+  const expired = Buffer.from(
+    JSON.stringify({ ...JSON.parse(Buffer.from(encoded, 'base64url').toString()), exp: 1 }),
+  ).toString('base64url');
+
+  const signature = createHmac('sha256', 'isolated-integration-secret-32-characters')
+    .update(`${header}.${expired}`)
+    .digest('base64url');
+
+  for (const invalidToken of ['invalid-token', `${header}.${expired}.${signature}`]) {
+    verification.searchParams.set('token', invalidToken);
+
+    const invalid = await fetch(verification, { redirect: 'manual' });
+    if (invalid.status !== 302 || !invalid.headers.get('location')?.includes('error='))
+      throw new Error('Invalid or expired verification link was not rejected');
+  }
+
+  await verifyAccount(email);
   if (!(await request('/me')).value.user.id) throw new Error('Session failed');
+
+  // Old sessions cannot bypass the verification requirement.
+  await db`UPDATE "user" SET email_verified=false WHERE id=${owner}`;
+  const oldSession = await fetch(root + '/api/me', { headers: { cookie } });
+  if (oldSession.status !== 403 || (await oldSession.json()).error.code !== 'email_not_verified')
+    throw new Error('Unverified existing session reached protected account data');
+  await db`UPDATE "user" SET email_verified=true WHERE id=${owner}`;
   site = (
     await request('/sites', 'POST', { name: 'Bun migration fixture', domain: 'example.test' })
   ).value.site.id;
@@ -99,6 +176,7 @@ try {
       name: 'Other tenant fixture',
       email: otherEmail,
       password: 'secure-other-fixture-password',
+      callbackURL: '/dashboard',
     });
 
     otherOwner = otherSignup.value.user.id;
@@ -106,6 +184,7 @@ try {
       .getSetCookie()
       .map((s) => s.split(';')[0])
       .join('; ');
+    await verifyAccount(otherEmail);
     otherSite = (
       await request('/sites', 'POST', { name: 'Other tenant', domain: 'other.example.test' })
     ).value.site.id;
@@ -481,7 +560,7 @@ try {
   const suspended = await fetch(root + '/api/me', { headers: { cookie } });
   if (suspended.status !== 403) throw new Error('Suspension failed');
   console.log(
-    'PASS auth, onboarding, ingestion, idempotency, Timescale reports, usage, imports, tenant isolation, suspension',
+    'PASS auth, email verification, onboarding, ingestion, idempotency, Timescale reports, usage, imports, tenant isolation, suspension',
   );
 } finally {
   for (const [fixtureOwner, fixtureEmail] of [

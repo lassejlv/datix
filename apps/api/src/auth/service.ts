@@ -6,7 +6,8 @@ import { hashPassword, verifyPassword } from 'better-auth/crypto';
 import * as Context from 'effect/Context';
 import * as Effect from 'effect/Effect';
 import * as Layer from 'effect/Layer';
-import * as schema from '@datix/database/auth-schema';
+import * as schema from '@datix/db/auth-schema';
+import { sendVerificationEmail } from '@datix/email';
 import { Infrastructure } from '../platform/resources';
 import { attempt, ApiError } from '../shared/errors';
 
@@ -22,9 +23,27 @@ function makeAuth(r: Infrastructure['Service']) {
     database: drizzleAdapter(r.db, { provider: 'pg', schema, transaction: true }),
     emailAndPassword: {
       enabled: true,
+      requireEmailVerification: true,
       minPasswordLength: 8,
       maxPasswordLength: 128,
       password: { hash: hashPassword, verify: verifyPassword },
+    },
+    emailVerification: {
+      sendVerificationEmail: async (data) => {
+        try {
+          await sendVerificationEmail(data);
+        } catch {
+          // Provider errors may include recipient details or the verification URL.
+          throw new APIError('SERVICE_UNAVAILABLE', {
+            code: 'EMAIL_DELIVERY_FAILED',
+            message: 'Verification email could not be sent. Please try again.',
+          });
+        }
+      },
+      sendOnSignUp: true,
+      sendOnSignIn: true,
+      autoSignInAfterVerification: true,
+      expiresIn: 3600,
     },
     advanced: {
       cookiePrefix: 'better-auth',
@@ -40,7 +59,11 @@ function makeAuth(r: Infrastructure['Service']) {
       },
     },
     session: { cookieCache: { enabled: false } },
-    rateLimit: { enabled: true, storage: 'database' },
+    rateLimit: {
+      enabled: true,
+      storage: 'database',
+      customRules: { '/send-verification-email': { window: 60, max: 3 } },
+    },
     socialProviders: {
       ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
         ? {
@@ -92,6 +115,13 @@ export const identity = Effect.fn('identity')(function* (headers: Headers) {
       status: 401,
       code: 'unauthorized',
       message: 'Sign in to continue.',
+    });
+
+  if (!session.user.emailVerified)
+    return yield* new ApiError({
+      status: 403,
+      code: 'email_not_verified',
+      message: 'Verify your email address before using your account.',
     });
 
   const blocked = yield* attempt(

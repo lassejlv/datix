@@ -1,5 +1,5 @@
 {
-  "name": "@datix/database",
+  "name": "@datix/db",
   "private": true,
   "type": "module",
   "exports": {

@@ -1,4 +1,14 @@
 export const en = {
+  'Check your inbox.': 'Check your inbox.',
+  'Verify {email} to use your Datix account.': 'Verify {email} to use your Datix account.',
+  'Open the verification link in your email. It expires in one hour.':
+    'Open the verification link in your email. It expires in one hour.',
+  'Verification email sent. Check your inbox and spam folder.':
+    'Verification email sent. Check your inbox and spam folder.',
+  'Resend verification email': 'Resend verification email',
+  'Back to sign in': 'Back to sign in',
+  'This verification link is invalid or expired. Sign in to receive a new one.':
+    'This verification link is invalid or expired. Sign in to receive a new one.',
   'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
     'Hourly traffic chart. Use left and right arrow keys to inspect each hour.',
   'Live data is temporarily unavailable.': 'Live data is temporarily unavailable.',

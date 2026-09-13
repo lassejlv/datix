@@ -1,6 +1,6 @@
 import { SQL } from 'bun';
 import { parseArgs } from 'node:util';
-import { readMigrations, checkMigrations } from '../packages/database/src/migrations';
+import { readMigrations, checkMigrations } from '../packages/db/src/migrations';
 
 const { values } = parseArgs({
   options: { apply: { type: 'boolean' }, 'expect-host': { type: 'string' } },

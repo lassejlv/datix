@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.7.3",
-    "@datix/database": "workspace:*",
+    "@datix/db": "workspace:*",
+    "@datix/email": "workspace:*",
     "@polar-sh/sdk": "^0.49.0",
     "better-auth": "^1.7.3",
     "bullmq": "^6.3.4",

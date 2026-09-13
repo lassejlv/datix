@@ -2,7 +2,7 @@ import { SQL } from 'bun';
 import { randomBytes } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
-import { checkMigrations } from '../packages/database/src/migrations';
+import { checkMigrations } from '../packages/db/src/migrations';
 import { analyticsTables, primaryTables } from './migration/tables';
 
 const { values } = parseArgs({

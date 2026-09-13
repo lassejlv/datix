@@ -10,7 +10,7 @@ const ignorePatterns = [
   '.vite/**',
   'apps/web/src/routeTree.gen.ts',
   'apps/web/public/web-vitals.js',
-  'packages/database/migrations/**',
+  'packages/db/migrations/**',
 ];
 
 export default defineConfig({

@@ -1,6 +1,6 @@
 import * as Effect from 'effect/Effect';
 import { and, eq, asc, inArray, sql } from 'drizzle-orm';
-import { sites, environments } from '@datix/database/primary-schema';
+import { sites, environments } from '@datix/db/primary-schema';
 import { Infrastructure } from '../platform/resources';
 import { attempt, ApiError, invalid, attemptSync } from '../shared/errors';
 import { allowance, subscriptionRequired } from '../billing/service';

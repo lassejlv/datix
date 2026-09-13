@@ -1,5 +1,5 @@
 import type { Resources } from './resources';
-import { checkMigrations } from '@datix/database/migrations';
+import { checkMigrations } from '@datix/db/migrations';
 
 export async function checkSchema(r: Resources) {
   await checkMigrations(r.sql);

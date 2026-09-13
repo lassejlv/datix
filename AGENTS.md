@@ -1,6 +1,8 @@
 # Datix
 
-Bun + Hono + Effect v4 API in `apps/api`, React frontend and tracker in `apps/web`, Drizzle schemas and migrations in `packages/database`. Preserve existing API routes, payloads, auth cookies, and billing contracts.
+Bun + Hono + Effect v4 API in `apps/api`, React frontend and tracker in `apps/web`, Drizzle schemas and migrations in `packages/db`. Preserve existing API routes, payloads, auth cookies, and billing contracts.
+
+Email delivery and React Email templates live in `packages/email` (`@datix/email`). Unverified accounts must not access protected API routes; keep verification and resend flows available.
 
 Use one Neon PostgreSQL 18 database with TimescaleDB for application and analytics data. Bun provides SQL, Redis, and optional S3; BullMQ handles background delivery. Use Timescale chunks and indexes, not a separate analytics store or manual partitions.
 

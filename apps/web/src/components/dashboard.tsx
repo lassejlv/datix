@@ -65,14 +65,35 @@ export function AnalyticsApp() {
     [error, setError] = useState(''),
     [reload, setReload] = useState(0);
 
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   useEffect(() => {
     const controller = new AbortController();
     setError('');
     apiClient<{ user: User }>('/me', { signal: controller.signal })
       .then((data) => setUser(data.user))
-      .catch((error) => {
+      .catch(async (error) => {
         if (controller.signal.aborted) return;
-        if (error instanceof ApiError && error.status === 401) setUser(null);
+
+        if (error instanceof ApiError && error.code === 'email_not_verified') {
+          try {
+            const session = await apiClient<{ user: { email: string } } | null>(
+              '/auth/get-session',
+              { signal: controller.signal },
+            );
+
+            if (controller.signal.aborted) return;
+            setUnverifiedEmail(session?.user.email ?? '');
+          } catch {
+            if (controller.signal.aborted) return;
+          }
+        }
+
+        if (
+          error instanceof ApiError &&
+          (error.status === 401 || error.code === 'email_not_verified')
+        )
+          setUser(null);
         else setError(errorText(error));
       });
 
@@ -126,6 +147,7 @@ export function AnalyticsApp() {
     </AccountAccess>
   ) : (
     <AuthScreen
+      unverifiedEmail={unverifiedEmail}
       initialSignup={pathname === '/signup'}
       onModeChange={(signup) => {
         void navigate({ to: signup ? '/signup' : '/signin' });

@@ -61,6 +61,7 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    public code?: string,
   ) {
     super(message);
   }
@@ -78,6 +79,7 @@ export async function apiClient<T>(path: string, init: RequestInit = {}): Promis
   const data = (await response.json()) as {
     error?: { code?: string; message?: string };
     message?: string;
+    code?: string;
   };
 
   if (
@@ -94,6 +96,7 @@ export async function apiClient<T>(path: string, init: RequestInit = {}): Promis
         (response.status === 429
           ? 'Too many requests. Try again in a minute.'
           : 'This request could not be completed. Please try again.'),
+      data.error?.code ?? data.code,
     );
 
   return data as T;

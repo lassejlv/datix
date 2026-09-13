@@ -1,6 +1,16 @@
 import type { Copy } from './en';
 
 export const de = {
+  'Check your inbox.': 'Prüfe deinen Posteingang.',
+  'Verify {email} to use your Datix account.': 'Bestätige {email}, um dein Datix-Konto zu nutzen.',
+  'Open the verification link in your email. It expires in one hour.':
+    'Öffne den Bestätigungslink in deiner E-Mail. Er läuft in einer Stunde ab.',
+  'Verification email sent. Check your inbox and spam folder.':
+    'Bestätigungs-E-Mail gesendet. Prüfe deinen Posteingang und Spamordner.',
+  'Resend verification email': 'Bestätigungs-E-Mail erneut senden',
+  'Back to sign in': 'Zurück zur Anmeldung',
+  'This verification link is invalid or expired. Sign in to receive a new one.':
+    'Dieser Bestätigungslink ist ungültig oder abgelaufen. Melde dich an, um einen neuen zu erhalten.',
   'Checking your subscription…': 'Dein Abonnement wird geprüft…',
   'Choose a plan to continue': 'Wähle einen Tarif, um fortzufahren',
   'Choose a plan to continue.': 'Wähle einen Tarif, um fortzufahren.',

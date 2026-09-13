@@ -4,6 +4,7 @@
     "module": "Preserve",
     "moduleResolution": "bundler",
     "strict": true,
+    "jsx": "react-jsx",
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["bun"],

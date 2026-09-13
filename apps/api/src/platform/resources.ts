@@ -5,7 +5,7 @@ import { checkSchema } from './schema';
 import { RedisClient, SQL, S3Client } from 'bun';
 import { drizzle } from 'drizzle-orm/bun-sql';
 import { Queue, createBunRedisClient } from 'bullmq';
-import * as schema from '@datix/database/primary-schema';
+import * as schema from '@datix/db/primary-schema';
 import { redisConnection } from './redis';
 import { readConfig, type Config } from './config';
 import { attempt, unavailable } from '../shared/errors';
