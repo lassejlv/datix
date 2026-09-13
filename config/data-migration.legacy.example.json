@@ -1,0 +1,20 @@
+{
+  "source": {
+    "host": "ep-soft-morning-b18e39wv.c-5.eu-central-1.aws.neon.tech",
+    "port": 5432,
+    "database": "analytics",
+    "role": "analytics_runtime",
+    "urlEnv": "LEGACY_DATABASE_URL"
+  },
+  "target": {
+    "host": "ep-red-shape-b1wifxvx.c-5.eu-central-1.aws.neon.tech",
+    "port": 5432,
+    "database": "datix",
+    "role": "datix_owner",
+    "urlEnv": "DATABASE_URL_UNPOOLED",
+    "projectId": "rapid-flower-57581427",
+    "branchId": "br-ancient-smoke-b1le6vrt"
+  },
+  "rawFrom": "2026-09-13",
+  "batchSize": 500
+}

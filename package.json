@@ -1,0 +1,40 @@
+{
+  "name": "datix",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "bun scripts/dev.ts",
+    "build": "vp run -r build",
+    "typecheck": "vp run -r typecheck && tsc --noEmit -p scripts/tsconfig.json",
+    "test": "bun test apps/api/tests",
+    "check": "vp check && bun run typecheck && bun run test",
+    "lint": "vp lint",
+    "format": "vp fmt",
+    "db:generate": "bun run --cwd packages/database generate",
+    "db:migrate": "bun scripts/migrate.ts",
+    "start": "bun apps/api/src/main.ts",
+    "data:copy": "bun scripts/copy-data.ts",
+    "test:integration": "bun --env-file=.env --env-file=.env.test scripts/integration.ts",
+    "db:runtime": "bun scripts/runtime-role.ts",
+    "lint:fix": "vp lint --fix",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
+    "format:check": "vp fmt --check"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.1",
+    "effect": "4.0.0-rc.115",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
+    "vite-plus": "0.3.1"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
+    "vitest": "4.1.11"
+  },
+  "packageManager": "bun@1.4.2"
+}
