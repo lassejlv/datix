@@ -1,0 +1,11 @@
+{
+  "name": "datix-origin-headers",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-14",
+  "account_id": "a3bad09d467f7e00ca2f879e28ecb620",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "usedatix.com/api/collect*", "zone_name": "usedatix.com" },
+    { "pattern": "usedatix.com/api/preferences", "zone_name": "usedatix.com" }
+  ]
+}

@@ -9,6 +9,7 @@ pub mod config;
 mod diagnostics;
 mod email;
 pub mod error;
+mod geo;
 mod http;
 mod imports;
 mod ingestion;
@@ -40,6 +41,7 @@ pub struct AppState {
     pub health: Arc<workers::Health>,
     pub storage: storage::Storage,
     pub(crate) mailer: Option<Arc<email::Mailer>>,
+    pub(crate) geo: Arc<geo::Geo>,
 }
 
 impl AppState {
@@ -97,6 +99,7 @@ impl AppState {
         .with_social_providers(providers);
         let health = Arc::new(workers::Health::new(config.workers));
         let storage = storage::Storage::from_env(config.external_effects)?;
+        let geo = Arc::new(geo::Geo::load()?);
         Ok(Self {
             config,
             pool,
@@ -107,6 +110,7 @@ impl AppState {
             health,
             storage,
             mailer,
+            geo,
         })
     }
 }

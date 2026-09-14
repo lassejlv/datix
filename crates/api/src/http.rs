@@ -300,17 +300,7 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
     } else {
         peer
     };
-    let country = if trusted {
-        request
-            .headers()
-            .get("cf-ipcountry")
-            .and_then(|v| v.to_str().ok())
-            .filter(|v| v.len() == 2 && v.bytes().all(|b| b.is_ascii_uppercase()))
-            .unwrap_or("")
-            .to_owned()
-    } else {
-        String::new()
-    };
+    let country = state.geo.country(&ip);
     request.extensions_mut().insert(Country(country));
     // Replace client-supplied internal headers before the auth crate sees them.
     request.headers_mut().remove("x-datix-client-ip");

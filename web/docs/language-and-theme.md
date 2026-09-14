@@ -2,7 +2,7 @@
 
 The landing page, pricing, FAQs and public dialogs support English, German and Danish. Dashboard/account copy and the dashboard example image remain English.
 
-The TanStack Router root loader fetches `GET /api/preferences` from Axum. The API uses trusted country metadata: DK → Danish, DE/AT → German, everything else → English. The Rust ingress authenticates the Cloudflare proxy before accepting its country header; the app never requests browser location or uses a third-party IP lookup.
+The TanStack Router root loader fetches `GET /api/preferences` from Axum. The API uses country metadata from the visitor IP: DK → Danish, DE/AT → German, everything else → English. The app never requests browser location or calls a live geolocation API.
 
 The footer saves explicit language and theme choices in `ab-language` and `ab-theme` preference cookies (one year, SameSite=Lax, Secure on HTTPS). Explicit language, including English, overrides country selection. Invalid cookies fall back safely. These preference cookies are separate from analytics tracking. The client validates the API response and uses its saved choices if the preference request fails.
 

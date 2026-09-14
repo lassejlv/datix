@@ -146,6 +146,11 @@ contains the Rust server, migration binary, and static assets, running as a non-
   Keep owner credentials confined to the pre-deploy job's use; the API command
   must unset `DATABASE_URL_UNPOOLED`. Never upload legacy-source credentials.
 - Trust Cloudflare forwarding headers only with matching `x-analytics-origin-key`.
+  Worker `datix-origin-headers` on `usedatix.com/api/collect*` and
+  `/api/preferences` injects that key so the API can use `cf-connecting-ip`.
+  Country is resolved from that visitor IP with the bundled DB-IP country
+  database, not from Cloudflare country headers. Deploy the worker from
+  `cloudflare/origin-headers`.
   Protect `/internal/metrics` with its bearer token.
   Preserve Polar webhook `/api/webhooks/polar`.
 - Enable live external effects only after a verified, explicitly requested cutover.
