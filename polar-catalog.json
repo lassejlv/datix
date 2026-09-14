@@ -1,0 +1,86 @@
+{
+  "organizationId": "8ded9438-0be0-4f4a-8cef-f448d77c202c",
+  "currency": "usd",
+  "apiVersion": "2026-04",
+  "meter": {
+    "id": "774b9590-ae5d-4d44-a046-2cba78bc25c3",
+    "eventName": "events",
+    "quantityProperty": "quantity"
+  },
+  "analyticsBenefitId": "cf481448-f3cb-4b96-b546-25d68978a517",
+  "websitesBenefitId": "be3501b2-2ecf-4f7f-81cf-f5bd443df61a",
+  "plans": [
+    {
+      "id": "basic",
+      "name": "Basic",
+      "productId": "585ae927-4cc9-48b0-bb20-1323c9ac2837",
+      "events": 15000,
+      "websites": 10,
+      "interval": "month",
+      "price": 900,
+      "trialDays": 14,
+      "checkoutEnabled": true,
+      "eventsBenefitId": "fc842091-591b-4ad3-878d-b3dce7b0b036"
+    },
+    {
+      "id": "basic_annual",
+      "name": "Basic",
+      "productId": "8d317d92-f9c3-444e-92e0-a668646681de",
+      "events": 15000,
+      "websites": 10,
+      "interval": "year",
+      "price": 9000,
+      "trialDays": 14,
+      "checkoutEnabled": false,
+      "eventsBenefitId": "fc842091-591b-4ad3-878d-b3dce7b0b036"
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "productId": "5ac9604f-1de3-4998-95fa-c87979b2c738",
+      "events": 500000,
+      "websites": 10,
+      "interval": "month",
+      "price": 4900,
+      "trialDays": 0,
+      "checkoutEnabled": true,
+      "eventsBenefitId": "f6d3f9c1-6c3e-4853-8a52-d39b68df02c7"
+    },
+    {
+      "id": "pro_annual",
+      "name": "Pro",
+      "productId": "2cbd0aad-d8dd-4582-b9b5-f02446089746",
+      "events": 500000,
+      "websites": 10,
+      "interval": "year",
+      "price": 49000,
+      "trialDays": 0,
+      "checkoutEnabled": false,
+      "eventsBenefitId": "f6d3f9c1-6c3e-4853-8a52-d39b68df02c7"
+    },
+    {
+      "id": "ultra",
+      "name": "Ultra",
+      "productId": "ef6eef33-2fdb-44c7-998a-54d3d57596c4",
+      "events": 5000000,
+      "websites": 10,
+      "interval": "month",
+      "price": 14900,
+      "trialDays": 0,
+      "checkoutEnabled": true,
+      "eventsBenefitId": "49d5375c-43c0-4757-a69d-655c273b09bb"
+    },
+    {
+      "id": "ultra_annual",
+      "name": "Ultra",
+      "productId": "83a73910-1c3e-48a3-8522-6a065087fc93",
+      "events": 5000000,
+      "websites": 10,
+      "interval": "year",
+      "price": 149000,
+      "trialDays": 0,
+      "checkoutEnabled": false,
+      "eventsBenefitId": "49d5375c-43c0-4757-a69d-655c273b09bb"
+    }
+  ]
+}
