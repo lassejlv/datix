@@ -86,6 +86,9 @@ export function LandingLayout({
                 <a href="/privacy">{t('Privacy policy')}</a>
               </li>
               <li>
+                <a href="/dpa">{t('Data processing agreement')}</a>
+              </li>
+              <li>
                 <button
                   type="button"
                   className="landing-inline-link"

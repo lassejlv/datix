@@ -1,4 +1,9 @@
 export const en = {
+  'Data processing agreement': 'Data processing agreement',
+  'Download agreement': 'Download agreement',
+  'Print / save PDF': 'Print / save PDF',
+  'Your agreements': 'Your agreements',
+  'Agreement required': 'Agreement required',
   'Backend error monitoring': 'Backend error monitoring',
   'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.':
     'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.',

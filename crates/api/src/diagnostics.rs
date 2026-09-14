@@ -158,6 +158,9 @@ async fn telemetry(state: &AppState, input: Input, headers: &HeaderMap) -> Resul
         .bind(environment).bind(site).fetch_optional(&state.pool).await?.ok_or_else(||ApiError::new(StatusCode::BAD_REQUEST,"invalid_request","Environment not found."))?;
     let features: Value = env.get("feature_settings");
     let mut connection = state.pool.acquire().await?;
+    if !crate::legal::has_accepted(&mut connection, env.get("owner_id")).await? {
+        return Ok(json!({"accepted":false,"reason":"agreement_required"}));
+    }
     if !env.get::<bool, _>("enabled")
         || !features[if input.kind == "error" {
             "errors"
@@ -237,6 +240,9 @@ pub async fn ingest(state: &AppState, d: Diagnostic) -> Result<(), ApiError> {
         .bind(&owner)
         .execute(&mut *tx)
         .await?;
+    if !crate::legal::has_accepted(&mut tx, &owner).await? {
+        return Ok(());
+    }
     let Some(active) = billing::allowance(
         &mut tx,
         &owner,

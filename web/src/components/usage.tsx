@@ -28,6 +28,8 @@ export function useAccountUsage(refreshKey: string) {
         if (!controller.signal.aborted) {
           setData(result);
           setError('');
+          if (result.pauseReason === 'agreement_required')
+            window.dispatchEvent(new Event('datix:agreement-required'));
         }
       } catch (error) {
         if (!controller.signal.aborted) setError(errorText(error));
@@ -80,17 +82,19 @@ export function useAccountUsage(refreshKey: string) {
 }
 
 const reasonLabel = (reason: UsagePauseReason | null) =>
-  reason === 'subscription_required'
-    ? 'Subscription required'
-    : reason === 'event_limit'
-      ? 'Event limit reached'
-      : reason === 'website_budget'
-        ? 'Website budget reached'
-        : reason === 'website_limit'
-          ? 'Website limit reached'
-          : reason === 'disabled'
-            ? 'Disabled'
-            : 'Collecting';
+  reason === 'agreement_required'
+    ? 'Agreement required'
+    : reason === 'subscription_required'
+      ? 'Subscription required'
+      : reason === 'event_limit'
+        ? 'Event limit reached'
+        : reason === 'website_budget'
+          ? 'Website budget reached'
+          : reason === 'website_limit'
+            ? 'Website limit reached'
+            : reason === 'disabled'
+              ? 'Disabled'
+              : 'Collecting';
 
 export function PlanHeading({ data, action }: { data: AccountUsage; action?: ReactNode }) {
   const { dateTime, t } = useSitePreferences();

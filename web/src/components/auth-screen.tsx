@@ -342,6 +342,23 @@ export function AuthScreen({
                   {signup ? t('Sign in') : t('Create an account')}
                 </button>
               </p>
+              {signup && (
+                <p lang="en" className="mt-5 text-center text-xs leading-5 text-secondary-ink">
+                  By creating an account, you agree to the{' '}
+                  <a className="underline" href="/terms" target="_blank" rel="noopener">
+                    Terms
+                  </a>
+                  . After verifying your account, confirm your customer details and accept the{' '}
+                  <a className="underline" href="/dpa" target="_blank" rel="noopener">
+                    DPA
+                  </a>{' '}
+                  before collecting analytics. See our{' '}
+                  <a className="underline" href="/privacy" target="_blank" rel="noopener">
+                    Privacy Policy
+                  </a>
+                  .
+                </p>
+              )}
             </>
           )}
         </PageTransition>
@@ -351,6 +368,7 @@ export function AuthScreen({
         <nav aria-label={t('Footer navigation')}>
           <a href="/privacy">{t('Privacy')}</a>
           <a href="/terms">{t('Terms')}</a>
+          <a href="/dpa">DPA</a>
           <FooterPreferences />
         </nav>
       </footer>

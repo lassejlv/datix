@@ -16,10 +16,12 @@ import { Spinner } from './ui/spinner';
 export function AccountAccess({
   user,
   onSignedOut,
+  account,
   children,
 }: {
   user: User;
   onSignedOut: () => void;
+  account: ReactNode;
   children: (usage: ReturnType<typeof useAccountUsage>) => ReactNode;
 }) {
   const { t, message: messageText } = useSitePreferences();
@@ -80,6 +82,8 @@ export function AccountAccess({
           <div role="status" className="flex items-center gap-3 py-12 text-secondary-ink">
             <Spinner /> {t('Checking your subscription…')}
           </div>
+        ) : pathname === '/account' ? (
+          account
         ) : !usage.data.onboardingCompleted ? (
           <AccountOnboarding user={user} onCompleted={usage.refresh} />
         ) : (

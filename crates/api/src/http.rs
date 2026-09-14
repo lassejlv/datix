@@ -70,6 +70,7 @@ pub fn router(state: AppState) -> Router {
         .merge(crate::diagnostics::routes())
         .merge(crate::admin::routes())
         .merge(crate::imports::routes())
+        .merge(crate::legal::routes())
         .fallback_service(frontend(std::path::Path::new("web/dist/client")))
         .layer(middleware::from_fn_with_state(state.clone(), security))
         .layer(sentry::integrations::tower::NewSentryLayer::<Request>::new_from_top())
@@ -319,7 +320,7 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
     let result=async {
         if tracker && request.method()==Method::OPTIONS {return Ok(StatusCode::NO_CONTENT.into_response());}
         if api && request.method()==Method::HEAD {return Err(ApiError::new(StatusCode::METHOD_NOT_ALLOWED,"method_not_allowed","Use GET."));}
-        let account=path.strip_prefix("/api/").and_then(|v|v.split('/').next()).is_some_and(|v|matches!(v,"auth"|"sites"|"me"|"usage"|"billing"|"admin"|"onboarding"));
+        let account=path.strip_prefix("/api/").and_then(|v|v.split('/').next()).is_some_and(|v|matches!(v,"auth"|"sites"|"me"|"usage"|"billing"|"admin"|"onboarding"|"legal"));
         if account {
             if request.method()!=Method::GET && request.headers().get(header::ORIGIN).and_then(|v|v.to_str().ok())!=Some(&state.config.app_url) {
                 return Err(ApiError::new(StatusCode::FORBIDDEN,"invalid_origin","Use the application origin for account mutations."));
@@ -333,6 +334,7 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
                 let key=format!("{}:account:{}",state.config.queue_prefix,hex::encode(mac.finalize().into_bytes()));
                 let count:i64=redis::cmd("EVAL").arg("local n=redis.call('INCR',KEYS[1]);if n==1 then redis.call('EXPIRE',KEYS[1],60) end;return n").arg(1).arg(key).query_async(&mut state.redis.clone()).await?;
                 if count>600 {return Err(ApiError::new(StatusCode::TOO_MANY_REQUESTS,"rate_limited","Too many requests. Try again in a minute."));}
+                if (path.starts_with("/api/sites") && !matches!(*request.method(),Method::GET|Method::DELETE)) || path=="/api/onboarding/complete" || path=="/api/billing/checkout" {crate::legal::require(&state,&owner.id).await?;}
                 let completed=if path=="/api/sites" && request.method()==Method::GET {sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM account_onboarding WHERE owner_id=$1)").bind(&owner.id).fetch_one(&state.pool).await?} else {false};
                 if path.starts_with("/api/sites/") || completed {billing::require_subscription(&state,&owner.id).await?;}
                 request.extensions_mut().insert(owner);

@@ -620,6 +620,29 @@
   font-size: 0.875em;
   overflow-wrap: anywhere;
 }
+@media print {
+  .landing-header,
+  .landing-footer,
+  .landing-skip,
+  .legal-actions {
+    display: none !important;
+  }
+  .landing-page,
+  .legal-document,
+  .legal-document p,
+  .legal-document ul {
+    background: white !important;
+    color: black !important;
+  }
+  .legal-page {
+    max-width: none;
+    padding: 0;
+  }
+  .legal-document h2,
+  .legal-document h3 {
+    break-after: avoid;
+  }
+}
 .landing-inline-link {
   border: 0;
   background: transparent;

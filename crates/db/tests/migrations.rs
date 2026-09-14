@@ -36,7 +36,7 @@ async fn migration_failures_roll_back_schema_and_history_and_baselines_reject_dr
     let mut failing = expected.clone();
     let sql = "CREATE TABLE public.rust_migration_atomicity_fixture(id integer); SELECT 1/0;";
     failing.push(Migration {
-        name: "0002_atomicity_fixture.sql".into(),
+        name: "9999_atomicity_fixture.sql".into(),
         sql: sql.into(),
         checksum: hex::encode(Sha256::digest(sql.as_bytes())),
     });

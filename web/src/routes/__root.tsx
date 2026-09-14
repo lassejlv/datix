@@ -84,6 +84,7 @@ function DocumentMetadata() {
       pricing: 'Pricing',
       terms: 'Terms of service',
       privacy: 'Privacy policy',
+      dpa: 'Data processing agreement',
       usage: 'Usage',
       dashboard: 'Your workspace',
       account: 'Account settings',

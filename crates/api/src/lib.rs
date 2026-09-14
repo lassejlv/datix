@@ -14,6 +14,7 @@ mod imports;
 mod ingestion;
 #[cfg(test)]
 mod ingestion_tests;
+mod legal;
 mod maintenance;
 pub mod monitoring;
 mod queue;

@@ -18,7 +18,10 @@ pub async fn verify(state: &AppState, owner: &str, email: &str, site: &str, cook
     let (status, _, body) = call(&admin, "GET", "/api/admin/status", Value::Null, cookie).await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(body["status"], "ok");
-    assert_eq!(body["dependencies"]["database"]["schemaVersion"], 2);
+    assert_eq!(
+        body["dependencies"]["database"]["schemaVersion"],
+        datix_db::migrations::bundled().len()
+    );
     let (_, _, body) = call(
         &admin,
         "GET",

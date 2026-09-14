@@ -1,6 +1,11 @@
 import type { Copy } from './en';
 
 export const de = {
+  'Data processing agreement': 'Auftragsverarbeitungsvertrag',
+  'Download agreement': 'Vertrag herunterladen',
+  'Print / save PDF': 'Drucken / als PDF speichern',
+  'Your agreements': 'Ihre Verträge',
+  'Agreement required': 'Vertrag erforderlich',
   'Backend error monitoring': 'Backend-Fehlerüberwachung',
   'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.':
     'Eine harmlose Backend-Testmeldung für Sentry einreihen. Höchstens einmal alle 30 Sekunden.',

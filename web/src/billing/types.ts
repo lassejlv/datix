@@ -21,6 +21,7 @@ export type BillingSubscription = {
 };
 
 export type UsagePauseReason =
+  | 'agreement_required'
   | 'subscription_required'
   | 'event_limit'
   | 'website_limit'

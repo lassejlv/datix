@@ -185,7 +185,9 @@ pub async fn usage(state: &AppState, owner: &str) -> Result<Value, ApiError> {
     let remaining = active.as_ref().map_or(Some(0), |a| {
         a.entitlement.remaining.map(|r| (r - reserved).max(0))
     });
-    let reason = if active.is_none() {
+    let reason = if !crate::legal::has_accepted(&mut connection, owner).await? {
+        Some("agreement_required")
+    } else if active.is_none() {
         Some("subscription_required")
     } else if remaining.is_some_and(|r| r < 15) {
         Some("event_limit")

@@ -149,6 +149,27 @@ async fn receipts_policy_changes_telemetry_recovery_and_worker_lifecycle() {
         request(&state, "/api/collect", Some(input.clone()), None).await;
     assert_eq!(status, 202, "{rejected}");
     assert_eq!(headers["access-control-allow-origin"], "*");
+    assert_eq!(rejected["reason"], "agreement_required");
+    let (_, _, config) = request(
+        &state,
+        &format!("/api/tracker-config?siteId={site}"),
+        None,
+        None,
+    )
+    .await;
+    assert_eq!(config["enabled"], false);
+    let telemetry = json!({"siteId":site,"environmentId":site,"id":Uuid::new_v4(),"pageId":Uuid::new_v4(),"url":"https://collector.example.test/path","kind":"vital","payload":{"name":"LCP","value":1},"consent":false});
+    let (_, _, rejected) = request(&state, "/api/telemetry", Some(telemetry), None).await;
+    assert_eq!(rejected["reason"], "agreement_required");
+    let saved: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM ingestion_receipts WHERE owner_id=$1")
+            .bind(&owner)
+            .fetch_one(&state.pool)
+            .await
+            .unwrap();
+    assert_eq!(saved, 0);
+    crate::legal::fixture(&state, &owner).await;
+    let (_, _, rejected) = request(&state, "/api/collect", Some(input.clone()), None).await;
     assert_eq!(rejected["reason"], "subscription_required");
     let start = Utc::now() - Duration::days(1);
     let end = Utc::now() + Duration::days(29);
@@ -368,6 +389,11 @@ async fn receipts_policy_changes_telemetry_recovery_and_worker_lifecycle() {
     .unwrap();
     assert_eq!(expired_count, 0);
     sqlx::query("DELETE FROM billing_customers WHERE customer_id=$1")
+        .bind(&owner)
+        .execute(&state.pool)
+        .await
+        .unwrap();
+    sqlx::query("DELETE FROM legal_acceptances WHERE owner_id=$1")
         .bind(&owner)
         .execute(&state.pool)
         .await

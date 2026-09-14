@@ -1,6 +1,11 @@
 import type { Copy } from './en';
 
 export const da = {
+  'Data processing agreement': 'Databehandleraftale',
+  'Download agreement': 'Download aftale',
+  'Print / save PDF': 'Udskriv / gem PDF',
+  'Your agreements': 'Dine aftaler',
+  'Agreement required': 'Aftale påkrævet',
   'Backend error monitoring': 'Backend-fejlovervågning',
   'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.':
     'Sæt en harmløs backend-testfejl i kø til Sentry. Højst én gang hvert 30. sekund.',

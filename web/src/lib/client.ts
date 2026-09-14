@@ -82,6 +82,8 @@ export async function apiClient<T>(path: string, init: RequestInit = {}): Promis
     code?: string;
   };
 
+  if (data.error?.code === 'agreement_required' && typeof window !== 'undefined')
+    window.dispatchEvent(new Event('datix:agreement-required'));
   if (
     response.status === 402 &&
     data.error?.code === 'subscription_required' &&

@@ -15,6 +15,7 @@ import { deviceName } from '../lib/i18n/display';
 import { useSitePreferences } from './site-preferences';
 import { AccountPage } from './account-settings';
 import { AccountAccess } from './account-access';
+import { AgreementGate } from './agreement';
 import { useAccountUsage } from './usage';
 import { CountryLabel, countryName } from './country-label';
 import { Link, useLocation, useNavigate, useParams } from '@tanstack/react-router';
@@ -139,13 +140,25 @@ export function AnalyticsApp() {
     );
 
   return user ? (
-    <AccountAccess key={user.id} user={user} onSignedOut={signedOut}>
-      {(usage) => (
-        <SidebarProvider className="dashboard-workspace">
-          <Dashboard user={user} onSignedOut={signedOut} onUserUpdated={setUser} usage={usage} />
-        </SidebarProvider>
-      )}
-    </AccountAccess>
+    <AgreementGate
+      key={user.id}
+      user={user}
+      onSignedOut={signedOut}
+      account={<AccountPage user={user} onUpdated={setUser} onDeleted={signedOut} />}
+    >
+      <AccountAccess
+        key={user.id}
+        user={user}
+        onSignedOut={signedOut}
+        account={<AccountPage user={user} onUpdated={setUser} onDeleted={signedOut} />}
+      >
+        {(usage) => (
+          <SidebarProvider className="dashboard-workspace">
+            <Dashboard user={user} onSignedOut={signedOut} onUserUpdated={setUser} usage={usage} />
+          </SidebarProvider>
+        )}
+      </AccountAccess>
+    </AgreementGate>
   ) : (
     <AuthScreen
       unverifiedEmail={unverifiedEmail}

@@ -34,7 +34,7 @@ async fn tracker_config(
             .or_else(|| query.get("siteId"))
             .map_or("", String::as_str),
     )?;
-    let row=sqlx::query("SELECT e.enabled,e.tracking_settings,e.feature_settings,NOT EXISTS(SELECT 1 FROM site_suspensions WHERE site_id=s.id) AND NOT EXISTS(SELECT 1 FROM user_suspensions WHERE user_id=s.owner_id) AS permitted FROM environments e JOIN sites s ON s.id=e.site_id WHERE e.site_id=$1 AND e.id=$2")
+    let row=sqlx::query("SELECT s.owner_id,e.enabled,e.tracking_settings,e.feature_settings,NOT EXISTS(SELECT 1 FROM site_suspensions WHERE site_id=s.id) AND NOT EXISTS(SELECT 1 FROM user_suspensions WHERE user_id=s.owner_id) AS permitted FROM environments e JOIN sites s ON s.id=e.site_id WHERE e.site_id=$1 AND e.id=$2")
         .bind(site).bind(environment).fetch_optional(&state.pool).await?.ok_or_else(missing)?;
     let mut features = json!({"goals":false,"errors":false,"webVitals":true});
     if let Some(configured) = row.get::<Value, _>("feature_settings").as_object() {
@@ -43,8 +43,10 @@ async fn tracker_config(
             .expect("object")
             .extend(configured.clone());
     }
+    let agreed =
+        crate::legal::has_accepted(&mut *state.pool.acquire().await?, row.get("owner_id")).await?;
     Ok(Json(
-        json!({"enabled":row.get::<bool,_>("enabled") && row.get::<bool,_>("permitted"),"settings":tracking::settings(&row.get::<Value,_>("tracking_settings")),"features":features}),
+        json!({"enabled":row.get::<bool,_>("enabled") && row.get::<bool,_>("permitted") && agreed,"settings":tracking::settings(&row.get::<Value,_>("tracking_settings")),"features":features}),
     ))
 }
 
@@ -100,6 +102,9 @@ pub async fn collect(
         return Ok(
             json!({"accepted":false,"reason":if current.get::<bool,_>("suspended") {"admin_suspended"} else {"disabled"}}),
         );
+    }
+    if !crate::legal::has_accepted(&mut tx, &owner).await? {
+        return Ok(json!({"accepted":false,"reason":"agreement_required"}));
     }
     let event = tracking::normalize(
         input,
@@ -211,6 +216,7 @@ pub async fn deliver(state: &AppState, owner: &str, batch_size: i64) -> Result<(
     if receipts.is_empty() {
         return Ok(());
     }
+    let agreed = crate::legal::has_accepted(&mut tx, owner).await?;
     let environments=sqlx::query("SELECT e.*,NOT EXISTS(SELECT 1 FROM site_suspensions WHERE site_id=s.id) AND NOT EXISTS(SELECT 1 FROM user_suspensions WHERE user_id=s.owner_id) AS permitted FROM environments e JOIN sites s ON s.id=e.site_id WHERE s.owner_id=$1 ORDER BY s.id,e.id FOR KEY SHARE OF s,e")
         .bind(owner).fetch_all(&mut *tx).await?;
     for receipt in receipts {
@@ -232,7 +238,8 @@ pub async fn deliver(state: &AppState, owner: &str, batch_size: i64) -> Result<(
             .find(|row| row.get::<Uuid, _>("id") == environment);
         let event = env
             .filter(|row| {
-                row.get::<bool, _>("enabled")
+                agreed
+                    && row.get::<bool, _>("enabled")
                     && row.get::<bool, _>("permitted")
                     && (!raw.localhost || row.get("allow_localhost"))
             })

@@ -19,6 +19,8 @@ mod admin;
 mod analytics;
 #[path = "support/imports.rs"]
 mod imports;
+#[path = "support/legal.rs"]
+mod legal;
 
 #[derive(Default)]
 struct Hooks(Mutex<Vec<String>>);
@@ -62,7 +64,7 @@ async fn call(
     let value = if bytes.is_empty() {
         Value::Null
     } else {
-        serde_json::from_slice(&bytes).unwrap()
+        serde_json::from_slice(&bytes).unwrap_or_else(|_| json!(String::from_utf8_lossy(&bytes)))
     };
     (parts.status.as_u16(), parts.headers, value)
 }
@@ -138,6 +140,7 @@ async fn onboarding_site_ownership_and_subscription_gates_match_the_frontend_con
         (status, me["user"]["email"].as_str()),
         (200, Some(email.as_str()))
     );
+    let agreement_id = legal::verify(&state, user_id, &email, &cookie).await;
     let (status, _, created) = call(
         &state,
         "POST",
@@ -229,6 +232,11 @@ async fn onboarding_site_ownership_and_subscription_gates_match_the_frontend_con
         .unwrap();
     sqlx::query("DELETE FROM public.\"user\" WHERE id=$1")
         .bind(user_id)
+        .execute(&state.pool)
+        .await
+        .unwrap();
+    sqlx::query("DELETE FROM legal_acceptances WHERE id=$1 AND owner_id IS NULL")
+        .bind(agreement_id)
         .execute(&state.pool)
         .await
         .unwrap();

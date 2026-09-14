@@ -11,6 +11,117 @@
     }
   ],
   "paths": {
+    "/api/dpa/download": {
+      "get": {
+        "operationId": "downloadAgreementTemplate",
+        "summary": "Download the current unaccepted DPA and Terms",
+        "description": "Public standalone HTML attachment. Open it to print or save a PDF; downloading does not record acceptance.",
+        "responses": {
+          "200": {
+            "description": "HTML document containing the current DPA and Terms",
+            "content": { "text/html": { "schema": { "type": "string" } } }
+          }
+        }
+      }
+    },
+    "/api/legal/agreement": {
+      "get": {
+        "operationId": "getAgreementStatus",
+        "summary": "Get current document versions and this account's acceptance history",
+        "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
+        "responses": {
+          "200": {
+            "description": "Current versions, matching acceptance or null, and recorded history",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AgreementStatus" } }
+            }
+          },
+          "401": { "description": "Authentication required" },
+          "403": { "description": "Email not verified or account suspended" }
+        }
+      },
+      "post": {
+        "operationId": "acceptAgreement",
+        "summary": "Explicitly accept the current Terms and DPA for the identified customer",
+        "description": "Requires a verified session and application Origin. Versions and SHA-256 checksums must match the reviewed current documents. Signer email and timestamp are server-derived. Repeated acceptance preserves the original identity, timestamp and document snapshots. Acceptance grants no billing entitlement. Collection, telemetry, imports and new site configuration require a current acceptance.",
+        "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "customerName",
+                  "customerRole",
+                  "signerName",
+                  "signerTitle",
+                  "dpaVersion",
+                  "termsVersion",
+                  "dpaSha256",
+                  "termsSha256",
+                  "accepted"
+                ],
+                "properties": {
+                  "customerName": { "type": "string", "minLength": 1, "maxLength": 200 },
+                  "customerRole": { "type": "string", "enum": ["controller", "processor"] },
+                  "signerName": { "type": "string", "minLength": 1, "maxLength": 200 },
+                  "signerTitle": { "type": "string", "minLength": 1, "maxLength": 120 },
+                  "dpaVersion": { "type": "string" },
+                  "termsVersion": { "type": "string" },
+                  "dpaSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                  "termsSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                  "accepted": { "type": "boolean", "const": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Original or newly recorded acceptance",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AgreementStatus" } }
+            }
+          },
+          "400": {
+            "description": "Invalid identity, unknown fields, or missing affirmative acceptance"
+          },
+          "401": { "description": "Authentication required" },
+          "403": { "description": "Invalid origin, unverified email or suspended account" },
+          "409": {
+            "description": "Documents changed or a published version has inconsistent text"
+          },
+          "429": { "description": "Account rate limit exceeded" }
+        }
+      }
+    },
+    "/api/legal/agreement/{id}/download": {
+      "get": {
+        "operationId": "downloadAcceptedAgreement",
+        "summary": "Download this account's private acceptance record and original documents",
+        "description": "Returns an uncached HTML attachment containing the exact accepted DPA and Terms snapshots with customer identity, representative, verified email, versions, checksums and acceptance time. A record belonging to another account returns 404.",
+        "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private agreement HTML attachment",
+            "content": { "text/html": { "schema": { "type": "string" } } }
+          },
+          "401": { "description": "Authentication required" },
+          "403": { "description": "Email not verified or account suspended" },
+          "404": { "description": "No agreement accessible to this account" }
+        }
+      }
+    },
     "/api/preferences": {
       "get": {
         "operationId": "getPreferences",
@@ -329,6 +440,7 @@
                     "pauseReason": {
                       "enum": [
                         null,
+                        "agreement_required",
                         "subscription_required",
                         "event_limit",
                         "website_limit",
@@ -368,6 +480,7 @@
                           "pauseReason": {
                             "enum": [
                               null,
+                              "agreement_required",
                               "subscription_required",
                               "event_limit",
                               "website_limit",
@@ -4575,6 +4688,56 @@
       }
     },
     "schemas": {
+      "AgreementVersion": {
+        "type": "object",
+        "required": ["dpaVersion", "termsVersion", "dpaSha256", "termsSha256"],
+        "properties": {
+          "dpaVersion": { "type": "string" },
+          "termsVersion": { "type": "string" },
+          "dpaSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "termsSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      },
+      "AgreementReceipt": {
+        "allOf": [
+          { "$ref": "#/components/schemas/AgreementVersion" },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "customerName",
+              "customerRole",
+              "signerName",
+              "signerTitle",
+              "signerEmail",
+              "acceptedAt"
+            ],
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "customerName": { "type": "string" },
+              "customerRole": { "type": "string", "enum": ["controller", "processor"] },
+              "signerName": { "type": "string" },
+              "signerTitle": { "type": "string" },
+              "signerEmail": { "type": "string", "format": "email" },
+              "acceptedAt": { "type": "string", "format": "date-time" }
+            }
+          }
+        ]
+      },
+      "AgreementStatus": {
+        "type": "object",
+        "required": ["current", "acceptance", "history"],
+        "properties": {
+          "current": { "$ref": "#/components/schemas/AgreementVersion" },
+          "acceptance": {
+            "anyOf": [{ "$ref": "#/components/schemas/AgreementReceipt" }, { "type": "null" }]
+          },
+          "history": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AgreementReceipt" }
+          }
+        }
+      },
       "SuspensionUpdate": {
         "oneOf": [
           {
