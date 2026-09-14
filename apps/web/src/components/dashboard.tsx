@@ -25,6 +25,7 @@ import { Button } from './ui/button';
 import { WorkspaceSidebar } from './workspace-sidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from './ui/sidebar';
 import { Spinner } from './ui/spinner';
+import { Skeleton } from './ui/skeleton';
 import { Brand } from './brand';
 import { AuthScreen } from './auth-screen';
 import { PageTransition } from './page-transition';
@@ -511,10 +512,7 @@ function Dashboard({
             }
           >
             {loading ? (
-              <div className="flex items-center gap-3 py-20 text-secondary-ink">
-                <Spinner className="size-5" />
-                <span>{t('Loading your workspace…')}</span>
-              </div>
+              <WorkspaceSkeleton />
             ) : isAccount ? (
               <AccountPage user={user} onUpdated={onUserUpdated} onDeleted={accountDeleted} />
             ) : params.siteId && (!site || !environment) ? (
@@ -953,15 +951,13 @@ function Overview({
                     style={selected ? { background: metricColor(item.key, dark) } : undefined}
                   />
                   <span className="text-xs text-secondary-ink md:text-sm">{t(item.name)}</span>
-                  <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
-                    {loading ? (
-                      <span className="block h-[38px] w-[72px] rounded-sm bg-pressed" />
-                    ) : reports ? (
-                      number(reports.overview[item.key])
-                    ) : (
-                      '-'
-                    )}
-                  </strong>
+                  {loading ? (
+                    <Skeleton className="my-1 h-[38px] w-[72px]" />
+                  ) : (
+                    <strong className="my-1 block text-[22px] leading-[1.2] font-medium tracking-[-0.025em] tabular-nums md:text-[28px]">
+                      {reports ? number(reports.overview[item.key]) : '-'}
+                    </strong>
+                  )}
                   {compare && reports?.previous && (
                     <MetricDelta
                       current={reports.overview[item.key]}
@@ -975,13 +971,7 @@ function Overview({
         </div>
         <div className="pt-1">
           {loading ? (
-            <div
-              className="flex h-[204px] flex-col items-center justify-center gap-3 text-[13px] text-secondary-ink"
-              role="status"
-            >
-              <Spinner className="size-5" />
-              <span>{t('Loading analytics…')}</span>
-            </div>
+            <ChartSkeleton />
           ) : reports ? (
             <TrafficChart
               data={reports.timeseries.data}
@@ -1162,6 +1152,62 @@ function Overview({
   );
 }
 
+// Fixed heights keep the server and client render identical.
+const chartBars = [38, 52, 44, 61, 55, 72, 64, 58, 79, 68, 85, 74, 66, 91, 82];
+
+/** A bar silhouette in place of the traffic chart while its report loads. */
+function ChartSkeleton() {
+  const { t } = useSitePreferences();
+
+  return (
+    <div
+      className="flex h-[204px] items-end gap-1"
+      role="status"
+      aria-label={t('Loading analytics…')}
+    >
+      {chartBars.map((height, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: index is the stable bar position
+        <Skeleton className="min-w-0 flex-1" key={index} style={{ height: `${height}%` }} />
+      ))}
+    </div>
+  );
+}
+
+/** The overview's own shape, so switching websites keeps the layout in place. */
+function WorkspaceSkeleton() {
+  const { t } = useSitePreferences();
+
+  return (
+    <div role="status" aria-label={t('Loading your workspace…')}>
+      <section>
+        <div className="grid grid-cols-3 gap-2 md:gap-3">
+          {[1, 2, 3].map((value) => (
+            <div className="min-w-0 px-3 py-3 md:px-4" key={value}>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="my-1 h-[38px] w-[72px]" />
+            </div>
+          ))}
+        </div>
+        <div className="pt-1">
+          <ChartSkeleton />
+        </div>
+      </section>
+      <div className="mt-8 grid grid-cols-1 items-start gap-x-10 gap-y-8 md:grid-cols-2">
+        {[1, 2, 3, 4].map((value) => (
+          <section className={cardClass} key={value}>
+            <Skeleton className="h-5 w-32" />
+            <div className="mt-3 flex flex-col gap-2 border-t border-line pt-3">
+              {[1, 2, 3].map((row) => (
+                <Skeleton className="h-8" key={row} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const cardClass = 'min-w-0';
 const cardTitleClass = 'text-[15px] leading-[1.4] font-medium tracking-[-0.02em]';
 
@@ -1247,7 +1293,7 @@ function BreakdownCard({
           aria-label={t('Loading {title}', { title })}
         >
           {[1, 2, 3].map((value) => (
-            <i className="h-8 rounded-sm bg-muted" key={value} />
+            <Skeleton className="h-8" key={value} />
           ))}
         </div>
       ) : !report?.data.length ? (

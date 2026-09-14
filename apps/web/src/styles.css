@@ -55,6 +55,7 @@
   --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
   --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
   --ease-kit: var(--ease-smooth-out);
+  --animate-skeleton: skeleton 1.6s var(--ease-linear) infinite;
 }
 
 /* Motion tokens. Easings live in @theme so the ease-* utilities and var(--ease-*)
@@ -258,6 +259,21 @@
   stroke-dasharray: 14 42.55;
   transform-origin: center;
   animation: kit-spinner-arc var(--spinner-arc) var(--ease-in-out) infinite;
+}
+/* The skeleton gradient is 200% wide over a muted base, so sweeping the
+   background position carries the highlight across the element. */
+@keyframes skeleton {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='skeleton'] {
+    animation: none;
+  }
 }
 @keyframes kit-spinner-rotate {
   to {
