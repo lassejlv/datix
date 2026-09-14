@@ -63,7 +63,7 @@ export function PolarRoot<TData extends Row>({
   margins: marginsProp,
   className,
   animate = true,
-  animationDuration = 900,
+  animationDuration = 500,
   replayToken = 0,
   bloom = 'off',
   bloomOnHover = false,

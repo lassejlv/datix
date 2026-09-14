@@ -30,7 +30,7 @@ const SIDEBAR_WIDTH_ICON: string = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT: string = 'b';
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-left text-sm text-secondary-ink outline-hidden transition-colors duration-200 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none hover:bg-canvas hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring active:bg-canvas active:text-foreground disabled:pointer-events-none disabled:opacity-36 group-has-data-[sidebar=menu-action]/menu-item:pe-8 aria-disabled:pointer-events-none aria-disabled:opacity-36 data-[active=true]:bg-canvas data-[active=true]:font-medium data-[active=true]:text-foreground data-[state=open]:hover:bg-canvas data-[state=open]:hover:text-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg:not([class*='size-'])]:size-[18px] [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-left text-sm text-secondary-ink outline-hidden transition-colors duration-(--duration-quick) ease-smooth-out motion-reduce:transition-none hover:bg-canvas hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring active:bg-canvas active:text-foreground disabled:pointer-events-none disabled:opacity-36 group-has-data-[sidebar=menu-action]/menu-item:pe-8 aria-disabled:pointer-events-none aria-disabled:opacity-36 data-[active=true]:bg-canvas data-[active=true]:font-medium data-[active=true]:text-foreground data-[state=open]:hover:bg-canvas data-[state=open]:hover:text-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg:not([class*='size-'])]:size-[18px] [&>svg]:shrink-0",
   {
     defaultVariants: {
       size: 'default',
@@ -234,7 +234,7 @@ export function Sidebar({
       {/* This is what handles the sidebar gap on desktop */}
       <div
         className={cn(
-          'relative w-(--sidebar-width) bg-transparent transition-[width] duration-[280ms] motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)]',
+          'relative w-(--sidebar-width) bg-transparent transition-[width] duration-(--duration-fast) motion-reduce:transition-none ease-smooth-out',
           'group-data-[collapsible=offcanvas]:w-0',
           'group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
@@ -245,7 +245,7 @@ export function Sidebar({
       />
       <div
         className={cn(
-          'fixed inset-y-0 z-10 hidden h-dvh w-(--sidebar-width) transition-[left,right,width] duration-[280ms] motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)] md:flex',
+          'fixed inset-y-0 z-10 hidden h-dvh w-(--sidebar-width) transition-[left,right,width] duration-(--duration-fast) motion-reduce:transition-none ease-smooth-out md:flex',
           side === 'left'
             ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
             : 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]',
@@ -310,7 +310,7 @@ export function SidebarRail({
     <button
       aria-label={t('Toggle Sidebar')}
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
+        'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-colors duration-(--duration-quick) ease-smooth-out after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
         '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'group-data-[collapsible=offcanvas]:translate-x-0 hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:after:left-full',
@@ -442,7 +442,7 @@ export function SidebarGroupLabel({
 }: useRender.ComponentProps<'div'>): React.ReactElement {
   const defaultProps = {
     className: cn(
-      'flex h-8 shrink-0 items-center rounded-lg px-2 font-medium text-sidebar-foreground text-xs outline-hidden ring-sidebar-ring transition-[margin,opacity] duration-[280ms] motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)] focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+      'flex h-8 shrink-0 items-center rounded-lg px-2 font-medium text-sidebar-foreground text-xs outline-hidden ring-sidebar-ring transition-[margin,opacity] duration-(--duration-fast) motion-reduce:transition-none ease-smooth-out focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
       'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
       className,
     ),

@@ -103,7 +103,7 @@ export function usePolarController({
   dimensions,
   margins,
   animate = true,
-  animationDuration = 900,
+  animationDuration = 500,
   replayToken = 0,
   bloom = 'off',
   bloomOnHover = false,

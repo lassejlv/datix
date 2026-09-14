@@ -326,7 +326,7 @@ function Diagnostics({ path, errors }: { path: string; errors: boolean }) {
                     </span>
                     <ChevronDown
                       size={14}
-                      className="mt-1 shrink-0 text-secondary-ink transition-transform group-open:rotate-180"
+                      className="mt-1 shrink-0 text-secondary-ink transition-transform duration-(--duration-fast) ease-smooth-out group-open:rotate-180"
                     />
                   </summary>
                   <div className="space-y-3 pb-4 pl-[18px]">

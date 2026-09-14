@@ -11,7 +11,7 @@ export function SelectionIndicator({ id, className }: { id: string; className: s
       className={className}
       layoutId={id}
       initial={false}
-      transition={{ type: 'tween', duration: reduceMotion ? 0 : 0.26, ease: [0.19, 1, 0.22, 1] }}
+      transition={{ type: 'tween', duration: reduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
     />
   );
 }

@@ -331,7 +331,7 @@ export function ComboboxChips({
   return (
     <ComboboxPrimitive.Chips
       className={cn(
-        'relative inline-flex min-h-8 w-full flex-wrap gap-1 rounded-lg border border-input bg-transparent p-1 text-sm outline-none transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] *:min-h-6 focus-within:border-[var(--input-focus)] focus-within:shadow-[0_0_0_1px_var(--input-focus)] has-disabled:pointer-events-none has-aria-invalid:border-danger has-disabled:opacity-40',
+        'relative inline-flex min-h-8 w-full flex-wrap gap-1 rounded-lg border border-input bg-transparent p-1 text-sm outline-none transition-[border-color,box-shadow] duration-(--duration-quick) ease-smooth-out *:min-h-6 focus-within:border-[var(--input-focus)] focus-within:shadow-[0_0_0_1px_var(--input-focus)] has-disabled:pointer-events-none has-aria-invalid:border-danger has-disabled:opacity-40',
         className,
       )}
       data-slot="combobox-chips"

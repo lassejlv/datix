@@ -187,7 +187,7 @@ export function useChartController({
   dimensions,
   margins,
   animate = true,
-  animationDuration = 900,
+  animationDuration = 500,
   replayToken = 0,
   markerIndex = null,
   hovered = false,

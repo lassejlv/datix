@@ -161,7 +161,7 @@ function RecordRow({
       type="button"
       onClick={onOpen}
       aria-label={openLabel}
-      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition-colors duration-150 hover:bg-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+      className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left transition-colors duration-(--duration-quick) hover:bg-accent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
     >
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2">
@@ -406,7 +406,7 @@ export function AdminUsers() {
         ) : (
           <div
             aria-busy={directory.loading}
-            className="divide-y divide-border rounded-lg border border-border transition-opacity duration-150 aria-busy:opacity-60"
+            className="divide-y divide-border rounded-lg border border-border transition-opacity duration-(--duration-quick) aria-busy:opacity-60"
           >
             {directory.rows.map((row) => (
               <RecordRow
@@ -577,7 +577,7 @@ export function AdminSites() {
         ) : (
           <div
             aria-busy={directory.loading}
-            className="divide-y divide-border rounded-lg border border-border transition-opacity duration-150 aria-busy:opacity-60"
+            className="divide-y divide-border rounded-lg border border-border transition-opacity duration-(--duration-quick) aria-busy:opacity-60"
           >
             {directory.rows.map((row) => {
               const source = suspensionSource(row);

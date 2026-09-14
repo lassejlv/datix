@@ -19,8 +19,8 @@ export function PageTransition({
 
     const animation = animate(
       element,
-      { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0px)'] },
-      { duration: 0.24, ease: [0.19, 1, 0.22, 1] },
+      { opacity: [0, 1], transform: ['translateY(8px)', 'translateY(0px)'] },
+      { duration: 0.25, ease: [0.22, 1, 0.36, 1] },
     );
 
     const stop = () => {

@@ -255,7 +255,10 @@ export function OverviewAnnotations({
   return (
     <details className="group">
       <summary className={disclosureSummary}>
-        <ChevronDown size={13} className="transition-transform group-open:rotate-180" />
+        <ChevronDown
+          size={13}
+          className="transition-transform duration-(--duration-fast) ease-smooth-out group-open:rotate-180"
+        />
         {t('Chart notes')} · {annotations.length}
       </summary>
       <div className="mt-3 max-w-xl space-y-3">

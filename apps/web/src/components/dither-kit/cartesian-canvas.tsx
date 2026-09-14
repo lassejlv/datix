@@ -443,7 +443,7 @@ export function CartesianCanvas() {
         className="pointer-events-none absolute"
         style={{
           ...pos,
-          transition: 'opacity 220ms ease',
+          transition: 'opacity var(--duration-fast) var(--ease-smooth-out)',
           ...(bloom ?? { opacity: 0 }),
         }}
       />

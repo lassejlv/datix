@@ -48,10 +48,35 @@
   --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-2xl: 16px;
-  --ease-kit: cubic-bezier(0.19, 1, 0.22, 1);
-  --duration-fast: 150ms;
-  --duration-nav: 200ms;
-  --duration-settle: 300ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: ease-in-out;
+  --ease-out: ease-out;
+  --ease-linear: linear;
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --ease-kit: var(--ease-smooth-out);
+}
+
+/* Motion tokens. Easings live in @theme so the ease-* utilities and var(--ease-*)
+   agree; the rest sits in a plain :root because Tailwind tree-shakes unused theme
+   variables and landing.css reads these from its own bundle. */
+:root {
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --distance-micro: 4px;
+  --distance-small: 6px;
+  --distance-base: 8px;
+  --distance-medium: 12px;
+  --distance-large: 30px;
+  --scale-large: 0.96;
+  --scale-medium: 0.97;
+  --scale-small: 0.98;
+  --scale-tiny: 0.99;
 }
 
 :root {
@@ -185,8 +210,8 @@
   font: inherit;
   cursor: pointer;
   transition:
-    color 150ms cubic-bezier(0.19, 1, 0.22, 1),
-    border-color 150ms cubic-bezier(0.19, 1, 0.22, 1);
+    color var(--duration-quick) var(--ease-kit),
+    border-color var(--duration-quick) var(--ease-kit);
 }
 .footer-preferences select:hover {
   color: var(--landing-ink, var(--foreground));
@@ -223,7 +248,7 @@
   width: 100%;
   height: 100%;
   fill: none;
-  animation: kit-spinner-rotate var(--spinner-rotation) linear infinite;
+  animation: kit-spinner-rotate var(--spinner-rotation) var(--ease-linear) infinite;
 }
 .kit-spinner circle {
   fill: none;
@@ -232,7 +257,7 @@
   stroke-linecap: round;
   stroke-dasharray: 14 42.55;
   transform-origin: center;
-  animation: kit-spinner-arc var(--spinner-arc) ease-in-out infinite;
+  animation: kit-spinner-arc var(--spinner-arc) var(--ease-in-out) infinite;
 }
 @keyframes kit-spinner-rotate {
   to {
@@ -279,8 +304,8 @@
   text-align: left;
   cursor: pointer;
   transition:
-    background-color 150ms var(--ease-kit),
-    border-color 150ms var(--ease-kit);
+    background-color var(--duration-quick) var(--ease-kit),
+    border-color var(--duration-quick) var(--ease-kit);
 }
 .kit-select-trigger:hover {
   background: var(--hover);
@@ -295,7 +320,7 @@
   box-shadow: 0 0 0 1px var(--input-focus);
 }
 .kit-select-trigger svg {
-  transition: transform 150ms var(--ease-kit);
+  transition: transform var(--duration-fast) var(--ease-kit);
 }
 .kit-select-trigger[data-popup-open] svg {
   transform: rotate(180deg);
@@ -305,21 +330,21 @@
 .kit-calendar {
   transform-origin: var(--transform-origin);
   transition:
-    opacity 180ms var(--ease-kit),
-    transform 240ms var(--ease-kit);
+    opacity var(--duration-fast) var(--ease-kit),
+    transform var(--duration-fast) var(--ease-kit);
 }
 .kit-popup[data-starting-style],
 .kit-select-popup[data-starting-style],
 .kit-calendar[data-starting-style] {
   opacity: 0;
-  transform: translateY(-4px) scale(0.975);
+  transform: translateY(-4px) scale(var(--scale-medium));
 }
 .kit-popup[data-ending-style],
 .kit-select-popup[data-ending-style],
 .kit-calendar[data-ending-style] {
   opacity: 0;
-  transform: translateY(-2px) scale(0.985);
-  transition-duration: 140ms;
+  transform: translateY(-2px) scale(var(--scale-tiny));
+  transition-duration: var(--duration-quick);
 }
 .kit-select-popup {
   min-width: var(--anchor-width);
@@ -387,8 +412,8 @@
   cursor: pointer;
   border: 1px solid var(--input-border);
   transition:
-    background-color 150ms var(--ease-kit),
-    border-color 150ms var(--ease-kit);
+    background-color var(--duration-quick) var(--ease-kit),
+    border-color var(--duration-quick) var(--ease-kit);
 }
 .kit-checkbox {
   width: 16px;
@@ -413,8 +438,8 @@
   opacity: 0;
   transform: rotate(45deg) scale(0.6);
   transition:
-    opacity 120ms var(--ease-kit),
-    transform 180ms var(--ease-kit);
+    opacity var(--duration-quick) var(--ease-kit),
+    transform var(--duration-quick) var(--ease-kit);
 }
 .kit-checkbox:checked::after {
   opacity: 1;
@@ -437,8 +462,8 @@
   border-radius: 50%;
   background: var(--secondary-ink);
   transition:
-    transform 220ms var(--ease-kit),
-    background-color 150ms var(--ease-kit);
+    transform var(--duration-fast) var(--ease-kit),
+    background-color var(--duration-quick) var(--ease-kit);
 }
 .kit-switch:checked {
   background: var(--primary);
@@ -554,8 +579,8 @@ li.kit-toast:focus-visible {
   font-weight: 500;
   cursor: pointer;
   transition:
-    color 150ms var(--ease-kit),
-    border-color 150ms var(--ease-kit);
+    color var(--duration-quick) var(--ease-kit),
+    border-color var(--duration-quick) var(--ease-kit);
 }
 .kit-tabs button:hover,
 .kit-tabs button[aria-selected='true'] {
@@ -611,8 +636,8 @@ li.kit-toast:focus-visible {
   outline: none;
   cursor: pointer;
   transition:
-    background-color 180ms var(--ease-kit),
-    color 180ms var(--ease-kit);
+    background-color var(--duration-quick) var(--ease-kit),
+    color var(--duration-quick) var(--ease-kit);
 }
 .kit-theme-option[data-checked] {
   background: var(--hover);

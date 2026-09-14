@@ -78,7 +78,7 @@ export function TooltipPopup({
           role="tooltip"
           id={context?.id}
           className={cn(
-            'relative flex h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) text-balance rounded-lg bg-tooltip text-tooltip-foreground text-sm leading-[20px] shadow-[var(--menu-shadow)] transition-[width,height,scale,opacity] duration-[250ms] ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none data-ending-style:scale-[0.97] data-starting-style:scale-[0.97] data-ending-style:opacity-0 data-starting-style:opacity-0 data-instant:duration-0',
+            'relative flex h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) text-balance rounded-lg bg-tooltip text-tooltip-foreground text-sm leading-[20px] shadow-[var(--menu-shadow)] transition-[width,height,scale,opacity] duration-(--duration-quick) ease-out motion-reduce:transition-none data-ending-style:scale-(--scale-small) data-starting-style:scale-(--scale-small) data-ending-style:opacity-0 data-starting-style:opacity-0 data-instant:duration-0',
             className,
           )}
           data-slot="tooltip-popup"

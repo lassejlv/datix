@@ -110,7 +110,7 @@ export function WorkspaceSwitcher({
           </span>
           <ChevronDown
             size={12}
-            className="shrink-0 text-secondary-ink transition-transform duration-150 group-data-popup-open:rotate-180 motion-reduce:transition-none"
+            className="shrink-0 text-secondary-ink transition-transform duration-(--duration-fast) ease-smooth-out group-data-popup-open:rotate-180 motion-reduce:transition-none"
           />
         </ComboboxTrigger>
       </Hint>

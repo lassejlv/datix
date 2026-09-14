@@ -31,7 +31,7 @@ export function SheetBackdrop({
   return (
     <SheetPrimitive.Backdrop
       className={cn(
-        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-200 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
+        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-(--duration-slow) data-ending-style:duration-(--duration-medium) ease-smooth-out motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
         className,
       )}
       data-slot="sheet-backdrop"
@@ -90,7 +90,7 @@ export function SheetPopup({
       <SheetViewport side={side} variant={variant}>
         <SheetPrimitive.Popup
           className={cn(
-            'relative flex max-h-full min-h-0 w-full min-w-0 flex-col bg-popover text-popover-foreground shadow-[var(--menu-shadow)] transition-[opacity,translate] duration-[280ms] data-ending-style:duration-200 motion-reduce:transition-none ease-[cubic-bezier(0.19,1,0.22,1)] will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0',
+            'relative flex max-h-full min-h-0 w-full min-w-0 flex-col bg-popover text-popover-foreground shadow-[var(--menu-shadow)] transition-[opacity,translate] duration-(--duration-slow) data-ending-style:duration-(--duration-medium) motion-reduce:transition-none ease-smooth-out will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0',
             side === 'bottom' &&
               'row-start-2 border-t data-ending-style:translate-y-full data-starting-style:translate-y-full',
             side === 'top' &&

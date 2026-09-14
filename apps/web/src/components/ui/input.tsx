@@ -36,7 +36,7 @@ export function Input({
       className={
         cn(
           !unstyled &&
-            'relative inline-flex w-full rounded-lg border border-input bg-transparent text-sm transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none has-focus-visible:border-[var(--input-focus)] has-focus-visible:shadow-[0_0_0_1px_var(--input-focus)] has-aria-invalid:border-danger has-focus-visible:has-aria-invalid:border-danger has-disabled:opacity-40',
+            'relative inline-flex w-full rounded-lg border border-input bg-transparent text-sm transition-[border-color,box-shadow] duration-(--duration-quick) ease-smooth-out motion-reduce:transition-none has-focus-visible:border-[var(--input-focus)] has-focus-visible:shadow-[0_0_0_1px_var(--input-focus)] has-aria-invalid:border-danger has-focus-visible:has-aria-invalid:border-danger has-disabled:opacity-40',
           className,
         ) || undefined
       }
@@ -71,7 +71,7 @@ export function Textarea({ className, ...props }: React.ComponentProps<'textarea
     <textarea
       data-slot="textarea"
       className={cn(
-        'min-h-24 w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 motion-reduce:transition-none focus-visible:border-[var(--input-focus)] focus-visible:shadow-[0_0_0_1px_var(--input-focus)] aria-invalid:border-danger disabled:opacity-40',
+        'min-h-24 w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-(--duration-quick) ease-smooth-out motion-reduce:transition-none focus-visible:border-[var(--input-focus)] focus-visible:shadow-[0_0_0_1px_var(--input-focus)] aria-invalid:border-danger disabled:opacity-40',
         className,
       )}
       {...props}

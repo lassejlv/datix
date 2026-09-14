@@ -121,8 +121,8 @@
 button.journey-node {
   cursor: pointer;
   transition:
-    background 120ms,
-    border-color 120ms;
+    background var(--duration-quick) var(--ease-smooth-out),
+    border-color var(--duration-quick) var(--ease-smooth-out);
 }
 button.journey-node:hover,
 .journey-node[aria-expanded='true'] {

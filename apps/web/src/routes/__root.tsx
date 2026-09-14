@@ -41,7 +41,7 @@ function RootDocument() {
     <>
       <HeadContent />
       <SitePreferences initial={preferences}>
-        <TooltipProvider delay={400}>
+        <TooltipProvider delay={80}>
           <ToastProvider>
             <DocumentMetadata />
             <Outlet />

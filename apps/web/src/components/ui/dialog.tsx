@@ -32,7 +32,7 @@ export function DialogBackdrop({
   return (
     <DialogPrimitive.Backdrop
       className={cn(
-        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-200 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
+        'fixed inset-0 z-50 bg-black/50 backdrop-blur-[2px] transition-opacity duration-(--duration-fast) data-ending-style:duration-(--duration-quick) ease-smooth-out motion-reduce:transition-none data-ending-style:opacity-0 data-starting-style:opacity-0',
         className,
       )}
       data-slot="dialog-backdrop"
@@ -81,7 +81,7 @@ export function DialogPopup({
       >
         <DialogPrimitive.Popup
           className={cn(
-            'relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg origin-center flex-col rounded-xl border border-hover bg-popover text-popover-foreground opacity-[calc(1-var(--nested-dialogs))] shadow-[0_24px_80px_#0005] outline-none transition-[scale,opacity,translate] duration-[260ms] data-ending-style:duration-150 ease-[cubic-bezier(0.19,1,0.22,1)] motion-reduce:transition-none will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0 sm:scale-[calc(1-0.1*var(--nested-dialogs))] data-starting-style:translate-y-2 data-ending-style:translate-y-1 data-ending-style:scale-98 data-starting-style:scale-[0.97]',
+            'relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg origin-center flex-col rounded-xl border border-hover bg-popover text-popover-foreground opacity-[calc(1-var(--nested-dialogs))] shadow-[0_24px_80px_#0005] outline-none transition-[scale,opacity,translate] duration-(--duration-fast) data-ending-style:duration-(--duration-quick) ease-smooth-out motion-reduce:transition-none will-change-transform data-ending-style:opacity-0 data-starting-style:opacity-0 sm:scale-[calc(1-0.1*var(--nested-dialogs))] data-starting-style:translate-y-2 data-ending-style:translate-y-1 data-ending-style:scale-(--scale-large) data-starting-style:scale-(--scale-large)',
             bottomStickOnMobile &&
               'max-sm:max-w-none max-sm:origin-bottom max-sm:rounded-t-xl max-sm:rounded-b-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0 max-sm:data-ending-style:translate-y-4 max-sm:data-starting-style:translate-y-4',
             className,

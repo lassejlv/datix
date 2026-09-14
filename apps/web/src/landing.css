@@ -128,8 +128,8 @@
   line-height: 20px;
   text-decoration: none;
   transition:
-    background-color 150ms cubic-bezier(0.19, 1, 0.22, 1),
-    box-shadow 150ms cubic-bezier(0.19, 1, 0.22, 1);
+    background-color var(--duration-quick) var(--ease-smooth-out),
+    box-shadow var(--duration-quick) var(--ease-smooth-out);
 }
 .landing-page .landing-button:hover {
   background: color-mix(in srgb, var(--primary) 85%, var(--on-primary));
@@ -853,7 +853,7 @@
 }
 .pricing-faq-trigger svg {
   color: var(--landing-secondary);
-  transition: transform 200ms ease;
+  transition: transform var(--duration-fast) var(--ease-smooth-out);
 }
 .pricing-faq-trigger[data-panel-open] svg {
   transform: rotate(180deg);
@@ -861,7 +861,7 @@
 .pricing-faq-panel {
   height: var(--accordion-panel-height);
   overflow: hidden;
-  transition: height 200ms ease;
+  transition: height var(--duration-fast) var(--ease-smooth-out);
 }
 .pricing-faq-panel[data-starting-style],
 .pricing-faq-panel[data-ending-style] {

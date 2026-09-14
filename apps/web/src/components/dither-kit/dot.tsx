@@ -36,7 +36,7 @@ export function Dot({ variant = 'border', r = 2 }: { variant?: DotVariant; r?: n
     <g
       style={{
         opacity: ctx.entranceDone ? 1 : 0,
-        transition: 'opacity 300ms ease',
+        transition: 'opacity var(--duration-slow) var(--ease-in-out)',
       }}
     >
       {band.map((b, i) => (

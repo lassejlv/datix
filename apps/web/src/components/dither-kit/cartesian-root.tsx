@@ -81,7 +81,7 @@ export function CartesianRoot<TData extends Row>({
   className,
   ariaLabel = 'Chart. Use left and right arrow keys to inspect each point.',
   animate = true,
-  animationDuration = 900,
+  animationDuration = 500,
   replayToken = 0,
   interactive = true,
   markerIndex = null,

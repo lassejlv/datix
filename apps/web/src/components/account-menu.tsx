@@ -28,7 +28,7 @@ export function AccountMenu({
         aria-label={t('Account menu')}
         data-testid="account-menu"
         disabled={signingOut}
-        className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-lg p-2 text-left outline-none transition-colors duration-200 ease-[cubic-bezier(0.19,1,0.22,1)] hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring disabled:opacity-36"
+        className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-lg p-2 text-left outline-none transition-colors duration-(--duration-quick) ease-smooth-out hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring disabled:opacity-36"
       >
         <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium">{user.name}</span>

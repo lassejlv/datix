@@ -1054,7 +1054,10 @@ function Overview({
             {!!reports.overview.imports?.importedDays && (
               <details className="group">
                 <summary className={disclosureSummary}>
-                  <ChevronDown size={13} className="transition-transform group-open:rotate-180" />
+                  <ChevronDown
+                    size={13}
+                    className="transition-transform duration-(--duration-fast) ease-smooth-out group-open:rotate-180"
+                  />
                   {t(
                     reports.overview.imports.importedDays === 1
                       ? 'Includes {count} day of imported history'
