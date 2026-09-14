@@ -90,7 +90,11 @@ mod diagnostic_tests {
                     axum::Router::new().fallback(move || async move {
                         (
                             status,
-                            "private-response customer@example.test secret-token",
+                            if status == StatusCode::UNPROCESSABLE_ENTITY {
+                                r#"{"detail":[{"type":"value_error","loc":["body","email"],"msg":"A customer with this email address already exists.","input":"private-response customer@example.test secret-token"}]}"#
+                            } else {
+                                "private-response customer@example.test secret-token"
+                            },
                         )
                     }),
                 )
@@ -133,6 +137,12 @@ mod diagnostic_tests {
             );
             for private in ["private-", "secret-", "example.test", "2026-04"] {
                 assert!(!log.contains(private), "Private data in diagnostics");
+            }
+            if status == StatusCode::UNPROCESSABLE_ENTITY {
+                assert!(
+                    log.contains("email") && log.contains("duplicate_email"),
+                    "{log}"
+                );
             }
         }
     }
@@ -313,7 +323,76 @@ impl Provider {
             return Ok(None);
         }
         if !response.status().is_success() {
-            return Err(failure("http_rejected", Some(response.status())));
+            let status = response.status();
+            if status == StatusCode::UNPROCESSABLE_ENTITY {
+                // Validation errors echo submitted values. Read a bounded body and
+                // emit only allowlisted field names and fixed categories.
+                let mut bytes = Vec::new();
+                while let Ok(Some(chunk)) = response.chunk().await {
+                    if bytes.len() + chunk.len() > 64 * 1024 {
+                        bytes.clear();
+                        break;
+                    }
+                    bytes.extend_from_slice(&chunk);
+                }
+                if let Ok(value) = serde_json::from_slice::<Value>(&bytes)
+                    && let Some(details) = value.get("detail").and_then(Value::as_array)
+                {
+                    for detail in details.iter().take(8) {
+                        let field = detail
+                            .get("loc")
+                            .and_then(Value::as_array)
+                            .and_then(|path| path.last())
+                            .and_then(Value::as_str)
+                            .filter(|field| {
+                                matches!(
+                                    *field,
+                                    "email"
+                                        | "name"
+                                        | "external_id"
+                                        | "organization_id"
+                                        | "locale"
+                                        | "type"
+                                        | "customer_id"
+                                        | "external_customer_id"
+                                        | "products"
+                                        | "currency"
+                                        | "allow_trial"
+                                        | "success_url"
+                                        | "return_url"
+                                )
+                            })
+                            .unwrap_or("other");
+                        let reason = match detail.get("msg").and_then(Value::as_str) {
+                            Some("A customer with this email address already exists.") => {
+                                "duplicate_email"
+                            }
+                            Some("A customer with this external ID already exists.") => {
+                                "duplicate_external_id"
+                            }
+                            _ => match detail.get("type").and_then(Value::as_str) {
+                                Some("missing") => "missing",
+                                Some("extra_forbidden") => "extra_forbidden",
+                                Some("string_too_long") => "string_too_long",
+                                Some("uuid_parsing" | "uuid_version") => "invalid_uuid",
+                                Some("literal_error" | "union_tag_invalid" | "enum") => {
+                                    "invalid_choice"
+                                }
+                                Some("value_error") => "value_error",
+                                _ => "other",
+                            },
+                        };
+                        tracing::warn!(
+                            provider = "polar",
+                            resource,
+                            field,
+                            reason,
+                            "Billing provider validation failed"
+                        );
+                    }
+                }
+            }
+            return Err(failure("http_rejected", Some(status)));
         }
         let status = response.status();
         let mut bytes = Vec::new();
