@@ -15,6 +15,129 @@ pub(super) struct Provider {
     version: String,
 }
 
+#[cfg(test)]
+mod diagnostic_tests {
+    use super::*;
+    use std::{
+        io::Write,
+        sync::{Arc, Mutex},
+    };
+    use tracing::instrument::WithSubscriber;
+
+    #[derive(Clone, Default)]
+    struct Capture(Arc<Mutex<Vec<u8>>>);
+    impl Write for Capture {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            self.0.lock().unwrap().extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[tokio::test]
+    async fn checkout_diagnostics_include_stage_and_attempt_without_account_data() {
+        let catalog = Arc::new(Catalog::load(None, false).unwrap());
+        let input = serde_json::json!({"events":catalog.plans[0].events,"interval":catalog.plans[0].interval});
+        let billing = crate::billing::Billing {
+            pool: sqlx::postgres::PgPoolOptions::new()
+                .connect_lazy("postgres://fixture:fixture@localhost/fixture")
+                .unwrap(),
+            catalog,
+            provider: None,
+            enabled: false,
+            webhook_secret: None,
+            app_url: "https://private-app.example.test".into(),
+        };
+        let capture = Capture::default();
+        let writer = capture.clone();
+        let subscriber = tracing_subscriber::fmt()
+            .without_time()
+            .with_ansi(false)
+            .with_writer(move || writer.clone())
+            .finish();
+        let result = billing
+            .checkout("private-owner", input)
+            .with_subscriber(subscriber)
+            .await;
+        assert_eq!(result.unwrap_err().code, "billing_unconfigured");
+        let log = String::from_utf8(capture.0.lock().unwrap().clone()).unwrap();
+        assert!(
+            log.contains("configuration")
+                && log.contains("attempt_id")
+                && log.contains("checkout_failed")
+                && log.contains("503"),
+            "{log}"
+        );
+        assert!(
+            !log.contains("private-") && !log.contains("fixture"),
+            "Private data in diagnostics"
+        );
+    }
+
+    #[tokio::test]
+    async fn provider_diagnostics_report_categories_without_private_data() {
+        for (status, category) in [
+            (StatusCode::UNPROCESSABLE_ENTITY, "http_rejected"),
+            (StatusCode::OK, "response_decode"),
+        ] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let base = Url::parse(&format!("http://{}/", listener.local_addr().unwrap())).unwrap();
+            let server = tokio::spawn(async move {
+                axum::serve(
+                    listener,
+                    axum::Router::new().fallback(move || async move {
+                        (
+                            status,
+                            "private-response customer@example.test secret-token",
+                        )
+                    }),
+                )
+                .await
+                .unwrap();
+            });
+            let provider = Provider {
+                client: Client::new(),
+                base,
+                token: "private-token".into(),
+                version: "2026-04".into(),
+            };
+            let capture = Capture::default();
+            let writer = capture.clone();
+            let subscriber = tracing_subscriber::fmt()
+                .without_time()
+                .with_ansi(false)
+                .with_writer(move || writer.clone())
+                .finish();
+            let result = provider
+                .request::<Value>(
+                    Method::POST,
+                    &["v1", "checkouts", "private-path"],
+                    &[("private-query", "secret-query".into())],
+                    Some(serde_json::json!({"email":"private-request@example.test"})),
+                    false,
+                )
+                .with_subscriber(subscriber)
+                .await;
+            server.abort();
+            let error = result.unwrap_err();
+            assert_eq!(error.status, StatusCode::SERVICE_UNAVAILABLE);
+            assert_eq!(error.message, "Service temporarily unavailable.");
+            let log = String::from_utf8(capture.0.lock().unwrap().clone()).unwrap();
+            assert!(
+                log.contains(category)
+                    && log.contains("checkouts")
+                    && log.contains(&status.as_u16().to_string()),
+                "{log}"
+            );
+            for private in ["private-", "secret-", "example.test", "2026-04"] {
+                assert!(!log.contains(private), "Private data in diagnostics");
+            }
+        }
+    }
+}
+
 #[derive(Deserialize)]
 pub(super) struct Customer {
     pub id: Uuid,
@@ -141,6 +264,27 @@ impl Provider {
         body: Option<Value>,
         optional: bool,
     ) -> Result<Option<T>, ApiError> {
+        // Never log paths: customer-state paths contain account identifiers.
+        let resource = match path.get(1).copied() {
+            Some("customers") => "customers",
+            Some("checkouts") => "checkouts",
+            Some("customer-sessions") => "customer_sessions",
+            Some("subscriptions") => "subscriptions",
+            Some("events") => "events",
+            _ => "other",
+        };
+        let method_name = if method == Method::GET { "GET" } else { "POST" };
+        let failure = |category: &'static str, status: Option<StatusCode>| {
+            tracing::warn!(
+                provider = "polar",
+                resource,
+                method = method_name,
+                category,
+                http_status = status.map(|s| s.as_u16()),
+                "Billing provider request failed"
+            );
+            ApiError::unavailable()
+        };
         let mut request = self
             .client
             .request(method, self.url(path)?)
@@ -153,27 +297,39 @@ impl Provider {
         }
         // No transport retries: checkout creation is not inherently idempotent and the
         // billing outbox, not an HTTP client, owns meter delivery retries.
-        let mut response = request.send().await.map_err(|_| ApiError::unavailable())?;
+        let mut response = request.send().await.map_err(|error| {
+            failure(
+                if error.is_timeout() {
+                    "timeout"
+                } else if error.is_connect() {
+                    "connection"
+                } else {
+                    "transport"
+                },
+                None,
+            )
+        })?;
         if optional && response.status() == StatusCode::NOT_FOUND {
             return Ok(None);
         }
         if !response.status().is_success() {
-            return Err(ApiError::unavailable());
+            return Err(failure("http_rejected", Some(response.status())));
         }
+        let status = response.status();
         let mut bytes = Vec::new();
         while let Some(chunk) = response
             .chunk()
             .await
-            .map_err(|_| ApiError::unavailable())?
+            .map_err(|_| failure("response_read", Some(status)))?
         {
             if bytes.len() + chunk.len() > 4 * 1024 * 1024 {
-                return Err(ApiError::unavailable());
+                return Err(failure("response_too_large", Some(status)));
             }
             bytes.extend_from_slice(&chunk);
         }
         serde_json::from_slice(&bytes)
             .map(Some)
-            .map_err(|_| ApiError::unavailable())
+            .map_err(|_| failure("response_decode", Some(status)))
     }
 
     pub async fn customer_state(&self, owner: &str) -> Result<Option<Customer>, ApiError> {

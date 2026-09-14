@@ -58,14 +58,17 @@ impl Workers {
                     loop {
                         if *receiver.borrow() {break;}
                         // Finish each in-flight transaction before honoring shutdown.
+                        let mut stage = "pending_receipts";
                         let result=async {
                             let owners:Vec<String>=sqlx::query_scalar("SELECT owner_id FROM ingestion_receipts WHERE state='pending' GROUP BY owner_id ORDER BY min(created_at) LIMIT 16")
                                 .fetch_all(&state.pool).await?;
+                            stage = "receipt_delivery";
                             for owner in owners {ingestion::deliver(&state,&owner,state.config.batch_size).await?;}
+                            stage = "diagnostic_queue";
                             state.queue.consume(&state,&consumer,&mut cursor).await?;
                             Ok::<_,crate::error::ApiError>(())
                         }.await;
-                        if result.is_err() {tracing::error!("Ingestion recovery failed; retrying");}
+                        if let Err(error) = result {tracing::error!(stage, code = error.code, "Ingestion recovery failed; retrying");}
                         else {state.health.ingestion[index].store(Utc::now().timestamp(),Ordering::Relaxed);}
                         tokio::select! {_=receiver.changed()=>break,_=tokio::time::sleep(Duration::from_secs(1))=>{}}
                     }

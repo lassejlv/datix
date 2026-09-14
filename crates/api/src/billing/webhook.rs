@@ -5,6 +5,7 @@ use super::{
 };
 use crate::error::ApiError;
 use axum::http::{HeaderMap, StatusCode};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -36,12 +37,21 @@ fn verify(secret: &str, headers: &HeaderMap, body: &[u8]) -> Result<Event, ApiEr
     if timestamp.abs_diff(Utc::now().timestamp()) > 300 {
         return Err(invalid_signature());
     }
-    // Polar's official SDK treats its secret as raw UTF-8, including any whsec_ prefix.
+    // Older Polar secrets sign with the complete UTF-8 string. Secrets generated
+    // from 2026-09-08 use the Standard Webhooks base64-encoded 32-byte key.
+    // The generation date is not in delivery headers, so support both schemes.
     let verifier =
         Webhook::from_bytes(secret.as_bytes().to_vec()).map_err(|_| invalid_signature())?;
-    verifier
-        .verify(body, headers)
-        .map_err(|_| invalid_signature())?;
+    if verifier.verify(body, headers).is_err() {
+        let key = secret
+            .strip_prefix("whsec_")
+            .and_then(|encoded| STANDARD.decode(encoded).ok())
+            .filter(|key| key.len() == 32)
+            .ok_or_else(invalid_signature)?;
+        Webhook::from_bytes(key)
+            .and_then(|verifier| verifier.verify(body, headers))
+            .map_err(|_| invalid_signature())?;
+    }
     serde_json::from_slice(body).map_err(|_| {
         ApiError::new(
             StatusCode::BAD_REQUEST,
@@ -57,6 +67,20 @@ impl Billing {
         headers: &HeaderMap,
         body: &[u8],
     ) -> Result<Value, ApiError> {
+        self.webhook_inner(headers, body)
+            .await
+            .inspect_err(|error| {
+                tracing::warn!(
+                    category = "webhook_failed",
+                    code = error.code,
+                    reason = error.message,
+                    http_status = error.status.as_u16(),
+                    "Polar webhook rejected"
+                );
+            })
+    }
+
+    async fn webhook_inner(&self, headers: &HeaderMap, body: &[u8]) -> Result<Value, ApiError> {
         if !self.enabled {
             return Err(unconfigured());
         }
@@ -128,5 +152,47 @@ impl Billing {
         };
         tx.commit().await?;
         Ok(result)
+    }
+}
+
+#[cfg(test)]
+mod signature_tests {
+    use super::*;
+    use hmac::{Hmac, Mac};
+    use sha2::Sha256;
+
+    #[test]
+    fn supports_both_polar_signing_generations_and_rejects_tampering() {
+        let key = [42_u8; 32];
+        let secret = format!("whsec_{}", STANDARD.encode(key));
+        let timestamp = Utc::now().timestamp();
+        let body = serde_json::to_vec(&json!({
+            "type":"customer.state_changed", "timestamp":Utc::now(), "data":{}
+        }))
+        .unwrap();
+        for signing_key in [key.as_slice(), secret.as_bytes()] {
+            let mut mac = Hmac::<Sha256>::new_from_slice(signing_key).unwrap();
+            mac.update(format!("fixture.{timestamp}.").as_bytes());
+            mac.update(&body);
+            let mut headers = HeaderMap::new();
+            headers.insert("webhook-id", "fixture".parse().unwrap());
+            headers.insert("webhook-timestamp", timestamp.to_string().parse().unwrap());
+            headers.insert(
+                "webhook-signature",
+                format!("v1,{}", STANDARD.encode(mac.finalize().into_bytes()))
+                    .parse()
+                    .unwrap(),
+            );
+            assert!(verify(&secret, &headers, &body).is_ok());
+            assert!(verify("wrong-secret", &headers, &body).is_err());
+            let mut changed = body.clone();
+            changed.push(b' ');
+            assert!(verify(&secret, &headers, &changed).is_err());
+            headers.insert(
+                "webhook-timestamp",
+                (timestamp - 600).to_string().parse().unwrap(),
+            );
+            assert!(verify(&secret, &headers, &body).is_err());
+        }
     }
 }

@@ -98,8 +98,9 @@ data. No DuckDB, separate analytics store, or manual partitions.
   provider has no send idempotency. Disabled external effects fail closed.
 - Polar has no official Rust SDK. The typed HTTP adapter preserves the pinned
   API version and `config/polar-catalog.json`, with no automatic HTTP retries.
-  Standard Webhooks uses the unchanged raw UTF-8 secret, including any
-  `whsec_` prefix, exact body bytes, and timestamp tolerance.
+  Preserve the configured webhook secret unchanged. Verify both Polar's legacy
+  raw UTF-8 signing (including `whsec_`) and Standard Webhooks decoded 32-byte
+  keys for secrets generated from 2026-09-08. Keep exact body bytes and timestamp tolerance.
 - Preserve organization-scoped entitlements, monotonic customer timestamps,
   webhook deduplication, stable usage event IDs, and complete inserted-plus-duplicate
   outbox acknowledgments. Keep checkout/portal/customer sync and deletion policy.

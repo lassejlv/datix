@@ -50,12 +50,32 @@ impl ApiError {
     }
 }
 impl From<sqlx::Error> for ApiError {
-    fn from(_: sqlx::Error) -> Self {
+    fn from(error: sqlx::Error) -> Self {
+        // Driver messages can contain SQL values, account data, and connection URLs.
+        // Report only a fixed category and the PostgreSQL SQLSTATE.
+        let category = match &error {
+            sqlx::Error::Database(_) => "database",
+            sqlx::Error::PoolTimedOut => "pool_timeout",
+            sqlx::Error::PoolClosed => "pool_closed",
+            sqlx::Error::RowNotFound => "row_not_found",
+            sqlx::Error::ColumnDecode { .. } | sqlx::Error::Decode(_) => "decode",
+            sqlx::Error::Io(_) | sqlx::Error::Tls(_) => "connection",
+            _ => "other",
+        };
+        let code = error.as_database_error().and_then(|error| error.code());
+        let sqlstate = code.as_deref().filter(|code| {
+            code.len() == 5
+                && code
+                    .bytes()
+                    .all(|b| b.is_ascii_uppercase() || b.is_ascii_digit())
+        });
+        tracing::warn!(category, sqlstate, "Database operation failed");
         Self::unavailable()
     }
 }
 impl From<redis::RedisError> for ApiError {
-    fn from(_: redis::RedisError) -> Self {
+    fn from(error: redis::RedisError) -> Self {
+        tracing::warn!(kind = ?error.kind(), "Redis operation failed");
         Self::unavailable()
     }
 }

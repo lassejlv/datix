@@ -163,7 +163,29 @@ impl Billing {
         self.portal_for(customer.id).await
     }
 
+    #[tracing::instrument(skip_all, fields(attempt_id = %Uuid::new_v4()))]
     pub(crate) async fn checkout(&self, owner: &str, input: Value) -> Result<Value, ApiError> {
+        let mut stage = "selection";
+        self.checkout_inner(owner, input, &mut stage)
+            .await
+            .inspect_err(|error| {
+                if error.status.is_server_error() {
+                    tracing::warn!(
+                        stage,
+                        category = "checkout_failed",
+                        http_status = error.status.as_u16(),
+                        "Billing checkout failed"
+                    );
+                }
+            })
+    }
+
+    async fn checkout_inner(
+        &self,
+        owner: &str,
+        input: Value,
+        stage: &mut &'static str,
+    ) -> Result<Value, ApiError> {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Selection {
@@ -198,14 +220,20 @@ impl Billing {
                 "Yearly billing is not available yet. Choose a monthly plan.",
             ));
         }
+        *stage = "configuration";
         let client = self.client()?;
+        *stage = "customer_sync";
         let mut customer = self.sync(owner).await?;
+        *stage = "subscription_check";
         if let Some(customer) = &customer
             && self.has_subscription(customer.id, true).await?
         {
+            *stage = "portal_redirect";
             return self.portal_for(customer.id).await;
         }
+        *stage = "database_begin";
         let mut tx = self.pool.begin().await?;
+        *stage = "owner_lock";
         let (name, email): (String, String) =
             sqlx::query_as("SELECT name,email FROM public.\"user\" WHERE id=$1 FOR UPDATE")
                 .bind(owner)
@@ -213,9 +241,11 @@ impl Billing {
                 .await?
                 .ok_or_else(ApiError::unavailable)?;
         let options = json!({"locale":locale,"currency":self.catalog.currency});
+        *stage = "cache_read";
         let cached:Option<String>=sqlx::query_scalar("SELECT checkout_id FROM billing_checkouts WHERE owner_id=$1 AND provider='polar' AND organization_id=$2 AND plan_id=$3 AND checkout_options=$4 AND created_at>now()-interval '10 minutes'")
             .bind(owner).bind(self.organization_id()).bind(plan.product_id.to_string()).bind(&options).fetch_optional(&mut *tx).await?;
         if let (Some(cached), Some(customer)) = (cached, &customer) {
+            *stage = "cached_checkout";
             let id = Uuid::parse_str(&cached).map_err(|_| ApiError::unavailable())?;
             if let Some(checkout) = client.checkout(id).await?
                 && matches!(checkout.status.as_str(), "open" | "confirmed")
@@ -228,14 +258,18 @@ impl Billing {
             }
         }
         if customer.is_none() {
+            *stage = "customer_create";
             let created:Customer=client.create("customers",json!({"type":"individual","external_id":owner,"organization_id":self.organization_id(),"email":email,"name":name,"locale":locale})).await?;
+            *stage = "customer_validate";
             verify_customer(&created, owner, &self.catalog)?;
             customer = Some(created);
         }
         let customer = customer.ok_or_else(ApiError::unavailable)?;
+        *stage = "checkout_create";
         let checkout:Checkout=client.create("checkouts",json!({"products":[plan.product_id],"customer_id":customer.id,"external_customer_id":owner,
             "currency":self.catalog.currency,"locale":locale,"allow_trial":plan.trial_days>0,
             "success_url":format!("{}/dashboard?checkout_id={{CHECKOUT_ID}}",self.app_url),"return_url":format!("{}/dashboard",self.app_url)})).await?;
+        *stage = "checkout_validate";
         if checkout.product_id != Some(plan.product_id)
             || checkout.customer_id != Some(customer.id)
             || checkout.currency != self.catalog.currency
@@ -243,8 +277,10 @@ impl Billing {
             return Err(ApiError::unavailable());
         }
         let url = redirect_url(&checkout.url)?;
+        *stage = "cache_write";
         sqlx::query("INSERT INTO billing_checkouts(owner_id,checkout_id,organization_id,plan_id,checkout_url,checkout_options) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(owner_id) DO UPDATE SET checkout_id=excluded.checkout_id,organization_id=excluded.organization_id,plan_id=excluded.plan_id,checkout_url=excluded.checkout_url,checkout_options=excluded.checkout_options,created_at=now()")
             .bind(owner).bind(checkout.id.to_string()).bind(self.organization_id()).bind(plan.product_id.to_string()).bind(url).bind(options).execute(&mut *tx).await?;
+        *stage = "database_commit";
         tx.commit().await?;
         Ok(json!({"url":url}))
     }
