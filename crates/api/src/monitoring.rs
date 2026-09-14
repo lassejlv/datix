@@ -128,6 +128,20 @@ pub fn report_process_failure(stage: &str) {
     );
 }
 
+pub(crate) fn admin_test_event() -> sentry::protocol::Event<'static> {
+    sentry::protocol::Event {
+        message: Some("Datix backend test issue (admin-triggered)".into()),
+        level: sentry::Level::Error,
+        fingerprint: vec![Cow::Borrowed("datix-admin-sentry-test")].into(),
+        tags: [
+            ("test".into(), "true".into()),
+            ("source".into(), "admin-panel".into()),
+        ]
+        .into(),
+        ..Default::default()
+    }
+}
+
 pub fn worker<F>(future: F, component: &'static str, instance: Option<usize>) -> SentryFuture<F>
 where
     F: Future,
@@ -181,6 +195,18 @@ const fn role_name(role: Role) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn admin_test_is_identifiable_and_contains_no_personal_data() {
+        let event = admin_test_event();
+        assert!(!event.event_id.is_nil());
+        assert_eq!(event.level, sentry::Level::Error);
+        assert_eq!(event.tags.get("test").map(String::as_str), Some("true"));
+        assert_eq!(event.fingerprint.as_ref(), &["datix-admin-sentry-test"]);
+        assert!(event.user.is_none());
+        assert!(event.request.is_none());
+        assert!(event.extra.is_empty());
+    }
 
     #[test]
     fn sentry_error_sample_rate_is_bounded() {

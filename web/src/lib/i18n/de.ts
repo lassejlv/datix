@@ -1,6 +1,16 @@
 import type { Copy } from './en';
 
 export const de = {
+  'Backend error monitoring': 'Backend-Fehlerüberwachung',
+  'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.':
+    'Eine harmlose Backend-Testmeldung für Sentry einreihen. Höchstens einmal alle 30 Sekunden.',
+  'Send Sentry test': 'Sentry-Test senden',
+  'Sentry test queued.': 'Sentry-Test eingereiht.',
+  'Sentry test requested': 'Sentry-Test angefordert',
+  'Test queued. Search Sentry for event ID {id} to confirm delivery.':
+    'Test eingereiht. In Sentry nach Ereignis-ID {id} suchen, um die Zustellung zu bestätigen.',
+  'Requires Sentry and external effects to be enabled on the backend. No frontend errors are collected.':
+    'Sentry und externe Effekte müssen im Backend aktiviert sein. Es werden keine Frontend-Fehler erfasst.',
   'Check your inbox.': 'Prüfe deinen Posteingang.',
   'Verify {email} to use your Datix account.': 'Bestätige {email}, um dein Datix-Konto zu nutzen.',
   'Open the verification link in your email. It expires in one hour.':

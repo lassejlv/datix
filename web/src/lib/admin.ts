@@ -125,6 +125,7 @@ export function adminAuditPath(query: AdminAuditQuery = {}): string {
 }
 
 const auditActions: Record<string, Copy> = {
+  'sentry.test_requested': 'Sentry test requested',
   'user.suspended': 'Account suspended',
   'user.restored': 'Account restored',
   'user.suspension_updated': 'Suspension reason updated',

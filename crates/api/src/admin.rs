@@ -8,7 +8,7 @@ use axum::{
     Extension, Json, Router,
     extract::{Path, Query, Request, State},
     http::StatusCode,
-    routing::get,
+    routing::{get, post},
 };
 use serde::Deserialize;
 use serde_json::{Value, json};
@@ -20,8 +20,64 @@ const SITES: &str = include_str!("admin/site.sql");
 
 pub fn routes() -> Router<AppState> {
     Router::new()
+        .route("/api/admin/sentry-test", post(sentry_test))
         .route("/api/admin/{resource}", get(list))
         .route("/api/admin/{resource}/{id}", get(detail).patch(update))
+}
+
+async fn sentry_test(
+    State(state): State<AppState>,
+    Extension(actor): Extension<Owner>,
+) -> Result<(StatusCode, Json<Value>), ApiError> {
+    authorize_sentry_test(&actor, state.config.external_effects)?;
+    // Shared across API instances; repeated clicks must not flood the project.
+    let acquired: Option<String> = redis::cmd("SET")
+        .arg(format!("{}:admin:sentry-test", state.config.queue_prefix))
+        .arg("1")
+        .arg("NX")
+        .arg("EX")
+        .arg(30)
+        .query_async(&mut state.redis.clone())
+        .await?;
+    if acquired.is_none() {
+        return Err(ApiError::new(
+            StatusCode::TOO_MANY_REQUESTS,
+            "rate_limited",
+            "Wait 30 seconds before sending another Sentry test.",
+        ));
+    }
+    let event = crate::monitoring::admin_test_event();
+    let event_id = event.event_id.simple().to_string();
+    // Record the request before the external effect; do not claim delivery in the audit log.
+    sqlx::query("INSERT INTO admin_audit_log(actor_user_id,action,target_type,target_id,metadata) VALUES($1,'sentry.test_requested','user',$1,$2)")
+        .bind(&actor.id).bind(json!({"eventId":event_id})).execute(&state.pool).await?;
+    if sentry::capture_event(event).is_nil() {
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "sentry_discarded",
+            "Sentry discarded the test event. Check the error sample rate.",
+        ));
+    }
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(json!({"status":"queued","eventId":event_id})),
+    ))
+}
+
+fn authorize_sentry_test(actor: &Owner, external_effects: bool) -> Result<(), ApiError> {
+    authorized(actor)?;
+    if !external_effects
+        || !sentry::Hub::current()
+            .client()
+            .is_some_and(|client| client.is_enabled())
+    {
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "sentry_disabled",
+            "Backend Sentry reporting is not enabled.",
+        ));
+    }
+    Ok(())
 }
 
 fn authorized(owner: &Owner) -> Result<(), ApiError> {
@@ -406,4 +462,38 @@ async fn update(
     }
     tx.commit().await?;
     Ok(Json(read(&state, &resource, &id).await?))
+}
+
+#[cfg(test)]
+mod sentry_tests {
+    use super::*;
+
+    #[test]
+    fn test_issue_requires_admin_and_enabled_reporting() {
+        let mut actor = Owner {
+            id: "fixture".into(),
+            name: "Fixture".into(),
+            email: "fixture@example.test".into(),
+            admin: false,
+        };
+        assert_eq!(
+            authorize_sentry_test(&actor, true).unwrap_err().status,
+            StatusCode::FORBIDDEN
+        );
+        actor.admin = true;
+        assert_eq!(
+            authorize_sentry_test(&actor, false).unwrap_err().code,
+            "sentry_disabled"
+        );
+        let hub = std::sync::Arc::new(sentry::Hub::new(
+            None,
+            std::sync::Arc::new(sentry::Scope::default()),
+        ));
+        sentry::Hub::run(hub, || {
+            assert_eq!(
+                authorize_sentry_test(&actor, true).unwrap_err().code,
+                "sentry_disabled"
+            );
+        });
+    }
 }

@@ -210,9 +210,57 @@ function AdminOverview() {
               </div>
             </dl>
           </AdminSection>
+          <SentryTest />
         </>
       )}
     </AdminState>
+  );
+}
+
+function SentryTest() {
+  const { t } = useSitePreferences();
+  const [busy, setBusy] = useState(false);
+  const [eventId, setEventId] = useState<string | null>(null);
+
+  async function sendTest() {
+    if (busy) return;
+    setBusy(true);
+    setEventId(null);
+
+    try {
+      const result = await apiClient<{ status: 'queued'; eventId: string }>('/admin/sentry-test', {
+        method: 'POST',
+      });
+
+      setEventId(result.eventId);
+      toast.success(t('Sentry test queued.'));
+    } catch (cause) {
+      toast.error(errorText(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <AdminSection
+      title={t('Backend error monitoring')}
+      description={t(
+        'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.',
+      )}
+      action={
+        <Button variant="outline" size="sm" loading={busy} onClick={sendTest}>
+          {t('Send Sentry test')}
+        </Button>
+      }
+    >
+      <p role="status" className="text-sm break-words text-secondary-ink">
+        {eventId
+          ? t('Test queued. Search Sentry for event ID {id} to confirm delivery.', { id: eventId })
+          : t(
+              'Requires Sentry and external effects to be enabled on the backend. No frontend errors are collected.',
+            )}
+      </p>
+    </AdminSection>
   );
 }
 

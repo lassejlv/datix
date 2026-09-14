@@ -1,4 +1,14 @@
 export const en = {
+  'Backend error monitoring': 'Backend error monitoring',
+  'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.':
+    'Queue a harmless backend test issue in Sentry. Limited to once every 30 seconds.',
+  'Send Sentry test': 'Send Sentry test',
+  'Sentry test queued.': 'Sentry test queued.',
+  'Sentry test requested': 'Sentry test requested',
+  'Test queued. Search Sentry for event ID {id} to confirm delivery.':
+    'Test queued. Search Sentry for event ID {id} to confirm delivery.',
+  'Requires Sentry and external effects to be enabled on the backend. No frontend errors are collected.':
+    'Requires Sentry and external effects to be enabled on the backend. No frontend errors are collected.',
   'Check your inbox.': 'Check your inbox.',
   'Verify {email} to use your Datix account.': 'Verify {email} to use your Datix account.',
   'Open the verification link in your email. It expires in one hour.':
