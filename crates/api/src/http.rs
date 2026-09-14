@@ -76,10 +76,52 @@ pub fn router(state: AppState) -> Router {
         .with_state(state)
 }
 
-fn frontend(root: &std::path::Path) -> ServeDir<ServeFile> {
-    // SPA routes must retain the index file's 200 status. API misses
-    // are rejected by security before reaching this fallback.
-    ServeDir::new(root).fallback(ServeFile::new(root.join("index.html")))
+fn frontend(root: &std::path::Path) -> Router {
+    let index = root.join("index.html");
+    let fallback = get(move |request: Request| {
+        let index = index.clone();
+        async move {
+            let path = request.uri().path();
+            // Never disguise a missing asset as a successful HTML response.
+            if path.starts_with("/assets/")
+                || path
+                    .rsplit('/')
+                    .next()
+                    .is_some_and(|name| name.contains('.'))
+            {
+                return StatusCode::NOT_FOUND.into_response();
+            }
+            match ServeFile::new(index).try_call(request).await {
+                Ok(response) => response.into_response(),
+                Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+            }
+        }
+    });
+    Router::new()
+        .fallback_service(ServeDir::new(root).fallback(fallback))
+        .layer(middleware::from_fn(frontend_cache))
+}
+
+async fn frontend_cache(request: Request, next: Next) -> Response {
+    let hashed_asset = request.uri().path().starts_with("/assets/");
+    let mut response = next.run(request).await;
+    let cache = if response.status().is_client_error() || response.status().is_server_error() {
+        "no-store"
+    } else if hashed_asset
+        && response
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .is_some_and(|value| !value.as_bytes().starts_with(b"text/html"))
+    {
+        "public, max-age=31536000, immutable"
+    } else {
+        // HTML and unhashed files must revalidate across deployments.
+        "no-cache"
+    };
+    response
+        .headers_mut()
+        .insert(header::CACHE_CONTROL, HeaderValue::from_static(cache));
+    response
 }
 
 #[cfg(test)]
@@ -97,8 +139,19 @@ mod tests {
         )
         .unwrap();
         std::fs::write(root.join("tracker.js"), "/* fixture */").unwrap();
+        std::fs::create_dir(root.join("assets")).unwrap();
+        std::fs::write(root.join("assets/app-hash.js"), "/* fixture */").unwrap();
         let mut results = Vec::new();
-        for path in ["/dashboard", "/tracker.js"] {
+        for path in [
+            "/dashboard",
+            "/tracker.js",
+            "/assets/missing.js",
+            "/missing.css",
+            "/assets/missing",
+            "/site/site-id/environment-id/overview",
+            "/",
+            "/assets/app-hash.js",
+        ] {
             let response = frontend(&root)
                 .oneshot(
                     Request::builder()
@@ -110,17 +163,51 @@ mod tests {
                 .unwrap();
             results.push((
                 response.status(),
-                response.headers()[header::CONTENT_TYPE]
-                    .to_str()
-                    .unwrap()
+                response
+                    .headers()
+                    .get(header::CONTENT_TYPE)
+                    .and_then(|value| value.to_str().ok())
+                    .unwrap_or("")
+                    .to_owned(),
+                response
+                    .headers()
+                    .get(header::CACHE_CONTROL)
+                    .and_then(|value| value.to_str().ok())
+                    .unwrap_or("")
                     .to_owned(),
             ));
         }
         std::fs::remove_file(root.join("index.html")).unwrap();
         std::fs::remove_file(root.join("tracker.js")).unwrap();
+        std::fs::remove_file(root.join("assets/app-hash.js")).unwrap();
+        std::fs::remove_dir(root.join("assets")).unwrap();
         std::fs::remove_dir(root).unwrap();
-        assert_eq!(results[0], (StatusCode::OK, "text/html".into()));
-        assert_eq!(results[1], (StatusCode::OK, "text/javascript".into()));
+        assert_eq!(
+            results[0],
+            (StatusCode::OK, "text/html".into(), "no-cache".into())
+        );
+        assert_eq!(
+            results[1],
+            (StatusCode::OK, "text/javascript".into(), "no-cache".into())
+        );
+        assert_eq!(results[2].0, StatusCode::NOT_FOUND);
+        assert_eq!(results[3].0, StatusCode::NOT_FOUND);
+        for result in &results[2..5] {
+            assert_eq!(result.0, StatusCode::NOT_FOUND);
+            assert_eq!(result.2, "no-store");
+        }
+        for result in &results[5..7] {
+            assert_eq!(result.0, StatusCode::OK);
+            assert_eq!(result.2, "no-cache");
+        }
+        assert_eq!(
+            results[7],
+            (
+                StatusCode::OK,
+                "text/javascript".into(),
+                "public, max-age=31536000, immutable".into()
+            )
+        );
     }
 }
 
