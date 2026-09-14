@@ -1,16 +1,7 @@
 import { useSitePreferences } from './site-preferences';
-import { useState } from 'react';
-import { ArrowRight, Check, Code2, Globe2, MousePointer2, Play, Plus } from './ui/icons';
+import { ArrowRight, Check, Code2, Globe2, MousePointer2, Plus } from './ui/icons';
 import { LandingLayout } from './landing-layout';
 import { DashboardPreview } from './dashboard-preview';
-import {
-  Dialog,
-  DialogPopup,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogPanel,
-} from './ui/dialog';
 
 const questions = [
   [
@@ -41,7 +32,6 @@ const questions = [
 
 export function LandingPage() {
   const { t } = useSitePreferences();
-  const [dialog, setDialog] = useState<'demo' | null>(null);
 
   return (
     <LandingLayout home>
@@ -62,13 +52,14 @@ export function LandingPage() {
               <a className="landing-button" href="/signup">
                 {t('Start 14-day trial')} <ArrowRight size={17} aria-hidden="true" />
               </a>
-              <button
+              <a
                 className="landing-text-button"
-                type="button"
-                onClick={() => setDialog('demo')}
+                href="https://github.com/lassejlv/datix"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Play size={14} aria-hidden="true" /> {t('Explore dashboard')}
-              </button>
+                <Code2 size={14} aria-hidden="true" /> {t('Open source on GitHub')}
+              </a>
             </div>
           </div>
         </section>
@@ -142,40 +133,6 @@ export function LandingPage() {
           </a>
         </section>
       </main>
-
-      <Dialog
-        open={dialog !== null}
-        onOpenChange={(open) => {
-          if (!open) setDialog(null);
-        }}
-      >
-        <DialogPopup
-          closeProps={{ 'aria-label': t('Close') }}
-          className="landing-dialog sm:max-w-5xl"
-          bottomStickOnMobile={false}
-        >
-          <DialogHeader>
-            <DialogTitle>{t('The useful stuff, at a glance.')}</DialogTitle>
-            <DialogDescription>
-              {t('An actual Datix dashboard, shown with example traffic.')}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogPanel>
-            <picture>
-              <img
-                className="landing-demo"
-                src="/media/dashboard-dark.webp"
-                alt={t(
-                  'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
-                )}
-                width="1440"
-                height="1128"
-                loading="lazy"
-              />
-            </picture>
-          </DialogPanel>
-        </DialogPopup>
-      </Dialog>
     </LandingLayout>
   );
 }

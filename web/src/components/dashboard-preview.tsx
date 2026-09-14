@@ -6,17 +6,19 @@ export function DashboardPreview() {
   return (
     <section className="landing-product" aria-label={t('Explore dashboard')}>
       <div className="landing-preview-window" id="dashboard-preview">
-        <picture>
-          <img
-            src="/media/dashboard-dark.webp"
-            width="1440"
-            height="1128"
-            fetchPriority="high"
-            alt={t(
-              'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
-            )}
-          />
-        </picture>
+        <video
+          src="/media/datix-launch.mp4"
+          poster="/media/datix-launch-poster.jpg"
+          width="1920"
+          height="1080"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label={t(
+            'Datix dashboard with sample pageviews, daily visitors, a traffic chart, and page and referrer reports.',
+          )}
+        />
       </div>
     </section>
   );

@@ -198,7 +198,7 @@
 }
 .landing-preview-window {
   width: min(1000px, 100%);
-  height: 412px;
+  aspect-ratio: 16 / 9;
   margin: 0 auto;
   border: 1px solid var(--landing-line);
   border-radius: 12px;
@@ -206,8 +206,7 @@
   background: var(--landing-canvas);
   text-align: left;
 }
-.landing-preview-window picture,
-.landing-preview-window img {
+.landing-preview-window video {
   display: block;
   width: 100%;
   height: auto;
@@ -1095,20 +1094,6 @@
   }
   .landing-product {
     padding: 8px 16px 16px;
-  }
-  .landing-preview-window {
-    height: 340px;
-  }
-  .landing-preview-window picture {
-    width: 760px;
-    max-width: none;
-  }
-  .landing-preview-window img {
-    width: 760px;
-    max-width: none;
-  }
-  .landing-preview-window {
-    overflow: auto;
   }
   .landing-reassurance {
     padding: 24px 20px;
