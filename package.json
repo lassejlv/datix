@@ -2,40 +2,23 @@
   "name": "datix",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "web"
   ],
   "type": "module",
   "scripts": {
-    "dev": "bun scripts/dev.ts",
-    "build": "vp run -r build",
-    "typecheck": "vp run -r typecheck && tsc --noEmit -p scripts/tsconfig.json",
-    "test": "bun test apps/api/tests packages/email/tests",
-    "check": "vp check && bun run typecheck && bun run test",
-    "lint": "vp lint",
+    "dev": "bun --no-env-file web/scripts/dev.ts",
+    "build": "cargo build --workspace --release --locked && bun run --cwd web build",
+    "typecheck": "cargo check --workspace --locked && bun run --cwd web typecheck",
+    "test": "cargo test --workspace --locked && bun run --cwd web test",
+    "check": "bun run fmt:check && bun run lint && bun run typecheck && bun run test",
+    "lint": "cargo clippy --workspace --all-targets --locked -- -D warnings && bun run --cwd web lint",
+    "lint:fix": "bun run --cwd web lint:fix",
+    "db": "cargo run --locked -p datix-db --",
+    "test:integration": "DATIX_TEST_ENV=.local/rust.env cargo test --workspace --locked -- --ignored",
+    "fmt": "cargo fmt --all && bun run --cwd web fmt",
+    "fmt:check": "cargo fmt --all --check && bun run --cwd web fmt:check",
     "format": "bun run fmt",
-    "db:generate": "bun run --cwd packages/db generate",
-    "db:migrate": "bun scripts/migrate.ts",
-    "start": "bun apps/api/src/main.ts",
-    "data:copy": "bun scripts/copy-data.ts",
-    "test:integration": "bun --env-file=.env --env-file=.env.test scripts/integration.ts",
-    "db:runtime": "bun scripts/runtime-role.ts",
-    "lint:fix": "vp lint --fix",
-    "fmt": "vp lint --quiet --fix -A all -D spacing/padding-line-between-statements && vp fmt",
-    "fmt:check": "vp lint --quiet -A all -D spacing/padding-line-between-statements && vp fmt --check",
     "format:check": "bun run fmt:check"
-  },
-  "devDependencies": {
-    "@stylistic/eslint-plugin": "^5.10.0",
-    "@types/bun": "^1.4.1",
-    "effect": "4.0.0-rc.115",
-    "typescript": "^7.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
-    "vite-plus": "0.3.1"
-  },
-  "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
-    "vitest": "4.1.11"
   },
   "packageManager": "bun@1.4.2"
 }

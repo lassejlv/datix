@@ -1,0 +1,18 @@
+Verify your email to get started with Datix.
+
+Datix
+
+
+VERIFY YOUR EMAIL ADDRESS
+
+Hi {{name}}, confirm your email address to finish creating your Datix account.
+
+Verify email address {{verification_url}}
+
+This link expires in one hour.
+
+If the button doesn’t work, copy and paste this link into your browser:
+
+{{verification_url}}
+
+If you didn’t request this email, you can ignore it.

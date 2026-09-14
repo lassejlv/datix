@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "jsPlugins": [{ "name": "spacing", "specifier": "@stylistic/eslint-plugin" }],
+  "categories": { "correctness": "error" },
+  "rules": {
+    "spacing/padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": ["export", "function", "block-like", "return"]
+      },
+      {
+        "blankLine": "always",
+        "prev": ["import", "export", "function", "block-like"],
+        "next": "*"
+      },
+      { "blankLine": "always", "prev": "*", "next": ["multiline-const", "multiline-let"] },
+      { "blankLine": "always", "prev": ["multiline-const", "multiline-let"], "next": "*" },
+      { "blankLine": "any", "prev": "import", "next": "import" }
+    ]
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "artifacts/**",
+    "src/routeTree.gen.ts",
+    "public/web-vitals.js"
+  ],
+  "overrides": [
+    {
+      "files": ["src/components/**"],
+      "rules": {
+        "react/set-state-in-effect": "warn",
+        "react/purity": "warn",
+        "react/refs": "warn",
+        "react-hooks/exhaustive-deps": "warn"
+      }
+    }
+  ]
+}

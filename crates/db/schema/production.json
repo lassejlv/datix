@@ -1,0 +1,4626 @@
+{
+  "format": 2,
+  "schema": {
+    "columns": [
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "abuse_daily",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 2,
+        "table_name": "abuse_daily",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "reason",
+        "not_null": true,
+        "position": 3,
+        "table_name": "abuse_daily",
+        "type": "text"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "blocked",
+        "not_null": true,
+        "position": 4,
+        "table_name": "abuse_daily",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "last_blocked_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "abuse_daily",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "abuse_environment",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "baseline",
+        "not_null": true,
+        "position": 2,
+        "table_name": "abuse_environment",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "learned_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "abuse_environment",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "traffic",
+        "not_null": true,
+        "position": 4,
+        "table_name": "abuse_environment",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "abuse_sources",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "source",
+        "not_null": true,
+        "position": 2,
+        "table_name": "abuse_sources",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "activity",
+        "not_null": true,
+        "position": 3,
+        "table_name": "abuse_sources",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "abuse_sources",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "account_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "provider_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "user_id",
+        "not_null": true,
+        "position": 4,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "access_token",
+        "not_null": false,
+        "position": 5,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "refresh_token",
+        "not_null": false,
+        "position": 6,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id_token",
+        "not_null": false,
+        "position": 7,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "access_token_expires_at",
+        "not_null": false,
+        "position": 8,
+        "table_name": "account",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "refresh_token_expires_at",
+        "not_null": false,
+        "position": 9,
+        "table_name": "account",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "scope",
+        "not_null": false,
+        "position": 10,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "password",
+        "not_null": false,
+        "position": 11,
+        "table_name": "account",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 12,
+        "table_name": "account",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 13,
+        "table_name": "account",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "account_onboarding",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "completed_at",
+        "not_null": true,
+        "position": 2,
+        "table_name": "account_onboarding",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "activity_events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "activity_events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "session_key",
+        "not_null": true,
+        "position": 3,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitor_key",
+        "not_null": true,
+        "position": 4,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "received_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "activity_events",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "kind",
+        "not_null": true,
+        "position": 6,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 7,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "path",
+        "not_null": true,
+        "position": 8,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "referrer",
+        "not_null": true,
+        "position": 9,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "country",
+        "not_null": true,
+        "position": 10,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "device",
+        "not_null": true,
+        "position": 11,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "browser",
+        "not_null": true,
+        "position": 12,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "os",
+        "not_null": true,
+        "position": 13,
+        "table_name": "activity_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "details",
+        "not_null": true,
+        "position": 14,
+        "table_name": "activity_events",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "a",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "admin_audit_log",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "actor_user_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "admin_audit_log",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "action",
+        "not_null": true,
+        "position": 3,
+        "table_name": "admin_audit_log",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "target_type",
+        "not_null": true,
+        "position": 4,
+        "table_name": "admin_audit_log",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "target_id",
+        "not_null": true,
+        "position": 5,
+        "table_name": "admin_audit_log",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "reason",
+        "not_null": false,
+        "position": 6,
+        "table_name": "admin_audit_log",
+        "type": "text"
+      },
+      {
+        "default_expression": "'{}'::jsonb",
+        "generated": "",
+        "identity": "",
+        "name": "metadata",
+        "not_null": true,
+        "position": 7,
+        "table_name": "admin_audit_log",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 8,
+        "table_name": "admin_audit_log",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "analytics_deletions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 2,
+        "table_name": "analytics_deletions",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "analytics_imports",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "analytics_imports",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "provider",
+        "not_null": true,
+        "position": 3,
+        "table_name": "analytics_imports",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "source_timezone",
+        "not_null": true,
+        "position": 4,
+        "table_name": "analytics_imports",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "fingerprint",
+        "not_null": true,
+        "position": 5,
+        "table_name": "analytics_imports",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "summary",
+        "not_null": true,
+        "position": 6,
+        "table_name": "analytics_imports",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 7,
+        "table_name": "analytics_imports",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_checkouts",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "checkout_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_checkouts",
+        "type": "text"
+      },
+      {
+        "default_expression": "'polar'::text",
+        "generated": "",
+        "identity": "",
+        "name": "provider",
+        "not_null": true,
+        "position": 3,
+        "table_name": "billing_checkouts",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "organization_id",
+        "not_null": false,
+        "position": 4,
+        "table_name": "billing_checkouts",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "plan_id",
+        "not_null": false,
+        "position": 5,
+        "table_name": "billing_checkouts",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "checkout_url",
+        "not_null": false,
+        "position": 6,
+        "table_name": "billing_checkouts",
+        "type": "text"
+      },
+      {
+        "default_expression": "'{}'::jsonb",
+        "generated": "",
+        "identity": "",
+        "name": "checkout_options",
+        "not_null": true,
+        "position": 7,
+        "table_name": "billing_checkouts",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 8,
+        "table_name": "billing_checkouts",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "customer_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_customers",
+        "type": "text"
+      },
+      {
+        "default_expression": "'polar'::text",
+        "generated": "",
+        "identity": "",
+        "name": "provider",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_customers",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "organization_id",
+        "not_null": false,
+        "position": 3,
+        "table_name": "billing_customers",
+        "type": "uuid"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "sync_attempted_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "billing_customers",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": false,
+        "position": 5,
+        "table_name": "billing_customers",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "subscriptions",
+        "not_null": true,
+        "position": 6,
+        "table_name": "billing_customers",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "false",
+        "generated": "",
+        "identity": "",
+        "name": "deleted",
+        "not_null": true,
+        "position": 7,
+        "table_name": "billing_customers",
+        "type": "boolean"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "occurred_at",
+        "not_null": true,
+        "position": 8,
+        "table_name": "billing_customers",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 9,
+        "table_name": "billing_customers",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "organization_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_organization_usage",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_organization_usage",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "billing_organization_usage",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_start",
+        "not_null": true,
+        "position": 4,
+        "table_name": "billing_organization_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_end",
+        "not_null": true,
+        "position": 5,
+        "table_name": "billing_organization_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "events",
+        "not_null": true,
+        "position": 6,
+        "table_name": "billing_organization_usage",
+        "type": "numeric(20,2)"
+      },
+      {
+        "default_expression": "gen_random_uuid()",
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_outbox",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_outbox",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "event_type",
+        "not_null": true,
+        "position": 3,
+        "table_name": "billing_outbox",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "event_count",
+        "not_null": true,
+        "position": 4,
+        "table_name": "billing_outbox",
+        "type": "numeric(20,2)"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "occurred_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "billing_outbox",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "available_at",
+        "not_null": true,
+        "position": 6,
+        "table_name": "billing_outbox",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "attempts",
+        "not_null": true,
+        "position": 7,
+        "table_name": "billing_outbox",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "lease_id",
+        "not_null": false,
+        "position": 8,
+        "table_name": "billing_outbox",
+        "type": "uuid"
+      },
+      {
+        "default_expression": "'polar'::text",
+        "generated": "",
+        "identity": "",
+        "name": "provider",
+        "not_null": true,
+        "position": 9,
+        "table_name": "billing_outbox",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "organization_id",
+        "not_null": false,
+        "position": 10,
+        "table_name": "billing_outbox",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "delivery_started_at",
+        "not_null": false,
+        "position": 11,
+        "table_name": "billing_outbox",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_usage",
+        "type": "text"
+      },
+      {
+        "default_expression": "'00000000-0000-0000-0000-000000000000'::uuid",
+        "generated": "",
+        "identity": "",
+        "name": "organization_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_usage",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "billing_usage",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_start",
+        "not_null": true,
+        "position": 4,
+        "table_name": "billing_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_end",
+        "not_null": true,
+        "position": 5,
+        "table_name": "billing_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "events",
+        "not_null": true,
+        "position": 6,
+        "table_name": "billing_usage",
+        "type": "numeric(20,2)"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "billing_webhook_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "type",
+        "not_null": true,
+        "position": 2,
+        "table_name": "billing_webhook_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "occurred_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "billing_webhook_events",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "received_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "billing_webhook_events",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "gen_random_uuid()",
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "conversion_goals",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "conversion_goals",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 3,
+        "table_name": "conversion_goals",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "match_type",
+        "not_null": true,
+        "position": 4,
+        "table_name": "conversion_goals",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "match_value",
+        "not_null": true,
+        "position": 5,
+        "table_name": "conversion_goals",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 6,
+        "table_name": "conversion_goals",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "daily_stats",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 2,
+        "table_name": "daily_stats",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "dimension",
+        "not_null": true,
+        "position": 3,
+        "table_name": "daily_stats",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "value",
+        "not_null": true,
+        "position": 4,
+        "table_name": "daily_stats",
+        "type": "text"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "pageviews",
+        "not_null": true,
+        "position": 5,
+        "table_name": "daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "custom_events",
+        "not_null": true,
+        "position": 6,
+        "table_name": "daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "visitors",
+        "not_null": true,
+        "position": 7,
+        "table_name": "daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "daily_visitors",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 2,
+        "table_name": "daily_visitors",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitor",
+        "not_null": true,
+        "position": 3,
+        "table_name": "daily_visitors",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 1,
+        "table_name": "datix_schema_migrations",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "checksum",
+        "not_null": true,
+        "position": 2,
+        "table_name": "datix_schema_migrations",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "applied_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "datix_schema_migrations",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "diagnostic_events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "diagnostic_events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "page_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "diagnostic_events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "received_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "diagnostic_events",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "kind",
+        "not_null": true,
+        "position": 5,
+        "table_name": "diagnostic_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "path",
+        "not_null": true,
+        "position": 6,
+        "table_name": "diagnostic_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "device",
+        "not_null": true,
+        "position": 7,
+        "table_name": "diagnostic_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitor",
+        "not_null": true,
+        "position": 8,
+        "table_name": "diagnostic_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "fingerprint",
+        "not_null": true,
+        "position": 9,
+        "table_name": "diagnostic_events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "payload",
+        "not_null": true,
+        "position": 10,
+        "table_name": "diagnostic_events",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "gen_random_uuid()",
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "environments",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "environments",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 3,
+        "table_name": "environments",
+        "type": "text"
+      },
+      {
+        "default_expression": "'{}'::jsonb",
+        "generated": "",
+        "identity": "",
+        "name": "tracking_settings",
+        "not_null": true,
+        "position": 4,
+        "table_name": "environments",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "import_revision",
+        "not_null": true,
+        "position": 5,
+        "table_name": "environments",
+        "type": "bigint"
+      },
+      {
+        "default_expression": "'{}'::jsonb",
+        "generated": "",
+        "identity": "",
+        "name": "feature_settings",
+        "not_null": true,
+        "position": 6,
+        "table_name": "environments",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "'cookieless'::text",
+        "generated": "",
+        "identity": "",
+        "name": "tracking_mode",
+        "not_null": true,
+        "position": 7,
+        "table_name": "environments",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "domain",
+        "not_null": true,
+        "position": 8,
+        "table_name": "environments",
+        "type": "text"
+      },
+      {
+        "default_expression": "true",
+        "generated": "",
+        "identity": "",
+        "name": "enabled",
+        "not_null": true,
+        "position": 9,
+        "table_name": "environments",
+        "type": "boolean"
+      },
+      {
+        "default_expression": "false",
+        "generated": "",
+        "identity": "",
+        "name": "allow_localhost",
+        "not_null": true,
+        "position": 10,
+        "table_name": "environments",
+        "type": "boolean"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 11,
+        "table_name": "environments",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "error_resolutions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "fingerprint",
+        "not_null": true,
+        "position": 2,
+        "table_name": "error_resolutions",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "resolved_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "error_resolutions",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "events",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "received_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "events",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 4,
+        "table_name": "events",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "type",
+        "not_null": true,
+        "position": 5,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 6,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "path",
+        "not_null": true,
+        "position": 7,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "referrer",
+        "not_null": true,
+        "position": 8,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "country",
+        "not_null": true,
+        "position": 9,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "device",
+        "not_null": true,
+        "position": 10,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitor",
+        "not_null": true,
+        "position": 11,
+        "table_name": "events",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "free_usage",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "free_usage",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_start",
+        "not_null": true,
+        "position": 3,
+        "table_name": "free_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_end",
+        "not_null": true,
+        "position": 4,
+        "table_name": "free_usage",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "0",
+        "generated": "",
+        "identity": "",
+        "name": "events",
+        "not_null": true,
+        "position": 5,
+        "table_name": "free_usage",
+        "type": "numeric(20,2)"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "goal_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "goal_conversions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "goal_conversions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "event_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "goal_conversions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "received_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "goal_conversions",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 5,
+        "table_name": "goal_conversions",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitor",
+        "not_null": true,
+        "position": 6,
+        "table_name": "goal_conversions",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "path",
+        "not_null": true,
+        "position": 7,
+        "table_name": "goal_conversions",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "imported_breakdowns",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 2,
+        "table_name": "imported_breakdowns",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "dimension",
+        "not_null": true,
+        "position": 3,
+        "table_name": "imported_breakdowns",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "value",
+        "not_null": true,
+        "position": 4,
+        "table_name": "imported_breakdowns",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "count",
+        "not_null": true,
+        "position": 5,
+        "table_name": "imported_breakdowns",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "imported_daily_stats",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 2,
+        "table_name": "imported_daily_stats",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "import_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "imported_daily_stats",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "starts_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "imported_daily_stats",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "ends_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "imported_daily_stats",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "pageviews",
+        "not_null": true,
+        "position": 6,
+        "table_name": "imported_daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "visitors",
+        "not_null": true,
+        "position": 7,
+        "table_name": "imported_daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "custom_events",
+        "not_null": true,
+        "position": 8,
+        "table_name": "imported_daily_stats",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "ingestion_receipts",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "event_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "ingestion_receipts",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 3,
+        "table_name": "ingestion_receipts",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 4,
+        "table_name": "ingestion_receipts",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_start",
+        "not_null": true,
+        "position": 5,
+        "table_name": "ingestion_receipts",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "period_end",
+        "not_null": true,
+        "position": 6,
+        "table_name": "ingestion_receipts",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "units",
+        "not_null": true,
+        "position": 7,
+        "table_name": "ingestion_receipts",
+        "type": "integer"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "payload",
+        "not_null": false,
+        "position": 8,
+        "table_name": "ingestion_receipts",
+        "type": "jsonb"
+      },
+      {
+        "default_expression": "'pending'::text",
+        "generated": "",
+        "identity": "",
+        "name": "state",
+        "not_null": true,
+        "position": 9,
+        "table_name": "ingestion_receipts",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 10,
+        "table_name": "ingestion_receipts",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": "gen_random_uuid()",
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "overview_annotations",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "environment_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "overview_annotations",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "day",
+        "not_null": true,
+        "position": 3,
+        "table_name": "overview_annotations",
+        "type": "date"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "label",
+        "not_null": true,
+        "position": 4,
+        "table_name": "overview_annotations",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "overview_annotations",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "rate_limit",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "key",
+        "not_null": true,
+        "position": 2,
+        "table_name": "rate_limit",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "count",
+        "not_null": true,
+        "position": 3,
+        "table_name": "rate_limit",
+        "type": "integer"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "last_request",
+        "not_null": true,
+        "position": 4,
+        "table_name": "rate_limit",
+        "type": "bigint"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "session",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "expires_at",
+        "not_null": true,
+        "position": 2,
+        "table_name": "session",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "token",
+        "not_null": true,
+        "position": 3,
+        "table_name": "session",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "session",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "session",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "ip_address",
+        "not_null": false,
+        "position": 6,
+        "table_name": "session",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "user_agent",
+        "not_null": false,
+        "position": 7,
+        "table_name": "session",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "user_id",
+        "not_null": true,
+        "position": 8,
+        "table_name": "session",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "site_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "site_suspensions",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "reason",
+        "not_null": true,
+        "position": 2,
+        "table_name": "site_suspensions",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "suspended_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "site_suspensions",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "suspended_by",
+        "not_null": true,
+        "position": 4,
+        "table_name": "site_suspensions",
+        "type": "text"
+      },
+      {
+        "default_expression": "gen_random_uuid()",
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "sites",
+        "type": "uuid"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "owner_id",
+        "not_null": true,
+        "position": 2,
+        "table_name": "sites",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 3,
+        "table_name": "sites",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "domain",
+        "not_null": true,
+        "position": 4,
+        "table_name": "sites",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "credit_budget",
+        "not_null": false,
+        "position": 5,
+        "table_name": "sites",
+        "type": "numeric(20,2)"
+      },
+      {
+        "default_expression": "true",
+        "generated": "",
+        "identity": "",
+        "name": "enabled",
+        "not_null": true,
+        "position": 6,
+        "table_name": "sites",
+        "type": "boolean"
+      },
+      {
+        "default_expression": "false",
+        "generated": "",
+        "identity": "",
+        "name": "allow_localhost",
+        "not_null": true,
+        "position": 7,
+        "table_name": "sites",
+        "type": "boolean"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 8,
+        "table_name": "sites",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "user",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "name",
+        "not_null": true,
+        "position": 2,
+        "table_name": "user",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "email",
+        "not_null": true,
+        "position": 3,
+        "table_name": "user",
+        "type": "text"
+      },
+      {
+        "default_expression": "false",
+        "generated": "",
+        "identity": "",
+        "name": "email_verified",
+        "not_null": true,
+        "position": 4,
+        "table_name": "user",
+        "type": "boolean"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "image",
+        "not_null": false,
+        "position": 5,
+        "table_name": "user",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 6,
+        "table_name": "user",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 7,
+        "table_name": "user",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "user_id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "user_suspensions",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "reason",
+        "not_null": true,
+        "position": 2,
+        "table_name": "user_suspensions",
+        "type": "text"
+      },
+      {
+        "default_expression": "now()",
+        "generated": "",
+        "identity": "",
+        "name": "suspended_at",
+        "not_null": true,
+        "position": 3,
+        "table_name": "user_suspensions",
+        "type": "timestamp with time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "suspended_by",
+        "not_null": true,
+        "position": 4,
+        "table_name": "user_suspensions",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "id",
+        "not_null": true,
+        "position": 1,
+        "table_name": "verification",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "identifier",
+        "not_null": true,
+        "position": 2,
+        "table_name": "verification",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "value",
+        "not_null": true,
+        "position": 3,
+        "table_name": "verification",
+        "type": "text"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "expires_at",
+        "not_null": true,
+        "position": 4,
+        "table_name": "verification",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "created_at",
+        "not_null": true,
+        "position": 5,
+        "table_name": "verification",
+        "type": "timestamp without time zone"
+      },
+      {
+        "default_expression": null,
+        "generated": "",
+        "identity": "",
+        "name": "updated_at",
+        "not_null": true,
+        "position": 6,
+        "table_name": "verification",
+        "type": "timestamp without time zone"
+      }
+    ],
+    "constraints": [
+      {
+        "definition": "NOT NULL blocked",
+        "name": "abuse_daily_blocked_not_null",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "abuse_daily_day_not_null",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, day, reason)",
+        "name": "abuse_daily_environment_id_day_reason_pk",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "abuse_daily_environment_id_environments_id_fk",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "abuse_daily_environment_id_not_null",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "NOT NULL last_blocked_at",
+        "name": "abuse_daily_last_blocked_at_not_null",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "NOT NULL reason",
+        "name": "abuse_daily_reason_not_null",
+        "table_name": "abuse_daily"
+      },
+      {
+        "definition": "NOT NULL baseline",
+        "name": "abuse_environment_baseline_not_null",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "abuse_environment_environment_id_environments_id_fk",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "abuse_environment_environment_id_not_null",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "NOT NULL learned_at",
+        "name": "abuse_environment_learned_at_not_null",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id)",
+        "name": "abuse_environment_pkey",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "NOT NULL traffic",
+        "name": "abuse_environment_traffic_not_null",
+        "table_name": "abuse_environment"
+      },
+      {
+        "definition": "NOT NULL activity",
+        "name": "abuse_sources_activity_not_null",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "abuse_sources_environment_id_environments_id_fk",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "abuse_sources_environment_id_not_null",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, source)",
+        "name": "abuse_sources_environment_id_source_pk",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "NOT NULL source",
+        "name": "abuse_sources_source_not_null",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "abuse_sources_updated_at_not_null",
+        "table_name": "abuse_sources"
+      },
+      {
+        "definition": "NOT NULL account_id",
+        "name": "account_account_id_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "account_created_at_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "account_id_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "account_pkey",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL provider_id",
+        "name": "account_provider_id_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "account_updated_at_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL user_id",
+        "name": "account_user_id_not_null",
+        "table_name": "account"
+      },
+      {
+        "definition": "FOREIGN KEY (user_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "account_user_id_user_id_fk",
+        "table_name": "account"
+      },
+      {
+        "definition": "NOT NULL completed_at",
+        "name": "account_onboarding_completed_at_not_null",
+        "table_name": "account_onboarding"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "account_onboarding_owner_id_not_null",
+        "table_name": "account_onboarding"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "account_onboarding_owner_id_user_id_fk",
+        "table_name": "account_onboarding"
+      },
+      {
+        "definition": "PRIMARY KEY (owner_id)",
+        "name": "account_onboarding_pkey",
+        "table_name": "account_onboarding"
+      },
+      {
+        "definition": "NOT NULL browser",
+        "name": "activity_events_browser_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL country",
+        "name": "activity_events_country_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL details",
+        "name": "activity_events_details_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL device",
+        "name": "activity_events_device_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, id, received_at)",
+        "name": "activity_events_environment_id_id_received_at_pk",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "activity_events_environment_id_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "activity_events_id_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL kind",
+        "name": "activity_events_kind_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "activity_events_name_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL os",
+        "name": "activity_events_os_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL path",
+        "name": "activity_events_path_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL received_at",
+        "name": "activity_events_received_at_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL referrer",
+        "name": "activity_events_referrer_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL session_key",
+        "name": "activity_events_session_key_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL visitor_key",
+        "name": "activity_events_visitor_key_not_null",
+        "table_name": "activity_events"
+      },
+      {
+        "definition": "NOT NULL action",
+        "name": "admin_audit_log_action_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL actor_user_id",
+        "name": "admin_audit_log_actor_user_id_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "admin_audit_log_created_at_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "admin_audit_log_id_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL metadata",
+        "name": "admin_audit_log_metadata_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "admin_audit_log_pkey",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL target_id",
+        "name": "admin_audit_log_target_id_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL target_type",
+        "name": "admin_audit_log_target_type_not_null",
+        "table_name": "admin_audit_log"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "analytics_deletions_created_at_not_null",
+        "table_name": "analytics_deletions"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "analytics_deletions_environment_id_not_null",
+        "table_name": "analytics_deletions"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id)",
+        "name": "analytics_deletions_pkey",
+        "table_name": "analytics_deletions"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "analytics_imports_created_at_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "analytics_imports_environment_id_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL fingerprint",
+        "name": "analytics_imports_fingerprint_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "analytics_imports_id_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "analytics_imports_pkey",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL provider",
+        "name": "analytics_imports_provider_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL source_timezone",
+        "name": "analytics_imports_source_timezone_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL summary",
+        "name": "analytics_imports_summary_not_null",
+        "table_name": "analytics_imports"
+      },
+      {
+        "definition": "NOT NULL checkout_id",
+        "name": "billing_checkouts_checkout_id_not_null",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "NOT NULL checkout_options",
+        "name": "billing_checkouts_checkout_options_not_null",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "billing_checkouts_created_at_not_null",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "billing_checkouts_owner_id_not_null",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "billing_checkouts_owner_id_user_id_fk",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "PRIMARY KEY (owner_id)",
+        "name": "billing_checkouts_pkey",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "NOT NULL provider",
+        "name": "billing_checkouts_provider_not_null",
+        "table_name": "billing_checkouts"
+      },
+      {
+        "definition": "NOT NULL customer_id",
+        "name": "billing_customers_customer_id_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL deleted",
+        "name": "billing_customers_deleted_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL occurred_at",
+        "name": "billing_customers_occurred_at_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE SET NULL",
+        "name": "billing_customers_owner_id_user_id_fk",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "PRIMARY KEY (customer_id)",
+        "name": "billing_customers_pkey",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL provider",
+        "name": "billing_customers_provider_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL subscriptions",
+        "name": "billing_customers_subscriptions_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL sync_attempted_at",
+        "name": "billing_customers_sync_attempted_at_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "billing_customers_updated_at_not_null",
+        "table_name": "billing_customers"
+      },
+      {
+        "definition": "NOT NULL events",
+        "name": "billing_organization_usage_events_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL organization_id",
+        "name": "billing_organization_usage_organization_id_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "PRIMARY KEY (organization_id, owner_id, period_start, site_id)",
+        "name": "billing_organization_usage_organization_id_owner_id_period_star",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "billing_organization_usage_owner_id_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "billing_organization_usage_owner_id_user_id_fk",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL period_end",
+        "name": "billing_organization_usage_period_end_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL period_start",
+        "name": "billing_organization_usage_period_start_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "billing_organization_usage_site_id_not_null",
+        "table_name": "billing_organization_usage"
+      },
+      {
+        "definition": "NOT NULL attempts",
+        "name": "billing_outbox_attempts_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL available_at",
+        "name": "billing_outbox_available_at_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "CHECK ((event_count > (0)::numeric))",
+        "name": "billing_outbox_count_check",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL event_count",
+        "name": "billing_outbox_event_count_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL event_type",
+        "name": "billing_outbox_event_type_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "billing_outbox_id_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL occurred_at",
+        "name": "billing_outbox_occurred_at_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "billing_outbox_owner_id_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "billing_outbox_owner_id_user_id_fk",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "billing_outbox_pkey",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL provider",
+        "name": "billing_outbox_provider_not_null",
+        "table_name": "billing_outbox"
+      },
+      {
+        "definition": "NOT NULL events",
+        "name": "billing_usage_events_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL organization_id",
+        "name": "billing_usage_organization_id_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "billing_usage_owner_id_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "PRIMARY KEY (owner_id, period_start, site_id)",
+        "name": "billing_usage_owner_id_period_start_site_id_pk",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "billing_usage_owner_id_user_id_fk",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL period_end",
+        "name": "billing_usage_period_end_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL period_start",
+        "name": "billing_usage_period_start_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "billing_usage_site_id_not_null",
+        "table_name": "billing_usage"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "billing_webhook_events_id_not_null",
+        "table_name": "billing_webhook_events"
+      },
+      {
+        "definition": "NOT NULL occurred_at",
+        "name": "billing_webhook_events_occurred_at_not_null",
+        "table_name": "billing_webhook_events"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "billing_webhook_events_pkey",
+        "table_name": "billing_webhook_events"
+      },
+      {
+        "definition": "NOT NULL received_at",
+        "name": "billing_webhook_events_received_at_not_null",
+        "table_name": "billing_webhook_events"
+      },
+      {
+        "definition": "NOT NULL type",
+        "name": "billing_webhook_events_type_not_null",
+        "table_name": "billing_webhook_events"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "conversion_goals_created_at_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "conversion_goals_environment_id_environments_id_fk",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "conversion_goals_environment_id_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "conversion_goals_id_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL match_type",
+        "name": "conversion_goals_match_type_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL match_value",
+        "name": "conversion_goals_match_value_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "conversion_goals_name_not_null",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "conversion_goals_pkey",
+        "table_name": "conversion_goals"
+      },
+      {
+        "definition": "NOT NULL custom_events",
+        "name": "daily_stats_custom_events_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "daily_stats_day_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL dimension",
+        "name": "daily_stats_dimension_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL pageviews",
+        "name": "daily_stats_pageviews_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "PRIMARY KEY (site_id, day, dimension, value)",
+        "name": "daily_stats_site_id_day_dimension_value_pk",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "daily_stats_site_id_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL value",
+        "name": "daily_stats_value_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL visitors",
+        "name": "daily_stats_visitors_not_null",
+        "table_name": "daily_stats"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "daily_visitors_day_not_null",
+        "table_name": "daily_visitors"
+      },
+      {
+        "definition": "PRIMARY KEY (site_id, day, visitor)",
+        "name": "daily_visitors_site_id_day_visitor_pk",
+        "table_name": "daily_visitors"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "daily_visitors_site_id_not_null",
+        "table_name": "daily_visitors"
+      },
+      {
+        "definition": "NOT NULL visitor",
+        "name": "daily_visitors_visitor_not_null",
+        "table_name": "daily_visitors"
+      },
+      {
+        "definition": "NOT NULL applied_at",
+        "name": "datix_schema_migrations_applied_at_not_null",
+        "table_name": "datix_schema_migrations"
+      },
+      {
+        "definition": "NOT NULL checksum",
+        "name": "datix_schema_migrations_checksum_not_null",
+        "table_name": "datix_schema_migrations"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "datix_schema_migrations_name_not_null",
+        "table_name": "datix_schema_migrations"
+      },
+      {
+        "definition": "PRIMARY KEY (name)",
+        "name": "datix_schema_migrations_pkey",
+        "table_name": "datix_schema_migrations"
+      },
+      {
+        "definition": "NOT NULL device",
+        "name": "diagnostic_events_device_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, id, received_at)",
+        "name": "diagnostic_events_environment_id_id_received_at_pk",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "diagnostic_events_environment_id_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL fingerprint",
+        "name": "diagnostic_events_fingerprint_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "diagnostic_events_id_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL kind",
+        "name": "diagnostic_events_kind_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL page_id",
+        "name": "diagnostic_events_page_id_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL path",
+        "name": "diagnostic_events_path_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL payload",
+        "name": "diagnostic_events_payload_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL received_at",
+        "name": "diagnostic_events_received_at_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL visitor",
+        "name": "diagnostic_events_visitor_not_null",
+        "table_name": "diagnostic_events"
+      },
+      {
+        "definition": "NOT NULL allow_localhost",
+        "name": "environments_allow_localhost_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "environments_created_at_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL domain",
+        "name": "environments_domain_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL enabled",
+        "name": "environments_enabled_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL feature_settings",
+        "name": "environments_feature_settings_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "environments_id_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL import_revision",
+        "name": "environments_import_revision_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "environments_name_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "environments_pkey",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "environments_site_id_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE",
+        "name": "environments_site_id_sites_id_fk",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL tracking_mode",
+        "name": "environments_tracking_mode_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "NOT NULL tracking_settings",
+        "name": "environments_tracking_settings_not_null",
+        "table_name": "environments"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "error_resolutions_environment_id_environments_id_fk",
+        "table_name": "error_resolutions"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, fingerprint)",
+        "name": "error_resolutions_environment_id_fingerprint_pk",
+        "table_name": "error_resolutions"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "error_resolutions_environment_id_not_null",
+        "table_name": "error_resolutions"
+      },
+      {
+        "definition": "NOT NULL fingerprint",
+        "name": "error_resolutions_fingerprint_not_null",
+        "table_name": "error_resolutions"
+      },
+      {
+        "definition": "NOT NULL resolved_at",
+        "name": "error_resolutions_resolved_at_not_null",
+        "table_name": "error_resolutions"
+      },
+      {
+        "definition": "NOT NULL country",
+        "name": "events_country_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "events_day_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL device",
+        "name": "events_device_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "events_id_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "events_name_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL path",
+        "name": "events_path_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL received_at",
+        "name": "events_received_at_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL referrer",
+        "name": "events_referrer_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "PRIMARY KEY (site_id, id, day)",
+        "name": "events_site_id_id_day_pk",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "events_site_id_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "CHECK ((type = ANY (ARRAY['pageview'::text, 'event'::text])))",
+        "name": "events_type_check",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL type",
+        "name": "events_type_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL visitor",
+        "name": "events_visitor_not_null",
+        "table_name": "events"
+      },
+      {
+        "definition": "NOT NULL events",
+        "name": "free_usage_events_not_null",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "free_usage_owner_id_not_null",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "PRIMARY KEY (owner_id, period_start, site_id)",
+        "name": "free_usage_owner_id_period_start_site_id_pk",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "free_usage_owner_id_user_id_fk",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "NOT NULL period_end",
+        "name": "free_usage_period_end_not_null",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "NOT NULL period_start",
+        "name": "free_usage_period_start_not_null",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "free_usage_site_id_not_null",
+        "table_name": "free_usage"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "goal_conversions_day_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "goal_conversions_environment_id_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL event_id",
+        "name": "goal_conversions_event_id_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "PRIMARY KEY (goal_id, event_id, day)",
+        "name": "goal_conversions_goal_id_event_id_day_pk",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL goal_id",
+        "name": "goal_conversions_goal_id_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL path",
+        "name": "goal_conversions_path_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL received_at",
+        "name": "goal_conversions_received_at_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL visitor",
+        "name": "goal_conversions_visitor_not_null",
+        "table_name": "goal_conversions"
+      },
+      {
+        "definition": "NOT NULL count",
+        "name": "imported_breakdowns_count_not_null",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "imported_breakdowns_day_not_null",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "NOT NULL dimension",
+        "name": "imported_breakdowns_dimension_not_null",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, day, dimension, value)",
+        "name": "imported_breakdowns_environment_id_day_dimension_value_pk",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id, day) REFERENCES imported_daily_stats(environment_id, day) ON DELETE CASCADE",
+        "name": "imported_breakdowns_environment_id_day_imported_daily_stats_env",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "imported_breakdowns_environment_id_not_null",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "NOT NULL value",
+        "name": "imported_breakdowns_value_not_null",
+        "table_name": "imported_breakdowns"
+      },
+      {
+        "definition": "NOT NULL custom_events",
+        "name": "imported_daily_stats_custom_events_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "imported_daily_stats_day_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL ends_at",
+        "name": "imported_daily_stats_ends_at_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, day)",
+        "name": "imported_daily_stats_environment_id_day_pk",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "imported_daily_stats_environment_id_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "FOREIGN KEY (import_id) REFERENCES analytics_imports(id) ON DELETE CASCADE",
+        "name": "imported_daily_stats_import_id_analytics_imports_id_fk",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL import_id",
+        "name": "imported_daily_stats_import_id_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL pageviews",
+        "name": "imported_daily_stats_pageviews_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL starts_at",
+        "name": "imported_daily_stats_starts_at_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL visitors",
+        "name": "imported_daily_stats_visitors_not_null",
+        "table_name": "imported_daily_stats"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "ingestion_receipts_created_at_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "PRIMARY KEY (environment_id, event_id)",
+        "name": "ingestion_receipts_environment_id_event_id_pk",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "ingestion_receipts_environment_id_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL event_id",
+        "name": "ingestion_receipts_event_id_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "ingestion_receipts_owner_id_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL period_end",
+        "name": "ingestion_receipts_period_end_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL period_start",
+        "name": "ingestion_receipts_period_start_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "ingestion_receipts_site_id_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL state",
+        "name": "ingestion_receipts_state_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL units",
+        "name": "ingestion_receipts_units_not_null",
+        "table_name": "ingestion_receipts"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "overview_annotations_created_at_not_null",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "NOT NULL day",
+        "name": "overview_annotations_day_not_null",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE",
+        "name": "overview_annotations_environment_id_environments_id_fk",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "NOT NULL environment_id",
+        "name": "overview_annotations_environment_id_not_null",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "overview_annotations_id_not_null",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "NOT NULL label",
+        "name": "overview_annotations_label_not_null",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "overview_annotations_pkey",
+        "table_name": "overview_annotations"
+      },
+      {
+        "definition": "NOT NULL count",
+        "name": "rate_limit_count_not_null",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "rate_limit_id_not_null",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "NOT NULL key",
+        "name": "rate_limit_key_not_null",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "UNIQUE (key)",
+        "name": "rate_limit_key_unique",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "NOT NULL last_request",
+        "name": "rate_limit_last_request_not_null",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "rate_limit_pkey",
+        "table_name": "rate_limit"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "session_created_at_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "NOT NULL expires_at",
+        "name": "session_expires_at_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "session_id_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "session_pkey",
+        "table_name": "session"
+      },
+      {
+        "definition": "NOT NULL token",
+        "name": "session_token_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "UNIQUE (token)",
+        "name": "session_token_unique",
+        "table_name": "session"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "session_updated_at_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "NOT NULL user_id",
+        "name": "session_user_id_not_null",
+        "table_name": "session"
+      },
+      {
+        "definition": "FOREIGN KEY (user_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "session_user_id_user_id_fk",
+        "table_name": "session"
+      },
+      {
+        "definition": "PRIMARY KEY (site_id)",
+        "name": "site_suspensions_pkey",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "NOT NULL reason",
+        "name": "site_suspensions_reason_not_null",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "NOT NULL site_id",
+        "name": "site_suspensions_site_id_not_null",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE",
+        "name": "site_suspensions_site_id_sites_id_fk",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "NOT NULL suspended_at",
+        "name": "site_suspensions_suspended_at_not_null",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "NOT NULL suspended_by",
+        "name": "site_suspensions_suspended_by_not_null",
+        "table_name": "site_suspensions"
+      },
+      {
+        "definition": "NOT NULL allow_localhost",
+        "name": "sites_allow_localhost_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "sites_created_at_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL domain",
+        "name": "sites_domain_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL enabled",
+        "name": "sites_enabled_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "sites_id_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "sites_name_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL owner_id",
+        "name": "sites_owner_id_not_null",
+        "table_name": "sites"
+      },
+      {
+        "definition": "FOREIGN KEY (owner_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "sites_owner_id_user_id_fk",
+        "table_name": "sites"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "sites_pkey",
+        "table_name": "sites"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "user_created_at_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "NOT NULL email",
+        "name": "user_email_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "UNIQUE (email)",
+        "name": "user_email_unique",
+        "table_name": "user"
+      },
+      {
+        "definition": "NOT NULL email_verified",
+        "name": "user_email_verified_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "user_id_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "NOT NULL name",
+        "name": "user_name_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "user_pkey",
+        "table_name": "user"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "user_updated_at_not_null",
+        "table_name": "user"
+      },
+      {
+        "definition": "PRIMARY KEY (user_id)",
+        "name": "user_suspensions_pkey",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "NOT NULL reason",
+        "name": "user_suspensions_reason_not_null",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "NOT NULL suspended_at",
+        "name": "user_suspensions_suspended_at_not_null",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "NOT NULL suspended_by",
+        "name": "user_suspensions_suspended_by_not_null",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "NOT NULL user_id",
+        "name": "user_suspensions_user_id_not_null",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "FOREIGN KEY (user_id) REFERENCES \"user\"(id) ON DELETE CASCADE",
+        "name": "user_suspensions_user_id_user_id_fk",
+        "table_name": "user_suspensions"
+      },
+      {
+        "definition": "NOT NULL created_at",
+        "name": "verification_created_at_not_null",
+        "table_name": "verification"
+      },
+      {
+        "definition": "NOT NULL expires_at",
+        "name": "verification_expires_at_not_null",
+        "table_name": "verification"
+      },
+      {
+        "definition": "NOT NULL id",
+        "name": "verification_id_not_null",
+        "table_name": "verification"
+      },
+      {
+        "definition": "NOT NULL identifier",
+        "name": "verification_identifier_not_null",
+        "table_name": "verification"
+      },
+      {
+        "definition": "PRIMARY KEY (id)",
+        "name": "verification_pkey",
+        "table_name": "verification"
+      },
+      {
+        "definition": "NOT NULL updated_at",
+        "name": "verification_updated_at_not_null",
+        "table_name": "verification"
+      },
+      {
+        "definition": "NOT NULL value",
+        "name": "verification_value_not_null",
+        "table_name": "verification"
+      }
+    ],
+    "dimensions": [
+      {
+        "column_name": "received_at",
+        "column_type": "timestamp with time zone",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "activity_events",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "1 day"
+      },
+      {
+        "column_name": "day",
+        "column_type": "date",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "daily_stats",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "30 days"
+      },
+      {
+        "column_name": "day",
+        "column_type": "date",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "daily_visitors",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "30 days"
+      },
+      {
+        "column_name": "received_at",
+        "column_type": "timestamp with time zone",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "diagnostic_events",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "1 day"
+      },
+      {
+        "column_name": "day",
+        "column_type": "date",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "events",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "7 days"
+      },
+      {
+        "column_name": "day",
+        "column_type": "date",
+        "dimension_number": 1,
+        "dimension_type": "Time",
+        "hypertable_name": "goal_conversions",
+        "integer_interval": null,
+        "num_partitions": null,
+        "time_interval": "7 days"
+      }
+    ],
+    "extensions": [
+      {
+        "name": "plpgsql",
+        "schema": "pg_catalog",
+        "version": "1.0"
+      },
+      {
+        "name": "timescaledb",
+        "schema": "public",
+        "version": "2.24.0"
+      }
+    ],
+    "functions": [
+      {
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.datix_default_environment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  INSERT INTO environments (id,site_id,name,domain,enabled,allow_localhost,created_at)\n  VALUES (NEW.id,NEW.id,'Production',NEW.domain,NEW.enabled,NEW.allow_localhost,NEW.created_at)\n  ON CONFLICT(id) DO UPDATE SET domain=excluded.domain,enabled=excluded.enabled,allow_localhost=excluded.allow_localhost;\n  RETURN NEW;\nEND;\n$function$\n",
+        "name": "datix_default_environment"
+      },
+      {
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.datix_delete_environment()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  INSERT INTO analytics_deletions(environment_id) VALUES(OLD.id) ON CONFLICT DO NOTHING;\n  RETURN OLD;\nEND;\n$function$\n",
+        "name": "datix_delete_environment"
+      },
+      {
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.datix_retention()\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\nBEGIN\n  PERFORM public.drop_chunks('public.events', older_than => (current_date-730));\n  PERFORM public.drop_chunks('public.activity_events', older_than => now()-interval '30 days');\n  PERFORM public.drop_chunks('public.diagnostic_events', older_than => now()-interval '30 days');\n  PERFORM public.drop_chunks('public.goal_conversions', older_than => (current_date-730));\n  PERFORM public.drop_chunks('public.daily_stats', older_than => (current_date-730));\n  PERFORM public.drop_chunks('public.daily_visitors', older_than => (current_date-730));\nEND;\n$function$\n",
+        "name": "datix_retention"
+      },
+      {
+        "arguments": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.datix_session_access_guard()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  PERFORM id FROM public.\"user\" WHERE id=NEW.user_id FOR UPDATE;\n  IF EXISTS (SELECT 1 FROM public.user_suspensions WHERE user_id=NEW.user_id) THEN\n    RAISE EXCEPTION 'Account suspended' USING ERRCODE='42501';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n",
+        "name": "datix_session_access_guard"
+      }
+    ],
+    "indexes": [
+      {
+        "indexdef": "CREATE UNIQUE INDEX abuse_daily_environment_id_day_reason_pk ON public.abuse_daily USING btree (environment_id, day, reason)",
+        "indexname": "abuse_daily_environment_id_day_reason_pk",
+        "tablename": "abuse_daily"
+      },
+      {
+        "indexdef": "CREATE INDEX abuse_daily_retention_idx ON public.abuse_daily USING btree (day)",
+        "indexname": "abuse_daily_retention_idx",
+        "tablename": "abuse_daily"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX abuse_environment_pkey ON public.abuse_environment USING btree (environment_id)",
+        "indexname": "abuse_environment_pkey",
+        "tablename": "abuse_environment"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX abuse_sources_environment_id_source_pk ON public.abuse_sources USING btree (environment_id, source)",
+        "indexname": "abuse_sources_environment_id_source_pk",
+        "tablename": "abuse_sources"
+      },
+      {
+        "indexdef": "CREATE INDEX abuse_sources_retention_idx ON public.abuse_sources USING btree (updated_at)",
+        "indexname": "abuse_sources_retention_idx",
+        "tablename": "abuse_sources"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX account_pkey ON public.account USING btree (id)",
+        "indexname": "account_pkey",
+        "tablename": "account"
+      },
+      {
+        "indexdef": "CREATE INDEX \"account_userId_idx\" ON public.account USING btree (user_id)",
+        "indexname": "account_userId_idx",
+        "tablename": "account"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX account_onboarding_pkey ON public.account_onboarding USING btree (owner_id)",
+        "indexname": "account_onboarding_pkey",
+        "tablename": "account_onboarding"
+      },
+      {
+        "indexdef": "CREATE INDEX activity_environment_received_idx ON public.activity_events USING btree (environment_id, received_at)",
+        "indexname": "activity_environment_received_idx",
+        "tablename": "activity_events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX activity_events_environment_id_id_received_at_pk ON public.activity_events USING btree (environment_id, id, received_at)",
+        "indexname": "activity_events_environment_id_id_received_at_pk",
+        "tablename": "activity_events"
+      },
+      {
+        "indexdef": "CREATE INDEX activity_retention_idx ON public.activity_events USING btree (received_at)",
+        "indexname": "activity_retention_idx",
+        "tablename": "activity_events"
+      },
+      {
+        "indexdef": "CREATE INDEX activity_session_idx ON public.activity_events USING btree (environment_id, session_key, received_at)",
+        "indexname": "activity_session_idx",
+        "tablename": "activity_events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX admin_audit_log_pkey ON public.admin_audit_log USING btree (id)",
+        "indexname": "admin_audit_log_pkey",
+        "tablename": "admin_audit_log"
+      },
+      {
+        "indexdef": "CREATE INDEX admin_audit_target_idx ON public.admin_audit_log USING btree (target_type, target_id, id)",
+        "indexname": "admin_audit_target_idx",
+        "tablename": "admin_audit_log"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX analytics_deletions_pkey ON public.analytics_deletions USING btree (environment_id)",
+        "indexname": "analytics_deletions_pkey",
+        "tablename": "analytics_deletions"
+      },
+      {
+        "indexdef": "CREATE INDEX analytics_imports_environment_idx ON public.analytics_imports USING btree (environment_id, created_at)",
+        "indexname": "analytics_imports_environment_idx",
+        "tablename": "analytics_imports"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX analytics_imports_fingerprint_idx ON public.analytics_imports USING btree (environment_id, fingerprint)",
+        "indexname": "analytics_imports_fingerprint_idx",
+        "tablename": "analytics_imports"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX analytics_imports_pkey ON public.analytics_imports USING btree (id)",
+        "indexname": "analytics_imports_pkey",
+        "tablename": "analytics_imports"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_checkouts_pkey ON public.billing_checkouts USING btree (owner_id)",
+        "indexname": "billing_checkouts_pkey",
+        "tablename": "billing_checkouts"
+      },
+      {
+        "indexdef": "CREATE INDEX billing_customers_owner_idx ON public.billing_customers USING btree (owner_id)",
+        "indexname": "billing_customers_owner_idx",
+        "tablename": "billing_customers"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_customers_pkey ON public.billing_customers USING btree (customer_id)",
+        "indexname": "billing_customers_pkey",
+        "tablename": "billing_customers"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_organization_usage_organization_id_owner_id_period_star ON public.billing_organization_usage USING btree (organization_id, owner_id, period_start, site_id)",
+        "indexname": "billing_organization_usage_organization_id_owner_id_period_star",
+        "tablename": "billing_organization_usage"
+      },
+      {
+        "indexdef": "CREATE INDEX billing_outbox_available_idx ON public.billing_outbox USING btree (available_at)",
+        "indexname": "billing_outbox_available_idx",
+        "tablename": "billing_outbox"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_outbox_pkey ON public.billing_outbox USING btree (id)",
+        "indexname": "billing_outbox_pkey",
+        "tablename": "billing_outbox"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_usage_owner_id_period_start_site_id_pk ON public.billing_usage USING btree (owner_id, period_start, site_id)",
+        "indexname": "billing_usage_owner_id_period_start_site_id_pk",
+        "tablename": "billing_usage"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX billing_webhook_events_pkey ON public.billing_webhook_events USING btree (id)",
+        "indexname": "billing_webhook_events_pkey",
+        "tablename": "billing_webhook_events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX conversion_goals_match_idx ON public.conversion_goals USING btree (environment_id, match_type, match_value)",
+        "indexname": "conversion_goals_match_idx",
+        "tablename": "conversion_goals"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX conversion_goals_pkey ON public.conversion_goals USING btree (id)",
+        "indexname": "conversion_goals_pkey",
+        "tablename": "conversion_goals"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX daily_stats_site_id_day_dimension_value_pk ON public.daily_stats USING btree (site_id, day, dimension, value)",
+        "indexname": "daily_stats_site_id_day_dimension_value_pk",
+        "tablename": "daily_stats"
+      },
+      {
+        "indexdef": "CREATE INDEX stats_retention_idx ON public.daily_stats USING btree (day)",
+        "indexname": "stats_retention_idx",
+        "tablename": "daily_stats"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX daily_visitors_site_id_day_visitor_pk ON public.daily_visitors USING btree (site_id, day, visitor)",
+        "indexname": "daily_visitors_site_id_day_visitor_pk",
+        "tablename": "daily_visitors"
+      },
+      {
+        "indexdef": "CREATE INDEX visitors_retention_idx ON public.daily_visitors USING btree (day)",
+        "indexname": "visitors_retention_idx",
+        "tablename": "daily_visitors"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX datix_schema_migrations_pkey ON public.datix_schema_migrations USING btree (name)",
+        "indexname": "datix_schema_migrations_pkey",
+        "tablename": "datix_schema_migrations"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX diagnostic_events_environment_id_id_received_at_pk ON public.diagnostic_events USING btree (environment_id, id, received_at)",
+        "indexname": "diagnostic_events_environment_id_id_received_at_pk",
+        "tablename": "diagnostic_events"
+      },
+      {
+        "indexdef": "CREATE INDEX diagnostic_events_received_at_idx ON public.diagnostic_events USING btree (received_at DESC)",
+        "indexname": "diagnostic_events_received_at_idx",
+        "tablename": "diagnostic_events"
+      },
+      {
+        "indexdef": "CREATE INDEX diagnostic_events_report_idx ON public.diagnostic_events USING btree (environment_id, kind, received_at)",
+        "indexname": "diagnostic_events_report_idx",
+        "tablename": "diagnostic_events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX environments_pkey ON public.environments USING btree (id)",
+        "indexname": "environments_pkey",
+        "tablename": "environments"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX environments_site_name_idx ON public.environments USING btree (site_id, lower(name))",
+        "indexname": "environments_site_name_idx",
+        "tablename": "environments"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX error_resolutions_environment_id_fingerprint_pk ON public.error_resolutions USING btree (environment_id, fingerprint)",
+        "indexname": "error_resolutions_environment_id_fingerprint_pk",
+        "tablename": "error_resolutions"
+      },
+      {
+        "indexdef": "CREATE INDEX events_day_idx ON public.events USING btree (day DESC)",
+        "indexname": "events_day_idx",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE INDEX events_retention_idx ON public.events USING btree (received_at)",
+        "indexname": "events_retention_idx",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX events_site_id_id_day_pk ON public.events USING btree (site_id, id, day)",
+        "indexname": "events_site_id_id_day_pk",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE INDEX events_site_received_idx ON public.events USING btree (site_id, received_at)",
+        "indexname": "events_site_received_idx",
+        "tablename": "events"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX free_usage_owner_id_period_start_site_id_pk ON public.free_usage USING btree (owner_id, period_start, site_id)",
+        "indexname": "free_usage_owner_id_period_start_site_id_pk",
+        "tablename": "free_usage"
+      },
+      {
+        "indexdef": "CREATE INDEX goal_conversions_day_idx ON public.goal_conversions USING btree (day DESC)",
+        "indexname": "goal_conversions_day_idx",
+        "tablename": "goal_conversions"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX goal_conversions_goal_id_event_id_day_pk ON public.goal_conversions USING btree (goal_id, event_id, day)",
+        "indexname": "goal_conversions_goal_id_event_id_day_pk",
+        "tablename": "goal_conversions"
+      },
+      {
+        "indexdef": "CREATE INDEX goal_conversions_report_idx ON public.goal_conversions USING btree (environment_id, received_at)",
+        "indexname": "goal_conversions_report_idx",
+        "tablename": "goal_conversions"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX imported_breakdowns_environment_id_day_dimension_value_pk ON public.imported_breakdowns USING btree (environment_id, day, dimension, value)",
+        "indexname": "imported_breakdowns_environment_id_day_dimension_value_pk",
+        "tablename": "imported_breakdowns"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX imported_daily_stats_environment_id_day_pk ON public.imported_daily_stats USING btree (environment_id, day)",
+        "indexname": "imported_daily_stats_environment_id_day_pk",
+        "tablename": "imported_daily_stats"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ingestion_receipts_environment_id_event_id_pk ON public.ingestion_receipts USING btree (environment_id, event_id)",
+        "indexname": "ingestion_receipts_environment_id_event_id_pk",
+        "tablename": "ingestion_receipts"
+      },
+      {
+        "indexdef": "CREATE INDEX ingestion_receipts_pending_idx ON public.ingestion_receipts USING btree (state, created_at)",
+        "indexname": "ingestion_receipts_pending_idx",
+        "tablename": "ingestion_receipts"
+      },
+      {
+        "indexdef": "CREATE INDEX overview_annotations_environment_day_idx ON public.overview_annotations USING btree (environment_id, day)",
+        "indexname": "overview_annotations_environment_day_idx",
+        "tablename": "overview_annotations"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX overview_annotations_pkey ON public.overview_annotations USING btree (id)",
+        "indexname": "overview_annotations_pkey",
+        "tablename": "overview_annotations"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX rate_limit_key_unique ON public.rate_limit USING btree (key)",
+        "indexname": "rate_limit_key_unique",
+        "tablename": "rate_limit"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX rate_limit_pkey ON public.rate_limit USING btree (id)",
+        "indexname": "rate_limit_pkey",
+        "tablename": "rate_limit"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX session_pkey ON public.session USING btree (id)",
+        "indexname": "session_pkey",
+        "tablename": "session"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX session_token_unique ON public.session USING btree (token)",
+        "indexname": "session_token_unique",
+        "tablename": "session"
+      },
+      {
+        "indexdef": "CREATE INDEX \"session_userId_idx\" ON public.session USING btree (user_id)",
+        "indexname": "session_userId_idx",
+        "tablename": "session"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX site_suspensions_pkey ON public.site_suspensions USING btree (site_id)",
+        "indexname": "site_suspensions_pkey",
+        "tablename": "site_suspensions"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX sites_owner_domain_idx ON public.sites USING btree (owner_id, domain)",
+        "indexname": "sites_owner_domain_idx",
+        "tablename": "sites"
+      },
+      {
+        "indexdef": "CREATE INDEX sites_owner_idx ON public.sites USING btree (owner_id)",
+        "indexname": "sites_owner_idx",
+        "tablename": "sites"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX sites_pkey ON public.sites USING btree (id)",
+        "indexname": "sites_pkey",
+        "tablename": "sites"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX user_email_unique ON public.\"user\" USING btree (email)",
+        "indexname": "user_email_unique",
+        "tablename": "user"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX user_pkey ON public.\"user\" USING btree (id)",
+        "indexname": "user_pkey",
+        "tablename": "user"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX user_suspensions_pkey ON public.user_suspensions USING btree (user_id)",
+        "indexname": "user_suspensions_pkey",
+        "tablename": "user_suspensions"
+      },
+      {
+        "indexdef": "CREATE INDEX verification_identifier_idx ON public.verification USING btree (identifier)",
+        "indexname": "verification_identifier_idx",
+        "tablename": "verification"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX verification_pkey ON public.verification USING btree (id)",
+        "indexname": "verification_pkey",
+        "tablename": "verification"
+      }
+    ],
+    "policies": [],
+    "sequences": [
+      {
+        "name": "admin_audit_log_id_seq",
+        "owned_column": "id",
+        "owned_table": "admin_audit_log",
+        "seqcache": 1,
+        "seqcycle": false,
+        "seqincrement": 1,
+        "seqmax": 9223372036854775807,
+        "seqmin": 1,
+        "seqstart": 1,
+        "type": "bigint"
+      }
+    ],
+    "tables": [
+      {
+        "name": "abuse_daily",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "abuse_environment",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "abuse_sources",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "account",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "account_onboarding",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "activity_events",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "admin_audit_log",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "analytics_deletions",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "analytics_imports",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_checkouts",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_customers",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_organization_usage",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_outbox",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_usage",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "billing_webhook_events",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "conversion_goals",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "daily_stats",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "daily_visitors",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "datix_schema_migrations",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "diagnostic_events",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "environments",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "error_resolutions",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "events",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "free_usage",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "goal_conversions",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "imported_breakdowns",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "imported_daily_stats",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "ingestion_receipts",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "overview_annotations",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "rate_limit",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "session",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "site_suspensions",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "sites",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "user",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "user_suspensions",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      },
+      {
+        "name": "verification",
+        "partition_key": null,
+        "relforcerowsecurity": false,
+        "relkind": "r",
+        "reloptions": null,
+        "relpersistence": "p",
+        "relreplident": "d",
+        "relrowsecurity": false
+      }
+    ],
+    "triggers": [
+      {
+        "definition": "CREATE TRIGGER environments_analytics_cleanup AFTER DELETE ON public.environments FOR EACH ROW EXECUTE FUNCTION datix_delete_environment()",
+        "enabled": "O",
+        "name": "environments_analytics_cleanup",
+        "table_name": "environments"
+      },
+      {
+        "definition": "CREATE TRIGGER datix_session_access BEFORE INSERT ON public.session FOR EACH ROW EXECUTE FUNCTION datix_session_access_guard()",
+        "enabled": "O",
+        "name": "datix_session_access",
+        "table_name": "session"
+      },
+      {
+        "definition": "CREATE TRIGGER sites_default_environment AFTER INSERT OR UPDATE OF domain, enabled, allow_localhost ON public.sites FOR EACH ROW EXECUTE FUNCTION datix_default_environment()",
+        "enabled": "O",
+        "name": "sites_default_environment",
+        "table_name": "sites"
+      }
+    ],
+    "types": [],
+    "views": []
+  },
+  "migrations": [
+    {
+      "name": "0000_fluffy_plazm.sql",
+      "checksum": "921ccadeadeaf514216b57edcb5a3634961145ea74a97b56e68412c111dfea66"
+    },
+    {
+      "name": "0001_timescale.sql",
+      "checksum": "d5480a6c90b1c439ff40dff6d212766cffa3ee99f4b6175adf4505818c5be36a"
+    }
+  ]
+}

@@ -1,29 +1,24 @@
 # Datix
 
-Bun, Hono, Effect v4, and Vite+ monorepo with a React frontend and Neon/TimescaleDB.
+Rust/Axum API, Better Auth-compatible authentication, SQLx, and Neon PostgreSQL 18
+with TimescaleDB. The unchanged React frontend lives in `web/` and uses standard Vite.
 
-See [AGENTS.md](AGENTS.md) for development commands and essential operational guidance.
+```sh
+bun install --frozen-lockfile
+bun run dev
+bun run check
+bun run test:integration
+bun run build
+```
 
-## Email
+Development uses the isolated branch in ignored `.local/rust.env`, never the root
+production `.env`. The launcher disables external effects and validates its target.
+Bun is only frontend tooling; the production server is a Rust binary.
 
-`packages/email` (`@datix/email`) owns the Email SDK client and React Email templates.
-It exports `createEmail()`, a lazy client using
-Cloudflare's HTTP adapter. Set `CLOUDFLARE_API_TOKEN` (with Email Sending permissions)
-and `CLOUDFLARE_ACCOUNT_ID`, and enable Email Sending for the sender domain in Cloudflare.
-Sending requires `EXTERNAL_EFFECTS=enabled` and a non-snapshot `BILLING_STATE_MODE`.
+Cloudflare verification emails use Rust `email-sdk` 0.1.1. Configure
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `EMAIL_FROM`.
+Sending requires enabled external effects and live billing mode. SDK retries and
+fallbacks are disabled; recipient acceptance is checked and provider errors are redacted.
 
-Set `EMAIL_FROM` to your default sender, then call `email.send({ to, subject, text })`.
-An explicit `from` overrides `EMAIL_FROM`; omitting both raises an error. Use plain email
-addresses and a sender on your configured domain. SDK retries and telemetry are disabled;
-delivery errors propagate to the caller.
-
-New email/password accounts must verify their email before signing in. Signup and
-unverified sign-in attempts send a verification link; the inbox screen also supports resending.
-Links expire after one hour and sign the user in after verification. Existing unverified
-sessions are blocked from protected API routes. Verified OAuth emails satisfy the requirement.
-Configure email delivery before enabling registrations; disabled external effects block sending.
-
-For configuration validation without sending, run `EMAIL_SDK_TELEMETRY=0 bun run --cwd packages/email email-sdk doctor --adapter cloudflare`.
-The SDK's `send --dry-run` command validates a message without sending it.
-
-`bun run test:integration` captures verification links in the test subprocess without sending mail.
+See [AGENTS.md](AGENTS.md) for schema safety, commands, queue cutover, and deployment
+boundaries. No deployment or production data writes are part of this migration.

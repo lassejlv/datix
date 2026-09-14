@@ -2,10 +2,10 @@ node_modules/
 .env
 .env.*
 !.env.example
-!.env.test.example
 .local/
 .neon
 **/dist/
 **/artifacts/
 .vite/
 .DS_Store
+/target/
