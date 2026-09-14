@@ -1241,13 +1241,13 @@ function MeterRow({
   children: ReactNode;
 }) {
   return (
-    <li className="relative flex min-h-9 items-center justify-between gap-4 px-2 py-1.5 text-sm">
+    <li className="relative flex min-h-9 min-w-0 items-center justify-between gap-4 overflow-hidden px-2 py-1.5 text-sm">
       <span
         aria-hidden="true"
         className="absolute inset-y-0.5 left-0 rounded-sm bg-muted"
         style={{ width: `${share}%` }}
       />
-      <span className="relative min-w-0 flex-1">{children}</span>
+      <span className="relative min-w-0 flex-1 overflow-hidden">{children}</span>
       <strong className="relative shrink-0 text-[13px] font-normal tabular-nums">{value}</strong>
     </li>
   );
@@ -1326,6 +1326,8 @@ function BreakdownCard({
                 ? t('Unknown')
                 : t('Direct / none');
 
+            const truncateStart = !countries && !devices && text.startsWith('/');
+
             return (
               <MeterRow
                 key={item.value}
@@ -1333,12 +1335,22 @@ function BreakdownCard({
                 value={number(item.count)}
               >
                 <button
-                  className="w-full cursor-pointer rounded-sm text-left hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                  className="block min-w-0 w-full cursor-pointer overflow-hidden rounded-sm text-left hover:underline focus-visible:outline-2 focus-visible:outline-ring"
                   aria-label={t('Filter by {value}', { value: text })}
                   onClick={() => onSelect?.(item.value)}
                 >
-                  <HintText content={text} className={`truncate ${devices ? 'capitalize' : ''}`}>
-                    {countries ? <CountryLabel code={item.value} /> : text}
+                  <HintText
+                    content={text}
+                    dir={truncateStart ? 'rtl' : undefined}
+                    className={`block truncate ${devices ? 'capitalize' : ''} ${truncateStart ? 'text-left' : ''}`}
+                  >
+                    {countries ? (
+                      <CountryLabel code={item.value} />
+                    ) : truncateStart ? (
+                      <span dir="ltr">{text}</span>
+                    ) : (
+                      text
+                    )}
                   </HintText>
                 </button>
               </MeterRow>
