@@ -38,6 +38,7 @@ pub struct AppState {
     pub queue: queue::Queue,
     pub health: Arc<workers::Health>,
     pub storage: storage::Storage,
+    pub(crate) mailer: Option<Arc<email::Mailer>>,
 }
 
 impl AppState {
@@ -60,14 +61,15 @@ impl AppState {
             .timeout(std::time::Duration::from_secs(20))
             .redirect(reqwest::redirect::Policy::none())
             .build()?;
+        let mailer = if config.external_effects {
+            Some(Arc::new(email::Mailer::from_env(client)?))
+        } else {
+            None
+        };
         let hooks = Arc::new(auth_hooks::Hooks {
             billing: billing.clone(),
             config: config.clone(),
-            mailer: if config.external_effects {
-                Some(email::Mailer::from_env(client)?)
-            } else {
-                None
-            },
+            mailer: mailer.clone(),
         });
         let mut providers = Vec::new();
         for (id, construct) in [
@@ -103,6 +105,7 @@ impl AppState {
             queue,
             health,
             storage,
+            mailer,
         })
     }
 }

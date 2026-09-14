@@ -426,6 +426,7 @@ async fn update(
     .bind(&id)
     .fetch_one(&mut *tx)
     .await?;
+    let notify = new_user_suspension(&resource, input.suspended, previous);
     let mut revoked = 0;
     if input.suspended {
         sqlx::query(&format!("INSERT INTO {table}({column},reason,suspended_by) VALUES($1::{kind},$2,$3) ON CONFLICT({column}) DO UPDATE SET reason=excluded.reason,suspended_at=now(),suspended_by=excluded.suspended_by"))
@@ -443,6 +444,7 @@ async fn update(
             .execute(&mut *tx)
             .await?;
     }
+    let mut audit_id = None;
     if input.suspended || previous {
         let target_type = if resource == "users" { "user" } else { "site" };
         let action = format!(
@@ -457,16 +459,53 @@ async fn update(
                 "restored"
             }
         );
-        sqlx::query("INSERT INTO admin_audit_log(actor_user_id,action,target_type,target_id,reason,metadata) VALUES($1,$2,$3,$4,$5,$6)")
-            .bind(&actor.id).bind(action).bind(target_type).bind(&id).bind(input.reason).bind(json!({"sessionsRevoked":revoked})).execute(&mut *tx).await?;
+        let mut metadata = json!({"sessionsRevoked":revoked});
+        if notify {
+            metadata["suspensionEmail"] = json!("pending");
+        }
+        audit_id = Some(sqlx::query_scalar::<_, i64>("INSERT INTO admin_audit_log(actor_user_id,action,target_type,target_id,reason,metadata) VALUES($1,$2,$3,$4,$5,$6) RETURNING id")
+            .bind(&actor.id).bind(action).bind(target_type).bind(&id).bind(input.reason).bind(metadata).fetch_one(&mut *tx).await?);
     }
     tx.commit().await?;
+    // The locked active-to-suspended transition owns this single send attempt.
+    // Commit first so a mail failure cannot roll back suspension or session revocation.
+    if notify && let Some(audit_id) = audit_id {
+        let status = crate::email::notify_suspension(
+            state.mailer.as_deref(),
+            state.config.external_effects,
+            &target.get::<String, _>("name"),
+            &target.get::<String, _>("email"),
+        )
+        .await;
+        if sqlx::query("UPDATE admin_audit_log SET metadata=metadata || $2::jsonb WHERE id=$1")
+            .bind(audit_id)
+            .bind(json!({"suspensionEmail":status}))
+            .execute(&state.pool)
+            .await
+            .is_err()
+        {
+            tracing::error!("Account suspension email audit update failed");
+        }
+    }
     Ok(Json(read(&state, &resource, &id).await?))
+}
+
+fn new_user_suspension(resource: &str, suspended: bool, previously_suspended: bool) -> bool {
+    resource == "users" && suspended && !previously_suspended
 }
 
 #[cfg(test)]
 mod sentry_tests {
     use super::*;
+
+    #[test]
+    fn suspension_email_only_for_new_account_suspensions() {
+        assert!(new_user_suspension("users", true, false));
+        assert!(!new_user_suspension("users", true, true));
+        assert!(!new_user_suspension("users", false, true));
+        assert!(!new_user_suspension("users", false, false));
+        assert!(!new_user_suspension("sites", true, false));
+    }
 
     #[test]
     fn test_issue_requires_admin_and_enabled_reporting() {

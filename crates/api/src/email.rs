@@ -56,16 +56,31 @@ impl Mailer {
         let text = include_str!("email/verification.txt")
             .replace("{{verification_url}}", url)
             .replace("{{name}}", &user.name);
-        let message = EmailMessage::builder(
-            self.from.as_str(),
-            user.email.as_str(),
-            "Verify your Datix email address",
-        )
-        .html(html)
-        .text(text)
-        .build();
+        self.send(&user.email, "Verify your Datix email address", html, text)
+            .await
+    }
+
+    async fn send_suspension(&self, name: &str, email: &str) -> Result<(), AuthError> {
+        // Moderation reasons are internal notes, not recipient-facing email content.
+        let html = include_str!("email/suspension.html").replace("{{name}}", &escape(name));
+        let text = include_str!("email/suspension.txt").replace("{{name}}", name);
+        self.send(email, "Your Datix account has been suspended", html, text)
+            .await
+    }
+
+    async fn send(
+        &self,
+        email: &str,
+        subject: &str,
+        html: String,
+        text: String,
+    ) -> Result<(), AuthError> {
+        let message = EmailMessage::builder(self.from.as_str(), email, subject)
+            .html(html)
+            .text(text)
+            .build();
         // Cloudflare has no idempotency support. Do not automatically retry an ambiguous send
-        // or fall back to another provider; the existing verification resend flow owns recovery.
+        // or fall back to another provider. Recovery must be an explicit separate action.
         let response = self
             .client
             .send(message, Some(SendOptions::new().retries(0)))
@@ -74,15 +89,35 @@ impl Mailer {
         if !response
             .accepted
             .iter()
-            .any(|email| email.eq_ignore_ascii_case(&user.email))
+            .any(|accepted| accepted.eq_ignore_ascii_case(email))
             || response
                 .rejected
                 .iter()
-                .any(|email| email.eq_ignore_ascii_case(&user.email))
+                .any(|rejected| rejected.eq_ignore_ascii_case(email))
         {
             return Err(delivery_failed());
         }
         Ok(())
+    }
+}
+
+pub(crate) async fn notify_suspension(
+    mailer: Option<&Mailer>,
+    external_effects: bool,
+    name: &str,
+    email: &str,
+) -> &'static str {
+    if !external_effects {
+        return "disabled";
+    }
+    if let Some(mailer) = mailer
+        && mailer.send_suspension(name, email).await.is_ok()
+    {
+        // Provider acceptance does not prove inbox delivery.
+        "accepted"
+    } else {
+        tracing::error!("Account suspension email failed");
+        "failed"
     }
 }
 
@@ -180,8 +215,15 @@ mod tests {
                 assert_eq!(error.code, "EMAIL_DELIVERY_FAILED");
                 assert!(!error.to_string().contains("private-provider-error"));
             }
+            assert_eq!(
+                notify_suspension(Some(&mailer), false, &user.name, &user.email).await,
+                "disabled"
+            );
+            assert_eq!(mock.requests.lock().unwrap().len(), 1);
+            let suspension = notify_suspension(Some(&mailer), true, &user.name, &user.email).await;
+            assert_eq!(suspension, if accepted { "accepted" } else { "failed" });
             let requests = mock.requests.lock().unwrap();
-            assert_eq!(requests.len(), 1);
+            assert_eq!(requests.len(), 2);
             assert_eq!(
                 requests[0]["from"],
                 json!({"address":"hello@example.test","name":"Datix"})
@@ -193,7 +235,30 @@ mod tests {
             assert!(html.contains("This link expires in one hour."));
             assert!(!html.contains("{{verification_url}}"));
             assert!(requests[0]["text"].as_str().unwrap().contains(link));
+            assert_eq!(requests[1]["to"], json!(["verify@example.test"]));
+            assert_eq!(
+                requests[1]["subject"],
+                "Your Datix account has been suspended"
+            );
+            let suspension_html = requests[1]["html"].as_str().unwrap();
+            assert!(suspension_html.contains("&lt;b&gt;Alice &amp; Bob&lt;/b&gt;"));
+            assert!(!suspension_html.contains("<b>Alice"));
+            assert!(suspension_html.contains("mailto:hello@usedatix.com"));
+            assert!(!suspension_html.contains(link));
+            assert!(requests[1]["text"].as_str().unwrap().contains("signed out"));
             server.abort();
         }
+    }
+
+    #[tokio::test]
+    async fn suspension_without_a_mailer_is_not_claimed_as_sent() {
+        assert_eq!(
+            notify_suspension(None, false, "Fixture", "fixture@example.test").await,
+            "disabled"
+        );
+        assert_eq!(
+            notify_suspension(None, true, "Fixture", "fixture@example.test").await,
+            "failed"
+        );
     }
 }

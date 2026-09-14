@@ -155,6 +155,40 @@ pub async fn verify(state: &AppState, owner: &str, email: &str, site: &str, cook
     .await;
     assert_eq!(audit["entries"][0]["metadata"]["sessionsRevoked"], 1);
     assert_eq!(
+        audit["entries"][0]["metadata"]["suspensionEmail"],
+        "disabled"
+    );
+    let (status, _, _) = call(
+        &admin,
+        "PATCH",
+        &format!("/api/admin/users/{target}"),
+        json!({"suspended":true,"reason":"Updated internal reason"}),
+        cookie,
+    )
+    .await;
+    assert_eq!(status, 200);
+    let (_, _, updated_audit) = call(
+        &admin,
+        "GET",
+        &format!("/api/admin/audit?targetType=user&targetId={target}"),
+        Value::Null,
+        cookie,
+    )
+    .await;
+    assert_eq!(
+        updated_audit["entries"][0]["action"],
+        "user.suspension_updated"
+    );
+    assert!(
+        updated_audit["entries"][0]["metadata"]
+            .get("suspensionEmail")
+            .is_none()
+    );
+    assert_eq!(
+        updated_audit["entries"][1]["metadata"]["suspensionEmail"],
+        "disabled"
+    );
+    assert_eq!(
         call(
             &admin,
             "GET",

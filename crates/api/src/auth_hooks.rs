@@ -5,7 +5,7 @@ use std::sync::Arc;
 pub struct Hooks {
     pub billing: crate::billing::Billing,
     pub config: Arc<Config>,
-    pub mailer: Option<crate::email::Mailer>,
+    pub mailer: Option<Arc<crate::email::Mailer>>,
 }
 
 impl AuthHooks for Hooks {

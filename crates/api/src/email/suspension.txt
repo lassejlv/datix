@@ -1,0 +1,11 @@
+Datix
+
+Your account has been suspended
+
+Hi {{name}},
+
+Your Datix account has been suspended. You have been signed out, and access to your account and analytics collection for your websites is paused.
+
+If you have questions or believe this is a mistake, contact hello@usedatix.com from the email address associated with your account.
+
+Please do not send passwords or payment card details.
