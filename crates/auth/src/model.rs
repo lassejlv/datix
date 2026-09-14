@@ -41,6 +41,8 @@ pub struct EmailCredentials {
     #[serde(rename = "callbackURL", alias = "callbackUrl")]
     pub callback_url: Option<String>,
     pub remember_me: Option<bool>,
+    #[serde(default)]
+    pub accept_terms: bool,
 }
 
 #[derive(Deserialize)]

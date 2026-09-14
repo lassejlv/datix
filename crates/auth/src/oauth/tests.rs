@@ -47,9 +47,10 @@ async fn profile(State(mock): State<Mock>, headers: HeaderMap) -> Json<Value> {
     Json(mock.profiles.lock().unwrap()[code].clone())
 }
 
-async fn begin(auth: &Auth) -> (String, HeaderMap, String) {
+async fn begin(auth: &Auth, accept_terms: bool) -> (String, HeaderMap, String) {
     let result = auth.api().sign_in_social(serde_json::from_value(json!({
-        "provider":"google","callbackURL":"/dashboard","errorCallbackURL":"/signin?oauth=failed"
+        "provider":"google","callbackURL":"/dashboard","errorCallbackURL":"/signin?oauth=failed",
+        "acceptTerms":accept_terms
     })).unwrap()).await.unwrap();
     let query: HashMap<_, _> = Url::parse(&result.url)
         .unwrap()
@@ -77,6 +78,22 @@ async fn begin(auth: &Auth) -> (String, HeaderMap, String) {
         headers,
         query["code_challenge"].clone(),
     )
+}
+
+#[test]
+fn oauth_consent_defaults_to_not_accepted() {
+    let input: SocialSignIn = serde_json::from_value(json!({"provider":"google"})).unwrap();
+    assert!(!input.accept_terms);
+
+    let state: OAuthState = serde_json::from_value(json!({
+        "provider":"google",
+        "callback":"http://localhost:3000/dashboard",
+        "error_callback":"http://localhost:3000/signin?oauth=failed",
+        "new_user_callback":"http://localhost:3000/dashboard",
+        "verifier":"fixture"
+    }))
+    .unwrap();
+    assert!(!state.accept_terms);
 }
 
 async fn callback(
@@ -145,7 +162,22 @@ async fn oauth_binds_browser_and_provider_and_preserves_verified_account_linking
     )
     .unwrap();
     assert!(auth.api().sign_in_social(invalid).await.is_err());
-    let (state, headers, challenge) = begin(&auth).await;
+    let (state, headers, _) = begin(&auth, false).await;
+    let rejected = callback(&auth, &state, &headers, "new").await;
+    assert!(
+        rejected.headers()[header::LOCATION]
+            .to_str()
+            .unwrap()
+            .contains("TERMS_NOT_ACCEPTED")
+    );
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM public.\"user\" WHERE email=$1")
+        .bind(&email)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+    assert_eq!(count, 0);
+
+    let (state, headers, challenge) = begin(&auth, true).await;
     assert!(
         auth.api()
             .consume_oauth_state("google", &state, &HeaderMap::new())
@@ -191,7 +223,7 @@ async fn oauth_binds_browser_and_provider_and_preserves_verified_account_linking
     assert_eq!(
         challenge,
         URL_SAFE_NO_PAD.encode(Sha256::digest(
-            mock.exchanges.lock().unwrap()[0]["code_verifier"].as_bytes()
+            mock.exchanges.lock().unwrap().last().unwrap()["code_verifier"].as_bytes()
         ))
     );
     let replay = callback(&auth, &state, &headers, "new").await;
@@ -201,14 +233,14 @@ async fn oauth_binds_browser_and_provider_and_preserves_verified_account_linking
             .unwrap()
             .contains("invalid_state")
     );
-    assert_eq!(mock.exchanges.lock().unwrap().len(), 1);
+    assert_eq!(mock.exchanges.lock().unwrap().len(), 2);
 
     let unverified_id = uuid::Uuid::new_v4().simple().to_string();
     let blocked_email = format!("unverified-{nonce}@example.test");
     sqlx::query("INSERT INTO public.\"user\"(id,name,email,email_verified,created_at,updated_at) VALUES($1,'Local name',$2,false,now(),now())")
         .bind(&unverified_id).bind(&blocked_email).execute(&pool).await.unwrap();
     mock.profiles.lock().unwrap().insert("link".into(), json!({"sub":format!("linked-{nonce}"),"email":blocked_email,"email_verified":true,"name":"Provider name"}));
-    let (state, headers, _) = begin(&auth).await;
+    let (state, headers, _) = begin(&auth, true).await;
     let blocked = callback(&auth, &state, &headers, "link").await;
     assert!(
         blocked.headers()[header::LOCATION]
@@ -227,7 +259,7 @@ async fn oauth_binds_browser_and_provider_and_preserves_verified_account_linking
         .execute(&pool)
         .await
         .unwrap();
-    let (state, headers, _) = begin(&auth).await;
+    let (state, headers, _) = begin(&auth, true).await;
     let linked = callback(&auth, &state, &headers, "link").await;
     assert_eq!(
         linked.headers()[header::LOCATION],
@@ -245,7 +277,7 @@ async fn oauth_binds_browser_and_provider_and_preserves_verified_account_linking
         "changed".into(),
         json!({"sub":nonce,"email":blocked_email,"email_verified":true,"name":"Changed"}),
     );
-    let (state, headers, _) = begin(&auth).await;
+    let (state, headers, _) = begin(&auth, false).await;
     let changed = callback(&auth, &state, &headers, "changed").await;
     assert_eq!(
         changed.headers()[header::LOCATION],

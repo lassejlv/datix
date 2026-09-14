@@ -1,6 +1,7 @@
 import { Alert } from './ui/alert';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Checkbox } from './ui/checkbox';
 import { FooterPreferences, useSitePreferences } from './site-preferences';
 import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from './ui/icons';
@@ -43,6 +44,7 @@ export function AuthScreen({
   const [oauthBusy, setOauthBusy] = useState<OAuthProvider | null>(null);
   const [pendingEmail, setPendingEmail] = useState(unverifiedEmail);
   const [resent, setResent] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [verificationFailed, setVerificationFailed] = useState(() => {
     const error = new URLSearchParams(window.location.search).get('error')?.toLowerCase();
@@ -75,6 +77,15 @@ export function AuthScreen({
 
   async function startOauth(provider: OAuthProvider) {
     if (busy || oauthBusy) return;
+
+    if (signup && !acceptTerms) {
+      setError(
+        t('Accept the Terms of Service and acknowledge the Privacy Policy to create an account.'),
+      );
+
+      return;
+    }
+
     setOauthBusy(provider);
     setError('');
 
@@ -84,7 +95,8 @@ export function AuthScreen({
         write('POST', {
           provider,
           callbackURL: '/dashboard',
-          errorCallbackURL: '/signin?oauth=failed',
+          errorCallbackURL: `${signup ? '/signup' : '/signin'}?oauth=failed`,
+          acceptTerms: signup && acceptTerms,
         }),
       );
 
@@ -97,6 +109,15 @@ export function AuthScreen({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (signup && !acceptTerms) {
+      setError(
+        t('Accept the Terms of Service and acknowledge the Privacy Policy to create an account.'),
+      );
+
+      return;
+    }
+
     setBusy(true);
     setError('');
     const form = new FormData(event.currentTarget);
@@ -108,7 +129,7 @@ export function AuthScreen({
           email: form.get('email'),
           password: form.get('password'),
           callbackURL: '/dashboard',
-          ...(signup ? { name: form.get('name') } : {}),
+          ...(signup ? { name: form.get('name'), acceptTerms } : {}),
         }),
       );
 
@@ -159,6 +180,7 @@ export function AuthScreen({
     onModeChange?.(!signup);
     setError('');
     setVisible(false);
+    setAcceptTerms(false);
     setPendingEmail('');
   };
 
@@ -235,6 +257,27 @@ export function AuthScreen({
                 <Alert className="auth-error">
                   {t('This verification link is invalid or expired. Sign in to receive a new one.')}
                 </Alert>
+              )}
+              {signup && (
+                <label className="auth-legal-consent">
+                  <Checkbox
+                    checked={acceptTerms}
+                    onChange={(event) => setAcceptTerms(event.currentTarget.checked)}
+                    disabled={busy || oauthBusy !== null}
+                    aria-required="true"
+                  />
+                  <span>
+                    {t('I agree to the')}{' '}
+                    <a href="/terms" target="_blank" rel="noopener">
+                      {t('Terms of service')}
+                    </a>{' '}
+                    {t('and acknowledge the')}{' '}
+                    <a href="/privacy" target="_blank" rel="noopener">
+                      {t('Privacy policy')}
+                    </a>
+                    .
+                  </span>
+                </label>
               )}
               {oauth.length > 0 && (
                 <>
@@ -344,11 +387,7 @@ export function AuthScreen({
               </p>
               {signup && (
                 <p lang="en" className="mt-5 text-center text-xs leading-5 text-secondary-ink">
-                  By creating an account, you agree to the{' '}
-                  <a className="underline" href="/terms" target="_blank" rel="noopener">
-                    Terms
-                  </a>
-                  . After verifying your account, confirm your customer details and accept the{' '}
+                  After verifying your account, confirm your customer details and accept the{' '}
                   <a className="underline" href="/dpa" target="_blank" rel="noopener">
                     DPA
                   </a>{' '}

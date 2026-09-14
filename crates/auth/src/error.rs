@@ -56,6 +56,13 @@ impl AuthError {
             "Invalid verification token.",
         )
     }
+    pub const fn terms_not_accepted() -> Self {
+        Self::new(
+            StatusCode::BAD_REQUEST,
+            "TERMS_NOT_ACCEPTED",
+            "Accept the Terms of Service and acknowledge the Privacy Policy to create an account.",
+        )
+    }
 }
 
 impl From<sqlx::Error> for AuthError {

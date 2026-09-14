@@ -91,6 +91,10 @@ export const de = {
   Terms: 'Nutzungsbedingungen',
   'Privacy policy': 'Datenschutzerklärung',
   Privacy: 'Datenschutz',
+  'I agree to the': 'Ich akzeptiere die',
+  'and acknowledge the': 'und bestätige die',
+  'Accept the Terms of Service and acknowledge the Privacy Policy to create an account.':
+    'Akzeptiere die Nutzungsbedingungen und bestätige die Datenschutzerklärung, um ein Konto zu erstellen.',
   'Understand your traffic.': 'Verstehe deinen Traffic.',
   'Respect your visitors.': 'Respektiere deine Besucher.',
   'See your top pages, traffic sources, and custom events.':

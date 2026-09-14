@@ -115,7 +115,12 @@ async fn onboarding_site_ownership_and_subscription_gates_match_the_frontend_con
     let (status, _, _) = call(&state, "GET", "/api/sites", Value::Null, "").await;
     assert_eq!(status, 401);
     let email = format!("rust-api-{nonce}@example.test");
-    let (status,_,created)=call(&state,"POST","/api/auth/sign-up/email",json!({"email":email,"password":"account-test-password","name":"API fixture","callbackURL":"/dashboard"}),"").await;
+    let (status,_,error)=call(&state,"POST","/api/auth/sign-up/email",json!({"email":email,"password":"account-test-password","name":"API fixture","callbackURL":"/dashboard"}),"").await;
+    assert_eq!(
+        (status, error["code"].as_str()),
+        (400, Some("TERMS_NOT_ACCEPTED"))
+    );
+    let (status,_,created)=call(&state,"POST","/api/auth/sign-up/email",json!({"email":email,"password":"account-test-password","name":"API fixture","callbackURL":"/dashboard","acceptTerms":true}),"").await;
     assert_eq!(status, 200, "{created}");
     let user_id = created["user"]["id"].as_str().unwrap();
     let url = hooks.0.lock().unwrap()[0].clone();

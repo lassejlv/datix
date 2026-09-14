@@ -89,6 +89,10 @@ export const da = {
   Terms: 'Vilkår',
   'Privacy policy': 'Privatlivspolitik',
   Privacy: 'Privatliv',
+  'I agree to the': 'Jeg accepterer',
+  'and acknowledge the': 'og bekræfter at have læst',
+  'Accept the Terms of Service and acknowledge the Privacy Policy to create an account.':
+    'Acceptér brugervilkårene, og bekræft at du har læst privatlivspolitikken for at oprette en konto.',
   'Understand your traffic.': 'Forstå din trafik.',
   'Respect your visitors.': 'Respektér dine besøgende.',
   'See your top pages, traffic sources, and custom events.':

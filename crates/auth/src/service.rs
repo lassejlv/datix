@@ -131,6 +131,9 @@ impl AuthApi<'_> {
     }
 
     pub async fn sign_up_email(&self, input: EmailCredentials) -> Result<User, AuthError> {
+        if !input.accept_terms {
+            return Err(AuthError::terms_not_accepted());
+        }
         let email = normalize_email(&input.email)?;
         valid_password(&input.password)?;
         let name = input
@@ -519,5 +522,52 @@ impl Auth {
                 ""
             }
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use serde_json::json;
+
+    use super::*;
+    use crate::{AuthHooks, HookFuture};
+
+    struct Hooks;
+
+    impl AuthHooks for Hooks {
+        fn send_verification<'a>(&'a self, _: &'a User, _: &'a str) -> HookFuture<'a> {
+            Box::pin(async { Ok(()) })
+        }
+
+        fn before_delete<'a>(&'a self, _: &'a User) -> HookFuture<'a> {
+            Box::pin(async { Ok(()) })
+        }
+    }
+
+    #[tokio::test]
+    async fn email_signup_fails_closed_without_terms_acceptance() {
+        let pool = sqlx::postgres::PgPoolOptions::new()
+            .connect_lazy("postgres://fixture:fixture@localhost/fixture")
+            .unwrap();
+        let auth = Auth::new(
+            pool,
+            "fixture-secret-at-least-32-characters".into(),
+            "http://localhost:3000",
+            Arc::new(Hooks),
+        )
+        .unwrap();
+        let input = serde_json::from_value(json!({
+            "email":"person@example.test",
+            "password":"long-enough-password",
+            "name":"Person"
+        }))
+        .unwrap();
+
+        let error = auth.api().sign_up_email(input).await.unwrap_err();
+
+        assert_eq!(error.code, "TERMS_NOT_ACCEPTED");
+        assert_eq!(error.status, StatusCode::BAD_REQUEST);
     }
 }

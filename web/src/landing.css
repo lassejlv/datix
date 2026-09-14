@@ -428,6 +428,22 @@
   font-size: 16px;
   line-height: 26px;
 }
+.auth-legal-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 18px;
+  color: var(--landing-secondary);
+  font-size: 13px;
+  line-height: 20px;
+  text-align: left;
+}
+.auth-legal-consent a {
+  color: var(--landing-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .auth-oauth {
   display: flex;
   flex-direction: column;

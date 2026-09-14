@@ -75,6 +75,10 @@ export const en = {
   Terms: 'Terms',
   'Privacy policy': 'Privacy policy',
   Privacy: 'Privacy',
+  'I agree to the': 'I agree to the',
+  'and acknowledge the': 'and acknowledge the',
+  'Accept the Terms of Service and acknowledge the Privacy Policy to create an account.':
+    'Accept the Terms of Service and acknowledge the Privacy Policy to create an account.',
   'Understand your traffic.': 'Understand your traffic.',
   'Respect your visitors.': 'Respect your visitors.',
   'See your top pages, traffic sources, and custom events.':

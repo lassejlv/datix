@@ -93,7 +93,12 @@ async fn signup_verification_cookie_rotation_and_revocation_use_the_existing_sch
     let nonce = uuid::Uuid::new_v4().simple().to_string();
     let email = format!("rust-{nonce}@example.test");
     let ip = format!("test-{nonce}");
-    let (status,_,created)=request(&auth,"/sign-up/email",json!({"email":email,"password":"Pässｗord-123","name":"Rust integration","callbackURL":"/dashboard"}),None,&ip).await;
+    let (status,_,error)=request(&auth,"/sign-up/email",json!({"email":email,"password":"Pässｗord-123","name":"Rust integration","callbackURL":"/dashboard"}),None,&ip).await;
+    assert_eq!(
+        (status, error["code"].as_str()),
+        (400, Some("TERMS_NOT_ACCEPTED"))
+    );
+    let (status,_,created)=request(&auth,"/sign-up/email",json!({"email":email,"password":"Pässｗord-123","name":"Rust integration","callbackURL":"/dashboard","acceptTerms":true}),None,&ip).await;
     assert_eq!(status, 200, "{created}");
     let user_id = created["user"]["id"].as_str().unwrap();
     assert!(created["token"].is_null());

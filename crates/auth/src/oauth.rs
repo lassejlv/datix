@@ -88,6 +88,8 @@ pub struct SocialSignIn {
     pub new_user_callback_url: Option<String>,
     #[serde(default)]
     pub disable_redirect: bool,
+    #[serde(default)]
+    pub accept_terms: bool,
 }
 
 pub struct SocialAuthorization {
@@ -102,6 +104,8 @@ pub(crate) struct OAuthState {
     pub(crate) error_callback: String,
     new_user_callback: String,
     verifier: String,
+    #[serde(default)]
+    accept_terms: bool,
 }
 
 #[derive(Deserialize)]
@@ -216,6 +220,7 @@ impl AuthApi<'_> {
                     .or(Some("/signin?oauth=failed")),
             )?,
             verifier: crypto::random_token(),
+            accept_terms: input.accept_terms,
         };
         let mut url = Url::parse(&provider.authorize).map_err(|_| AuthError::unavailable())?;
         url.query_pairs_mut()
@@ -297,7 +302,9 @@ impl AuthApi<'_> {
         let profile = self
             .provider_profile(provider, &tokens.access_token)
             .await?;
-        let (user, new_user) = self.link_social_account(provider, profile, &tokens).await?;
+        let (user, new_user) = self
+            .link_social_account(provider, profile, &tokens, state.accept_terms)
+            .await?;
         let callback = if new_user {
             &state.new_user_callback
         } else {
@@ -370,6 +377,7 @@ impl AuthApi<'_> {
         provider: &SocialProvider,
         profile: Profile,
         tokens: &Tokens,
+        accept_terms: bool,
     ) -> Result<(User, bool), AuthError> {
         let mut tx = self.0.0.pool.begin().await?;
         // The inherited schema has no provider/account unique constraint. Serialize both
@@ -434,6 +442,9 @@ impl AuthApi<'_> {
             }
             user
         } else {
+            if !accept_terms {
+                return Err(AuthError::terms_not_accepted());
+            }
             let id = uuid::Uuid::new_v4().simple().to_string();
             // A concurrent email signup is handled by the unique email constraint. Retrying
             // the flow will then apply the local-email verification rule above.
