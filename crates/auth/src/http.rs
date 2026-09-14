@@ -239,7 +239,10 @@ async fn social_callback(
         .await;
     let fallback = auth.callback_url(Some("/signin?oauth=failed"))?;
     let mut response = match state {
-        Err(error) => oauth_failure(&fallback, error.code)?,
+        Err(error) => {
+            report_redirected_failure("oauth_state", &error);
+            oauth_failure(&fallback, error.code)?
+        }
         Ok(state) => {
             let result = if query.error.is_some() {
                 Err(AuthError::new(
@@ -263,7 +266,10 @@ async fn social_callback(
                     *response.body_mut() = axum::body::Body::empty();
                     response
                 }
-                Err(error) => oauth_failure(&state.error_callback, error.code)?,
+                Err(error) => {
+                    report_redirected_failure("oauth_callback", &error);
+                    oauth_failure(&state.error_callback, error.code)?
+                }
             }
         }
     };
@@ -277,6 +283,16 @@ fn oauth_failure(callback: &str, code: &str) -> Result<Response, AuthError> {
     let mut response = Redirect::temporary(url.as_str()).into_response();
     *response.status_mut() = StatusCode::FOUND;
     Ok(response)
+}
+
+fn report_redirected_failure(stage: &'static str, error: &AuthError) {
+    if error.status.is_server_error() || error.code == "oauth_provider_error" {
+        tracing::error!(
+            tags.auth_stage = stage,
+            tags.error_code = error.code,
+            "Authentication callback failed"
+        );
+    }
 }
 
 async fn send_verification(
@@ -314,6 +330,7 @@ async fn verify_email(
             if query.callback_url.is_none() {
                 return Err(error);
             }
+            report_redirected_failure("email_verification", &error);
             let mut target = url::Url::parse(&callback).map_err(|_| AuthError::invalid())?;
             target.query_pairs_mut().append_pair("error", error.code);
             return Ok(Redirect::temporary(target.as_str()).into_response());

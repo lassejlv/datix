@@ -95,7 +95,10 @@ impl Queue {
                 Err(error) if error.status.is_client_error() => {
                     self.ack(&entry.id, Some(error.code)).await?
                 }
-                Err(_) => tracing::error!("Diagnostic delivery failed; receipt remains pending"),
+                Err(error) => tracing::error!(
+                    code = error.code,
+                    "Diagnostic delivery failed; receipt remains pending"
+                ),
             }
         }
         Ok(())

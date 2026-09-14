@@ -1,22 +1,16 @@
-<h1 id="analytiks-privacy-policy">Analytiks Privacy Policy</h1>
-<p>Effective date: 8 September 2026</p>
-<p>
-  Draft for owner and legal review. Not yet published. The consent flow described for analytiks.app
-  must be implemented before this policy is published; the current site starts its default analytics
-  automatically.
-</p>
+<h1 id="datix-privacy-policy">Datix Privacy Policy</h1>
+<p>Effective date: 14 September 2026</p>
 <h2 id="1-who-is-responsible">1. Who is responsible</h2>
 <p>
-  <strong>Lasse Vestergaard</strong>, operating Analytiks personally and based in
+  <strong>Lasse Vestergaard</strong>, operating Datix personally and based in
   <strong>9000 Aalborg, Denmark</strong>, is responsible for personal data used to operate
-  <a href="https://analytiks.app">analytiks.app</a> and
-  <a href="https://analytics.beer">analytics.beer</a>, manage customer accounts, administer the
-  service, and answer support and privacy requests. Our contact for privacy requests, support, and
-  legal matters is <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>.
+  <a href="https://usedatix.com">usedatix.com</a>, manage customer accounts, administer the service,
+  and answer support and privacy requests. Our contact for privacy requests, support, and legal
+  matters is <a href="mailto:hello@usedatix.com">hello@usedatix.com</a>.
 </p>
 <p>
-  This policy covers our website, application, API, tracking service, billing integration, and
-  correspondence. Our role depends on the data:
+  This policy covers our website, application, API, tracking service, imports, social sign-in,
+  billing integration, verification email, and correspondence. Our role depends on the data:
 </p>
 <ul>
   <li>
@@ -31,7 +25,7 @@
   </li>
 </ul>
 <p>
-  If your question concerns a website using Analytiks, contact that website's operator first. We can
+  If your question concerns a website using Datix, contact that website's operator first. We can
   assist with requests concerning information we process on its behalf.
 </p>
 <h2 id="2-account-billing-and-support-information">2. Account, billing, and support information</h2>
@@ -43,9 +37,23 @@
   analytics.
 </p>
 <p>
+  If you choose Google or GitHub sign-in, we receive the provider account identifier, verified email
+  address, name, profile image, granted scope, and authentication tokens needed to maintain that
+  connection. Google or GitHub also receives the information inherent in the authorization request,
+  such as our application identity, requested permissions, redirect address, and request metadata.
+</p>
+<p>
   We store the website names, domains, environments, settings, and collection budgets you enter.
   Account use generates usage totals and operational information needed to provide, secure, and
   troubleshoot the service.
+</p>
+<p>
+  If you import a supported Plausible or Google Analytics 4 export, the uploaded CSV or ZIP is read
+  to validate and normalize aggregate dates, counts, and breakdowns. The original upload is not kept
+  as an archive. We store normalized metrics and dimensions, which can include paths, referrer
+  hostnames, event names, device categories, and countries, plus the import source, source filename,
+  source timezone, fingerprint, summary, and creation time. If archive storage is configured, only
+  the normalized metrics are archived; the original upload is never archived.
 </p>
 <p>
   When you start a Polar checkout, we send Polar your name, email address, account identifier,
@@ -170,12 +178,11 @@
 </p>
 <h3 id="consent-and-withdrawal">Consent and withdrawal</h3>
 <p>
-  On <strong>analytiks.app and analytics.beer</strong>, we ask for consent before loading
-  nonessential analytics or allowing its associated device access and browser storage. Rejecting
-  optional analytics does not prevent access to the website or the account functions needed to
-  provide the service. You can withdraw consent through the site's consent controls. Withdrawal
-  stops future analytics; it does not retrospectively make earlier processing unlawful or
-  automatically erase information already received.
+  On <strong>usedatix.com</strong>, the Datix tracker currently runs in the cookie-based visitor
+  mode described above and begins collecting when its script loads. It uses first-party visitor and
+  session cookies. You can prevent collection before the script runs by enabling Do Not Track or by
+  blocking the tracker in your browser. Clearing the cookies breaks the stored browser identifiers,
+  but does not by itself prevent new identifiers from being created during a later visit.
 </p>
 <p>
   On <strong>customer websites</strong>, the website operator supplies the consent controls and
@@ -185,10 +192,10 @@
   affirmative consent signal.
 </p>
 <p>
-  Withdrawal through the tracker integration stops future activity, cancels retries and pending
-  requests where possible, and clears the relevant persistent visitor identifiers. Withdrawal is
-  also communicated to other open tabs of the same site where browser support allows. Previously
-  delivered records are handled through retention or a separate deletion request.
+  Withdrawal through a customer's tracker integration stops future activity, cancels retries and
+  pending requests where possible, and clears the relevant persistent visitor identifiers.
+  Withdrawal is also communicated to other open tabs of the same site where browser support allows.
+  Previously delivered records are handled through retention or a separate deletion request.
 </p>
 <p>
   The tracker respects <strong>Do Not Track</strong>. It does not currently use
@@ -197,7 +204,7 @@
   creating new data on a later visit. Use the site's consent controls or an appropriate browser
   blocking control as well.
 </p>
-<h2 id="5-other-browser-storage-on-analytiksapp">5. Other browser storage on analytiks.app</h2>
+<h2 id="5-other-browser-storage-on-usedatixcom">5. Other browser storage on usedatix.com</h2>
 <p>
   We use storage for account and interface functions independently of optional visitor analytics:
 </p>
@@ -224,6 +231,11 @@
         <td>Browser session; the corresponding server session expires after one day</td>
       </tr>
       <tr>
+        <td><code>__Secure-better-auth.oauth_state</code> cookie</td>
+        <td>Bind a Google or GitHub sign-in callback to the browser that started it</td>
+        <td>Up to ten minutes or until the callback completes</td>
+      </tr>
+      <tr>
         <td><code>ab-language</code> and <code>ab-theme</code> cookies</td>
         <td>Remember your selected language and appearance</td>
         <td>One year from the setting being saved</td>
@@ -242,10 +254,10 @@
   </table>
 </div>
 <p>
-  The default tracker's separate pageview-throttle entry uses the key
+  Cookieless tracker integrations use a separate pageview-throttle entry with the key
   <code>analytics-beer:pageviews:&lt;environment&gt;</code>. Entries stop affecting counts after one
-  minute, but stored entries may remain until a later cleanup or the browser session ends. On our
-  own site, this is part of the analytics controlled by consent.
+  minute, but stored entries may remain until a later cleanup or the browser session ends. The
+  persistent mode currently used on our own site does not use this throttle entry.
 </p>
 <p>
   You can change language and appearance using the website controls and remove cookies or other site
@@ -266,8 +278,8 @@
     </thead>
     <tbody>
       <tr>
-        <td>Create and operate your account and provide the service</td>
-        <td>Account details, website settings, sessions, and usage</td>
+        <td>Create and operate your account, import your data, and provide the service</td>
+        <td>Account and social sign-in details, website settings, imports, sessions, and usage</td>
         <td>
           Performance of our contract with you; legitimate interests in serving an organization
           where you act as its representative
@@ -284,15 +296,18 @@
       <tr>
         <td>Protect accounts, prevent abuse, and troubleshoot failures</td>
         <td>
-          Request information, session records, rate-limit and abuse signals, and operational
-          records
+          Request information, session records, rate-limit and abuse signals, backend error codes,
+          fixed route templates, stack traces, and operational records
         </td>
         <td>Legitimate interests in protecting the service, customers, and visitors</td>
       </tr>
       <tr>
-        <td>Understand use of our own site through optional analytics</td>
-        <td>Consented visitor and activity information</td>
-        <td>Consent</td>
+        <td>Understand and improve use of our own site</td>
+        <td>Visitor, activity, performance, and error information</td>
+        <td>
+          Legitimate interests in understanding and improving the service; consent where required
+          for device access or analytics
+        </td>
       </tr>
       <tr>
         <td>Remember requested interface choices</td>
@@ -317,9 +332,8 @@
 </div>
 <p>
   Our legitimate interests are limited to the purposes stated and must be balanced against your
-  rights. You can object as explained below. Optional analytics consent is separate from accepting
-  the service contract. You do not have to provide optional analytics information to buy or use the
-  service, although information needed to create an account and process a payment is required for
+  rights. You can object as explained below. Any analytics consent is separate from accepting the
+  service contract. Information needed to create an account and process a payment is required for
   those functions.
 </p>
 <p>
@@ -339,30 +353,56 @@
     </thead>
     <tbody>
       <tr>
-        <td><strong>Railway</strong></td>
+        <td><strong>Unkey</strong></td>
         <td>
-          Runs our application, background workers, and Redis queues. Processes service requests,
-          account and event data passing through those systems, and operational information. See its
-          <a href="https://railway.com/legal/privacy">Privacy Policy</a> and
-          <a href="https://railway.com/legal/dpa">data processing terms</a>.
+          Runs our application and background workers on Unkey Compute. It processes service
+          requests, account and analytics data passing through the service, and operational
+          information. See Unkey's
+          <a href="https://www.unkey.com/policies/privacy">Privacy Policy</a>.
         </td>
       </tr>
       <tr>
         <td><strong>Neon</strong></td>
         <td>
-          Hosts the PostgreSQL database containing accounts, analytics, settings, and billing
-          metadata. Neon is part of Databricks; see the current
-          <a href="https://neon.com/platform-terms">Neon platform terms</a>.
+          Hosts the PostgreSQL database containing accounts, analytics, normalized imports,
+          settings, and billing metadata. Neon is part of Databricks; see the
+          <a href="https://neon.com/msa">Neon service terms</a> and
+          <a href="https://neon.com/pdf/DPA.pdf">data processing agreement</a>.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Upstash</strong></td>
+        <td>
+          Provides Redis for short-lived rate-limit state and the diagnostic processing stream.
+          Diagnostic messages are sanitized before they enter the stream, but can include paths,
+          device categories, pseudonymous identifiers, performance values, and redacted error
+          details. See Upstash's
+          <a href="https://upstash.com/static/trust/privacy.pdf">Privacy Policy</a> and
+          <a href="https://upstash.com/static/trust/dpa.pdf">data processing agreement</a>.
         </td>
       </tr>
       <tr>
         <td><strong>Cloudflare</strong></td>
         <td>
-          Provides the public site's proxy, network delivery, DNS, and security functions, including
-          processing request information. Its Email Routing service also forwards messages sent to
-          our contact address. See its
+          Provides network, DNS, proxy, and security functions, routes messages sent to our contact
+          address, and sends account verification email. It processes request information and
+          receives email addresses, names, message content, attachments, correspondence metadata,
+          and one-time verification links as applicable. See its
           <a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a> and
           <a href="https://www.cloudflare.com/cloudflare-customer-dpa/">data processing terms</a>.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Sentry</strong></td>
+        <td>
+          Provides backend-only error and crash monitoring when enabled. It can receive the service
+          release and environment, stack traces, fixed API route templates, HTTP methods and status
+          codes, internal error codes, random request identifiers, and worker-stage information. We
+          configure the integration not to send user profiles, request contents, headers, query
+          strings, cookies, or IP addresses, and we do not use its frontend SDK or session replay.
+          See Sentry's <a href="https://sentry.io/privacy/">Privacy Policy</a>,
+          <a href="https://sentry.io/legal/dpa/">data processing addendum</a>, and
+          <a href="https://sentry.io/legal/subprocessors/">subprocessor list</a>.
         </td>
       </tr>
       <tr>
@@ -377,20 +417,35 @@
         </td>
       </tr>
       <tr>
-        <td><strong>Google/Gmail</strong></td>
+        <td><strong>Google and GitHub</strong></td>
         <td>
-          Receives and stores support and privacy correspondence forwarded from our contact address.
-          This includes message content, attachments, and metadata. See
-          <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.
+          Provide optional social sign-in. We request basic profile and verified email information
+          using the scopes shown during authorization. Google also receives and stores support and
+          privacy correspondence handled through Gmail, including message content, attachments, and
+          metadata. See
+          <a href="https://policies.google.com/privacy">Google's Privacy Policy</a> and
+          <a
+            href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+            >GitHub's Privacy Statement</a
+          >.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>S3-compatible archive provider, if configured</strong></td>
+        <td>
+          Stores normalized import metrics under environment-scoped object keys. Original CSV and
+          ZIP uploads are not archived. Contact us for the currently configured provider before
+          relying on this optional feature.
         </td>
       </tr>
     </tbody>
   </table>
 </div>
 <p>
-  These providers do not all have the same legal role. Hosting and database providers process
-  service data to support our operation. Polar also acts for its own transaction-related purposes.
-  Google/Gmail handles correspondence under the privacy terms linked above.
+  These providers do not all have the same legal role. Infrastructure and monitoring providers
+  process service data to support our operation. Polar also acts for its own transaction-related
+  purposes. Google and GitHub process social sign-in under their own privacy terms, and Google
+  handles correspondence under the privacy terms linked above.
 </p>
 <p>
   We may disclose relevant information where a binding legal obligation requires it or where
@@ -402,25 +457,23 @@
   8. Processing locations and international transfers
 </h2>
 <p>
-  Our application, worker, and Redis services are currently deployed in a European Railway region.
-  The primary Neon database is configured in Frankfurt, Germany. Those deployment locations do not
-  mean that all processing stays in the EEA: network delivery, provider administration, support,
-  payment processing, email, and provider subprocessors can involve other countries, including the
-  United States.
+  The primary Neon database is configured in Frankfurt, Germany. Other infrastructure, network
+  delivery, error monitoring, provider administration, support, payment processing, email, social
+  sign-in, and provider subprocessors can involve other countries, including the United States.
+  Enabling an optional import archive can add the locations used by the configured S3-compatible
+  provider.
 </p>
 <p>
-  We have agreed to Railway's <a href="https://railway.com/legal/dpa">data processing agreement</a>,
-  which contains provisions for international transfers, including standard contractual clauses for
-  relevant restricted transfers. Cloudflare's and Polar's applicable data processing terms also
-  provide standard contractual clauses for relevant restricted transfers. Neon's current platform
-  terms incorporate Databricks' contractual framework. Google's Privacy Policy describes
-  international processing and its transfer arrangements.
+  The provider data-processing terms linked above include transfer provisions for covered
+  processing, which can include the European Commission's standard contractual clauses. Provider
+  privacy notices describe processing for their own purposes. A provider's public document does not
+  by itself mean every service, transfer, or optional feature is covered in the same way.
 </p>
 <p>
   Where we transfer personal data subject to the GDPR outside the EEA, an applicable adequacy
   decision or another valid safeguard, such as the European Commission's standard contractual
   clauses with any necessary supplementary measures, is required. Contact
-  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a> for information about the safeguards
+  <a href="mailto:hello@usedatix.com">hello@usedatix.com</a> for information about the safeguards
   applicable to your data and how to obtain a copy, subject to necessary redactions.
 </p>
 <h2 id="9-retention-and-deletion">9. Retention and deletion</h2>
@@ -435,22 +488,38 @@
     </thead>
     <tbody>
       <tr>
-        <td>Raw analytics events and detailed activity</td>
+        <td>
+          Pageviews, custom events, goal conversions, daily visitor keys, and aggregate reports
+        </td>
+        <td>
+          A rolling 730-calendar-day reporting window; records can contain paths, event names, and
+          pseudonymous visitor keys
+        </td>
+      </tr>
+      <tr>
+        <td>Detailed activity, performance measurements, and error diagnostics</td>
         <td>Scheduled deletion after approximately 30 days</td>
       </tr>
       <tr>
-        <td>Daily visitor and session-grouping records</td>
-        <td>Approximately 30 days</td>
+        <td>Backend error-monitoring events sent to Sentry</td>
+        <td>
+          Kept under the retention configured for our Sentry project while needed to identify
+          recurring faults, validate fixes, and protect the service; this can differ from the
+          application's 30-day diagnostic cleanup
+        </td>
       </tr>
       <tr>
         <td>Event receipt identifiers used to prevent duplicate processing</td>
-        <td>Approximately 31 days</td>
+        <td>
+          Completed and rejected receipts are scheduled for deletion after approximately 731 days;
+          pending receipts remain until processed or the relevant environment is deleted
+        </td>
       </tr>
       <tr>
-        <td>Daily aggregate reports</td>
+        <td>Imported metrics and optional normalized import archives</td>
         <td>
-          A rolling 730-calendar-day reporting window; report dimensions can still contain paths or
-          event names
+          Limited to the same rolling 730-calendar-day reporting window; the original uploaded file
+          is not archived
         </td>
       </tr>
       <tr>
@@ -499,22 +568,25 @@
   email threads.
 </p>
 <p>
-  Successfully processed event messages are removed from the active processing queue. Failed or
-  interrupted records can remain in recovery queues until reviewed, replayed, or removed. Failed
-  queue records currently have no fixed automatic expiry. Database retention rules do not
-  automatically erase these separate recovery records.
+  Pending analytics receipts retain the event payload until processing completes. After successful
+  processing or a permanent rejection, the payload is cleared and the receipt identifiers and state
+  remain for deduplication until their retention period ends. Diagnostics use a separate Redis
+  processing stream: acknowledged messages are removed, while failed or interrupted records can
+  remain for recovery or review. Failed diagnostic records have a bounded count but no fixed
+  time-based expiry. Database retention rules do not automatically erase these separate records.
 </p>
 <p>
-  Account deletion removes the account and its linked websites, environments, analytics records, and
-  authentication sessions from the active application database. A billing customer identifier and
-  subscription snapshot can remain after the link to the deleted account is removed. Billing webhook
-  delivery identifiers also remain separately; these records do not currently have an automatic
-  scheduled expiry. Removing an account link is not a guarantee that the remaining billing
-  information is anonymous.
+  Account deletion removes access immediately and deletes the account, authentication sessions, and
+  linked website configuration. Environment-scoped analytics and normalized import archives are
+  removed through bounded background cleanup, so that cleanup can take additional time. A billing
+  customer identifier and subscription snapshot can remain after the link to the deleted account is
+  removed. Billing webhook delivery identifiers also remain separately; these records do not
+  currently have an automatic scheduled expiry. Removing an account link is not a guarantee that the
+  remaining billing information is anonymous.
 </p>
 <p>
-  Polar retains transaction information under its own legal and operational obligations. Deleting an
-  Analytiks account does not erase Polar's records or complete a separate privacy request to Polar.
+  Polar retains transaction information under its own legal and operational obligations. Deleting a
+  Datix account does not erase Polar's records or complete a separate privacy request to Polar.
   Recovery copies, provider logs, and backups can also remain beyond deletion from the active
   application database, according to the relevant provider's recovery and retention processes. We do
   not promise that all provider logs or backups share the analytics retention period.
@@ -534,11 +606,11 @@
 </p>
 <p>
   We handle support and privacy requests through
-  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>, including requests that require
-  manual review or action. We may ask for information reasonably needed to verify your identity and
-  locate the relevant records. We handle requests within the time required by applicable law; under
-  the GDPR this is normally one month, with a permitted extension for complex or numerous requests
-  and notice of the extension.
+  <a href="mailto:hello@usedatix.com">hello@usedatix.com</a>, including requests that require manual
+  review or action. We may ask for information reasonably needed to verify your identity and locate
+  the relevant records. We handle requests within the time required by applicable law; under the
+  GDPR this is normally one month, with a permitted extension for complex or numerous requests and
+  notice of the extension.
 </p>
 <p>
   The dashboard supports account and website management and deletion, but there is no dedicated
@@ -564,7 +636,7 @@
   checks, and controls intended to limit unauthorized origins, duplicate events, and abusive
   traffic. These measures reduce risk; no service can guarantee absolute security. Report a
   suspected security or privacy issue to
-  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a>.
+  <a href="mailto:hello@usedatix.com">hello@usedatix.com</a>.
 </p>
 <p>
   Automated rules can reject events or pause collection when traffic appears abusive or a
@@ -574,8 +646,8 @@
 </p>
 <h2 id="12-children">12. Children</h2>
 <p>
-  Analytiks accounts are intended for business or professional users aged 18 or older. Contact us if
-  you believe an account has been created by someone below that age.
+  Datix accounts are intended for business or professional users aged 18 or older. Contact us if you
+  believe an account has been created by someone below that age.
 </p>
 <p>
   The tracker does not determine a website visitor's age. The account age restriction therefore does
@@ -593,7 +665,6 @@
   <strong>Controller for our own processing:</strong> Lasse Vestergaard<br />
   <strong>City and country:</strong> 9000 Aalborg, Denmark<br />
   <strong>Privacy, support, and legal requests:</strong>
-  <a href="mailto:hello@analytiks.app">hello@analytiks.app</a><br />
-  <strong>Website:</strong> <a href="https://analytiks.app">analytiks.app</a> (also
-  <a href="https://analytics.beer">analytics.beer</a>)
+  <a href="mailto:hello@usedatix.com">hello@usedatix.com</a><br />
+  <strong>Website:</strong> <a href="https://usedatix.com">usedatix.com</a>
 </p>

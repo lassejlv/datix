@@ -24,6 +24,7 @@ reqwest.workspace = true
 email-sdk.workspace = true
 standardwebhooks.workspace = true
 rust_decimal.workspace = true
+rustls.workspace = true
 regex.workspace = true
 icu_collator.workspace = true
 icu_locale_core.workspace = true
@@ -40,6 +41,7 @@ subtle.workspace = true
 tower-http.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+sentry.workspace = true
 
 [dev-dependencies]
 tower.workspace = true

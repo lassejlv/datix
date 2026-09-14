@@ -259,9 +259,9 @@ impl Billing {
         }
         if customer.is_none() {
             *stage = "customer_create";
-            let created:Customer=client.create("customers",json!({"type":"individual","external_id":owner,"organization_id":self.organization_id(),"email":email,"name":name,"locale":locale})).await?;
-            *stage = "customer_validate";
-            verify_customer(&created, owner, &self.catalog)?;
+            let created = client
+                .create_customer(&self.catalog, owner, &name, &email, locale)
+                .await?;
             customer = Some(created);
         }
         let customer = customer.ok_or_else(ApiError::unavailable)?;

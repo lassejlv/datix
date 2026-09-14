@@ -1,4 +1,4 @@
-use datix_api::{AppState, config::Config};
+use datix_api::{AppState, config::Config, monitoring};
 
 #[tokio::main]
 async fn main() {
@@ -22,32 +22,44 @@ async fn run() -> anyhow::Result<()> {
         dotenvy::from_path_override(path)
             .map_err(|_| anyhow::anyhow!("Cannot load environment file"))?;
     }
-    tracing_subscriber::fmt()
-        .with_env_filter("datix_api=info,tower_http=warn")
-        .init();
-    let config = Config::from_env()?;
-    let port = config.port;
-    let state = AppState::connect(config).await?;
-    let pool = state.pool.clone();
-    let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
-    let workers = datix_api::workers::Workers::start(state.clone());
-    let stop = workers.shutdown_trigger();
-    tracing::info!(port, "Datix Rust API listening");
-    let result = axum::serve(
-        listener,
-        datix_api::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
-    )
-    .with_graceful_shutdown(async move {
-        shutdown().await;
-        stop();
-    })
+    let _sentry = monitoring::init()?;
+    monitoring::init_tracing();
+
+    let mut stage = "configuration";
+    let result = async {
+        let config = Config::from_env()?;
+        monitoring::configure_runtime(config.role);
+        let port = config.port;
+        stage = "state_initialization";
+        let state = AppState::connect(config).await?;
+        let pool = state.pool.clone();
+        stage = "listener_bind";
+        let listener = tokio::net::TcpListener::bind(("0.0.0.0", port)).await?;
+        let workers = datix_api::workers::Workers::start(state.clone());
+        let stop = workers.shutdown_trigger();
+        tracing::info!(port, "Datix Rust API listening");
+        stage = "http_server";
+        let server_result = axum::serve(
+            listener,
+            datix_api::router(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+        )
+        .with_graceful_shutdown(async move {
+            shutdown().await;
+            stop();
+        })
+        .await;
+        // The platform must allow at least 90 seconds for active transactions and
+        // external acknowledgments to finish. Do not force-abort in-flight tasks.
+        workers.shutdown().await;
+        pool.close().await;
+        server_result?;
+        Ok(())
+    }
     .await;
-    // The platform must allow at least 90 seconds for active transactions and
-    // external acknowledgments to finish. Do not force-abort in-flight tasks.
-    workers.shutdown().await;
-    pool.close().await;
-    result?;
-    Ok(())
+    if result.is_err() {
+        monitoring::report_process_failure(stage);
+    }
+    result
 }
 
 async fn shutdown() {

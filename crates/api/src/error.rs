@@ -12,6 +12,11 @@ pub struct ApiError {
     pub message: &'static str,
 }
 
+#[derive(Clone, Copy)]
+pub(crate) struct ApiErrorContext {
+    pub code: &'static str,
+}
+
 impl ApiError {
     pub const fn new(status: StatusCode, code: &'static str, message: &'static str) -> Self {
         Self {
@@ -94,10 +99,14 @@ impl From<datix_auth::AuthError> for ApiError {
 }
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        (
+        let mut response = (
             self.status,
             Json(serde_json::json!({"error":{"code":self.code,"message":self.message}})),
         )
-            .into_response()
+            .into_response();
+        response
+            .extensions_mut()
+            .insert(ApiErrorContext { code: self.code });
+        response
     }
 }

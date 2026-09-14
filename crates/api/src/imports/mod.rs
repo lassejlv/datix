@@ -245,7 +245,7 @@ async fn upload(
                 && let Some(id) = archived
                 && state.storage.remove_archive(env.id, id).await.is_err()
             {
-                tracing::warn!("Import archive cleanup failed");
+                tracing::error!("Import archive cleanup failed");
             }
             return Err(error);
         }

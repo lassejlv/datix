@@ -4,7 +4,7 @@ import html from '../content/legal/terms.html?raw';
 
 export const Route = createFileRoute('/terms')({
   head: () => ({
-    meta: [{ title: 'Terms of service | Datix' }, { name: 'robots', content: 'noindex' }],
+    meta: [{ title: 'Terms of service | Datix' }],
   }),
   component: () => <LegalPage html={html} />,
 });

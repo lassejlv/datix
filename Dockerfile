@@ -4,14 +4,15 @@ COPY package.json bun.lock ./
 COPY web/package.json web/package.json
 RUN bun install --frozen-lockfile
 COPY web ./web
-COPY config/polar-catalog.json ./config/polar-catalog.json
+COPY polar-catalog.json ./polar-catalog.json
 RUN bun run --cwd web build
 
 FROM rust:1.98.1-bookworm AS backend
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
-COPY config ./config
+COPY polar-catalog.json ./polar-catalog.json
+COPY web/public/openapi.json ./web/public/openapi.json
 RUN cargo build --release --locked -p datix-api
 
 FROM debian:bookworm-slim AS runtime

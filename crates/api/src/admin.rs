@@ -78,10 +78,22 @@ async fn status(state: &AppState) -> Result<Value, ApiError> {
     )
     .fetch_one(&state.pool)
     .await;
+    let database_ok = database.is_ok();
     let redis_ok = redis.as_deref() == Ok("PONG");
+    let queue_ok = queue.is_ok();
+    let pending_ok = pending.is_ok();
+    if !(database_ok && redis_ok && queue_ok && pending_ok) {
+        tracing::error!(
+            database_ok,
+            redis_ok,
+            queue_ok,
+            pending_ok,
+            "Administrative status check degraded"
+        );
+    }
     Ok(
-        json!({"status":if database.is_ok() && redis_ok && queue.is_ok() && pending.is_ok() {"ok"} else {"degraded"},"service":{"name":"analytics","version":"1","role":state.config.role},
-        "dependencies":{"database":{"status":if database.is_ok() {"ok"} else {"unavailable"},"schemaVersion":counts.get::<i64,_>("version")},"redis":{"status":if redis_ok {"ok"} else {"unavailable"}}},
+        json!({"status":if database_ok && redis_ok && queue_ok && pending_ok {"ok"} else {"degraded"},"service":{"name":"analytics","version":"1","role":state.config.role},
+        "dependencies":{"database":{"status":if database_ok {"ok"} else {"unavailable"},"schemaVersion":counts.get::<i64,_>("version")},"redis":{"status":if redis_ok {"ok"} else {"unavailable"}}},
         "counts":{"users":{"total":counts.get::<i64,_>("users"),"suspended":counts.get::<i64,_>("suspended_users")},"sites":{"total":counts.get::<i64,_>("sites"),"suspended":counts.get::<i64,_>("suspended_sites")},"environments":counts.get::<i64,_>("environments"),"activeSessions":counts.get::<i64,_>("sessions")},
         "queue":{"pending":queue.as_ref().ok().zip(pending.ok()).map(|((waiting,active,_),pending)|waiting+active+pending),"failed":queue.as_ref().ok().map(|(_,_,failed)|failed)}}),
     )

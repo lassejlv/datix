@@ -24,6 +24,56 @@ mod diagnostic_tests {
     };
     use tracing::instrument::WithSubscriber;
 
+    #[tokio::test]
+    async fn new_customer_uses_token_organization_and_checks_returned_identity() {
+        use axum::{Json, Router, routing::post};
+        use serde_json::json;
+
+        let catalog = Catalog::load(None, false).unwrap();
+        for (organization, owner, accepted) in [
+            (catalog.organization_id, "fixture-owner", true),
+            (Uuid::new_v4(), "fixture-owner", false),
+            (catalog.organization_id, "another-owner", false),
+        ] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let base = Url::parse(&format!("http://{}", listener.local_addr().unwrap())).unwrap();
+            let app = Router::new().route("/v1/customers/", post(move |Json(body): Json<Value>| async move {
+                // Reproduce Polar's organization-token validation at the HTTP boundary.
+                if body.get("organization_id").is_some() {
+                    return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({"detail":[{
+                        "type":"organization_token", "loc":["body","organization_id"],
+                        "msg":"Setting organization_id is disallowed when using an organization token."
+                    }]})));
+                }
+                assert_eq!(body["external_id"], "fixture-owner");
+                assert_eq!(body["email"], "fixture@example.test");
+                assert_eq!(body["name"], "Fixture");
+                assert_eq!(body["locale"], "da");
+                (StatusCode::CREATED, Json(json!({"id":Uuid::new_v4(), "organization_id":organization, "external_id":owner})))
+            }));
+            let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+            let result = Provider::local_fixture(base, &catalog)
+                .create_customer(
+                    &catalog,
+                    "fixture-owner",
+                    "Fixture",
+                    "fixture@example.test",
+                    "da",
+                )
+                .await;
+            server.abort();
+            if accepted {
+                assert!(
+                    result.is_ok(),
+                    "Fresh customer creation failed: {:?}",
+                    result.err()
+                );
+            } else {
+                assert_eq!(result.err().unwrap().code, "invalid_billing_customer");
+            }
+        }
+    }
+
     #[derive(Clone, Default)]
     struct Capture(Arc<Mutex<Vec<u8>>>);
     impl Write for Capture {
@@ -373,6 +423,7 @@ impl Provider {
                             _ => match detail.get("type").and_then(Value::as_str) {
                                 Some("missing") => "missing",
                                 Some("extra_forbidden") => "extra_forbidden",
+                                Some("organization_token") => "organization_token",
                                 Some("string_too_long") => "string_too_long",
                                 Some("uuid_parsing" | "uuid_version") => "invalid_uuid",
                                 Some("literal_error" | "union_tag_invalid" | "enum") => {
@@ -439,6 +490,29 @@ impl Provider {
         self.request(Method::POST, &["v1", resource, ""], &[], Some(body), false)
             .await?
             .ok_or_else(ApiError::unavailable)
+    }
+
+    pub async fn create_customer(
+        &self,
+        catalog: &Catalog,
+        owner: &str,
+        name: &str,
+        email: &str,
+        locale: &str,
+    ) -> Result<Customer, ApiError> {
+        // Organization access tokens choose the organization implicitly; Polar
+        // rejects an explicit organization_id in this request body.
+        let customer = self
+            .create(
+                "customers",
+                serde_json::json!({
+                    "type":"individual", "external_id":owner,
+                    "email":email, "name":name, "locale":locale
+                }),
+            )
+            .await?;
+        verify_customer(&customer, owner, catalog)?;
+        Ok(customer)
     }
     pub async fn subscriptions(
         &self,

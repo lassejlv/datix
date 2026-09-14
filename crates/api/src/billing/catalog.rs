@@ -56,7 +56,7 @@ struct SandboxPlan {
 impl Catalog {
     pub fn load(mapping: Option<&str>, snapshot: bool) -> Result<Self, ApiError> {
         let mut catalog: Self =
-            serde_json::from_str(include_str!("../../../../config/polar-catalog.json"))
+            serde_json::from_str(include_str!("../../../../polar-catalog.json"))
                 .map_err(|_| super::unconfigured())?;
         if let Some(mapping) = mapping {
             if snapshot {

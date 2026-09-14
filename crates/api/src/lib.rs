@@ -15,6 +15,7 @@ mod ingestion;
 #[cfg(test)]
 mod ingestion_tests;
 mod maintenance;
+pub mod monitoring;
 mod queue;
 mod sites;
 mod storage;

@@ -61,10 +61,13 @@ impl Billing {
                 Ok(json!({"external_id":format!("datix-usage-{}",row.get::<Uuid,_>("id")),"name":self.catalog.meter.event_name,"external_customer_id":owner,"timestamp":row.get::<DateTime<Utc>,_>("occurred_at"),
                     "metadata":{self.catalog.meter.quantity_property.clone():quantity,"event_type":row.get::<String,_>("event_type")}}))
             }).collect::<Result<Vec<_>,ApiError>>()?;
-            let response = client
-                .ingest(json!({"events":events}))
-                .await
-                .unwrap_or(Value::Null);
+            let response = match client.ingest(json!({"events":events})).await {
+                Ok(response) => response,
+                Err(error) => {
+                    tracing::error!(code = error.code, "Billing usage delivery failed; retrying");
+                    Value::Null
+                }
+            };
             if acknowledged(&response, batch.len()) {
                 sqlx::query("DELETE FROM billing_outbox WHERE owner_id=$1 AND lease_id=$2 AND provider='polar' AND organization_id=$3")
                     .bind(&owner).bind(lease).bind(self.organization_id()).execute(&mut *tx).await?;
@@ -86,8 +89,8 @@ impl Billing {
         for owner in owners {
             sqlx::query("UPDATE billing_customers SET sync_attempted_at=now() WHERE owner_id=$1 AND provider='polar' AND organization_id=$2")
                 .bind(&owner).bind(self.organization_id()).execute(&self.pool).await?;
-            if self.sync(&owner).await.is_err() {
-                tracing::error!("Billing refresh failed");
+            if let Err(error) = self.sync(&owner).await {
+                tracing::error!(code = error.code, "Billing refresh failed");
             }
         }
         Ok(())

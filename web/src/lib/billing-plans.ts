@@ -1,4 +1,4 @@
-import catalog from '../../../config/polar-catalog.json';
+import catalog from '../../../polar-catalog.json';
 import type { Copy } from './i18n/translations';
 
 // The Rust checkout allowlist and every displayed price share the verified catalog.

@@ -25,6 +25,7 @@ unicode-normalization.workspace = true
 percent-encoding.workspace = true
 url.workspace = true
 reqwest.workspace = true
+tracing.workspace = true
 
 [lints]
 workspace = true

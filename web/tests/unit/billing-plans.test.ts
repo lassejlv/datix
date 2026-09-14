@@ -5,7 +5,7 @@ import {
   billingCurrency,
   billingAvailable,
 } from '../../src/lib/billing-plans';
-import catalog from '../../../config/polar-catalog.json';
+import catalog from '../../../polar-catalog.json';
 
 describe('Polar pricing', () => {
   test('all locales display the same USD amounts from the backend catalog', () => {

@@ -1,6 +1,6 @@
 use axum::{
     Extension, Json, Router,
-    extract::{ConnectInfo, Request, State},
+    extract::{ConnectInfo, MatchedPath, Request, State},
     http::{HeaderValue, Method, StatusCode, header},
     middleware::{self, Next},
     response::{IntoResponse, Response},
@@ -14,7 +14,11 @@ use std::net::SocketAddr;
 use subtle::ConstantTimeEq;
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::{AppState, billing, error::ApiError, sites};
+use crate::{
+    AppState, billing,
+    error::{ApiError, ApiErrorContext},
+    monitoring, sites,
+};
 
 #[derive(Clone, Serialize)]
 pub struct Owner {
@@ -35,6 +39,7 @@ pub fn router(state: AppState) -> Router {
             .route("/internal/metrics", get(metrics))
             .fallback(|| async { ApiError::new(StatusCode::NOT_FOUND, "not_found", "Not found.") })
             .layer(middleware::from_fn_with_state(state.clone(), security))
+            .layer(sentry::integrations::tower::NewSentryLayer::<Request>::new_from_top())
             .with_state(state);
     }
     Router::new()
@@ -50,7 +55,7 @@ pub fn router(state: AppState) -> Router {
             get(|| async {
                 (
                     [(header::CONTENT_TYPE, "application/json")],
-                    include_str!("../../../config/openapi.json"),
+                    include_str!("../../../web/public/openapi.json"),
                 )
             }),
         )
@@ -67,6 +72,7 @@ pub fn router(state: AppState) -> Router {
         .merge(crate::imports::routes())
         .fallback_service(frontend(std::path::Path::new("web/dist/client")))
         .layer(middleware::from_fn_with_state(state.clone(), security))
+        .layer(sentry::integrations::tower::NewSentryLayer::<Request>::new_from_top())
         .with_state(state)
 }
 
@@ -159,6 +165,23 @@ fn matches_secret(expected: &str, supplied: &str) -> bool {
 async fn security(State(state): State<AppState>, mut request: Request, next: Next) -> Response {
     let path = request.uri().path().to_owned();
     let api = path.starts_with("/api/");
+    let route = request
+        .extensions()
+        .get::<MatchedPath>()
+        .map(MatchedPath::as_str)
+        .unwrap_or(if api {
+            "/api/*unmatched"
+        } else if path == "/health/ready" {
+            "/health/ready"
+        } else if path == "/internal/metrics" {
+            "/internal/metrics"
+        } else {
+            "frontend-static"
+        })
+        .to_owned();
+    let method = request.method().as_str().to_owned();
+    let request_id = uuid::Uuid::new_v4().to_string();
+    monitoring::configure_request(&route, &method);
     let tracker = matches!(
         path.as_str(),
         "/api/collect" | "/api/telemetry" | "/api/tracker-config"
@@ -238,6 +261,21 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
         Ok(response) => response,
         Err(error) => error.into_response(),
     };
+    if response.status().is_server_error()
+        && ((api && path != "/api/health") || path == "/internal/metrics")
+    {
+        let code = response
+            .extensions()
+            .get::<ApiErrorContext>()
+            .map_or("backend_failure", |context| context.code);
+        monitoring::report_http_failure(
+            &route,
+            &method,
+            response.status().as_u16(),
+            code,
+            &request_id,
+        );
+    }
     let headers = response.headers_mut();
     headers.insert(
         "x-content-type-options",
@@ -258,7 +296,7 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
     }
     if api {
         headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
-        if let Ok(id) = HeaderValue::from_str(&uuid::Uuid::new_v4().to_string()) {
+        if let Ok(id) = HeaderValue::from_str(&request_id) {
             headers.insert("x-request-id", id);
         }
     }

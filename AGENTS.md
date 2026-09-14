@@ -97,7 +97,7 @@ data. No DuckDB, separate analytics store, or manual partitions.
   Check recipient acceptance; disable automatic retries/fallbacks because the
   provider has no send idempotency. Disabled external effects fail closed.
 - Polar has no official Rust SDK. The typed HTTP adapter preserves the pinned
-  API version and `config/polar-catalog.json`, with no automatic HTTP retries.
+  API version and `polar-catalog.json`, with no automatic HTTP retries.
   Preserve the configured webhook secret unchanged. Verify both Polar's legacy
   raw UTF-8 signing (including `whsec_`) and Standard Webhooks decoded 32-byte
   keys for secrets generated from 2026-09-08. Keep exact body bytes and timestamp tolerance.

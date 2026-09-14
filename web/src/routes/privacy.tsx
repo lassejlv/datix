@@ -4,7 +4,7 @@ import html from '../content/legal/privacy.html?raw';
 
 export const Route = createFileRoute('/privacy')({
   head: () => ({
-    meta: [{ title: 'Privacy policy | Datix' }, { name: 'robots', content: 'noindex' }],
+    meta: [{ title: 'Privacy policy | Datix' }],
   }),
   component: () => <LegalPage html={html} />,
 });

@@ -53,7 +53,7 @@ impl Workers {
             for index in 0..state.config.workers {
                 let state = state.clone();
                 let mut receiver = receiver.clone();
-                tasks.spawn(async move {
+                tasks.spawn(crate::monitoring::worker(async move {
                     let consumer=uuid::Uuid::new_v4().to_string();let mut cursor="0-0".to_owned();
                     loop {
                         if *receiver.borrow() {break;}
@@ -72,11 +72,11 @@ impl Workers {
                         else {state.health.ingestion[index].store(Utc::now().timestamp(),Ordering::Relaxed);}
                         tokio::select! {_=receiver.changed()=>break,_=tokio::time::sleep(Duration::from_secs(1))=>{}}
                     }
-                });
+                }, "ingestion", Some(index)));
             }
             let state = state.clone();
             let mut receiver = receiver;
-            tasks.spawn(async move {
+            tasks.spawn(crate::monitoring::worker(async move {
                 let mut refresh_at=std::time::Instant::now()-Duration::from_secs(61);
                 loop {
                     if *receiver.borrow() {break;}
@@ -94,10 +94,12 @@ impl Workers {
                         }
                         Ok::<_,crate::error::ApiError>(())
                     }.await;
-                    if result.is_err() {tracing::error!("Background recovery failed; retrying");}
+                    if let Err(error) = result {
+                        tracing::error!(code = error.code, "Background recovery failed; retrying");
+                    }
                     tokio::select! {_=receiver.changed()=>break,_=tokio::time::sleep(Duration::from_secs(10))=>{}}
                 }
-            });
+            }, "maintenance", None));
         }
         Self {
             stop,
