@@ -70,6 +70,7 @@ export const en = {
   'Subscription refreshed.': 'Subscription refreshed.',
   'Dismiss notification': 'Dismiss notification',
   Menu: 'Menu',
+  'Open source on GitHub': 'Open source on GitHub',
   'Terms of service': 'Terms of service',
   Terms: 'Terms',
   'Privacy policy': 'Privacy policy',

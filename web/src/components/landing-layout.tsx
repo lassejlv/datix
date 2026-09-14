@@ -80,6 +80,15 @@ export function LandingLayout({
                 <a href="/signin">{t('Sign in')}</a>
               </li>
               <li>
+                <a
+                  href="https://github.com/lassejlv/datix"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('Open source on GitHub')}
+                </a>
+              </li>
+              <li>
                 <a href="/terms">{t('Terms of service')}</a>
               </li>
               <li>

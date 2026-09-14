@@ -1,6 +1,7 @@
 {
   "name": "datix",
   "private": true,
+  "license": "MIT",
   "workspaces": [
     "web"
   ],

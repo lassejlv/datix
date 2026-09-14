@@ -84,6 +84,7 @@ export const da = {
   'Subscription refreshed.': 'Abonnement opdateret.',
   'Dismiss notification': 'Luk meddelelse',
   Menu: 'Menu',
+  'Open source on GitHub': 'Open source på GitHub',
   'Terms of service': 'Brugervilkår',
   Terms: 'Vilkår',
   'Privacy policy': 'Privatlivspolitik',

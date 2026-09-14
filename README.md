@@ -22,3 +22,9 @@ fallbacks are disabled; recipient acceptance is checked and provider errors are 
 
 See [AGENTS.md](AGENTS.md) for schema safety, commands, queue cutover, and deployment
 boundaries. No deployment or production data writes are part of this migration.
+
+## License
+
+Datix source code is available under the [MIT License](LICENSE). Third-party
+components retain their respective licenses. Use of the hosted Datix service is
+separately governed by its [Terms of Service](https://usedatix.com/terms).

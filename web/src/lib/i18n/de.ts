@@ -86,6 +86,7 @@ export const de = {
   'Subscription refreshed.': 'Abonnement aktualisiert.',
   'Dismiss notification': 'Benachrichtigung schließen',
   Menu: 'Menü',
+  'Open source on GitHub': 'Open Source auf GitHub',
   'Terms of service': 'Nutzungsbedingungen',
   Terms: 'Nutzungsbedingungen',
   'Privacy policy': 'Datenschutzerklärung',

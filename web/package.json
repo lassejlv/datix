@@ -1,6 +1,7 @@
 {
   "name": "@datix/web",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "bun --no-env-file scripts/dev.ts",
