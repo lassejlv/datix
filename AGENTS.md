@@ -57,19 +57,26 @@ data. No DuckDB, separate analytics store, or manual partitions.
   initialized from the original migrations, and catalog-compared with production.
   Never copy production rows into fixtures.
 - Runtime uses restricted pooled `DATABASE_URL`; direct owner
-  `DATABASE_URL_UNPOOLED` is only for explicit database tooling. Keep UTC,
+  `DATABASE_URL_UNPOOLED` is only for database tooling and Railway's pre-deploy
+  migration job; the container command removes it before executing the API. Keep UTC,
   bounded statement/lock timeouts, and Neon's connection budget.
 - `crates/db/schema/production.json` is a metadata-only format-2 catalog snapshot:
   columns, constraints, indexes, triggers, non-extension functions, Timescale
   dimensions, table/security settings, views, sequence definitions (not counters),
   policies, enum/domain types, and extension versions. Production/dev catalogs match.
-- The two SQL migrations are byte-for-byte originals. Preserve filenames,
+- The first two SQL migrations are byte-for-byte originals; forward expansions follow them. Preserve filenames,
   SHA-256 checksums, ledger `datix_schema_migrations`, and advisory transaction
   lock `791343524`. Never edit applied SQL, clear history, or add destructive downs.
 - Plan explicitly:
   `bun run db --env-file .local/rust.env --expect-host HOST --expect-database datix migrate`.
   Review target and pending SQL before adding `--apply`. No startup migrations.
-  Production writes remain disabled in the migration CLI until a separately requested cutover.
+  Production writes require `--allow-production` and the exact expected target.
+  Railway automatically runs `/app/datix-db --allow-production deploy` before
+  startup, using `MIGRATION_EXPECT_HOST` and `MIGRATION_EXPECT_DATABASE`.
+  This command uses embedded release migrations, checks that owner and restricted
+  runtime URLs target the same database, applies pending SQL under the existing
+  advisory lock, refreshes runtime grants, and verifies runtime invariants.
+  A failure blocks deployment. Never bypass checks or reset migration history.
 - `runtime-role [--apply]` refreshes minimal grants after new tables. Create the
   unprivileged login separately; reconnect after role-default changes.
   `snapshot --output PATH` reads metadata only.
@@ -117,9 +124,10 @@ data. No DuckDB, separate analytics store, or manual partitions.
 
 ## Workers and deployment
 
-Do not deploy without an explicit request. Use Unkey Compute, never Railway.
+Do not deploy without an explicit request. The user has requested Railway deployment
+and automatic pre-deploy migrations; `railway.json` configures this release flow.
 The root Dockerfile builds frontend assets and Rust separately; the runtime
-contains only the Rust server and static assets, running as a non-root user.
+contains the Rust server, migration binary, and static assets, running as a non-root user.
 
 - PostgreSQL `ingestion_receipts` is the durable analytics queue. Workers poll,
   reapply current tracking policy, and atomically commit analytics, usage outbox,
@@ -135,7 +143,8 @@ contains only the Rust server and static assets, running as a non-root user.
   Retention uses Timescale chunks plus bounded deletion batches and durable tombstones.
 - Readiness `/health/ready`, liveness `/api/health`. Honor `PORT`.
   Allow at least 90 seconds for graceful HTTP/worker transaction draining.
-  Never upload owner or legacy-source database credentials to the runtime.
+  Keep owner credentials confined to the pre-deploy job's use; the API command
+  must unset `DATABASE_URL_UNPOOLED`. Never upload legacy-source credentials.
 - Trust Cloudflare forwarding headers only with matching `x-analytics-origin-key`.
   Protect `/internal/metrics` with its bearer token.
   Preserve Polar webhook `/api/webhooks/polar`.
