@@ -145,12 +145,12 @@ contains the Rust server, migration binary, and static assets, running as a non-
   Allow at least 90 seconds for graceful HTTP/worker transaction draining.
   Keep owner credentials confined to the pre-deploy job's use; the API command
   must unset `DATABASE_URL_UNPOOLED`. Never upload legacy-source credentials.
-- Trust Cloudflare forwarding headers only with matching `x-analytics-origin-key`.
-  Worker `datix-origin-headers` on `usedatix.com/api/collect*` and
-  `/api/preferences` injects that key so the API can use `cf-connecting-ip`.
-  Country is resolved from that visitor IP with the bundled DB-IP country
-  database, not from Cloudflare country headers. Deploy the worker from
-  `cloudflare/origin-headers`.
+- Client IP (`http.rs` `client_ip`): `cf-connecting-ip` only with matching
+  `x-analytics-origin-key` (set by a Cloudflare request-header rule on all of
+  `usedatix.com`, value `CLOUDFLARE_ORIGIN_SECRET`); otherwise Railway's
+  `x-real-ip` only from edge peers in 100.0.0.0/8; otherwise the TCP peer.
+  Rate limits, abuse detection, and auth use this address. Country is resolved
+  from it with the bundled DB-IP database, not Cloudflare country headers.
   Protect `/internal/metrics` with its bearer token.
   Preserve Polar webhook `/api/webhooks/polar`.
 - Enable live external effects only after a verified, explicitly requested cutover.

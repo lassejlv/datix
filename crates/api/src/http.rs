@@ -10,7 +10,7 @@ use hmac::{Hmac, Mac};
 use serde::Serialize;
 use serde_json::{Value, json};
 use sha2::Sha256;
-use std::net::SocketAddr;
+use std::net::{IpAddr, SocketAddr};
 use subtle::ConstantTimeEq;
 use tower_http::services::{ServeDir, ServeFile};
 
@@ -129,6 +129,39 @@ async fn frontend_cache(request: Request, next: Next) -> Response {
 mod tests {
     use super::*;
     use tower::ServiceExt;
+
+    #[test]
+    fn client_ip_trusts_forwarding_headers_only_from_known_proxies() {
+        let headers = |pairs: &[(&'static str, &str)]| {
+            let mut map = axum::http::HeaderMap::new();
+            for (name, value) in pairs {
+                map.insert(*name, value.parse().unwrap());
+            }
+            map
+        };
+        let railway = Some("100.64.0.2".parse().unwrap());
+        let direct = Some("203.0.113.9".parse().unwrap());
+        let forwarded = headers(&[
+            ("cf-connecting-ip", "198.51.100.1"),
+            ("x-real-ip", "198.51.100.2"),
+        ]);
+        assert_eq!(client_ip(&forwarded, railway, true), "198.51.100.1");
+        assert_eq!(client_ip(&forwarded, railway, false), "198.51.100.2");
+        assert_eq!(client_ip(&forwarded, direct, false), "203.0.113.9");
+        assert_eq!(client_ip(&forwarded, direct, true), "198.51.100.1");
+        let invalid = headers(&[("cf-connecting-ip", "nope"), ("x-real-ip", "2001:db8::1")]);
+        assert_eq!(client_ip(&invalid, railway, true), "2001:db8::1");
+        assert_eq!(client_ip(&invalid, direct, true), "203.0.113.9");
+        assert_eq!(
+            client_ip(
+                &headers(&[]),
+                Some("::ffff:100.64.0.2".parse().unwrap()),
+                false
+            ),
+            "100.64.0.2"
+        );
+        assert_eq!(client_ip(&headers(&[]), None, false), "unknown");
+    }
 
     #[tokio::test]
     async fn frontend_fallback_returns_success_without_losing_javascript_mime() {
@@ -250,6 +283,29 @@ fn matches_secret(expected: &str, supplied: &str) -> bool {
     bool::from(expected.as_bytes().ct_eq(supplied.as_bytes()))
 }
 
+/// Visitor address for rate limits, abuse detection, and country lookup.
+/// `cf-connecting-ip` is trusted only with the Cloudflare origin key. Otherwise
+/// Railway's edge, which connects from 100.0.0.0/8 and overwrites `x-real-ip`,
+/// supplies the address; any other peer is used directly.
+fn client_ip(headers: &axum::http::HeaderMap, peer: Option<IpAddr>, trusted: bool) -> String {
+    let header = |name| {
+        headers
+            .get(name)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|v| v.trim().parse::<IpAddr>().ok())
+    };
+    let railway = peer.is_some_and(|ip| match ip.to_canonical() {
+        IpAddr::V4(ip) => ip.octets()[0] == 100,
+        IpAddr::V6(_) => false,
+    });
+    trusted
+        .then(|| header("cf-connecting-ip"))
+        .flatten()
+        .or_else(|| railway.then(|| header("x-real-ip")).flatten())
+        .or(peer)
+        .map_or_else(|| "unknown".into(), |ip| ip.to_canonical().to_string())
+}
+
 async fn security(State(state): State<AppState>, mut request: Request, next: Next) -> Response {
     let path = request.uri().path().to_owned();
     let api = path.starts_with("/api/");
@@ -288,18 +344,8 @@ async fn security(State(state): State<AppState>, mut request: Request, next: Nex
     let peer = request
         .extensions()
         .get::<ConnectInfo<SocketAddr>>()
-        .map(|ip| ip.0.ip().to_string())
-        .unwrap_or_else(|| "unknown".into());
-    let ip = if trusted {
-        request
-            .headers()
-            .get("cf-connecting-ip")
-            .and_then(|v| v.to_str().ok())
-            .unwrap_or(&peer)
-            .to_owned()
-    } else {
-        peer
-    };
+        .map(|ip| ip.0.ip());
+    let ip = client_ip(request.headers(), peer, trusted);
     let country = state.geo.country(&ip);
     request.extensions_mut().insert(Country(country));
     // Replace client-supplied internal headers before the auth crate sees them.
