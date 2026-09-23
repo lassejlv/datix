@@ -1313,6 +1313,13 @@ export const en = {
     '{count} extra credits · about {amount} billed at the end of the period',
   'Separate environments are available on Pro. Upgrade to add another environment.':
     'Separate environments are available on Pro. Upgrade to add another environment.',
+  'Estimate a month': 'Estimate a month',
+  'Other events': 'Other events',
+  'Within the Free allowance. {count} credits left.':
+    'Within the Free allowance. {count} credits left.',
+  'Included with Pro. {count} credits left.': 'Included with Pro. {count} credits left.',
+  '{count} credits beyond Pro, at {price} per 1,000.':
+    '{count} credits beyond Pro, at {price} per 1,000.',
 } as const;
 
 export type Copy = keyof typeof en;

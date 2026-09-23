@@ -1327,4 +1327,11 @@ export const da = {
     '{count} ekstra credits · ca. {amount} afregnes ved periodens udgang',
   'Separate environments are available on Pro. Upgrade to add another environment.':
     'Separate miljøer er inkluderet i Pro. Opgrader for at tilføje endnu et miljø.',
+  'Estimate a month': 'Skøn en måned',
+  'Other events': 'Andre hændelser',
+  'Within the Free allowance. {count} credits left.':
+    'Inden for Free-kvoten. {count} credits tilbage.',
+  'Included with Pro. {count} credits left.': 'Inkluderet i Pro. {count} credits tilbage.',
+  '{count} credits beyond Pro, at {price} per 1,000.':
+    '{count} credits over Pro, til {price} pr. 1.000.',
 } satisfies Record<Copy, string>;
