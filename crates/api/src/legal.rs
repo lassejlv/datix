@@ -8,7 +8,7 @@ use axum::{
     extract::{Path, Request, State},
     http::{StatusCode, header},
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post},
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -39,6 +39,7 @@ pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/api/dpa/download", get(template_download))
         .route("/api/legal/agreement", get(status).post(accept))
+        .route("/api/legal/terms", post(accept_terms))
         .route("/api/legal/agreement/{id}/download", get(receipt_download))
 }
 
@@ -93,10 +94,53 @@ impl AcceptanceInput {
     }
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct TermsInput {
+    dpa_version: String,
+    terms_version: String,
+    dpa_sha256: String,
+    terms_sha256: String,
+    accepted: bool,
+}
+
+impl TermsInput {
+    fn validate(&self) -> Result<(), ApiError> {
+        if !self.accepted {
+            return Err(ApiError::new(
+                StatusCode::BAD_REQUEST,
+                "terms_acceptance_required",
+                "Accept the Terms of Service to continue.",
+            ));
+        }
+        // The DPA is part of the Terms, so both snapshots must match what the user reviewed.
+        if self.dpa_version != VERSIONS.dpa_version
+            || self.terms_version != VERSIONS.terms_version
+            || self.dpa_sha256 != *DPA_HASH
+            || self.terms_sha256 != *TERMS_HASH
+        {
+            return Err(ApiError::new(
+                StatusCode::CONFLICT,
+                "agreement_changed",
+                "The agreement has changed. Reload and review the current documents before accepting.",
+            ));
+        }
+        Ok(())
+    }
+}
+
+/// When the owner accepted the current Terms, either directly or by signing the DPA.
+/// Signing the DPA is optional; the DPA applies through the Terms either way.
+async fn terms_accepted_at(
+    connection: &mut PgConnection,
+    owner: &str,
+) -> Result<Option<DateTime<Utc>>, ApiError> {
+    Ok(sqlx::query_scalar("SELECT min(accepted_at) FROM (SELECT accepted_at FROM terms_acceptances WHERE owner_id=$1 AND terms_version=$2 AND terms_sha256=$3 UNION ALL SELECT accepted_at FROM legal_acceptances WHERE owner_id=$1 AND terms_version=$2 AND terms_sha256=$3) accepted")
+        .bind(owner).bind(&VERSIONS.terms_version).bind(&*TERMS_HASH).fetch_one(connection).await?)
+}
+
 pub async fn has_accepted(connection: &mut PgConnection, owner: &str) -> Result<bool, ApiError> {
-    Ok(sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM legal_acceptances WHERE owner_id=$1 AND dpa_version=$2 AND terms_version=$3 AND dpa_sha256=$4 AND terms_sha256=$5)")
-        .bind(owner).bind(&VERSIONS.dpa_version).bind(&VERSIONS.terms_version)
-        .bind(&*DPA_HASH).bind(&*TERMS_HASH).fetch_one(connection).await?)
+    Ok(terms_accepted_at(connection, owner).await?.is_some())
 }
 
 pub async fn require(state: &AppState, owner: &str) -> Result<(), ApiError> {
@@ -104,7 +148,7 @@ pub async fn require(state: &AppState, owner: &str) -> Result<(), ApiError> {
         return Err(ApiError::new(
             StatusCode::FORBIDDEN,
             "agreement_required",
-            "Accept the Terms and Data Processing Agreement in your account before collecting or importing analytics.",
+            "Accept the Terms of Service in your account before collecting or importing analytics.",
         ));
     }
     Ok(())
@@ -137,7 +181,9 @@ async fn agreement_status(state: &AppState, owner: &str) -> Result<Value, ApiErr
             && entry["dpaSha256"] == *DPA_HASH
             && entry["termsSha256"] == *TERMS_HASH
     });
+    let terms = terms_accepted_at(&mut *state.pool.acquire().await?, owner).await?;
     Ok(json!({
+        "terms": {"accepted": terms.is_some(), "acceptedAt": terms},
         "current": {
             "dpaVersion": VERSIONS.dpa_version,
             "termsVersion": VERSIONS.terms_version,
@@ -173,6 +219,31 @@ async fn accept(
         .execute(&state.pool).await?;
     let result = agreement_status(&state, &owner.id).await?;
     if result["acceptance"].is_null() {
+        // A published version must not silently acquire different text.
+        return Err(ApiError::new(
+            StatusCode::CONFLICT,
+            "agreement_version_conflict",
+            "This agreement version has inconsistent text. Contact hello@usedatix.com.",
+        ));
+    }
+    Ok(Json(result))
+}
+
+async fn accept_terms(
+    State(state): State<AppState>,
+    Extension(owner): Extension<Owner>,
+    request: Request,
+) -> Result<Json<Value>, ApiError> {
+    let input: TermsInput = json_body(request).await?;
+    input.validate()?;
+    // Retries keep the original acceptance time and snapshot for this Terms version.
+    sqlx::query("INSERT INTO terms_acceptances(owner_id,account_email,terms_version,dpa_version,terms_sha256,dpa_sha256,terms_html,dpa_html) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(owner_id,terms_version) DO NOTHING")
+        .bind(&owner.id).bind(&owner.email)
+        .bind(&VERSIONS.terms_version).bind(&VERSIONS.dpa_version)
+        .bind(&*TERMS_HASH).bind(&*DPA_HASH).bind(TERMS).bind(DPA)
+        .execute(&state.pool).await?;
+    let result = agreement_status(&state, &owner.id).await?;
+    if result["terms"]["accepted"] != true {
         // A published version must not silently acquire different text.
         return Err(ApiError::new(
             StatusCode::CONFLICT,
@@ -292,5 +363,28 @@ mod tests {
         input.signer_name = "\n".into();
         assert!(input.validate().is_err());
         assert_eq!(escape("<script>\"&'"), "&lt;script&gt;&quot;&amp;&#39;");
+    }
+
+    #[test]
+    fn terms_acceptance_needs_explicit_consent_and_current_documents() {
+        let mut input = TermsInput {
+            dpa_version: VERSIONS.dpa_version.clone(),
+            terms_version: VERSIONS.terms_version.clone(),
+            dpa_sha256: DPA_HASH.clone(),
+            terms_sha256: TERMS_HASH.clone(),
+            accepted: true,
+        };
+        input.validate().unwrap();
+        input.accepted = false;
+        assert_eq!(
+            input.validate().unwrap_err().code,
+            "terms_acceptance_required"
+        );
+        input.accepted = true;
+        input.dpa_sha256 = "old".into();
+        assert_eq!(input.validate().unwrap_err().code, "agreement_changed");
+        input.dpa_sha256 = DPA_HASH.clone();
+        input.terms_version = "2026-01-01.1".into();
+        assert_eq!(input.validate().unwrap_err().code, "agreement_changed");
     }
 }

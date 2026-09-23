@@ -18,6 +18,12 @@ pub async fn verify(state: &AppState, owner: &str, email: &str, cookie: &str) ->
     let (code, _, result) = call(state, "GET", "/api/legal/agreement", Value::Null, cookie).await;
     assert_eq!(code, 200);
     assert!(result["acceptance"].is_null());
+    assert_eq!(result["terms"]["accepted"], false);
+    let mut terms = result["current"].clone();
+    terms["accepted"] = json!(false);
+    let (code, _, refused) = call(state, "POST", "/api/legal/terms", terms, cookie).await;
+    assert_eq!(code, 400);
+    assert_eq!(refused["error"]["code"], "terms_acceptance_required");
     let mut input = result["current"].clone();
     input["customerName"] = json!("Fixture <script>alert(1)</script> Ltd");
     input["customerRole"] = json!("processor");
@@ -62,6 +68,8 @@ pub async fn verify(state: &AppState, owner: &str, email: &str, cookie: &str) ->
     let (code, _, accepted) =
         call(state, "POST", "/api/legal/agreement", input.clone(), cookie).await;
     assert_eq!(code, 200, "{accepted}");
+    // Signing the optional DPA also accepts the current Terms.
+    assert_eq!(accepted["terms"]["accepted"], true);
     let receipt = &accepted["acceptance"];
     assert_eq!(receipt["signerEmail"], email);
     assert_eq!(receipt["customerRole"], "processor");

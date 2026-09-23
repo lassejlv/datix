@@ -27,11 +27,11 @@
     "/api/legal/agreement": {
       "get": {
         "operationId": "getAgreementStatus",
-        "summary": "Get current document versions and this account's acceptance history",
+        "summary": "Get current document versions, Terms acceptance, and signed DPA history",
         "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
         "responses": {
           "200": {
-            "description": "Current versions, matching acceptance or null, and recorded history",
+            "description": "Current versions, Terms acceptance, matching signed DPA or null, and signed history",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/AgreementStatus" } }
             }
@@ -42,8 +42,8 @@
       },
       "post": {
         "operationId": "acceptAgreement",
-        "summary": "Explicitly accept the current Terms and DPA for the identified customer",
-        "description": "Requires a verified session and application Origin. Versions and SHA-256 checksums must match the reviewed current documents. Signer email and timestamp are server-derived. Repeated acceptance preserves the original identity, timestamp and document snapshots. Acceptance grants no billing entitlement. Collection, telemetry, imports and new site configuration require a current acceptance.",
+        "summary": "Optionally sign the current DPA for the identified customer",
+        "description": "Optional: the DPA already applies through the Terms. Requires a verified session and application Origin. Versions and SHA-256 checksums must match the reviewed current documents. Signer email and timestamp are server-derived. Repeated signing preserves the original identity, timestamp and document snapshots. Signing also accepts the current Terms and grants no billing entitlement.",
         "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
         "requestBody": {
           "required": true,
@@ -88,6 +88,48 @@
           "400": {
             "description": "Invalid identity, unknown fields, or missing affirmative acceptance"
           },
+          "401": { "description": "Authentication required" },
+          "403": { "description": "Invalid origin, unverified email or suspended account" },
+          "409": {
+            "description": "Documents changed or a published version has inconsistent text"
+          },
+          "429": { "description": "Account rate limit exceeded" }
+        }
+      }
+    },
+    "/api/legal/terms": {
+      "post": {
+        "operationId": "acceptTerms",
+        "summary": "Accept the current Terms of Service, including the incorporated DPA",
+        "description": "Requires a verified session and application Origin. Versions and SHA-256 checksums of both documents must match the reviewed current documents, because the DPA forms part of the Terms. Email and timestamp are server-derived, and repeated acceptance preserves the original record. Collection, telemetry, imports and new site configuration require acceptance of the current Terms, directly or by signing the DPA.",
+        "security": [{ "SessionCookie": [] }, { "SecureSessionCookie": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["dpaVersion", "termsVersion", "dpaSha256", "termsSha256", "accepted"],
+                "properties": {
+                  "dpaVersion": { "type": "string" },
+                  "termsVersion": { "type": "string" },
+                  "dpaSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                  "termsSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                  "accepted": { "type": "boolean", "const": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Original or newly recorded Terms acceptance",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AgreementStatus" } }
+            }
+          },
+          "400": { "description": "Unknown fields or missing affirmative acceptance" },
           "401": { "description": "Authentication required" },
           "403": { "description": "Invalid origin, unverified email or suspended account" },
           "409": {
@@ -4735,10 +4777,20 @@
       },
       "AgreementStatus": {
         "type": "object",
-        "required": ["current", "acceptance", "history"],
+        "required": ["terms", "current", "acceptance", "history"],
         "properties": {
+          "terms": {
+            "type": "object",
+            "description": "Current Terms accepted, directly or by signing the DPA.",
+            "required": ["accepted", "acceptedAt"],
+            "properties": {
+              "accepted": { "type": "boolean" },
+              "acceptedAt": { "type": ["string", "null"], "format": "date-time" }
+            }
+          },
           "current": { "$ref": "#/components/schemas/AgreementVersion" },
           "acceptance": {
+            "description": "Optional signed DPA for the current versions, or null.",
             "anyOf": [{ "$ref": "#/components/schemas/AgreementReceipt" }, { "type": "null" }]
           },
           "history": {

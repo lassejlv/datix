@@ -5,7 +5,7 @@ import { useState, type FormEvent } from 'react';
 import { apiClient, errorText, write, type User } from '../lib/client';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { AgreementHistory } from './agreement';
+import { DataProcessingAgreement } from './agreement';
 
 export function AccountPage({
   user,
@@ -24,7 +24,7 @@ export function AccountPage({
       <p className="mt-2 text-sm text-secondary-ink">{t('Manage your profile and password.')}</p>
       <div className="mt-6">
         <AccountForm user={user} onUpdated={onUpdated} onDeleted={onDeleted} />
-        <AgreementHistory />
+        <DataProcessingAgreement user={user} />
       </div>
     </div>
   );

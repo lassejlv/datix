@@ -9,28 +9,33 @@ added to contract evidence. The contract record survives account deletion with a
 
 ## Acceptance and data access
 
-Email, Google and GitHub users enter the same agreement step after verified sign-in. Existing users
-are not silently enrolled. Signup explains the Terms and the following DPA step. Creating an
-account, opening a PDF, accepting visitor cookies or paying does not create a DPA acceptance.
-Users can manage/delete accounts and reach billing cancellation without accepting.
+The DPA forms part of the Terms. Email, Google and GitHub users accept the current Terms, and with
+them the DPA, in a one-checkbox step after verified sign-in (`POST /api/legal/terms`, stored in
+`terms_acceptances` with both document snapshots). Existing users are not silently enrolled.
+Signing the DPA in account settings (`POST /api/legal/agreement`, stored in `legal_acceptances`) is
+optional; it adds the customer's legal name, role and representative, provides a downloadable
+signed copy, and also counts as acceptance of the same Terms version. Creating an account, opening a
+PDF, accepting visitor cookies or paying does not create an acceptance. Users can manage/delete
+accounts and reach billing cancellation without accepting.
 
 The API rejects new site/configuration writes, imports, onboarding completion and checkout without
-the current acceptance. Tracker configuration disables collection, collectors reject before storing
-analytics or queuing diagnostics, and workers recheck acceptance. Usage reports `agreement_required`.
-Reading existing records and deletion do not require new agreement acceptance; ordinary account,
-subscription and ownership checks continue to apply. Acceptance never grants a subscription.
+acceptance of the current Terms version and checksum. Tracker configuration disables collection,
+collectors reject before storing analytics or queuing diagnostics, and workers recheck acceptance.
+Usage reports `agreement_required`. Reading existing records and deletion do not require new
+acceptance; ordinary account, subscription and ownership checks continue to apply. Acceptance never
+grants a subscription.
 
 Submitted versions and checksums must match the server and browser document build. Repeated acceptance
 is idempotent and cannot overwrite the original evidence. Always change the relevant version when
 changing published document bytes, including formatting. Never rewrite a previously accepted version.
 Notify affected customers before a material revision; plan the collection pause and new acceptance.
-The service currently requires both current versions, so changing either one requires acceptance.
-Separately signed contracts and corrections require owner handling; do not create a false self-service
-acceptance record or backdate acceptance to bypass the gate.
+Only a Terms version change pauses collection. Because the DPA is part of the Terms, publish material
+DPA changes together with a Terms version. Separately signed contracts and corrections require owner
+handling; do not create a false self-service acceptance record or backdate acceptance to bypass the gate.
 
 ## Database and deployment
 
-Migration `0002_legal_acceptances.sql` only adds a table. The original two migrations and production
+Migrations `0002_legal_acceptances.sql` and `0003_terms_acceptances.sql` only add tables. The original two migrations and production
 catalog snapshot remain unchanged. It must be applied with the existing reviewed migration CLI,
 followed by `runtime-role --apply`, before starting the new API. There are no startup migrations.
 Production migration and deployment require a separate explicit request under `AGENTS.md`.

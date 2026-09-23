@@ -387,11 +387,11 @@ export function AuthScreen({
               </p>
               {signup && (
                 <p lang="en" className="mt-5 text-center text-xs leading-5 text-secondary-ink">
-                  After verifying your account, confirm your customer details and accept the{' '}
+                  The Terms include our{' '}
                   <a className="underline" href="/dpa" target="_blank" rel="noopener">
                     DPA
-                  </a>{' '}
-                  before collecting analytics. See our{' '}
+                  </a>
+                  . You can sign a copy naming your organization later in account settings. See our{' '}
                   <a className="underline" href="/privacy" target="_blank" rel="noopener">
                     Privacy Policy
                   </a>

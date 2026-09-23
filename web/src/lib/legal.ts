@@ -15,10 +15,16 @@ export type AgreementReceipt = AgreementVersion & {
 };
 
 export type AgreementStatus = {
+  /** Current Terms accepted, directly or by signing the DPA. This alone unlocks collection. */
+  terms: { accepted: boolean; acceptedAt: string | null };
   current: AgreementVersion;
+  /** Optional signed DPA for the current versions. */
   acceptance: AgreementReceipt | null;
   history: AgreementReceipt[];
 };
+
+/** Tells the agreement gate to reload after a signature elsewhere also accepted the Terms. */
+export const agreementChanged = 'datix:agreement-changed';
 
 async function digest(text: string) {
   const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
