@@ -14,6 +14,7 @@ import {
 } from '../lib/billing-plans';
 import { useSitePreferences } from './site-preferences';
 import { useState } from 'react';
+import { PricingCalculator } from './pricing-calculator';
 import { ArrowRight, Check, ChevronDown } from './ui/icons';
 
 const pricingQuestions = [
@@ -147,6 +148,7 @@ export function PricingSection() {
         <p className="pricing-currency-note">
           {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
         </p>
+        <PricingCalculator />
       </div>
       <section className="pricing-event-note" aria-labelledby="usage-guide-title">
         <h2 id="usage-guide-title">{t('How credits are counted')}</h2>

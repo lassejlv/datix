@@ -1342,4 +1342,11 @@ export const de = {
     '{count} zusätzliche Credits · etwa {amount} werden am Ende des Zeitraums abgerechnet',
   'Separate environments are available on Pro. Upgrade to add another environment.':
     'Getrennte Umgebungen sind in Pro enthalten. Upgrade, um eine weitere Umgebung hinzuzufügen.',
+  'Estimate a month': 'Einen Monat abschätzen',
+  'Other events': 'Andere Ereignisse',
+  'Within the Free allowance. {count} credits left.':
+    'Innerhalb des Free-Kontingents. Noch {count} Credits.',
+  'Included with Pro. {count} credits left.': 'In Pro enthalten. Noch {count} Credits.',
+  '{count} credits beyond Pro, at {price} per 1,000.':
+    '{count} Credits über Pro, zu {price} pro 1.000.',
 } satisfies Record<Copy, string>;
