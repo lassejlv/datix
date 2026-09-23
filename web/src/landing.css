@@ -699,10 +699,11 @@
   align-items: stretch;
 }
 .pricing-two-plans {
+  --pricing-rule: color-mix(in srgb, var(--landing-ink) 18%, var(--landing-canvas));
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   overflow: hidden;
-  border: 1px solid var(--landing-line);
+  border: 1px solid var(--pricing-rule);
   border-radius: 12px;
   background: var(--landing-canvas);
 }
@@ -721,7 +722,7 @@
   background: transparent;
 }
 .pricing-two-plans .pricing-card + .pricing-card {
-  border-left: 1px solid var(--landing-line);
+  border-left: 1px solid var(--pricing-rule);
 }
 .pricing-two-plans .pricing-card-pro {
   background: var(--landing-wash);
@@ -1243,7 +1244,7 @@
   }
   .pricing-two-plans .pricing-card + .pricing-card {
     border-left: 0;
-    border-top: 1px solid var(--landing-line);
+    border-top: 1px solid var(--pricing-rule);
   }
   .pricing-plan-kicker-spacer {
     display: none;
