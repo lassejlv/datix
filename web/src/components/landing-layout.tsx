@@ -50,7 +50,7 @@ export function LandingLayout({
               {t('Sign in')}
             </a>
             <a className="landing-button landing-nav-cta" href="/signup">
-              {t('Start 14-day trial')}
+              {t('Start for free')}
             </a>
           </div>
           <MobileNavigation pricing={pricing} />

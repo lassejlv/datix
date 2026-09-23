@@ -363,7 +363,15 @@
                         },
                         "eventLimit": {
                           "type": ["number", "null"],
-                          "description": "Customer-specific Polar grant allowance; null means unlimited."
+                          "description": "Credits after which collection pauses; null means no cap, including plans that bill overage."
+                        },
+                        "includedEvents": {
+                          "type": ["number", "null"],
+                          "description": "Credits included in the current period from the Polar grant."
+                        },
+                        "overageUnitAmount": {
+                          "type": ["string", "null"],
+                          "description": "Metered price per credit in cents for usage beyond the included credits; null when the plan pauses at its limit."
                         },
                         "websiteLimit": {
                           "type": ["integer", "null"],

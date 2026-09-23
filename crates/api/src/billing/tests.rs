@@ -36,20 +36,24 @@ fn signed(id: &str, body: &[u8], timestamp: i64) -> HeaderMap {
     headers
 }
 
-fn customer(catalog: &Catalog, owner: &str) -> Value {
-    let plan = &catalog.plans[0];
+fn plan<'a>(catalog: &'a Catalog, id: &str) -> &'a catalog::Plan {
+    catalog.plans.iter().find(|plan| plan.id == id).unwrap()
+}
+
+fn customer(catalog: &Catalog, owner: &str, plan: &str) -> Value {
+    let plan = self::plan(catalog, plan);
     json!({"id":Uuid::new_v4(),"external_id":owner,"organization_id":catalog.organization_id,"deleted_at":null,
         "active_subscriptions":[{"id":Uuid::new_v4(),"product_id":plan.product_id,"status":"trialing","currency":catalog.currency,"recurring_interval":plan.interval,
             "current_period_start":Utc::now()-Duration::days(1),"current_period_end":Utc::now()+Duration::days(29),"trial_end":Utc::now()+Duration::days(6),"ends_at":null,"cancel_at_period_end":false}],
         "granted_benefits":[{"benefit_id":catalog.analytics_benefit_id,"benefit_type":"custom","properties":{}},
-            {"benefit_id":catalog.websites_benefit_id,"benefit_type":"custom","benefit_metadata":{"included":3},"properties":{}},
+            {"benefit_id":plan.websites_benefit_id,"benefit_type":"custom","benefit_metadata":{"included":3},"properties":{}},
             {"benefit_id":plan.events_benefit_id,"benefit_type":"meter_credit","properties":{}}]})
 }
 
 #[test]
 fn entitlements_require_matching_catalog_grants_and_safe_integer_credits() {
     let catalog = Catalog::load(None, false).unwrap();
-    let fixture = customer(&catalog, "fixture");
+    let fixture = customer(&catalog, "fixture", "free");
     let read = |value: Value| {
         operations::subscriptions(
             &serde_json::from_value::<Customer>(value).unwrap(),
@@ -60,7 +64,7 @@ fn entitlements_require_matching_catalog_grants_and_safe_integer_credits() {
     };
     assert_eq!(
         read(fixture.clone())[0]["entitlements"]["eventLimit"],
-        catalog.plans[0].events * 100
+        plan(&catalog, "free").events * 100
     );
     let mut value = fixture.clone();
     value["granted_benefits"][2]["properties"] =
@@ -104,12 +108,50 @@ fn entitlements_require_matching_catalog_grants_and_safe_integer_credits() {
     }
 }
 
+#[test]
+fn overage_plans_are_uncapped_and_legacy_plans_still_grant_access() {
+    let catalog = Catalog::load(None, false).unwrap();
+    let read = |value: Value| {
+        operations::subscriptions(
+            &serde_json::from_value::<Customer>(value).unwrap(),
+            &catalog,
+            Utc::now(),
+        )
+        .unwrap()
+    };
+    let pro = read(customer(&catalog, "fixture", "pro"));
+    let entitlements = &pro[0]["entitlements"];
+    assert_eq!(entitlements["eventLimit"], Value::Null);
+    assert_eq!(entitlements["remaining"], Value::Null);
+    assert_eq!(entitlements["includedEvents"], 50_000 * 100);
+    assert_eq!(entitlements["overageUnitAmount"], "0.004");
+    let free = read(customer(&catalog, "fixture", "free"));
+    assert_eq!(free[0]["entitlements"]["remaining"], 15_000 * 100);
+    assert_eq!(free[0]["entitlements"]["overageUnitAmount"], Value::Null);
+    let legacy = read(customer(&catalog, "fixture", "legacy_ultra"));
+    assert_eq!(legacy[0]["entitlements"]["eventLimit"], 5_000_000 * 100);
+    // A benefit from another plan must not stand in for the plan's own website grant.
+    let mut mismatched = customer(&catalog, "fixture", "free");
+    mismatched["granted_benefits"][1]["benefit_id"] =
+        json!(plan(&catalog, "pro").websites_benefit_id);
+    assert!(read(mismatched).is_empty());
+    assert!(
+        catalog
+            .plans
+            .iter()
+            .filter(|p| !p.legacy)
+            .all(|p| p.interval == "month")
+    );
+    assert!(plan(&catalog, "free").free() && !plan(&catalog, "pro").free());
+}
+
 #[derive(Clone)]
 struct Mock(Arc<Mutex<MockData>>);
 struct MockData {
     customer: Value,
     checkout: Value,
     statuses: Vec<Value>,
+    created: Value,
     response: Value,
     fail_state: bool,
     requests: Vec<(String, Value)>,
@@ -131,8 +173,14 @@ async fn provider_call(State(mock): State<Mock>, request: Request) -> Response {
             return (StatusCode::BAD_GATEWAY, "private-provider-details").into_response();
         }
         data.customer.clone()
+    } else if path == "/v1/subscriptions/" && method == axum::http::Method::POST {
+        data.created.clone()
     } else if path == "/v1/subscriptions/" {
         json!({"items":data.statuses,"pagination":{"max_page":1}})
+    } else if path.starts_with("/v1/subscriptions/") && method == axum::http::Method::DELETE {
+        let mut revoked = data.created.clone();
+        revoked["status"] = json!("canceled");
+        revoked
     } else if path == "/v1/customer-sessions/" {
         json!({"customer_id":data.customer["id"],"customer_portal_url":"https://polar.example.test/portal"})
     } else if path.starts_with("/v1/checkouts/") {
@@ -184,13 +232,17 @@ async fn billing_replays_checkout_cancellation_and_outbox_recovery() {
     let owner = format!("rust-billing-{}", Uuid::new_v4());
     let mut catalog = Catalog::load(None, false).unwrap();
     catalog.organization_id = Uuid::new_v4();
-    let fixture = customer(&catalog, &owner);
+    let fixture = customer(&catalog, &owner, "pro");
+    let pro = plan(&catalog, "pro").clone();
+    let free = plan(&catalog, "free").clone();
+    let free_subscription = json!({"id":Uuid::new_v4(),"product_id":free.product_id,"customer_id":fixture["id"],"status":"active","cancel_at_period_end":false});
     let mock = Mock(Arc::new(Mutex::new(MockData {
-        checkout: json!({"id":Uuid::new_v4(),"product_id":catalog.plans[0].product_id,"customer_id":fixture["id"],"currency":"usd","url":"https://polar.example.test/checkout","status":"open","expires_at":Utc::now()+Duration::hours(1)}),
+        checkout: json!({"id":Uuid::new_v4(),"product_id":pro.product_id,"customer_id":fixture["id"],"currency":"usd","url":"https://polar.example.test/checkout","status":"open","expires_at":Utc::now()+Duration::hours(1)}),
         customer: fixture.clone(),
         statuses: vec![
-            json!({"customer_id":fixture["id"],"status":"trialing","cancel_at_period_end":false}),
+            json!({"id":Uuid::new_v4(),"product_id":pro.product_id,"customer_id":fixture["id"],"status":"trialing","cancel_at_period_end":false}),
         ],
+        created: free_subscription.clone(),
         response: json!({"inserted":1}),
         fail_state: false,
         requests: vec![],
@@ -217,18 +269,15 @@ async fn billing_replays_checkout_cancellation_and_outbox_recovery() {
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(
-        active.entitlement.event_limit,
-        Some(billing.catalog.plans[0].events * 100)
-    );
+    assert_eq!(active.entitlement.event_limit, None);
+    assert_eq!(active.entitlement.included_events, Some(pro.events * 100));
     assert!(active.entitlement.period_end < Utc::now() + Duration::days(7));
     drop(connection);
     assert_eq!(
         billing.ensure_deletable(&owner).await.unwrap_err().code,
         "cancel_subscription_first"
     );
-    let selection =
-        json!({"events":billing.catalog.plans[0].events,"interval":"month","locale":"da"});
+    let selection = json!({"events":pro.events,"interval":"month","locale":"da"});
     assert_eq!(
         billing.checkout(&owner, selection.clone()).await.unwrap()["url"],
         "https://polar.example.test/portal"
@@ -263,18 +312,62 @@ async fn billing_replays_checkout_cancellation_and_outbox_recovery() {
             requests[0].1["success_url"],
             "http://localhost:3000/dashboard?checkout_id={CHECKOUT_ID}"
         );
+        assert!(requests[0].1.get("subscription_id").is_none());
     }
+    // Free starts without checkout; a later paid selection upgrades that subscription.
+    let started = billing
+        .checkout(&owner, json!({"events":free.events,"interval":"month"}))
+        .await
+        .unwrap();
+    assert_eq!(
+        started["url"],
+        format!(
+            "http://localhost:3000/dashboard?checkout_id={}",
+            free_subscription["id"].as_str().unwrap()
+        )
+    );
+    mock.0.lock().unwrap().statuses = vec![free_subscription.clone()];
     assert_eq!(
         billing
-            .checkout(
-                &owner,
-                json!({"events":billing.catalog.plans[0].events,"interval":"year"})
-            )
+            .checkout(&owner, json!({"events":free.events,"interval":"month"}))
             .await
-            .unwrap_err()
-            .code,
-        "plan_unavailable"
+            .unwrap()["url"],
+        "https://polar.example.test/portal"
     );
+    billing.checkout(&owner, selection.clone()).await.unwrap();
+    {
+        let data = mock.0.lock().unwrap();
+        let created = data
+            .requests
+            .iter()
+            .filter(|(path, _)| path == "POST /v1/subscriptions/")
+            .collect::<Vec<_>>();
+        assert_eq!(created.len(), 1);
+        assert_eq!(created[0].1["product_id"], json!(free.product_id));
+        let checkouts = data
+            .requests
+            .iter()
+            .filter(|(path, _)| path == "POST /v1/checkouts/")
+            .collect::<Vec<_>>();
+        assert_eq!(checkouts.len(), 2);
+        assert_eq!(checkouts[1].1["subscription_id"], free_subscription["id"]);
+    }
+    billing.ensure_deletable(&owner).await.unwrap();
+    assert!(mock.0.lock().unwrap().requests.iter().any(|(path, _)| path
+        == &format!(
+            "DELETE /v1/subscriptions/{}",
+            free_subscription["id"].as_str().unwrap()
+        )));
+    mock.0.lock().unwrap().statuses.clear();
+    for legacy in [
+        json!({"events":500000,"interval":"month"}),
+        json!({"events":pro.events,"interval":"year"}),
+    ] {
+        assert_eq!(
+            billing.checkout(&owner, legacy).await.unwrap_err().code,
+            "invalid_request"
+        );
+    }
     mock.0.lock().unwrap().fail_state = true;
     assert_eq!(
         billing.sync(&owner).await.err().unwrap().code,

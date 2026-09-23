@@ -1,6 +1,9 @@
 use super::{
-    catalog::Catalog,
-    provider::{Checkout, Customer, CustomerSession, Provider, redirect_url, verify_customer},
+    catalog::{Catalog, Plan},
+    provider::{
+        Checkout, Customer, CustomerSession, Provider, SubscriptionStatus, redirect_url,
+        verify_customer,
+    },
     unconfigured,
 };
 use crate::{config::Config, error::ApiError};
@@ -109,11 +112,12 @@ impl Billing {
         Ok(result.rows_affected() > 0)
     }
 
-    async fn has_subscription(
+    /// Subscriptions that have not ended, including ones canceling at period end.
+    async fn live_subscriptions(
         &self,
         customer: Uuid,
-        include_canceling: bool,
-    ) -> Result<bool, ApiError> {
+    ) -> Result<Vec<SubscriptionStatus>, ApiError> {
+        let mut live = Vec::new();
         for page in 1..=100 {
             let result = self
                 .client()?
@@ -126,16 +130,22 @@ impl Billing {
                 if !matches!(
                     row.status.as_str(),
                     "canceled" | "unpaid" | "incomplete_expired"
-                ) && (include_canceling || !row.cancel_at_period_end)
-                {
-                    return Ok(true);
+                ) {
+                    live.push(row);
                 }
             }
             if page >= result.pagination.max_page {
-                return Ok(false);
+                return Ok(live);
             }
         }
         Err(ApiError::unavailable())
+    }
+
+    fn free_product(&self, product: Uuid) -> bool {
+        self.catalog
+            .plans
+            .iter()
+            .any(|plan| plan.product_id == product && plan.free())
     }
 
     async fn portal_for(&self, customer: Uuid) -> Result<Value, ApiError> {
@@ -205,7 +215,7 @@ impl Billing {
             .catalog
             .plans
             .iter()
-            .find(|p| p.events == selection.events && p.interval == selection.interval)
+            .find(|p| !p.legacy && p.events == selection.events && p.interval == selection.interval)
             .ok_or_else(|| {
                 ApiError::new(
                     StatusCode::BAD_REQUEST,
@@ -213,23 +223,29 @@ impl Billing {
                     "Select an available plan.",
                 )
             })?;
-        if !plan.checkout_enabled {
-            return Err(ApiError::new(
-                StatusCode::CONFLICT,
-                "plan_unavailable",
-                "Yearly billing is not available yet. Choose a monthly plan.",
-            ));
-        }
         *stage = "configuration";
         let client = self.client()?;
         *stage = "customer_sync";
         let mut customer = self.sync(owner).await?;
         *stage = "subscription_check";
-        if let Some(customer) = &customer
-            && self.has_subscription(customer.id, true).await?
-        {
-            *stage = "portal_redirect";
-            return self.portal_for(customer.id).await;
+        // A free subscription is upgraded in place; any other plan change uses the portal.
+        let mut upgrade = None;
+        if let Some(customer) = &customer {
+            let live = self.live_subscriptions(customer.id).await?;
+            match live.as_slice() {
+                [] => {}
+                [current]
+                    if !plan.free()
+                        && self.free_product(current.product_id)
+                        && !current.cancel_at_period_end =>
+                {
+                    upgrade = Some(current.id);
+                }
+                _ => {
+                    *stage = "portal_redirect";
+                    return self.portal_for(customer.id).await;
+                }
+            }
         }
         *stage = "database_begin";
         let mut tx = self.pool.begin().await?;
@@ -240,7 +256,18 @@ impl Billing {
                 .fetch_optional(&mut *tx)
                 .await?
                 .ok_or_else(ApiError::unavailable)?;
-        let options = json!({"locale":locale,"currency":self.catalog.currency});
+        if plan.free() {
+            *stage = "free_subscription";
+            return self
+                .start_free(tx, owner, plan, customer, &name, &email, locale)
+                .await;
+        }
+        let options = match upgrade {
+            Some(id) => {
+                json!({"locale":locale,"currency":self.catalog.currency,"subscription_id":id})
+            }
+            None => json!({"locale":locale,"currency":self.catalog.currency}),
+        };
         *stage = "cache_read";
         let cached:Option<String>=sqlx::query_scalar("SELECT checkout_id FROM billing_checkouts WHERE owner_id=$1 AND provider='polar' AND organization_id=$2 AND plan_id=$3 AND checkout_options=$4 AND created_at>now()-interval '10 minutes'")
             .bind(owner).bind(self.organization_id()).bind(plan.product_id.to_string()).bind(&options).fetch_optional(&mut *tx).await?;
@@ -266,9 +293,13 @@ impl Billing {
         }
         let customer = customer.ok_or_else(ApiError::unavailable)?;
         *stage = "checkout_create";
-        let checkout:Checkout=client.create("checkouts",json!({"products":[plan.product_id],"customer_id":customer.id,"external_customer_id":owner,
-            "currency":self.catalog.currency,"locale":locale,"allow_trial":plan.trial_days>0,
-            "success_url":format!("{}/dashboard?checkout_id={{CHECKOUT_ID}}",self.app_url),"return_url":format!("{}/dashboard",self.app_url)})).await?;
+        let mut body = json!({"products":[plan.product_id],"customer_id":customer.id,"external_customer_id":owner,
+            "currency":self.catalog.currency,"locale":locale,"allow_trial":false,
+            "success_url":format!("{}/dashboard?checkout_id={{CHECKOUT_ID}}",self.app_url),"return_url":format!("{}/dashboard",self.app_url)});
+        if let Some(id) = upgrade {
+            body["subscription_id"] = json!(id);
+        }
+        let checkout: Checkout = client.create("checkouts", body).await?;
         *stage = "checkout_validate";
         if checkout.product_id != Some(plan.product_id)
             || checkout.customer_id != Some(customer.id)
@@ -285,6 +316,53 @@ impl Billing {
         Ok(json!({"url":url}))
     }
 
+    /// Free plans need no payment, so they start without a Polar checkout. The caller
+    /// holds the owner lock, which serializes repeated selections.
+    #[allow(clippy::too_many_arguments)]
+    async fn start_free(
+        &self,
+        mut tx: sqlx::Transaction<'_, sqlx::Postgres>,
+        owner: &str,
+        plan: &Plan,
+        customer: Option<Customer>,
+        name: &str,
+        email: &str,
+        locale: &str,
+    ) -> Result<Value, ApiError> {
+        let client = self.client()?;
+        let customer = match customer {
+            Some(customer) => {
+                if !self.live_subscriptions(customer.id).await?.is_empty() {
+                    return self.portal_for(customer.id).await;
+                }
+                customer
+            }
+            None => {
+                client
+                    .create_customer(&self.catalog, owner, name, email, locale)
+                    .await?
+            }
+        };
+        let created: SubscriptionStatus = client
+            .create(
+                "subscriptions",
+                json!({"product_id":plan.product_id,"customer_id":customer.id}),
+            )
+            .await?;
+        if created.product_id != plan.product_id || created.customer_id != customer.id {
+            return Err(ApiError::unavailable());
+        }
+        let at = Utc::now();
+        let state = client.customer_state(owner).await?;
+        if let Some(state) = &state {
+            verify_customer(state, owner, &self.catalog)?;
+        }
+        self.save(&mut tx, owner, state.as_ref(), at).await?;
+        tx.commit().await?;
+        // The dashboard syncs on `checkout_id` returns, covering delayed benefit grants.
+        Ok(json!({"url":format!("{}/dashboard?checkout_id={}",self.app_url,created.id)}))
+    }
+
     pub(crate) async fn ensure_deletable(&self, owner: &str) -> Result<(), ApiError> {
         if !self.enabled {
             return if self.has_customer(owner).await? {
@@ -293,14 +371,26 @@ impl Billing {
                 Ok(())
             };
         }
-        if let Some(customer) = self.sync(owner).await?
-            && self.has_subscription(customer.id, false).await?
+        let Some(customer) = self.sync(owner).await? else {
+            return Ok(());
+        };
+        let live = self.live_subscriptions(customer.id).await?;
+        if live
+            .iter()
+            .any(|row| !row.cancel_at_period_end && !self.free_product(row.product_id))
         {
             return Err(ApiError::new(
                 StatusCode::CONFLICT,
                 "cancel_subscription_first",
                 "Cancel your subscription in Usage → Manage billing before deleting your account.",
             ));
+        }
+        // Free subscriptions carry no charges, so account deletion ends them directly.
+        for row in live.iter().filter(|row| self.free_product(row.product_id)) {
+            let revoked = self.client()?.revoke(row.id).await?;
+            if revoked.id != row.id || revoked.customer_id != customer.id {
+                return Err(ApiError::unavailable());
+            }
         }
         Ok(())
     }
@@ -342,14 +432,9 @@ pub(super) fn subscriptions(
             .iter()
             .find(|g| g.benefit_id == id && g.benefit_type == kind)
     };
-    let websites = grant(catalog.websites_benefit_id, "custom")
-        .and_then(|g| g.benefit_metadata.as_ref())
-        .and_then(|m| integer(&m["included"], 1));
-    let Some(websites) =
-        websites.filter(|_| grant(catalog.analytics_benefit_id, "custom").is_some())
-    else {
+    if grant(catalog.analytics_benefit_id, "custom").is_none() {
         return Ok(Vec::new());
-    };
+    }
     let mut result = Vec::new();
     for row in rows {
         let Some(plan) = catalog
@@ -359,13 +444,18 @@ pub(super) fn subscriptions(
         else {
             continue;
         };
-        if !plan.checkout_enabled
-            || row.currency != catalog.currency
+        if row.currency != catalog.currency
             || row.recurring_interval != plan.interval
             || !matches!(row.status.as_str(), "active" | "trialing")
         {
             continue;
         }
+        let Some(websites) = grant(plan.websites_benefit_id, "custom")
+            .and_then(|g| g.benefit_metadata.as_ref())
+            .and_then(|m| integer(&m["included"], 1))
+        else {
+            continue;
+        };
         let Some(properties) = grant(plan.events_benefit_id, "meter_credit")
             .and_then(|g| g.properties.as_ref())
             .and_then(Value::as_object)
@@ -394,8 +484,10 @@ pub(super) fn subscriptions(
         {
             continue;
         }
+        // Overage is billed by Polar's metered price, so those plans have no local cap.
+        let cap = plan.overage_unit_amount.is_none().then_some(limit);
         result.push(json!({"id":row.id,"productId":row.product_id,"status":row.status,"currentPeriodStart":row.current_period_start,"currentPeriodEnd":row.current_period_end,"trialEnd":row.trial_end,"endsAt":row.ends_at,"cancelAtPeriodEnd":row.cancel_at_period_end,
-            "entitlements":{"name":plan.name,"eventLimit":limit,"websiteLimit":websites,"used":0,"remaining":limit,"localBaseline":0,"pending":0,"periodStart":row.current_period_start,"periodEnd":row.current_period_end}}));
+            "entitlements":{"name":plan.name,"eventLimit":cap,"includedEvents":limit,"overageUnitAmount":plan.overage_unit_amount,"websiteLimit":websites,"used":0,"remaining":cap,"localBaseline":0,"pending":0,"periodStart":row.current_period_start,"periodEnd":row.current_period_end}}));
     }
     Ok(result)
 }

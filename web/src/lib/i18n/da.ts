@@ -29,12 +29,8 @@ export const da = {
   'Checking your subscription…': 'Tjekker dit abonnement…',
   'Choose a plan to continue': 'Vælg en plan for at fortsætte',
   'Choose a plan to continue.': 'Vælg en plan for at fortsætte.',
-  'An active subscription or trial is required to use your workspace.':
-    'Du skal have et aktivt abonnement eller en aktiv prøveperiode for at bruge dit arbejdsområde.',
   'Install the script on {domain}, then choose your plan.':
     'Installer scriptet på {domain}, og vælg derefter din plan.',
-  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
-    'Sporingen starter, når dit abonnement eller din prøveperiode er aktiv. Du kan tjekke installationen bagefter.',
   'Continue to plans': 'Fortsæt til planer',
   'Add your website before choosing a plan.': 'Tilføj dit website, før du vælger en plan.',
   'Hourly traffic chart. Use left and right arrow keys to inspect each hour.':
@@ -120,10 +116,7 @@ export const da = {
   'Every plan includes every report and every feature. Pick the one that matches your traffic.':
     'Alle planer inkluderer alle rapporter og alle funktioner. Vælg den, der passer til din trafik.',
   'For a personal site or a side project.': 'Til en personlig hjemmeside eller et sideprojekt.',
-  'For a growing product with steady traffic.': 'Til et voksende produkt med stabil trafik.',
-  'For high-traffic sites and agencies.': 'Til hjemmesider med meget trafik og til bureauer.',
   '{count} credits per month': '{count} credits om måneden',
-  'Includes a 14-day free trial': 'Inkluderer 14 dages gratis prøveperiode',
   'Frequently asked questions': 'Ofte stillede spørgsmål',
   'Most popular': 'Mest populær',
   'Monthly credits': 'Månedlige credits',
@@ -133,25 +126,14 @@ export const da = {
   'Choose by traffic, not features.': 'Vælg efter trafik, ikke funktioner.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'En sidevisning i produktion bruger 1 credit. Klik og andre hændelser bruger 0,5 credits.',
-  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
-    'Basic dækker 15.000 sidevisninger eller 12.000 sidevisninger + 6.000 andre hændelser om måneden.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'På localhost: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Aktiv tid er gratis.',
   'Do I need Pro to get all the reports?': 'Skal jeg have Pro for at få alle rapporter?',
-  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
-    'Nej. Alle planer inkluderer de samme rapporter og sporingsfunktioner. Vælg Basic, Pro eller Ultra efter din forventede trafik.',
   'Can I use one plan for several websites?': 'Kan jeg bruge én plan til flere hjemmesider?',
-  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
-    'Ja. Alle planer inkluderer op til 10 hjemmesider. Dine månedlige credits deles mellem dem, så beregn din samlede trafik, når du vælger plan.',
-  'Which plan includes the free trial?': 'Hvilken plan har en gratis prøveperiode?',
-  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
-    'Basic inkluderer en gratis prøveperiode på 14 dage. Du kan udforske rapporterne med trafik fra din egen hjemmeside, før du vælger en betalt plan.',
   'Does testing use my credits?': 'Bruger test mine credits?',
   'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
     'Trafik fra localhost har en lavere sats: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Separate miljøer holder testaktivitet ude af dine produktionsrapporter.',
   'Start with your own traffic.': 'Start med din egen trafik.',
-  'Yearly billing is not available yet. Choose a monthly plan.':
-    'Årlig betaling er ikke tilgængelig endnu. Vælg en månedsplan.',
   Goals: 'Mål',
   'Error Tracking': 'Fejlsporing',
   'Web Vitals': 'Web Vitals',
@@ -404,7 +386,6 @@ export const da = {
   Billing: 'Betaling',
   'Billing customer could not be verified.': 'Faktureringskunden kunne ikke bekræftes.',
   'Billing is temporarily unavailable.': 'Betaling er midlertidigt utilgængelig.',
-  'Billing period': 'Betalingsperiode',
   'blocked requests': 'blokerede anmodninger',
   'Bright Cat': 'Kvik Kat',
   'Bright Fish': 'Kvik Fisk',
@@ -719,7 +700,6 @@ export const da = {
   'Invalid tracking mode.': 'Ugyldig sporingstilstand.',
   'Invalid visitor or session identifier.': 'Ugyldig besøgs- eller sessionsidentifikator.',
   'Is there a free plan?': 'Er der en gratis plan?',
-  'Is there a free trial?': 'Er der en gratis prøveperiode?',
   'It may have been removed, or you may not have access to it.':
     'Det kan være fjernet, eller du har muligvis ikke adgang til det.',
   'Keep development and production traffic apart.':
@@ -773,7 +753,6 @@ export const da = {
   'Meet your visitors': 'Lær dine besøgende at kende',
   Mobile: 'Mobil',
   month: 'måned',
-  Monthly: 'Månedligt',
   'Monthly billing. No free trial.': 'Månedlig betaling. Ingen gratis prøveperiode.',
   'Monthly events': 'Månedlige hændelser',
   'Monthly plan': 'Månedlig plan',
@@ -915,7 +894,6 @@ export const da = {
   'Review installation': 'Gennemgå installation',
   'Review this export before importing it.': 'Gennemgå eksporten, før du importerer den.',
   'Review your import': 'Gennemgå din import',
-  'Save 2 months': 'Spar 2 måneder',
   'Save 2 months with yearly billing.': 'Spar 2 måneder med årlig betaling.',
   'Save budget': 'Gem budget',
   'Save changes': 'Gem ændringer',
@@ -966,7 +944,6 @@ export const da = {
   'Spam protection': 'Spambeskyttelse',
   'Spent time on the page': 'Brugte tid på siden',
   Staging: 'Staging',
-  'Start 14-day trial': 'Start 14 dages prøveperiode',
   'Start a plan before opening billing.': 'Start en plan, før du åbner betaling.',
   'Start free. Choose the volume you need.':
     'Start gratis. Vælg det antal hændelser, du har brug for.',
@@ -1181,7 +1158,6 @@ export const da = {
   'Where is your data coming from?': 'Hvor kommer dine data fra?',
   'Workspace pages': 'Sider i arbejdsområdet',
   year: 'år',
-  Yearly: 'Årligt',
   'Yearly billing is coming soon. Save 2 months when it arrives.':
     'Årlig betaling kommer snart. Spar 2 måneder, når den er klar.',
   'Yearly billing is not available yet. Choose monthly billing to start Pro.':
@@ -1219,17 +1195,11 @@ export const da = {
   'Choose plan': 'Vælg plan',
   '${price} per {interval}': '${price} pr. {interval}',
   '{events} events · ${price}/year': '{events} hændelser · ${price}/år',
-  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
-    'Basic inkluderer 14 dages prøveperiode. Bekræft pris og betalingsoplysninger ved checkout.',
   'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
     'Bekræft din plan og betalingsoplysninger ved checkout. Din prøveperiode starter først, når checkout er gennemført.',
   'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
     'Bekræft din plan og betalingsoplysninger ved checkout. Denne plan er betalt fra starten og har ingen gratis prøveperiode.',
   'An active plan is required': 'En aktiv plan er påkrævet',
-  'An active subscription or trial is required to collect events. Your existing reports remain available.':
-    'Et aktivt abonnement eller en prøveperiode er påkrævet for at indsamle hændelser. Dine eksisterende rapporter er stadig tilgængelige.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
-    'Basic inkluderer 14 dage gratis. Pro og Ultra har ingen gratis prøveperiode. Årlig betaling kommer snart.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Venter på, at Polar bekræfter dit abonnement. Din kvote vises her, når abonnementet er aktivt.',
   'Allowance renews on {date}. Upgrade to resume sooner.':
@@ -1330,4 +1300,29 @@ export const da = {
     'Jeg forstår, at mit website skal indhente samtykke, før scriptet indlæses.',
   "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.":
     'Sporing starter, så snart dette script indlæses, så tilføj det først, når dit banner har registreret samtykke til analyse. Vil du hellere beholde scriptet på alle sider, så sæt window.analyticsBeerConsent til false, før det indlæses, og kald dette fra dit banners callback med det gemte valg.',
+  'For growing products. Pay only for what you use beyond your included credits.':
+    'Til voksende produkter. Betal kun for det, du bruger ud over dine inkluderede credits.',
+  '{count} credits included per month': '{count} credits inkluderet om måneden',
+  'Then {price} per 1,000 credits': 'Derefter {price} pr. 1.000 credits',
+  '1 website': '1 hjemmeside',
+  'Start for free': 'Start gratis',
+  'Upgrade to {plan}': 'Opgrader til {plan}',
+  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
+    'Nej. Free og Pro har de samme rapporter og sporingsfunktioner. Pro giver flere credits, flere hjemmesider og forbrugsbaseret afregning.',
+  'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
+    'Free inkluderer én hjemmeside. Pro inkluderer op til {websites} hjemmesider, og dine månedlige credits deles mellem dem.',
+  'What happens when I use all my credits?': 'Hvad sker der, når jeg har brugt alle mine credits?',
+  'On Free, tracking pauses until your allowance renews. On Pro, tracking continues and extra usage is billed at {price} per 1,000 credits at the end of the month. Set a website budget to limit a single website.':
+    'På Free sættes sporingen på pause, indtil din kvote fornyes. På Pro fortsætter sporingen, og ekstra forbrug afregnes med {price} pr. 1.000 credits ved månedens udgang. Angiv et websitebudget for at begrænse en enkelt hjemmeside.',
+  'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.':
+    'Free dækker {count} sidevisninger eller {pageviews} sidevisninger + {events} andre hændelser om måneden.',
+  'Yes. Free includes {count} credits per month for one website, with every report. Upgrade to Pro when you need more.':
+    'Ja. Free inkluderer {count} credits om måneden til én hjemmeside med alle rapporter. Opgrader til Pro, når du har brug for mere.',
+  'Choose a plan to use your workspace. The Free plan needs no payment details.':
+    'Vælg en plan for at bruge dit arbejdsområde. Free-planen kræver ingen betalingsoplysninger.',
+  'Tracking starts when your plan is active. You can check the installation afterward.':
+    'Sporingen starter, når din plan er aktiv. Du kan kontrollere installationen bagefter.',
+  included: 'inkluderet',
+  '{count} extra credits · about {amount} billed at the end of the period':
+    '{count} ekstra credits · ca. {amount} afregnes ved periodens udgang',
 } satisfies Record<Copy, string>;

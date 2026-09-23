@@ -29,12 +29,8 @@ export const de = {
   'Checking your subscription…': 'Dein Abonnement wird geprüft…',
   'Choose a plan to continue': 'Wähle einen Tarif, um fortzufahren',
   'Choose a plan to continue.': 'Wähle einen Tarif, um fortzufahren.',
-  'An active subscription or trial is required to use your workspace.':
-    'Du benötigst ein aktives Abonnement oder eine aktive Testphase, um deinen Arbeitsbereich zu nutzen.',
   'Install the script on {domain}, then choose your plan.':
     'Installiere das Script auf {domain} und wähle anschließend deinen Tarif.',
-  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
-    'Das Tracking beginnt, sobald dein Abonnement oder deine Testphase aktiv ist. Danach kannst du die Installation prüfen.',
   'Continue to plans': 'Weiter zu den Tarifen',
   'Add your website before choosing a plan.':
     'Füge deine Website hinzu, bevor du einen Tarif wählst.',
@@ -122,10 +118,7 @@ export const de = {
   'Every plan includes every report and every feature. Pick the one that matches your traffic.':
     'Jeder Tarif enthält alle Berichte und alle Funktionen. Wähle den Tarif, der zu deinem Traffic passt.',
   'For a personal site or a side project.': 'Für eine persönliche Website oder ein Nebenprojekt.',
-  'For a growing product with steady traffic.': 'Für ein wachsendes Produkt mit stetigem Traffic.',
-  'For high-traffic sites and agencies.': 'Für Websites mit viel Traffic und für Agenturen.',
   '{count} credits per month': '{count} Credits pro Monat',
-  'Includes a 14-day free trial': 'Enthält eine 14-tägige kostenlose Testphase',
   'Frequently asked questions': 'Häufig gestellte Fragen',
   'Most popular': 'Am beliebtesten',
   'Monthly credits': 'Monatliche Credits',
@@ -135,25 +128,14 @@ export const de = {
   'Choose by traffic, not features.': 'Wähle nach Traffic, nicht nach Funktionen.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'Ein Seitenaufruf in Produktion verbraucht 1 Credit. Klicks und andere Ereignisse verbrauchen 0,5 Credits.',
-  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
-    'Basic deckt 15.000 Seitenaufrufe oder 12.000 Seitenaufrufe + 6.000 andere Ereignisse pro Monat ab.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'Auf localhost: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Aktive Zeit ist kostenlos.',
   'Do I need Pro to get all the reports?': 'Brauche ich Pro für alle Berichte?',
-  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
-    'Nein. Jeder Tarif enthält dieselben Berichte und Tracking-Funktionen. Wähle Basic, Pro oder Ultra nach deinem erwarteten Traffic.',
   'Can I use one plan for several websites?': 'Kann ich einen Tarif für mehrere Websites nutzen?',
-  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
-    'Ja. Jeder Tarif umfasst bis zu 10 Websites. Deine monatlichen Credits werden gemeinsam genutzt. Berücksichtige daher deinen gesamten Traffic bei der Tarifwahl.',
-  'Which plan includes the free trial?': 'Welcher Tarif enthält die kostenlose Testphase?',
-  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
-    'Basic enthält eine kostenlose Testphase von 14 Tagen. Du kannst die Berichte mit dem Traffic deiner eigenen Website ausprobieren, bevor du einen kostenpflichtigen Tarif wählst.',
   'Does testing use my credits?': 'Verbrauchen Tests meine Credits?',
   'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
     'Für localhost-Traffic gilt ein reduzierter Verbrauch: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Getrennte Umgebungen halten Testaktivitäten aus deinen Produktionsberichten heraus.',
   'Start with your own traffic.': 'Starte mit deinem eigenen Traffic.',
-  'Yearly billing is not available yet. Choose a monthly plan.':
-    'Jährliche Abrechnung ist noch nicht verfügbar. Wähle einen monatlichen Tarif.',
   Goals: 'Ziele',
   'Error Tracking': 'Fehlertracking',
   'Web Vitals': 'Web Vitals',
@@ -406,7 +388,6 @@ export const de = {
   Billing: 'Abrechnung',
   'Billing customer could not be verified.': 'Der Abrechnungskunde konnte nicht bestätigt werden.',
   'Billing is temporarily unavailable.': 'Die Abrechnung ist vorübergehend nicht verfügbar.',
-  'Billing period': 'Abrechnungszeitraum',
   'blocked requests': 'blockierte Anfragen',
   'Bright Cat': 'Kluge Katze',
   'Bright Fish': 'Kluger Fisch',
@@ -725,7 +706,6 @@ export const de = {
   'Invalid tracking mode.': 'Ungültiger Tracking-Modus.',
   'Invalid visitor or session identifier.': 'Ungültige Besucher- oder Sitzungskennung.',
   'Is there a free plan?': 'Gibt es einen kostenlosen Tarif?',
-  'Is there a free trial?': 'Gibt es eine kostenlose Testphase?',
   'It may have been removed, or you may not have access to it.':
     'Die Website oder Umgebung wurde möglicherweise entfernt, oder du hast keinen Zugriff darauf.',
   'Keep development and production traffic apart.':
@@ -779,7 +759,6 @@ export const de = {
   'Meet your visitors': 'Besucher kennenlernen',
   Mobile: 'Mobilgerät',
   month: 'Monat',
-  Monthly: 'Monatlich',
   'Monthly billing. No free trial.': 'Monatliche Abrechnung. Keine Testphase.',
   'Monthly events': 'Ereignisse pro Monat',
   'Monthly plan': 'Monatlicher Tarif',
@@ -921,7 +900,6 @@ export const de = {
   'Review installation': 'Installation ansehen',
   'Review this export before importing it.': 'Prüfe diesen Export, bevor du ihn importierst.',
   'Review your import': 'Prüfe deinen Import',
-  'Save 2 months': 'Spare 2 Monate',
   'Save 2 months with yearly billing.': 'Bei jährlicher Zahlung 2 Monate sparen.',
   'Save budget': 'Budget speichern',
   'Save changes': 'Änderungen speichern',
@@ -974,7 +952,6 @@ export const de = {
   'Spam protection': 'Spam-Schutz',
   'Spent time on the page': 'Zeit auf der Seite verbracht',
   Staging: 'Staging',
-  'Start 14-day trial': '14 Tage kostenlos testen',
   'Start a plan before opening billing.': 'Aktiviere einen Tarif, bevor du die Abrechnung öffnest.',
   'Start free. Choose the volume you need.': 'Kostenlos starten. Wähle die passende Ereignismenge.',
   'Start free. Grow when you need to.': 'Kostenlos starten. Bei Bedarf wachsen.',
@@ -1196,7 +1173,6 @@ export const de = {
   'Where is your data coming from?': 'Woher kommen deine Daten?',
   'Workspace pages': 'Seiten im Arbeitsbereich',
   year: 'Jahr',
-  Yearly: 'Jährlich',
   'Yearly billing is coming soon. Save 2 months when it arrives.':
     'Jährliche Zahlung folgt bald. Dann sparst du 2 Monate.',
   'Yearly billing is not available yet. Choose monthly billing to start Pro.':
@@ -1234,17 +1210,11 @@ export const de = {
   'Choose plan': 'Tarif wählen',
   '${price} per {interval}': '${price} pro {interval}',
   '{events} events · ${price}/year': '{events} Ereignisse · ${price}/Jahr',
-  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
-    'Basic umfasst 14 kostenlose Testtage. Bestätige Preis und Zahlungsdaten beim Checkout.',
   'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
     'Bestätige deinen Tarif und deine Zahlungsdaten beim Checkout. Deine Testphase beginnt erst nach Abschluss des Checkouts.',
   'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
     'Bestätige deinen Tarif und deine Zahlungsdaten beim Checkout. Dieser Tarif ist von Anfang an kostenpflichtig und hat keine kostenlose Testphase.',
   'An active plan is required': 'Ein aktiver Tarif ist erforderlich',
-  'An active subscription or trial is required to collect events. Your existing reports remain available.':
-    'Ein aktives Abonnement oder eine Testphase ist erforderlich, um Ereignisse zu erfassen. Deine bisherigen Berichte bleiben verfügbar.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
-    'Basic umfasst 14 kostenlose Testtage. Pro und Ultra haben keine kostenlose Testphase. Wähle monatliche oder jährliche Zahlung.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Polar muss dein Abonnement noch bestätigen. Dein Kontingent erscheint hier, sobald es aktiv ist.',
   'Allowance renews on {date}. Upgrade to resume sooner.':
@@ -1345,4 +1315,29 @@ export const de = {
     'Ich verstehe, dass meine Website die Einwilligung einholen muss, bevor das Skript geladen wird.',
   "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.":
     'Das Tracking startet, sobald dieses Skript geladen wird. Füge es deshalb erst hinzu, wenn dein Banner die Einwilligung zur Analyse erfasst hat. Wenn du das Skript lieber auf jeder Seite behalten möchtest, setze window.analyticsBeerConsent vor dem Laden auf false und rufe dies aus dem Callback deines Banners mit der gespeicherten Auswahl auf.',
+  'For growing products. Pay only for what you use beyond your included credits.':
+    'Für wachsende Produkte. Zahle nur für das, was du über deine enthaltenen Credits hinaus nutzt.',
+  '{count} credits included per month': '{count} Credits pro Monat inklusive',
+  'Then {price} per 1,000 credits': 'Danach {price} pro 1.000 Credits',
+  '1 website': '1 Website',
+  'Start for free': 'Kostenlos starten',
+  'Upgrade to {plan}': 'Auf {plan} upgraden',
+  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
+    'Nein. Free und Pro enthalten dieselben Berichte und Tracking-Funktionen. Pro bietet mehr Credits, mehr Websites und nutzungsbasierte Abrechnung.',
+  'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
+    'Free enthält eine Website. Pro enthält bis zu {websites} Websites, die sich deine monatlichen Credits teilen.',
+  'What happens when I use all my credits?': 'Was passiert, wenn ich alle Credits verbraucht habe?',
+  'On Free, tracking pauses until your allowance renews. On Pro, tracking continues and extra usage is billed at {price} per 1,000 credits at the end of the month. Set a website budget to limit a single website.':
+    'Bei Free pausiert das Tracking, bis dein Kontingent erneuert wird. Bei Pro läuft das Tracking weiter, und zusätzliche Nutzung wird am Monatsende mit {price} pro 1.000 Credits abgerechnet. Lege ein Website-Budget fest, um eine einzelne Website zu begrenzen.',
+  'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.':
+    'Free deckt {count} Seitenaufrufe oder {pageviews} Seitenaufrufe + {events} andere Ereignisse pro Monat ab.',
+  'Yes. Free includes {count} credits per month for one website, with every report. Upgrade to Pro when you need more.':
+    'Ja. Free enthält {count} Credits pro Monat für eine Website, mit allen Berichten. Wechsle zu Pro, wenn du mehr brauchst.',
+  'Choose a plan to use your workspace. The Free plan needs no payment details.':
+    'Wähle einen Tarif, um deinen Arbeitsbereich zu nutzen. Der Free-Tarif benötigt keine Zahlungsdaten.',
+  'Tracking starts when your plan is active. You can check the installation afterward.':
+    'Das Tracking startet, sobald dein Tarif aktiv ist. Die Installation kannst du danach prüfen.',
+  included: 'inklusive',
+  '{count} extra credits · about {amount} billed at the end of the period':
+    '{count} zusätzliche Credits · etwa {amount} werden am Ende des Zeitraums abgerechnet',
 } satisfies Record<Copy, string>;

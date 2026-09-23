@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { apiClient, errorText, write } from '../lib/client';
 import type { AccountUsage, UsagePauseReason } from '../billing/types';
 import { Button } from './ui/button';
+import { billingAmount } from '../lib/billing-plans';
 
 export function useAccountUsage(refreshKey: string) {
   const [data, setData] = useState<AccountUsage | null>(null);
@@ -124,10 +125,20 @@ export function PlanHeading({ data, action }: { data: AccountUsage; action?: Rea
 }
 
 export function EventCredits({ data }: { data: AccountUsage }) {
-  const { dateTime, number, t } = useSitePreferences();
+  const { dateTime, locale, number, t } = useSitePreferences();
 
   const date = (value: string) =>
     dateTime(value, { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // Overage plans have no cap; their bar measures the included credits instead.
+  const overagePer1k = data.plan?.overageUnitAmount
+    ? Number(data.plan.overageUnitAmount) * 10
+    : null;
+
+  const limit =
+    data.plan?.eventLimit ?? (overagePer1k === null ? null : (data.plan?.includedEvents ?? null));
+
+  const extra = limit === null || overagePer1k === null ? 0 : Math.max(0, data.events.used - limit);
 
   return (
     <>
@@ -153,31 +164,43 @@ export function EventCredits({ data }: { data: AccountUsage }) {
             <span className="text-2xl font-medium">{number(data.events.used)}</span>
             <span className="text-sm text-secondary-ink">
               {data.plan
-                ? ` / ${data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit)}`
+                ? ` / ${limit === null ? t('Unlimited') : number(limit)}${overagePer1k === null ? '' : ` ${t('included')}`}`
                 : t(' · No active allowance')}
             </span>
           </p>
         </div>
-        {data.plan && data.plan.eventLimit !== null && (
+        {data.plan && limit !== null && (
           <div
             role="progressbar"
             aria-label={t('Event allowance used')}
             aria-valuemin={0}
-            aria-valuemax={data.plan.eventLimit}
-            aria-valuenow={Math.min(data.events.used, data.plan.eventLimit)}
+            aria-valuemax={limit}
+            aria-valuenow={Math.min(data.events.used, limit)}
             aria-valuetext={t('{used} of {limit} credits', {
               used: number(data.events.used),
-              limit: data.plan.eventLimit === null ? t('Unlimited') : number(data.plan.eventLimit),
+              limit: number(limit),
             })}
             className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
           >
             <div
               className="h-full rounded-full bg-foreground"
               style={{
-                width: `${Math.min(100, data.plan.eventLimit > 0 ? (data.events.used / data.plan.eventLimit) * 100 : 0)}%`,
+                width: `${Math.min(100, limit > 0 ? (data.events.used / limit) * 100 : 0)}%`,
               }}
             />
           </div>
+        )}
+        {overagePer1k !== null && (
+          <p className="mt-2 text-sm text-secondary-ink">
+            {extra > 0
+              ? t('{count} extra credits · about {amount} billed at the end of the period', {
+                  count: number(extra),
+                  amount: billingAmount((extra / 1000) * overagePer1k, locale),
+                })
+              : t('Then {price} per 1,000 credits', {
+                  price: billingAmount(overagePer1k, locale),
+                })}
+          </p>
         )}
         <details className="mt-3 text-sm text-secondary-ink">
           <summary className="w-fit cursor-pointer underline underline-offset-4">

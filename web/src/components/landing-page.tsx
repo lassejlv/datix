@@ -2,6 +2,7 @@ import { useSitePreferences } from './site-preferences';
 import { ArrowRight, Check, Code2, Globe2, MousePointer2, Plus } from './ui/icons';
 import { LandingLayout } from './landing-layout';
 import { DashboardPreview } from './dashboard-preview';
+import { freePlan } from '../lib/billing-plans';
 
 const questions = [
   [
@@ -25,13 +26,13 @@ const questions = [
     'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.',
   ],
   [
-    'Is there a free trial?',
-    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
+    'Is there a free plan?',
+    'Yes. Free includes {count} credits per month for one website, with every report. Upgrade to Pro when you need more.',
   ],
 ] as const;
 
 export function LandingPage() {
-  const { t } = useSitePreferences();
+  const { number, t } = useSitePreferences();
 
   return (
     <LandingLayout home>
@@ -50,7 +51,7 @@ export function LandingPage() {
             </p>
             <div className="landing-actions">
               <a className="landing-button" href="/signup">
-                {t('Start 14-day trial')} <ArrowRight size={17} aria-hidden="true" />
+                {t('Start for free')} <ArrowRight size={17} aria-hidden="true" />
               </a>
               <a
                 className="landing-text-button"
@@ -120,7 +121,7 @@ export function LandingPage() {
                   {t(question)}
                   <Plus size={17} aria-hidden="true" />
                 </summary>
-                <p>{t(answer)}</p>
+                <p>{t(answer, { count: number(freePlan.events) })}</p>
               </details>
             ))}
           </div>
@@ -129,7 +130,7 @@ export function LandingPage() {
         <section className="landing-closing" aria-labelledby="closing-title">
           <h2 id="closing-title">{t('Here’s to a clearer picture.')}</h2>
           <a className="landing-button" href="/signup">
-            {t('Start 14-day trial')} <ArrowRight size={17} aria-hidden="true" />
+            {t('Start for free')} <ArrowRight size={17} aria-hidden="true" />
           </a>
         </section>
       </main>

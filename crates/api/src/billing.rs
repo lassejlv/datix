@@ -29,6 +29,12 @@ fn unconfigured() -> ApiError {
 pub struct Entitlement {
     pub name: String,
     pub event_limit: Option<i64>,
+    /// Credits included per period; stored states from before this field default to none.
+    #[serde(default)]
+    pub included_events: Option<i64>,
+    /// Metered price per event in cents when usage beyond the included credits is billed.
+    #[serde(default)]
+    pub overage_unit_amount: Option<String>,
     pub website_limit: Option<i64>,
     pub used: i64,
     pub remaining: Option<i64>,
@@ -90,6 +96,7 @@ pub async fn allowance(
         let valid_units = [
             Some(e.used),
             e.event_limit,
+            e.included_events,
             e.website_limit,
             e.remaining,
             Some(e.local_baseline),
@@ -214,7 +221,7 @@ pub async fn usage(state: &AppState, owner: &str) -> Result<Value, ApiError> {
     Ok(json!({
         "onboardingCompleted":completed,
         "protection":{"since":since,"blocked":reasons.iter().map(|r|r.get::<i64,_>("blocked")).sum::<i64>(),"reasons":reasons.iter().map(|r|json!({"reason":r.get::<String,_>("reason"),"blocked":r.get::<i64,_>("blocked")})).collect::<Vec<_>>(),"lastBlockedAt":reasons.iter().map(|r|r.get::<DateTime<Utc>,_>("last")).max(),"learning":days.iter().filter(|d|**d<3).count(),"learned":days.iter().filter(|d|**d>=3).count()},
-        "plan":active.as_ref().map(|a|json!({"name":a.entitlement.name,"trial":a.trial,"eventLimit":a.entitlement.event_limit.map(|n|n as f64/100.0),"websiteLimit":a.entitlement.website_limit})),
+        "plan":active.as_ref().map(|a|json!({"name":a.entitlement.name,"trial":a.trial,"eventLimit":a.entitlement.event_limit.map(|n|n as f64/100.0),"includedEvents":a.entitlement.included_events.or(a.entitlement.event_limit).map(|n|n as f64/100.0),"overageUnitAmount":a.entitlement.overage_unit_amount,"websiteLimit":a.entitlement.website_limit})),
         "period":active.as_ref().map(|a|json!({"start":a.entitlement.period_start,"end":a.entitlement.period_end})),
         "events":{"used":used as f64/100.0,"remaining":remaining.map(|r|r as f64/100.0)},
         "paused":reason.is_some(),"pauseReason":reason,"websites":websites

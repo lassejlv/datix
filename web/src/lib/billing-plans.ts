@@ -1,41 +1,70 @@
 import catalog from '../../../polar-catalog.json';
-import type { Copy } from './i18n/translations';
+import type { Copy, Translate } from './i18n/translations';
 
 // The Rust checkout allowlist and every displayed price share the verified catalog.
+// Legacy plans still grant access to existing subscriptions but are never offered.
 export const billingPlans = catalog.plans
-  .filter((plan) => plan.interval === 'month')
-  .map((plan) => {
-    const annual = catalog.plans.find(
-      (candidate) => candidate.events === plan.events && candidate.interval === 'year',
-    )!;
+  .filter((plan) => !plan.legacy)
+  .map((plan) => ({
+    id: plan.id,
+    name: plan.name,
+    events: plan.events,
+    price: plan.price / 100,
+    free: plan.price === 0,
+    websites: plan.websites,
+    // Polar prices overage in cents per credit; display it per 1,000 credits.
+    overagePer1k: plan.overageUnitAmount === null ? null : Number(plan.overageUnitAmount) * 10,
+  }));
 
-    return {
-      id: plan.id,
-      name: plan.name,
-      events: plan.events,
-      price: plan.price / 100,
-      yearlyPrice: annual.price / 100,
-      websites: plan.websites,
-      monthlyAvailable: plan.checkoutEnabled,
-      yearlyAvailable: annual.checkoutEnabled,
-    };
-  });
+export type BillingPlan = (typeof billingPlans)[number];
 
 export const billingPlanDescriptions: Record<string, Copy> = {
-  basic: 'For a personal site or a side project.',
-  pro: 'For a growing product with steady traffic.',
-  ultra: 'For high-traffic sites and agencies.',
+  free: 'For a personal site or a side project.',
+  pro: 'For growing products. Pay only for what you use beyond your included credits.',
 };
 
 export const billingCurrency = () => catalog.currency;
 
-export const billingAvailable = (plan: (typeof billingPlans)[number], yearly = false) =>
-  yearly ? plan.yearlyAvailable : plan.monthlyAvailable;
+export const freePlan = billingPlans.find((plan) => plan.free)!;
 
-export function billingPrice(plan: (typeof billingPlans)[number], locale: string, yearly = false) {
+export const overagePlan = billingPlans.find((plan) => plan.overagePer1k !== null)!;
+
+export function billingPrice(plan: BillingPlan, locale: string) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: billingCurrency(),
     maximumFractionDigits: 0,
-  }).format(yearly ? plan.yearlyPrice : plan.price);
+  }).format(plan.price);
+}
+
+/** Allowance lines shared by the public pricing page and the in-app plan picker. */
+export function billingAllowance(
+  plan: BillingPlan,
+  t: Translate,
+  number: (value: number) => string,
+  locale: string,
+) {
+  return [
+    plan.overagePer1k === null
+      ? t('{count} credits per month', { count: number(plan.events) })
+      : t('{count} credits included per month', { count: number(plan.events) }),
+    ...(plan.overagePer1k === null
+      ? []
+      : [
+          t('Then {price} per 1,000 credits', {
+            price: billingAmount(plan.overagePer1k, locale),
+          }),
+        ]),
+    plan.websites === 1 ? t('1 website') : t('{count} websites', { count: plan.websites }),
+  ];
+}
+
+/** Formats small usage prices such as $0.04 without rounding them to whole units. */
+export function billingAmount(amount: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: billingCurrency(),
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }

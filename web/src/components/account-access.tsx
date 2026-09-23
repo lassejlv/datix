@@ -103,7 +103,7 @@ function PlanRequired({ refresh }: { refresh: () => void }) {
         {t('Choose a plan to continue')}
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-secondary-ink">
-        {t('An active subscription or trial is required to use your workspace.')}
+        {t('Choose a plan to use your workspace. The Free plan needs no payment details.')}
       </p>
       <BillingActions active={false} refresh={refresh} />
     </section>
@@ -184,7 +184,7 @@ function AccountOnboarding({ user, onCompleted }: { user: User; onCompleted: () 
           />
           <p className="mb-4 text-sm leading-relaxed text-secondary-ink">
             {t(
-              'Tracking starts when your subscription or trial is active. You can check the installation afterward.',
+              'Tracking starts when your plan is active. You can check the installation afterward.',
             )}
           </p>
           <Button disabled={busy} loading={busy} onClick={complete}>

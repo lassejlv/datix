@@ -254,6 +254,8 @@ pub(super) struct SubscriptionPage {
 }
 #[derive(Deserialize)]
 pub(super) struct SubscriptionStatus {
+    pub id: Uuid,
+    pub product_id: Uuid,
     pub customer_id: Uuid,
     pub status: String,
     pub cancel_at_period_end: bool,
@@ -333,7 +335,13 @@ impl Provider {
             Some("events") => "events",
             _ => "other",
         };
-        let method_name = if method == Method::GET { "GET" } else { "POST" };
+        let method_name = if method == Method::GET {
+            "GET"
+        } else if method == Method::DELETE {
+            "DELETE"
+        } else {
+            "POST"
+        };
         let failure = |category: &'static str, status: Option<StatusCode>| {
             tracing::warn!(
                 provider = "polar",
@@ -406,6 +414,8 @@ impl Provider {
                                         | "customer_id"
                                         | "external_customer_id"
                                         | "products"
+                                        | "product_id"
+                                        | "subscription_id"
                                         | "currency"
                                         | "allow_trial"
                                         | "success_url"
@@ -529,6 +539,18 @@ impl Provider {
                 ("limit", "100".into()),
                 ("page", page.to_string()),
             ],
+            None,
+            false,
+        )
+        .await?
+        .ok_or_else(ApiError::unavailable)
+    }
+    /// Ends a subscription immediately. Only used for free subscriptions.
+    pub async fn revoke(&self, subscription: Uuid) -> Result<SubscriptionStatus, ApiError> {
+        self.request(
+            Method::DELETE,
+            &["v1", "subscriptions", &subscription.to_string()],
+            &[],
             None,
             false,
         )

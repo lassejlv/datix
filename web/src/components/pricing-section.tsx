@@ -2,30 +2,32 @@ import { Accordion } from '@base-ui/react/accordion';
 import { Alert } from './ui/alert';
 import { ApiError, apiClient, errorText } from '../lib/client';
 import {
+  billingAllowance,
+  billingAmount,
   billingPlans,
   billingPlanDescriptions,
   billingPrice,
   billingCurrency,
-  billingAvailable,
+  freePlan,
+  overagePlan,
+  type BillingPlan,
 } from '../lib/billing-plans';
 import { useSitePreferences } from './site-preferences';
 import { useState } from 'react';
 import { ArrowRight, Check, ChevronDown } from './ui/icons';
 
-type Plan = (typeof billingPlans)[number];
-
 const pricingQuestions = [
   [
     'Do I need Pro to get all the reports?',
-    'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.',
+    'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.',
   ],
   [
     'Can I use one plan for several websites?',
-    'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.',
+    'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.',
   ],
   [
-    'Which plan includes the free trial?',
-    'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.',
+    'What happens when I use all my credits?',
+    'On Free, tracking pauses until your allowance renews. On Pro, tracking continues and extra usage is billed at {price} per 1,000 credits at the end of the month. Set a website budget to limit a single website.',
   ],
   [
     'Does testing use my credits?',
@@ -37,11 +39,14 @@ export function PricingSection() {
   const { number, message: messageText, t, locale } = useSitePreferences();
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
-  const [yearly, setYearly] = useState(false);
-  const interval = yearly ? 'year' : 'month';
-  const amount = (plan: Plan) => billingPrice(plan, locale, yearly);
+  const interval = 'month';
 
-  const checkout = async (plan: Plan) => {
+  const answerValues = {
+    websites: overagePlan.websites,
+    price: billingAmount(overagePlan.overagePer1k!, locale),
+  };
+
+  const checkout = async (plan: BillingPlan) => {
     setBusy(plan.id);
     setError('');
 
@@ -82,22 +87,12 @@ export function PricingSection() {
             )}
           </p>
         </div>
-        <div className="pricing-billing-switch" role="group" aria-label={t('Billing period')}>
-          <button type="button" aria-pressed={!yearly} onClick={() => setYearly(false)}>
-            {t('Monthly')}
-          </button>
-          <button type="button" aria-pressed={yearly} onClick={() => setYearly(true)}>
-            {t('Yearly')}
-            <span className="pricing-coming-soon">{t('Save 2 months')}</span>
-          </button>
-        </div>
       </header>
       <div className="pricing-ledger">
         {error && <Alert className="pricing-error text-sm text-danger">{messageText(error)}</Alert>}
-        <div className="pricing-grid pricing-three-plans">
+        <div className="pricing-grid pricing-two-plans">
           {billingPlans.map((plan) => {
-            const available = billingAvailable(plan, yearly);
-            const popular = plan.id === 'pro';
+            const popular = !plan.free;
             const description = billingPlanDescriptions[plan.id];
 
             return (
@@ -112,33 +107,29 @@ export function PricingSection() {
                 </div>
                 <p className="pricing-card-description">{description ? t(description) : null}</p>
                 <p className="pricing-amount">
-                  <span>{amount(plan)}</span>
+                  <span>{billingPrice(plan, locale)}</span>
                   <span> / {t(interval)}</span>
                 </p>
                 <button
                   className="pricing-select"
-                  disabled={!available || busy === plan.id}
+                  disabled={busy === plan.id}
                   type="button"
                   onClick={() => void checkout(plan)}
                 >
-                  {!available
-                    ? t('Coming soon')
-                    : busy === plan.id
-                      ? t('Opening checkout…')
-                      : plan.id === 'basic'
-                        ? t('Start 14-day trial')
-                        : t('Choose {plan}', { plan: plan.name })}
+                  {busy === plan.id
+                    ? t('Opening checkout…')
+                    : plan.free
+                      ? t('Start for free')
+                      : t('Choose {plan}', { plan: plan.name })}
                   <ArrowRight size={16} aria-hidden="true" />
                 </button>
                 <ul className="pricing-card-features">
                   {[
-                    t('{count} credits per month', { count: number(plan.events) }),
-                    t('{count} websites', { count: plan.websites }),
+                    ...billingAllowance(plan, t, number, locale),
                     t('All dashboard reports'),
                     t('Custom events'),
                     t('Separate environments'),
                     t('Cookieless by default'),
-                    ...(plan.id === 'basic' ? [t('Includes a 14-day free trial')] : []),
                   ].map((feature) => (
                     <li key={feature}>
                       <Check size={15} aria-hidden="true" />
@@ -151,11 +142,6 @@ export function PricingSection() {
           })}
         </div>
       </div>
-      {yearly && !billingPlans.some((plan) => billingAvailable(plan, true)) && (
-        <p role="status" className="pricing-currency-note">
-          {t('Yearly billing is not available yet. Choose a monthly plan.')}
-        </p>
-      )}
       <p className="pricing-currency-note">
         {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
       </p>
@@ -163,7 +149,14 @@ export function PricingSection() {
         <h2 id="usage-guide-title">{t('Choose by traffic, not features.')}</h2>
         <p>{t('A production pageview uses 1 credit. Clicks and other events use 0.5 credits.')}</p>
         <p className="pricing-example">
-          {t('Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.')}
+          {t(
+            'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.',
+            {
+              count: number(freePlan.events),
+              pageviews: number(freePlan.events * 0.8),
+              events: number(freePlan.events * 0.4),
+            },
+          )}
         </p>
         <p className="pricing-localhost-note">
           {t(
@@ -183,7 +176,7 @@ export function PricingSection() {
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Panel className="pricing-faq-panel">
-                <p className="pricing-faq-answer">{t(answer)}</p>
+                <p className="pricing-faq-answer">{t(answer, answerValues)}</p>
               </Accordion.Panel>
             </Accordion.Item>
           ))}
@@ -192,7 +185,7 @@ export function PricingSection() {
       <section className="landing-closing" aria-labelledby="pricing-closing-title">
         <h2 id="pricing-closing-title">{t('Start with your own traffic.')}</h2>
         <a className="landing-button" href="/signup">
-          {t('Start 14-day trial')}
+          {t('Start for free')}
           <ArrowRight size={17} aria-hidden="true" />
         </a>
       </section>

@@ -42,6 +42,10 @@ export type AccountUsage = {
     name: string;
     trial: boolean;
     eventLimit: number | null;
+    /** Credits included per period; usage beyond them is billed when overage is set. */
+    includedEvents: number | null;
+    /** Metered price per credit in cents, or null when the plan stops at its limit. */
+    overageUnitAmount: string | null;
     websiteLimit: number | null;
   } | null;
   period: { start: string; end: string } | null;

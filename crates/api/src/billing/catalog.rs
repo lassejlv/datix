@@ -11,7 +11,6 @@ pub struct Catalog {
     pub api_version: String,
     pub meter: Meter,
     pub analytics_benefit_id: Uuid,
-    pub websites_benefit_id: Uuid,
     pub plans: Vec<Plan>,
 }
 
@@ -31,9 +30,20 @@ pub struct Plan {
     pub product_id: Uuid,
     pub events: i64,
     pub interval: String,
-    pub trial_days: u32,
-    pub checkout_enabled: bool,
+    /// Fixed price in cents; zero marks the free plan.
+    pub price: i64,
+    /// Metered price per event in cents. Plans with overage are not capped locally.
+    pub overage_unit_amount: Option<String>,
+    /// Legacy plans still grant access to existing subscriptions but are not sold.
+    pub legacy: bool,
     pub events_benefit_id: Uuid,
+    pub websites_benefit_id: Uuid,
+}
+
+impl Plan {
+    pub fn free(&self) -> bool {
+        self.price == 0
+    }
 }
 
 #[derive(Deserialize)]
@@ -42,7 +52,6 @@ struct SandboxIds {
     organization_id: Uuid,
     meter_id: Uuid,
     analytics_benefit_id: Uuid,
-    websites_benefit_id: Uuid,
     plans: HashMap<String, SandboxPlan>,
 }
 
@@ -51,6 +60,7 @@ struct SandboxIds {
 struct SandboxPlan {
     product_id: Uuid,
     events_benefit_id: Uuid,
+    websites_benefit_id: Uuid,
 }
 
 impl Catalog {
@@ -70,12 +80,21 @@ impl Catalog {
             catalog.organization_id = ids.organization_id;
             catalog.meter.id = ids.meter_id;
             catalog.analytics_benefit_id = ids.analytics_benefit_id;
-            catalog.websites_benefit_id = ids.websites_benefit_id;
-            for plan in &mut catalog.plans {
-                let ids = ids.plans.get(&plan.id).ok_or_else(super::unconfigured)?;
-                plan.product_id = ids.product_id;
-                plan.events_benefit_id = ids.events_benefit_id;
+            // Sandboxes need every plan that is sold; legacy plans are optional.
+            let mut plans = Vec::new();
+            for mut plan in catalog.plans {
+                let Some(mapped) = ids.plans.get(&plan.id) else {
+                    if plan.legacy {
+                        continue;
+                    }
+                    return Err(super::unconfigured());
+                };
+                plan.product_id = mapped.product_id;
+                plan.events_benefit_id = mapped.events_benefit_id;
+                plan.websites_benefit_id = mapped.websites_benefit_id;
+                plans.push(plan);
             }
+            catalog.plans = plans;
         }
         Ok(catalog)
     }

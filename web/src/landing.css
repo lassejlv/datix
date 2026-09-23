@@ -679,41 +679,6 @@
   line-height: 28px;
   color: var(--landing-secondary);
 }
-.pricing-billing-switch {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  margin-top: 24px;
-  background: var(--landing-wash);
-  border: 1px solid var(--landing-line);
-  border-radius: 999px;
-}
-.pricing-billing-switch button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  border: 0;
-  border-radius: 999px;
-  padding: 8px 18px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--landing-secondary);
-  background: transparent;
-}
-.pricing-billing-switch button[aria-pressed='true'] {
-  background: var(--landing-ink);
-  color: var(--landing-canvas);
-}
-.pricing-coming-soon {
-  font-size: 12px;
-  line-height: 16px;
-  border: 1px solid var(--landing-line);
-  border-radius: 6px;
-  padding: 1px 8px;
-}
 .pricing-ledger {
   width: min(1080px, calc(100% - 48px));
   margin: 0 auto;
@@ -727,6 +692,11 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   align-items: start;
+}
+.pricing-two-plans {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 800px;
+  margin-inline: auto;
 }
 .pricing-card {
   display: flex;
@@ -1196,9 +1166,6 @@
   .pricing-heading .landing-section-description {
     font-size: 16px;
     line-height: 28px;
-  }
-  .pricing-billing-switch button {
-    padding-inline: 14px;
   }
   .pricing-ledger {
     width: min(480px, calc(100% - 32px));

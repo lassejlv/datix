@@ -106,10 +106,7 @@ export const en = {
   'Every plan includes every report and every feature. Pick the one that matches your traffic.':
     'Every plan includes every report and every feature. Pick the one that matches your traffic.',
   'For a personal site or a side project.': 'For a personal site or a side project.',
-  'For a growing product with steady traffic.': 'For a growing product with steady traffic.',
-  'For high-traffic sites and agencies.': 'For high-traffic sites and agencies.',
   '{count} credits per month': '{count} credits per month',
-  'Includes a 14-day free trial': 'Includes a 14-day free trial',
   'Frequently asked questions': 'Frequently asked questions',
   'Most popular': 'Most popular',
   'Monthly credits': 'Monthly credits',
@@ -119,25 +116,14 @@ export const en = {
   'Choose by traffic, not features.': 'Choose by traffic, not features.',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.',
-  'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.':
-    'Basic covers 15,000 pageviews, or 12,000 pageviews + 6,000 other events per month.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
     'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
   'Do I need Pro to get all the reports?': 'Do I need Pro to get all the reports?',
-  'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.':
-    'No. Every plan includes the same reports and tracking features. Choose Basic, Pro, or Ultra based on how much traffic you expect.',
   'Can I use one plan for several websites?': 'Can I use one plan for several websites?',
-  'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.':
-    'Yes. Every plan includes up to 10 websites. Your monthly credits are shared across them, so estimate your total traffic when choosing a plan.',
-  'Which plan includes the free trial?': 'Which plan includes the free trial?',
-  'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.':
-    'Basic includes a 14-day free trial. You can explore the reports with your own website’s traffic before choosing a paid plan.',
   'Does testing use my credits?': 'Does testing use my credits?',
   'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
     'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.',
   'Start with your own traffic.': 'Start with your own traffic.',
-  'Yearly billing is not available yet. Choose a monthly plan.':
-    'Yearly billing is not available yet. Choose a monthly plan.',
   Goals: 'Goals',
   'Error Tracking': 'Error Tracking',
   'Web Vitals': 'Web Vitals',
@@ -386,7 +372,6 @@ export const en = {
   Billing: 'Billing',
   'Billing customer could not be verified.': 'Billing customer could not be verified.',
   'Billing is temporarily unavailable.': 'Billing is temporarily unavailable.',
-  'Billing period': 'Billing period',
   'blocked requests': 'blocked requests',
   'Bright Cat': 'Bright Cat',
   'Bright Fish': 'Bright Fish',
@@ -699,7 +684,6 @@ export const en = {
   'Invalid tracking mode.': 'Invalid tracking mode.',
   'Invalid visitor or session identifier.': 'Invalid visitor or session identifier.',
   'Is there a free plan?': 'Is there a free plan?',
-  'Is there a free trial?': 'Is there a free trial?',
   'It may have been removed, or you may not have access to it.':
     'It may have been removed, or you may not have access to it.',
   'Keep development and production traffic apart.':
@@ -753,7 +737,6 @@ export const en = {
   'Meet your visitors': 'Meet your visitors',
   Mobile: 'Mobile',
   month: 'month',
-  Monthly: 'Monthly',
   'Monthly billing. No free trial.': 'Monthly billing. No free trial.',
   'Monthly events': 'Monthly events',
   'Monthly plan': 'Monthly plan',
@@ -893,7 +876,6 @@ export const en = {
   'Review installation': 'Review installation',
   'Review this export before importing it.': 'Review this export before importing it.',
   'Review your import': 'Review your import',
-  'Save 2 months': 'Save 2 months',
   'Save 2 months with yearly billing.': 'Save 2 months with yearly billing.',
   'Save budget': 'Save budget',
   'Save changes': 'Save changes',
@@ -944,7 +926,6 @@ export const en = {
   'Spam protection': 'Spam protection',
   'Spent time on the page': 'Spent time on the page',
   Staging: 'Staging',
-  'Start 14-day trial': 'Start 14-day trial',
   'Start a plan before opening billing.': 'Start a plan before opening billing.',
   'Start free. Choose the volume you need.': 'Start free. Choose the volume you need.',
   'Start free. Grow when you need to.': 'Start free. Grow when you need to.',
@@ -1156,7 +1137,6 @@ export const en = {
   'Where is your data coming from?': 'Where is your data coming from?',
   'Workspace pages': 'Workspace pages',
   year: 'year',
-  Yearly: 'Yearly',
   'Yearly billing is coming soon. Save 2 months when it arrives.':
     'Yearly billing is coming soon. Save 2 months when it arrives.',
   'Yearly billing is not available yet. Choose monthly billing to start Pro.':
@@ -1194,17 +1174,11 @@ export const en = {
   'Choose plan': 'Choose plan',
   '${price} per {interval}': '${price} per {interval}',
   '{events} events · ${price}/year': '{events} events · ${price}/year',
-  'Basic includes a 14-day trial. Confirm the price and payment details at checkout.':
-    'Basic includes a 14-day trial. Confirm the price and payment details at checkout.',
   'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.':
     'Confirm your plan and payment details at checkout. Your trial starts only after checkout is completed.',
   'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.':
     'Confirm your plan and payment details at checkout. This plan starts with paid billing and has no free trial.',
   'An active plan is required': 'An active plan is required',
-  'An active subscription or trial is required to collect events. Your existing reports remain available.':
-    'An active subscription or trial is required to collect events. Your existing reports remain available.',
-  'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.':
-    'Basic includes a 14-day free trial. Pro and Ultra have no free trial. Yearly billing is coming soon.',
   'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.':
     'Waiting for Polar to confirm your subscription. Your allowance will appear here once it is active.',
   'Allowance renews on {date}. Upgrade to resume sooner.':
@@ -1213,12 +1187,8 @@ export const en = {
   'Checking your subscription…': 'Checking your subscription…',
   'Choose a plan to continue': 'Choose a plan to continue',
   'Choose a plan to continue.': 'Choose a plan to continue.',
-  'An active subscription or trial is required to use your workspace.':
-    'An active subscription or trial is required to use your workspace.',
   'Install the script on {domain}, then choose your plan.':
     'Install the script on {domain}, then choose your plan.',
-  'Tracking starts when your subscription or trial is active. You can check the installation afterward.':
-    'Tracking starts when your subscription or trial is active. You can check the installation afterward.',
   'Continue to plans': 'Continue to plans',
   'Add your website before choosing a plan.': 'Add your website before choosing a plan.',
   'Account ID': 'Account ID',
@@ -1316,6 +1286,31 @@ export const en = {
     'I understand that my website must obtain consent before the script loads.',
   "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.":
     "Tracking starts as soon as this script loads, so add it only after your banner records analytics consent. To keep the script on every page instead, set window.analyticsBeerConsent to false before it loads and call this from your banner's callback with its saved choice.",
+  'For growing products. Pay only for what you use beyond your included credits.':
+    'For growing products. Pay only for what you use beyond your included credits.',
+  '{count} credits included per month': '{count} credits included per month',
+  'Then {price} per 1,000 credits': 'Then {price} per 1,000 credits',
+  '1 website': '1 website',
+  'Start for free': 'Start for free',
+  'Upgrade to {plan}': 'Upgrade to {plan}',
+  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
+    'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.',
+  'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
+    'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.',
+  'What happens when I use all my credits?': 'What happens when I use all my credits?',
+  'On Free, tracking pauses until your allowance renews. On Pro, tracking continues and extra usage is billed at {price} per 1,000 credits at the end of the month. Set a website budget to limit a single website.':
+    'On Free, tracking pauses until your allowance renews. On Pro, tracking continues and extra usage is billed at {price} per 1,000 credits at the end of the month. Set a website budget to limit a single website.',
+  'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.':
+    'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.',
+  'Yes. Free includes {count} credits per month for one website, with every report. Upgrade to Pro when you need more.':
+    'Yes. Free includes {count} credits per month for one website, with every report. Upgrade to Pro when you need more.',
+  'Choose a plan to use your workspace. The Free plan needs no payment details.':
+    'Choose a plan to use your workspace. The Free plan needs no payment details.',
+  'Tracking starts when your plan is active. You can check the installation afterward.':
+    'Tracking starts when your plan is active. You can check the installation afterward.',
+  included: 'included',
+  '{count} extra credits · about {amount} billed at the end of the period':
+    '{count} extra credits · about {amount} billed at the end of the period',
 } as const;
 
 export type Copy = keyof typeof en;

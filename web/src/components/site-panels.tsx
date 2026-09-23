@@ -655,7 +655,11 @@ export function SiteSettings({
                     </Link>
                   }
                 />
-                <BillingActions active={Boolean(data.plan)} refresh={usage.refresh} />
+                <BillingActions
+                  active={Boolean(data.plan)}
+                  current={data.plan?.name}
+                  refresh={usage.refresh}
+                />
               </>
             )}
           </AccountUsageSection>
