@@ -115,8 +115,8 @@ export const de = {
   'Get started: add your website, paste one script, and check your first visit.':
     'So geht’s: Website hinzufügen, ein Skript einfügen und den ersten Besuch prüfen.',
   'Simple, transparent pricing': 'Einfache, transparente Preise',
-  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
-    'Jeder Tarif enthält alle Berichte und alle Funktionen. Wähle den Tarif, der zu deinem Traffic passt.',
+  'Every plan includes every report. Pick the one that matches your traffic and websites.':
+    'Jeder Tarif enthält alle Berichte. Wähle den, der zu deinem Traffic und deinen Websites passt.',
   'For a personal site or a side project.': 'Für eine persönliche Website oder ein Nebenprojekt.',
   '{count} credits per month': '{count} Credits pro Monat',
   'Frequently asked questions': 'Häufig gestellte Fragen',
@@ -125,7 +125,7 @@ export const de = {
   'Date ranges': 'Zeiträume',
   'Referrers and countries': 'Verweisquellen und Länder',
   '{count} websites': '{count} Websites',
-  'Choose by traffic, not features.': 'Wähle nach Traffic, nicht nach Funktionen.',
+  'How credits are counted': 'So werden Credits gezählt',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'Ein Seitenaufruf in Produktion verbraucht 1 Credit. Klicks und andere Ereignisse verbrauchen 0,5 Credits.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
@@ -133,8 +133,8 @@ export const de = {
   'Do I need Pro to get all the reports?': 'Brauche ich Pro für alle Berichte?',
   'Can I use one plan for several websites?': 'Kann ich einen Tarif für mehrere Websites nutzen?',
   'Does testing use my credits?': 'Verbrauchen Tests meine Credits?',
-  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
-    'Für localhost-Traffic gilt ein reduzierter Verbrauch: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Getrennte Umgebungen halten Testaktivitäten aus deinen Produktionsberichten heraus.',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. On Pro, separate environments keep test activity out of your production reports.':
+    'Localhost-Traffic wird günstiger berechnet: 0,3 Credits pro Seitenaufruf und 0,15 pro anderem Ereignis. Bei Pro halten getrennte Umgebungen Testaktivität aus deinen Produktionsberichten heraus.',
   'Start with your own traffic.': 'Starte mit deinem eigenen Traffic.',
   Goals: 'Ziele',
   'Error Tracking': 'Fehlertracking',
@@ -1179,8 +1179,8 @@ export const de = {
     'Jährliche Zahlung ist noch nicht verfügbar. Wähle monatliche Zahlung, um Pro zu starten.',
   'Yes. Add multiple websites and switch between them in your dashboard. Each website has its own tracking script and reports.':
     'Ja. Füge mehrere Websites hinzu und wechsle im Dashboard zwischen ihnen. Jede Website hat ihr eigenes Tracking-Skript und eigene Berichte.',
-  'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.':
-    'Ja. Erfasse eigene Ereignisse wie Registrierungen und Downloads. Trenne Produktions-, Staging- und Testzugriffe mit Umgebungen.',
+  'Yes. Record custom events such as signups and downloads. On Pro, separate production, staging, and testing traffic with environments.':
+    'Ja. Erfasse eigene Ereignisse wie Registrierungen und Downloads. Bei Pro trennst du Produktions-, Staging- und Testtraffic mit Umgebungen.',
   'You already added this domain.': 'Du hast diese Domain bereits hinzugefügt.',
   'You’re connected': 'Verbindung hergestellt',
   'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
@@ -1322,8 +1322,8 @@ export const de = {
   '1 website': '1 Website',
   'Start for free': 'Kostenlos starten',
   'Upgrade to {plan}': 'Auf {plan} upgraden',
-  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
-    'Nein. Free und Pro enthalten dieselben Berichte und Tracking-Funktionen. Pro bietet mehr Credits, mehr Websites und nutzungsbasierte Abrechnung.',
+  'No. Free and Pro include the same reports. Pro adds separate environments, more credits, more websites, and usage-based billing.':
+    'Nein. Free und Pro enthalten dieselben Berichte. Pro bietet getrennte Umgebungen, mehr Credits, mehr Websites und nutzungsbasierte Abrechnung.',
   'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
     'Free enthält eine Website. Pro enthält bis zu {websites} Websites, die sich deine monatlichen Credits teilen.',
   'What happens when I use all my credits?': 'Was passiert, wenn ich alle Credits verbraucht habe?',
@@ -1340,4 +1340,6 @@ export const de = {
   included: 'inklusive',
   '{count} extra credits · about {amount} billed at the end of the period':
     '{count} zusätzliche Credits · etwa {amount} werden am Ende des Zeitraums abgerechnet',
+  'Separate environments are available on Pro. Upgrade to add another environment.':
+    'Getrennte Umgebungen sind in Pro enthalten. Upgrade, um eine weitere Umgebung hinzuzufügen.',
 } satisfies Record<Copy, string>;

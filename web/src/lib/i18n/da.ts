@@ -113,8 +113,8 @@ export const da = {
   'Get started: add your website, paste one script, and check your first visit.':
     'Kom i gang: tilføj din hjemmeside, indsæt ét script, og se dit første besøg.',
   'Simple, transparent pricing': 'Enkel og gennemskuelig prissætning',
-  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
-    'Alle planer inkluderer alle rapporter og alle funktioner. Vælg den, der passer til din trafik.',
+  'Every plan includes every report. Pick the one that matches your traffic and websites.':
+    'Alle planer indeholder alle rapporter. Vælg den, der passer til din trafik og dine hjemmesider.',
   'For a personal site or a side project.': 'Til en personlig hjemmeside eller et sideprojekt.',
   '{count} credits per month': '{count} credits om måneden',
   'Frequently asked questions': 'Ofte stillede spørgsmål',
@@ -123,7 +123,7 @@ export const da = {
   'Date ranges': 'Datointervaller',
   'Referrers and countries': 'Henvisninger og lande',
   '{count} websites': '{count} hjemmesider',
-  'Choose by traffic, not features.': 'Vælg efter trafik, ikke funktioner.',
+  'How credits are counted': 'Sådan tælles credits',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'En sidevisning i produktion bruger 1 credit. Klik og andre hændelser bruger 0,5 credits.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
@@ -131,8 +131,8 @@ export const da = {
   'Do I need Pro to get all the reports?': 'Skal jeg have Pro for at få alle rapporter?',
   'Can I use one plan for several websites?': 'Kan jeg bruge én plan til flere hjemmesider?',
   'Does testing use my credits?': 'Bruger test mine credits?',
-  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
-    'Trafik fra localhost har en lavere sats: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. Separate miljøer holder testaktivitet ude af dine produktionsrapporter.',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. On Pro, separate environments keep test activity out of your production reports.':
+    'Localhost-trafik afregnes med en lavere sats: 0,3 credits pr. sidevisning og 0,15 pr. anden hændelse. På Pro holder separate miljøer testaktivitet ude af dine produktionsrapporter.',
   'Start with your own traffic.': 'Start med din egen trafik.',
   Goals: 'Mål',
   'Error Tracking': 'Fejlsporing',
@@ -1164,8 +1164,8 @@ export const da = {
     'Årlig betaling er endnu ikke tilgængelig. Vælg månedlig betaling for at starte Pro.',
   'Yes. Add multiple websites and switch between them in your dashboard. Each website has its own tracking script and reports.':
     'Ja. Tilføj flere websites, og skift mellem dem i dit dashboard. Hvert website har sit eget sporingsscript og sine egne rapporter.',
-  'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.':
-    'Ja. Registrer brugerdefinerede hændelser som tilmeldinger og downloads. Adskil produktions-, staging- og testtrafik med miljøer.',
+  'Yes. Record custom events such as signups and downloads. On Pro, separate production, staging, and testing traffic with environments.':
+    'Ja. Registrér brugerdefinerede hændelser som tilmeldinger og downloads. På Pro kan du adskille produktions-, staging- og testtrafik med miljøer.',
   'You already added this domain.': 'Du har allerede tilføjet dette domæne.',
   'You’re connected': 'Du er forbundet',
   'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
@@ -1307,8 +1307,8 @@ export const da = {
   '1 website': '1 hjemmeside',
   'Start for free': 'Start gratis',
   'Upgrade to {plan}': 'Opgrader til {plan}',
-  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
-    'Nej. Free og Pro har de samme rapporter og sporingsfunktioner. Pro giver flere credits, flere hjemmesider og forbrugsbaseret afregning.',
+  'No. Free and Pro include the same reports. Pro adds separate environments, more credits, more websites, and usage-based billing.':
+    'Nej. Free og Pro har de samme rapporter. Pro giver separate miljøer, flere credits, flere hjemmesider og forbrugsbaseret afregning.',
   'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
     'Free inkluderer én hjemmeside. Pro inkluderer op til {websites} hjemmesider, og dine månedlige credits deles mellem dem.',
   'What happens when I use all my credits?': 'Hvad sker der, når jeg har brugt alle mine credits?',
@@ -1325,4 +1325,6 @@ export const da = {
   included: 'inkluderet',
   '{count} extra credits · about {amount} billed at the end of the period':
     '{count} ekstra credits · ca. {amount} afregnes ved periodens udgang',
+  'Separate environments are available on Pro. Upgrade to add another environment.':
+    'Separate miljøer er inkluderet i Pro. Opgrader for at tilføje endnu et miljø.',
 } satisfies Record<Copy, string>;

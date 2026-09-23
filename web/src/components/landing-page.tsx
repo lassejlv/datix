@@ -23,7 +23,7 @@ const questions = [
   ],
   [
     'Can I track events and test environments?',
-    'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.',
+    'Yes. Record custom events such as signups and downloads. On Pro, separate production, staging, and testing traffic with environments.',
   ],
   [
     'Is there a free plan?',

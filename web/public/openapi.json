@@ -3648,6 +3648,7 @@
                         "event_limit",
                         "website_limit",
                         "website_budget",
+                        "environment_unavailable",
                         "disabled"
                       ]
                     }

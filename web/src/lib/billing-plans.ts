@@ -12,6 +12,7 @@ export const billingPlans = catalog.plans
     price: plan.price / 100,
     free: plan.price === 0,
     websites: plan.websites,
+    environments: plan.environments,
     // Polar prices overage in cents per credit; display it per 1,000 credits.
     overagePer1k: plan.overageUnitAmount === null ? null : Number(plan.overageUnitAmount) * 10,
   }));

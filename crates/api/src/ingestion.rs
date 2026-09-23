@@ -146,6 +146,11 @@ pub async fn collect(
     }) {
         return Ok(json!({"accepted":false,"reason":"website_limit"}));
     }
+    // Each website's default environment shares its ID; other environments need a plan
+    // that includes them, which also covers downgrades that leave extra environments.
+    if environment != site && !entitlement.environments {
+        return Ok(json!({"accepted":false,"reason":"environment_unavailable"}));
+    }
     let duplicate: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM ingestion_receipts WHERE environment_id=$1 AND event_id=$2)",
     )

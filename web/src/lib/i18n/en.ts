@@ -103,8 +103,8 @@ export const en = {
   'Get started: add your website, paste one script, and check your first visit.':
     'Get started: add your website, paste one script, and check your first visit.',
   'Simple, transparent pricing': 'Simple, transparent pricing',
-  'Every plan includes every report and every feature. Pick the one that matches your traffic.':
-    'Every plan includes every report and every feature. Pick the one that matches your traffic.',
+  'Every plan includes every report. Pick the one that matches your traffic and websites.':
+    'Every plan includes every report. Pick the one that matches your traffic and websites.',
   'For a personal site or a side project.': 'For a personal site or a side project.',
   '{count} credits per month': '{count} credits per month',
   'Frequently asked questions': 'Frequently asked questions',
@@ -113,7 +113,7 @@ export const en = {
   'Date ranges': 'Date ranges',
   'Referrers and countries': 'Referrers and countries',
   '{count} websites': '{count} websites',
-  'Choose by traffic, not features.': 'Choose by traffic, not features.',
+  'How credits are counted': 'How credits are counted',
   'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.':
     'A production pageview uses 1 credit. Clicks and other events use 0.5 credits.',
   'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.':
@@ -121,8 +121,8 @@ export const en = {
   'Do I need Pro to get all the reports?': 'Do I need Pro to get all the reports?',
   'Can I use one plan for several websites?': 'Can I use one plan for several websites?',
   'Does testing use my credits?': 'Does testing use my credits?',
-  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.':
-    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.',
+  'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. On Pro, separate environments keep test activity out of your production reports.':
+    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. On Pro, separate environments keep test activity out of your production reports.',
   'Start with your own traffic.': 'Start with your own traffic.',
   Goals: 'Goals',
   'Error Tracking': 'Error Tracking',
@@ -1143,8 +1143,8 @@ export const en = {
     'Yearly billing is not available yet. Choose monthly billing to start Pro.',
   'Yes. Add multiple websites and switch between them in your dashboard. Each website has its own tracking script and reports.':
     'Yes. Add multiple websites and switch between them in your dashboard. Each website has its own tracking script and reports.',
-  'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.':
-    'Yes. Record custom events such as signups and downloads. Separate production, staging, and testing traffic with environments.',
+  'Yes. Record custom events such as signups and downloads. On Pro, separate production, staging, and testing traffic with environments.':
+    'Yes. Record custom events such as signups and downloads. On Pro, separate production, staging, and testing traffic with environments.',
   'You already added this domain.': 'You already added this domain.',
   'You’re connected': 'You’re connected',
   'You’re running Datix locally. Use a hosted address in this script when connecting a public website.':
@@ -1293,8 +1293,8 @@ export const en = {
   '1 website': '1 website',
   'Start for free': 'Start for free',
   'Upgrade to {plan}': 'Upgrade to {plan}',
-  'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.':
-    'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.',
+  'No. Free and Pro include the same reports. Pro adds separate environments, more credits, more websites, and usage-based billing.':
+    'No. Free and Pro include the same reports. Pro adds separate environments, more credits, more websites, and usage-based billing.',
   'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.':
     'Free includes one website. Pro includes up to {websites} websites, and your monthly credits are shared across them.',
   'What happens when I use all my credits?': 'What happens when I use all my credits?',
@@ -1311,6 +1311,8 @@ export const en = {
   included: 'included',
   '{count} extra credits · about {amount} billed at the end of the period':
     '{count} extra credits · about {amount} billed at the end of the period',
+  'Separate environments are available on Pro. Upgrade to add another environment.':
+    'Separate environments are available on Pro. Upgrade to add another environment.',
 } as const;
 
 export type Copy = keyof typeof en;

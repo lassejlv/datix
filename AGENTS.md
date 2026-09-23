@@ -113,7 +113,8 @@ data. No DuckDB, separate analytics store, or manual partitions.
   outbox acknowledgments. Keep checkout/portal/customer sync and deletion policy.
 - Unpaid users can finish onboarding and select a plan. Onboarding completion
   does not grant subscription access to protected workspace routes.
-- Plans: Free ($0, 15k credits, 1 website) starts via Polar's free-subscription
+- Plans: Free ($0, 15k credits, 1 website, default environment only; extra
+  environments are rejected at creation and collection) starts via Polar's free-subscription
   API without checkout; Pro ($20, 50k included, metered overage, 10 websites) is
   uncapped locally because Polar bills overage. Paid selection from Free upgrades
   that subscription (`subscription_id`). Account deletion revokes free subscriptions.

@@ -344,6 +344,13 @@ async fn create_environment(
     Path(site): Path<String>,
     request: Request,
 ) -> Result<(StatusCode, Json<Value>), ApiError> {
+    if !crate::billing::require_subscription(&state, &owner.id)
+        .await?
+        .entitlement
+        .environments
+    {
+        return Err(crate::billing::environments_required());
+    }
     let environment = save_environment(
         &state,
         &owner.id,

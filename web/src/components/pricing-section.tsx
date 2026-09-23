@@ -19,7 +19,7 @@ import { ArrowRight, Check, ChevronDown } from './ui/icons';
 const pricingQuestions = [
   [
     'Do I need Pro to get all the reports?',
-    'No. Free and Pro include the same reports and tracking features. Pro adds more credits, more websites, and usage-based billing.',
+    'No. Free and Pro include the same reports. Pro adds separate environments, more credits, more websites, and usage-based billing.',
   ],
   [
     'Can I use one plan for several websites?',
@@ -31,7 +31,7 @@ const pricingQuestions = [
   ],
   [
     'Does testing use my credits?',
-    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. Separate environments keep test activity out of your production reports.',
+    'Localhost traffic uses a reduced rate: 0.3 credits per pageview and 0.15 per other event. On Pro, separate environments keep test activity out of your production reports.',
   ],
 ] as const;
 
@@ -83,7 +83,7 @@ export function PricingSection() {
           <h1 id="pricing-title">{t('Simple, transparent pricing')}</h1>
           <p className="landing-section-description">
             {t(
-              'Every plan includes every report and every feature. Pick the one that matches your traffic.',
+              'Every plan includes every report. Pick the one that matches your traffic and websites.',
             )}
           </p>
         </div>
@@ -128,7 +128,7 @@ export function PricingSection() {
                     ...billingAllowance(plan, t, number, locale),
                     t('All dashboard reports'),
                     t('Custom events'),
-                    t('Separate environments'),
+                    ...(plan.environments ? [t('Separate environments')] : []),
                     t('Cookieless by default'),
                   ].map((feature) => (
                     <li key={feature}>
@@ -146,7 +146,7 @@ export function PricingSection() {
         {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
       </p>
       <section className="pricing-event-note" aria-labelledby="usage-guide-title">
-        <h2 id="usage-guide-title">{t('Choose by traffic, not features.')}</h2>
+        <h2 id="usage-guide-title">{t('How credits are counted')}</h2>
         <p>{t('A production pageview uses 1 credit. Clicks and other events use 0.5 credits.')}</p>
         <p className="pricing-example">
           {t(

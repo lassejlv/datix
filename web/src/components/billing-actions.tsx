@@ -145,14 +145,16 @@ export function BillingActions({
                   <span className="text-sm text-secondary-ink"> / {t('month')}</span>
                 </p>
                 <ul className="mt-4 mb-5 flex flex-1 flex-col gap-1.5 text-sm">
-                  {[...billingAllowance(plan, t, number, locale), t('All dashboard reports')].map(
-                    (feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <Check size={15} className="mt-0.5 shrink-0" />
-                        {feature}
-                      </li>
-                    ),
-                  )}
+                  {[
+                    ...billingAllowance(plan, t, number, locale),
+                    t('All dashboard reports'),
+                    ...(plan.environments ? [t('Separate environments')] : []),
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check size={15} className="mt-0.5 shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
                 </ul>
                 <Button
                   className="w-full"

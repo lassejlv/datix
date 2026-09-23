@@ -487,7 +487,7 @@ pub(super) fn subscriptions(
         // Overage is billed by Polar's metered price, so those plans have no local cap.
         let cap = plan.overage_unit_amount.is_none().then_some(limit);
         result.push(json!({"id":row.id,"productId":row.product_id,"status":row.status,"currentPeriodStart":row.current_period_start,"currentPeriodEnd":row.current_period_end,"trialEnd":row.trial_end,"endsAt":row.ends_at,"cancelAtPeriodEnd":row.cancel_at_period_end,
-            "entitlements":{"name":plan.name,"eventLimit":cap,"includedEvents":limit,"overageUnitAmount":plan.overage_unit_amount,"websiteLimit":websites,"used":0,"remaining":cap,"localBaseline":0,"pending":0,"periodStart":row.current_period_start,"periodEnd":row.current_period_end}}));
+            "entitlements":{"name":plan.name,"eventLimit":cap,"includedEvents":limit,"overageUnitAmount":plan.overage_unit_amount,"environments":plan.environments,"websiteLimit":websites,"used":0,"remaining":cap,"localBaseline":0,"pending":0,"periodStart":row.current_period_start,"periodEnd":row.current_period_end}}));
     }
     Ok(result)
 }

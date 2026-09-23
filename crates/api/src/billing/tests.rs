@@ -143,6 +143,14 @@ fn overage_plans_are_uncapped_and_legacy_plans_still_grant_access() {
             .all(|p| p.interval == "month")
     );
     assert!(plan(&catalog, "free").free() && !plan(&catalog, "pro").free());
+    assert_eq!(entitlements["environments"], true);
+    assert_eq!(free[0]["entitlements"]["environments"], false);
+    assert_eq!(legacy[0]["entitlements"]["environments"], true);
+    // States stored before the flag existed belong to paid plans and keep environments.
+    let stored: Entitlement = serde_json::from_value(json!({"name":"Basic","eventLimit":100,"websiteLimit":10,"used":0,"remaining":100,"localBaseline":0,"pending":0,"periodStart":Utc::now(),"periodEnd":Utc::now()})).unwrap();
+    assert!(stored.environments);
+    let parsed: Entitlement = serde_json::from_value(free[0]["entitlements"].clone()).unwrap();
+    assert!(!parsed.environments);
 }
 
 #[derive(Clone)]

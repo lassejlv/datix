@@ -35,6 +35,9 @@ pub struct Entitlement {
     /// Metered price per event in cents when usage beyond the included credits is billed.
     #[serde(default)]
     pub overage_unit_amount: Option<String>,
+    /// Extra environments per website. States stored before this field were paid plans.
+    #[serde(default = "permitted")]
+    pub environments: bool,
     pub website_limit: Option<i64>,
     pub used: i64,
     pub remaining: Option<i64>,
@@ -42,6 +45,18 @@ pub struct Entitlement {
     pub pending: i64,
     pub period_start: DateTime<Utc>,
     pub period_end: DateTime<Utc>,
+}
+
+fn permitted() -> bool {
+    true
+}
+
+pub(crate) fn environments_required() -> ApiError {
+    ApiError::new(
+        axum::http::StatusCode::FORBIDDEN,
+        "plan_upgrade_required",
+        "Separate environments are available on Pro. Upgrade to add another environment.",
+    )
 }
 
 #[derive(Deserialize)]

@@ -48,6 +48,10 @@ describe('Polar pricing', () => {
       '10 websites',
     ]);
   });
+  test('separate environments are a Pro feature', () => {
+    expect(freePlan.environments).toBe(false);
+    expect(overagePlan.environments).toBe(true);
+  });
   test('legacy plans stay in the catalog but are never offered', () => {
     const legacy = catalog.plans.filter((plan) => plan.legacy);
 

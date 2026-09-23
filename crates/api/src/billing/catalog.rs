@@ -36,6 +36,8 @@ pub struct Plan {
     pub overage_unit_amount: Option<String>,
     /// Legacy plans still grant access to existing subscriptions but are not sold.
     pub legacy: bool,
+    /// Whether websites may use environments beyond their default one.
+    pub environments: bool,
     pub events_benefit_id: Uuid,
     pub websites_benefit_id: Uuid,
 }
