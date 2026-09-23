@@ -79,14 +79,12 @@ export function PricingSection() {
   return (
     <section id="pricing" className="landing-pricing" aria-labelledby="pricing-title">
       <header className="pricing-heading">
-        <div>
-          <h1 id="pricing-title">{t('Simple, transparent pricing')}</h1>
-          <p className="landing-section-description">
-            {t(
-              'Every plan includes every report. Pick the one that matches your traffic and websites.',
-            )}
-          </p>
-        </div>
+        <h1 id="pricing-title">{t('Simple, transparent pricing')}</h1>
+        <p className="landing-section-description">
+          {t(
+            'Every plan includes every report. Pick the one that matches your traffic and websites.',
+          )}
+        </p>
       </header>
       <div className="pricing-ledger">
         {error && <Alert className="pricing-error text-sm text-danger">{messageText(error)}</Alert>}
@@ -101,28 +99,20 @@ export function PricingSection() {
                 className={`pricing-card${popular ? ' pricing-card-pro' : ''}`}
                 aria-labelledby={`plan-${plan.id}`}
               >
+                <p
+                  className={`pricing-plan-kicker${popular ? '' : ' pricing-plan-kicker-spacer'}`}
+                  aria-hidden={popular ? undefined : true}
+                >
+                  {popular ? t('Most popular') : null}
+                </p>
                 <div className="pricing-plan-head">
                   <h2 id={`plan-${plan.id}`}>{plan.name}</h2>
-                  {popular && <span className="pricing-plan-tag">{t('Most popular')}</span>}
                 </div>
                 <p className="pricing-card-description">{description ? t(description) : null}</p>
                 <p className="pricing-amount">
-                  <span>{billingPrice(plan, locale)}</span>
-                  <span> / {t(interval)}</span>
+                  <span className="pricing-price">{billingPrice(plan, locale)}</span>
+                  <span className="pricing-interval">/ {t(interval)}</span>
                 </p>
-                <button
-                  className="pricing-select"
-                  disabled={busy === plan.id}
-                  type="button"
-                  onClick={() => void checkout(plan)}
-                >
-                  {busy === plan.id
-                    ? t('Opening checkout…')
-                    : plan.free
-                      ? t('Start for free')
-                      : t('Choose {plan}', { plan: plan.name })}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </button>
                 <ul className="pricing-card-features">
                   {[
                     ...billingAllowance(plan, t, number, locale),
@@ -137,32 +127,49 @@ export function PricingSection() {
                     </li>
                   ))}
                 </ul>
+                <button
+                  className="pricing-select"
+                  disabled={busy === plan.id}
+                  type="button"
+                  onClick={() => void checkout(plan)}
+                >
+                  {busy === plan.id
+                    ? t('Opening checkout…')
+                    : plan.free
+                      ? t('Start for free')
+                      : t('Choose {plan}', { plan: plan.name })}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
               </article>
             );
           })}
         </div>
+        <p className="pricing-currency-note">
+          {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
+        </p>
       </div>
-      <p className="pricing-currency-note">
-        {t('All prices in {currency}.', { currency: billingCurrency().toUpperCase() })}
-      </p>
       <section className="pricing-event-note" aria-labelledby="usage-guide-title">
         <h2 id="usage-guide-title">{t('How credits are counted')}</h2>
-        <p>{t('A production pageview uses 1 credit. Clicks and other events use 0.5 credits.')}</p>
-        <p className="pricing-example">
-          {t(
-            'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.',
-            {
-              count: number(freePlan.events),
-              pageviews: number(freePlan.events * 0.8),
-              events: number(freePlan.events * 0.4),
-            },
-          )}
-        </p>
-        <p className="pricing-localhost-note">
-          {t(
-            'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
-          )}
-        </p>
+        <div className="pricing-rate-list">
+          <p>
+            {t('A production pageview uses 1 credit. Clicks and other events use 0.5 credits.')}
+          </p>
+          <p className="pricing-example">
+            {t(
+              'Free covers {count} pageviews, or {pageviews} pageviews + {events} other events per month.',
+              {
+                count: number(freePlan.events),
+                pageviews: number(freePlan.events * 0.8),
+                events: number(freePlan.events * 0.4),
+              },
+            )}
+          </p>
+          <p className="pricing-localhost-note">
+            {t(
+              'On localhost: 0.3 credits per pageview and 0.15 per other event. Engagement time is free.',
+            )}
+          </p>
+        </div>
       </section>
       <section className="pricing-questions" aria-labelledby="pricing-questions-title">
         <h2 id="pricing-questions-title">{t('Frequently asked questions')}</h2>
